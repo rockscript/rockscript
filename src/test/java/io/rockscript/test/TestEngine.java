@@ -16,7 +16,6 @@
 
 package io.rockscript.test;
 
-import be.tombaeyens.script.*;
 import io.rockscript.*;
 import io.rockscript.engine.EngineImpl;
 import io.rockscript.engine.ScriptExecutionIdGenerator;

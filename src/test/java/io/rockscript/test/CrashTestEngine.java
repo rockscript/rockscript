@@ -15,7 +15,6 @@
  */
 package io.rockscript.test;
 
-import be.tombaeyens.script.*;
 import io.rockscript.engine.Event;
 import io.rockscript.engine.EventListener;
 
