@@ -1,12 +1,23 @@
 target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
+bin/
+tmp/
+.idea/
+.settings/
+.plugins/
+.mylyn/
+.classpath
+.project
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+*.iml
+*.class
+*.jar
+*.war
+*.rar
+*.tar
+*.zip
+*.log
 
-# Avoid ignoring Maven wrapper jar file (.jar files are usually ignored)
-!/.mvn/wrapper/maven-wrapper.jar
+
