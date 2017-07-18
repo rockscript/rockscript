@@ -41,7 +41,7 @@ public class HttpWorkerTest {
     public void actionDone(ActionOutput actionOutput) {
       // TODO engine.endWaitingExecutionId needs to be refactored
       // to actionDone and take an ActionOutput as an argument
-      engine.endWaitingExecutionId(
+      engine.endWaitingAction(
         actionOutput.scriptExecutionId,
         actionOutput.executionId,
         actionOutput.result);
@@ -100,7 +100,7 @@ public class HttpWorkerTest {
     assertNotNull(actionInput.scriptExecutionId);
     assertNotNull(actionInput.executionId);
 
-    Map<String,Object> actionInputArgs = (Map<String, Object>) actionInput.args;
+    Map<String,Object> actionInputArgs = (Map<String, Object>) actionInput.args.get(0);
     assertEquals("http://rockscript.io/interesting/data", actionInputArgs.get("url"));
 
     Map<String,Object> result = new HashMap<>();

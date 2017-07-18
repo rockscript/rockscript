@@ -26,14 +26,4 @@ public class IdentifierExpressionEvent extends Event<IdentifierExpressionExecuti
   public EventJson toJson() {
     return new IdentifierExpressionEventJson(this);
   }
-
-  @Override
-  public void apply() {
-    IdentifierExpression identifierExpression = execution.getOperation();
-    String variableName = identifierExpression.getIdentifier();
-    Execution parent = execution.getParent();
-    Variable variable = parent.getVariable(variableName);
-    Object value = variable!=null ? variable.getValue() : null;
-    execution.setResult(value);
-  }
 }

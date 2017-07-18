@@ -26,9 +26,9 @@ public interface Engine {
 
   String startScriptExecution(String scriptId);
 
-  void endWaitingExecutionId(String scriptExecutionId, String waitingExecutionId);
+  void endWaitingAction(String scriptExecutionId, String waitingExecutionId);
 
-  void endWaitingExecutionId(String scriptExecutionId, String waitingExecutionId, Object result);
+  void endWaitingAction(String scriptExecutionId, String waitingExecutionId, Object result);
 
   ServiceLocator getServiceLocator();
 

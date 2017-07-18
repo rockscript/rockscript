@@ -16,7 +16,7 @@
 
 package io.rockscript.engine;
 
-public class ActionEndedEvent extends RecoverableEvent<ArgumentsExpressionExecution> {
+public class ActionEndedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
 
   Object result;
 
@@ -26,18 +26,12 @@ public class ActionEndedEvent extends RecoverableEvent<ArgumentsExpressionExecut
   }
 
   @Override
-  public void proceed() {
-    apply();
-    execution.proceedActionEnded();
+  public void execute() {
+    execution.endActionExecute(result);
   }
 
   @Override
   public EventJson toJson() {
     return new ActionEndedEventJson(this);
-  }
-
-  @Override
-  public void apply() {
-    execution.setResult(result);
   }
 }

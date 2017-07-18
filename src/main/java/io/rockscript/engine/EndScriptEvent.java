@@ -25,7 +25,4 @@ public class EndScriptEvent extends Event<ScriptExecution> {
     return new EndScriptEventJson(this);
   }
 
-  @Override
-  public void apply() {
-  }
 }

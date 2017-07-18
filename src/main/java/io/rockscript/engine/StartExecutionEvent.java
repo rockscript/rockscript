@@ -18,9 +18,8 @@ package io.rockscript.engine;
 
 public class StartExecutionEvent extends Event<Execution> {
 
-  String childExecutableId;
+  String childOperationId;
   Operation childOperation;
-  Execution child;
 
   public StartExecutionEvent(Execution parent, Operation childOperation) {
     this(parent, childOperation.getId());
@@ -29,25 +28,11 @@ public class StartExecutionEvent extends Event<Execution> {
 
   public StartExecutionEvent(Execution parent, String childOperationId) {
     super(parent);
-    this.childExecutableId = childOperationId;
+    this.childOperationId = childOperationId;
   }
 
   @Override
   public EventJson toJson() {
     return new StartExecutionEventJson(this);
-  }
-
-  @Override
-  public void apply() {
-    if (childOperation==null) {
-      Script script = execution.getScript();
-      childOperation = script.findExecutable(childExecutableId);
-      ScriptException.throwIfNull(childOperation, "Couldn't find executable %s in script %s", childExecutableId, script.getId());
-    }
-    child = execution.createChild(childOperation);
-  }
-
-  public Execution getChild() {
-    return child;
   }
 }

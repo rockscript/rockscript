@@ -29,6 +29,4 @@ public abstract class Event<T extends Execution> {
   }
 
   public abstract EventJson toJson();
-
-  public abstract void apply();
 }

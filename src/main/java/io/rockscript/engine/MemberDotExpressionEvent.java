@@ -27,8 +27,4 @@ public class MemberDotExpressionEvent extends Event<MemberDotExpressionExecution
     return new MemberDotExpressionEventJson(this);
   }
 
-  @Override
-  public void apply() {
-    execution.applyObjectDereference();
-  }
 }

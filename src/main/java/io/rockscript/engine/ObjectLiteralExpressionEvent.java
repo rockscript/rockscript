@@ -26,9 +26,4 @@ public class ObjectLiteralExpressionEvent extends Event<ObjectLiteralExpressionE
   public EventJson toJson() {
     return new ObjectLiteralExpressionEventJson(this);
   }
-
-  @Override
-  public void apply() {
-    execution.applyResult();
-  }
 }

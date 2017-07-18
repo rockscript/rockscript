@@ -16,7 +16,7 @@
 
 package io.rockscript.engine;
 
-public abstract class RecoverableEventJson<T extends RecoverableEvent> extends EventJson<T> {
+public abstract class RecoverableEventJson<T extends ExecutableEvent> extends EventJson<T> {
 
   public RecoverableEventJson(T recoverableEvent) {
     super(recoverableEvent);

@@ -15,7 +15,6 @@
  */
 package io.rockscript.engine;
 
-
 public class VariableDeclarationExecution extends Execution<VariableDeclaration> {
 
   public VariableDeclarationExecution(VariableDeclaration operation, Execution parent) {
@@ -38,7 +37,21 @@ public class VariableDeclarationExecution extends Execution<VariableDeclaration>
   }
 
   public void done() {
-    dispatchAndApply(new VariableCreatedEvent(this));
+    dispatch(new VariableCreatedEvent(this));
+    createVariable();
     parent.childEnded(this);
+  }
+
+  private void createVariable() {
+    VariableDeclaration executable = getOperation();
+    String variableName = executable.getVariableName();
+    Variable variable = parent.createVariable(variableName);
+    Object initialValue = getInitialValue();
+    variable.setValue(initialValue);
+  }
+
+  private Object getInitialValue() {
+    Execution child = children!=null && !children.isEmpty() ? children.get(0) : null;
+    return child!=null ? child.getResult() : null;
   }
 }

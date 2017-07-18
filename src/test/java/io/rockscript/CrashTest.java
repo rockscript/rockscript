@@ -22,10 +22,12 @@ import java.util.List;
 import io.rockscript.engine.*;
 import io.rockscript.test.*;
 import io.rockscript.test.CrashTestEngine.CrashEventListener;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Ignore
 public class CrashTest {
 
   static Logger log = LoggerFactory.getLogger(CrashTest.class);

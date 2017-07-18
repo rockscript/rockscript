@@ -15,7 +15,7 @@
  */
 package io.rockscript.engine;
 
-public class StartScriptEvent extends RecoverableEvent<ScriptExecution> {
+public class StartScriptEvent extends ExecutableEvent<ScriptExecution> {
 
   public StartScriptEvent(ScriptExecution scriptExecution) {
     super(scriptExecution);
@@ -25,11 +25,8 @@ public class StartScriptEvent extends RecoverableEvent<ScriptExecution> {
     return new StartScriptEventJson(this);
   }
 
-  public void proceed() {
-    execution.executeNextStatement();
+  public void execute() {
+    execution.startExecute();
   }
 
-  @Override
-  public void apply() {
-  }
 }

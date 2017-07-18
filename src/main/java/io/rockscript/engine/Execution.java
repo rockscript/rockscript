@@ -51,10 +51,15 @@ public abstract class Execution<T extends Operation> {
   public void childEnded(Execution child) {
   }
 
-  protected void startChild(Operation operation) {
-    StartExecutionEvent event = new StartExecutionEvent(this, operation);
-    dispatchAndApply(event);
-    Execution child = event.getChild();
+  protected void startChild(Operation childOperation) {
+    dispatch(new StartExecutionEvent(this, childOperation));
+    if (childOperation==null) {
+      Script script = getScript();
+      String childOperationId = childOperation.getId();
+      childOperation = script.findExecutable(childOperationId);
+      ScriptException.throwIfNull(childOperation, "Couldn't find executable %s in script %s", childOperationId, script.getId());
+    }
+    Execution child = createChild(childOperation);
     child.start();
   }
 
@@ -123,12 +128,13 @@ public abstract class Execution<T extends Operation> {
     return null;
   }
 
-  protected void dispatchAndApply(Event event) {
-    parent.dispatchAndApply(event);
+  protected void dispatch(Event event) {
+    parent.dispatch(event);
   }
 
-  protected void dispatchAndProceed(RecoverableEvent event){
-    parent.dispatchAndProceed(event);
+  protected void dispatchAndExecute(ExecutableEvent event) {
+    dispatch(event);
+    event.execute();
   }
 
   public String getId() {
