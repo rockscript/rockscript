@@ -72,7 +72,7 @@ Consider web site user registration, where someone first enters an email address
 Your have to wait for the person to confirm the email address via a confirmation link.
 A snippet of the script could look like this:
 
-```
+```javascript
 emailService.send({
   to: [registrant.email],
   subject: 'Confirm registration',
