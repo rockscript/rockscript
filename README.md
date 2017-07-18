@@ -76,7 +76,7 @@ A snippet of the script could look like this:
 emailService.send({
   to: [registrant.email],
   subject: 'Confirm registration',
-  body: 'Please click this link http://...'+registrant.code'
+  body: 'Please click this link http://...'+registrant.code
 });
 
 timeout('24h') {
