@@ -54,29 +54,38 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   private void invokeSystemImportFunction() {
     // import functions have to be re-executed when the events
     // are applied because they can return functions
-    dispatchAndApply(new ImportFunctionEvent(this));
-    end();
+    dispatch(new ImportFunctionEvent(this));
+    ActionResponse actionResponse = startActionInvoke();
+    Object importedObject = actionResponse.getResult();
+    endActionExecute(importedObject);
   }
 
   private void startAction() {
-    dispatchAndProceed(new ActionStartEvent(this));
+    dispatchAndExecute(new ActionStartEvent(this));
   }
 
-  public void proceedStartAction() {
-    ActionResponse actionResponse = invokeAction();
+  public void startActionExecute() {
+    ActionResponse actionResponse = startActionInvoke();
     if (actionResponse.isEnded()) {
-      dispatchAndProceed(new ActionEndedEvent(this, actionResponse.getResult()));
+      endAction(actionResponse.getResult());
 
     } else {
-      dispatchAndApply(new ActionWaitEvent(this));
+      dispatch(new ActionWaitEvent(this));
     }
   }
 
-  public void proceedActionEnded() {
+  public void endAction(Object result) {
+    dispatchAndExecute(new ActionEndedEvent(this, result));
+    // Continues at this.endActionExecute()
+  }
+
+  // Continuation from startActionExecute -> ActionEndedEvent
+  void endActionExecute(Object result) {
+    setResult(result);
     end();
   }
 
-  public ActionResponse invokeAction() {
+  public ActionResponse startActionInvoke() {
     Execution actionExecution = children.get(0);
     Action action = (Action) actionExecution.getResult();
     List<Object> args = collectArgs();
@@ -92,11 +101,4 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     return args;
   }
 
-  public void functionEnded() {
-    functionEnded(null);
-  }
-
-  public void functionEnded(Object result) {
-    dispatchAndProceed(new ActionEndedEvent(this, result));
-  }
 }

@@ -26,7 +26,8 @@ public class ObjectLiteralExpressionExecution extends BlockExecution<ObjectLiter
 
   @Override
   protected void end() {
-    dispatchAndApply(new ObjectLiteralExpressionEvent(this));
+    dispatch(new ObjectLiteralExpressionEvent(this));
+    applyResult();
     super.end();
   }
 

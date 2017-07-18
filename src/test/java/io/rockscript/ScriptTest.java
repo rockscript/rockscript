@@ -71,7 +71,7 @@ public class ScriptTest {
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
     assertNotNull(waitingExecutionId);
 
-    engine.endWaitingExecutionId(scriptExecutionId, waitingExecutionId);
+    engine.endWaitingAction(scriptExecutionId, waitingExecutionId);
 
     assertEquals("Execution was here", synchronousCapturedData.get(2));
     assertEquals("hello", synchronousCapturedData.get(3));
@@ -82,8 +82,6 @@ public class ScriptTest {
   public void testSerialization() {
     String scriptId = engine.deployScript(
       "var helloService = system.import('example.com/hello'); \n" +
-        "var message = 5; \n" +
-        "helloService.aSyncFunction(message); \n"+
         "helloService.anAsyncFunction(); \n" +
         "helloService.aSyncFunction('hello');");
 
@@ -106,8 +104,10 @@ public class ScriptTest {
 
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
 
-    scriptExecution = engine.endWaitingExecutionImpl(scriptExecutionId, waitingExecutionId, null);
+    scriptExecution = engine.endWaitingActionImpl(scriptExecutionId, waitingExecutionId, null);
 
+    System.err.println();
+    System.err.println();
     reloadedScriptExecution = engine
       .getServiceLocator()
       .getEventStore()

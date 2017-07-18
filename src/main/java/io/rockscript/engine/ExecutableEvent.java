@@ -16,11 +16,11 @@
 
 package io.rockscript.engine;
 
-public abstract class RecoverableEvent<T extends Execution> extends Event<T> {
+public abstract class ExecutableEvent<T extends Execution> extends Event<T> {
 
-  public RecoverableEvent(T execution) {
+  public ExecutableEvent(T execution) {
     super(execution);
   }
 
-  public abstract void proceed();
+  public abstract void execute();
 }

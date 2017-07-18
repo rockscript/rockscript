@@ -26,10 +26,4 @@ public class ImportFunctionEvent extends Event<ArgumentsExpressionExecution> {
   public EventJson toJson() {
     return new ImportFunctionEventJson(this);
   }
-
-  @Override
-  public void apply() {
-    ActionResponse actionResponse = execution.invokeAction();
-    execution.setResult(actionResponse.getResult());
-  }
 }

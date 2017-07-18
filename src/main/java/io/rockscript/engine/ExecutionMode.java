@@ -12,18 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
-
 package io.rockscript.engine;
 
-public class VariableCreatedEvent extends Event<VariableDeclarationExecution> {
+public enum ExecutionMode {
 
-  public VariableCreatedEvent(VariableDeclarationExecution execution) {
-    super(execution);
-  }
+  REBUILDING,
 
-  @Override
-  public EventJson toJson() {
-    return new VariableCreatedEventJson(this);
-  }
+  EXECUTING
 }

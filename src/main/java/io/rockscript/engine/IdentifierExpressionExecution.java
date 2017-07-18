@@ -24,7 +24,15 @@ public class IdentifierExpressionExecution extends Execution<IdentifierExpressio
 
   @Override
   public void start() {
-    dispatchAndApply(new IdentifierExpressionEvent(this));
+    dispatch(new IdentifierExpressionEvent(this));
+    Object identifierValue = getIdentifierValue();
+    setResult(identifierValue);
     end();
+  }
+
+  public Object getIdentifierValue() {
+    String variableName = operation.getIdentifier();
+    Variable variable = parent.getVariable(variableName);
+    return variable!=null ? variable.getValue() : null;
   }
 }

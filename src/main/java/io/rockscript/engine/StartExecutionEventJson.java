@@ -22,7 +22,7 @@ public class StartExecutionEventJson extends EventJson {
 
   public StartExecutionEventJson(StartExecutionEvent startExecutionEvent) {
     super(startExecutionEvent);
-    this.childOperationId = startExecutionEvent.childExecutableId;
+    this.childOperationId = startExecutionEvent.childOperationId;
   }
 
   @Override

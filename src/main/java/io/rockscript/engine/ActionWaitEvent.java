@@ -28,8 +28,4 @@ public class ActionWaitEvent extends Event<ArgumentsExpressionExecution> {
   public EventJson toJson() {
     return new ActionWaitEventJson(this);
   }
-
-  @Override
-  public void apply() {
-  }
 }

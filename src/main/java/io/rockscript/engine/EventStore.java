@@ -34,6 +34,7 @@ public class EventStore implements EventListener {
   static Gson gson = new GsonBuilder()
     .registerTypeAdapterFactory(new PolymorphicTypeAdapterFactory()
       .typeName(new TypeToken<StartScriptEventJson>(){},              "startScript")
+      .typeName(new TypeToken<EndScriptEventJson>(){},                "endScript")
       .typeName(new TypeToken<StartExecutionEventJson>(){},           "startExecution")
       .typeName(new TypeToken<VariableCreatedEventJson>(){},          "variableCreated")
       .typeName(new TypeToken<ImportFunctionEventJson>(){},           "importInvocation")
@@ -73,9 +74,7 @@ public class EventStore implements EventListener {
   public ScriptExecution loadScriptExecution(String scriptExecutionId) {
     List<EventJson> eventJsons = findEventsByScriptExecutionId(scriptExecutionId);
 
-    ScriptExecution scriptExecution = recreateScriptExecution(eventJsons, scriptExecutionId);
-
-    return scriptExecution;
+    return recreateScriptExecution(eventJsons, scriptExecutionId);
   }
 
   private ScriptExecution recreateScriptExecution(List<EventJson> eventJsons, String scriptExecutionId) {
@@ -87,13 +86,21 @@ public class EventStore implements EventListener {
     ScriptException.throwIfNull(scriptId, "Script not found for scriptId: %s", scriptId);
 
     ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, serviceLocator, script);
+    scriptExecution.executionMode = ExecutionMode.REBUILDING;
 
     for (EventJson eventJson: eventJsons) {
-      Execution execution = scriptExecution.findExecutionRecursive(eventJson.executionId);
-      Event event = eventJson.toEvent(execution);
-      log.debug("applying: "+gson.toJson(eventJson));
-      event.apply();
+      if (isExecutable(eventJson)) {
+        Execution execution = scriptExecution.findExecutionRecursive(eventJson.executionId);
+        ExecutableEvent event = (ExecutableEvent) eventJson.toEvent(execution);
+        log.debug("reexecuting: "+gson.toJson(eventJson));
+        event.execute();
+      } else {
+        log.debug("skipping...: "+gson.toJson(eventJson));
+      }
     }
+
+    scriptExecution.executionMode = ExecutionMode.EXECUTING;
+
     return scriptExecution;
   }
 
@@ -116,8 +123,8 @@ public class EventStore implements EventListener {
       ScriptExecution scriptExecution = recreateScriptExecution(scriptExecutionEvents, scriptExecutionId);
       EventJson recoverableEventJson = scriptExecutionEvents.get(scriptExecutionEvents.size()-1);
       Execution execution = scriptExecution.findExecutionRecursive(recoverableEventJson.getExecutionId());
-      RecoverableEvent recoverableEvent = (RecoverableEvent) recoverableEventJson.toEvent(execution);
-      recoverableEvent.proceed();
+      ExecutableEvent executableEvent = (ExecutableEvent) recoverableEventJson.toEvent(execution);
+      executableEvent.execute();
       scriptExecutions.add(scriptExecution);
     }
     return scriptExecutions;
@@ -147,10 +154,26 @@ public class EventStore implements EventListener {
     for (String scriptExecutionId: new ArrayList<>(groupedEvents.keySet())) {
       List<EventJson> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
       EventJson lastEventJson = scriptExecutionEvents.get(scriptExecutionEvents.size()-1);
-      if (lastEventJson instanceof ActionWaitEventJson) {
+      if (isUnlocking(lastEventJson)) {
         groupedEvents.remove(scriptExecutionId);
       }
     }
     return groupedEvents;
+  }
+
+  private boolean isExecutable(EventJson eventJson) {
+    return eventJson!=null
+      && ( eventJson instanceof StartScriptEventJson
+           || eventJson instanceof ActionEndedEventJson);
+  }
+
+  private boolean isUnlocking(EventJson lastEventJson) {
+    return lastEventJson!=null
+      && ( lastEventJson instanceof ActionWaitEventJson
+           || lastEventJson instanceof EndScriptEventJson);
+  }
+
+  public String toJson(Event event) {
+    return event!=null ? gson.toJson(event.toJson()) : "null";
   }
 }

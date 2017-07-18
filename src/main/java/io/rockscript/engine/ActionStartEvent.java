@@ -16,7 +16,7 @@
 
 package io.rockscript.engine;
 
-public class ActionStartEvent extends RecoverableEvent<ArgumentsExpressionExecution> {
+public class ActionStartEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
 
   public ActionStartEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
     super(argumentsExpressionExecution);
@@ -28,11 +28,9 @@ public class ActionStartEvent extends RecoverableEvent<ArgumentsExpressionExecut
   }
 
   @Override
-  public void apply() {
-  }
-
-  @Override
-  public void proceed() {
-    execution.proceedStartAction();
+  public void execute() {
+    if (execution.getScriptExecution().executionMode!=ExecutionMode.REBUILDING) {
+      execution.startActionExecute();
+    }
   }
 }

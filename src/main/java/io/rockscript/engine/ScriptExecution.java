@@ -16,18 +16,24 @@
 package io.rockscript.engine;
 
 import io.rockscript.ServiceLocator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** The runtime state of a script execution, aka 'an execution'. */
 public class ScriptExecution extends BlockExecution<Script> {
 
+  static Logger log = LoggerFactory.getLogger(ScriptExecution.class);
+
   ServiceLocator serviceLocator;
   EventListener eventListener;
   int nextInternalExecutionId = 1;
+  ExecutionMode executionMode;
 
   public ScriptExecution(String scriptExecutionId, ServiceLocator serviceLocator, Script script) {
     super(scriptExecutionId, script, null);
     this.serviceLocator = serviceLocator;
     this.eventListener = serviceLocator.getEventListener();
+    this.executionMode = ExecutionMode.EXECUTING;
     initializeSystemVariable(serviceLocator);
   }
 
@@ -44,29 +50,26 @@ public class ScriptExecution extends BlockExecution<Script> {
 
   @Override
   public void start() {
-    dispatchAndProceed(new StartScriptEvent(this));
+    dispatchAndExecute(new StartScriptEvent(this));
+    // Executing the event will continue with this.startExecute()
+  }
+
+  // Continuation of start
+  void startExecute() {
+    executeNextStatement();
   }
 
   @Override
   protected void end() {
-    dispatchAndApply(new EndScriptEvent(this));
+    dispatch(new EndScriptEvent(this));
   }
 
   @Override
-  protected void dispatchAndApply(Event event) {
-    dispatch(event);
-    event.apply();
-  }
-
-  @Override
-  protected void dispatchAndProceed(RecoverableEvent event) {
-    dispatch(event);
-    event.proceed();
-  }
-
-  private void dispatch(Event event) {
-    if (eventListener!=null) {
+  protected void dispatch(Event event) {
+    if (eventListener!=null && this.executionMode==ExecutionMode.EXECUTING) {
       eventListener.handle(event);
+    } else {
+      log.debug("swallowing: "+serviceLocator.getEventStore().toJson(event));
     }
   }
 
@@ -107,6 +110,6 @@ public class ScriptExecution extends BlockExecution<Script> {
   public void endFunctionInvocationExecution(String executionId, Object result) {
     ArgumentsExpressionExecution argumentsExpressionExecution = (ArgumentsExpressionExecution) findExecutionRecursive(executionId);
     ScriptException.throwIfNull(argumentsExpressionExecution, "Couldn't find function invocation execution %s in script execution %s", executionId, id);
-    argumentsExpressionExecution.functionEnded(result);
+    argumentsExpressionExecution.endActionExecute(result);
   }
 }

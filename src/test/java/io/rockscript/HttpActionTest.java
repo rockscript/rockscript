@@ -58,7 +58,7 @@ public class HttpActionTest {
           ArgumentsExpressionExecution argumentsExpressionExecution = input.getArgumentsExpressionExecution();
           String httpActionId = argumentsExpressionExecution.getId();
           String scriptExecutionId = argumentsExpressionExecution.getScriptExecution().getId();
-          engine.endWaitingExecutionId(scriptExecutionId, httpActionId, new HttpResponseJson(response));
+          engine.endWaitingAction(scriptExecutionId, httpActionId, new HttpResponseJson(response));
           return response;
         });
     return ActionResponse.waitForFunctionToCompleteAsync();
