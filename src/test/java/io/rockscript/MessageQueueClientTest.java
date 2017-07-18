@@ -10,7 +10,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 /**
- * Pre-requisites: install and run RabbitMQ on the default server (localhost) and port.
+ * Pre-requisites: install (brew install rabbitmq) and run RabbitMQ on the default server and port (rabbitmq-server).
  */
 public class MessageQueueClientTest {
 
