@@ -12,6 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 package io.rockscript;
 
@@ -23,7 +24,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.rockscript.engine.ActionResponse.endFunction;
 import static org.junit.Assert.assertEquals;
 
 public class ObjectLiteralExpressionTest {

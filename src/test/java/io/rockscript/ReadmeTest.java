@@ -12,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
-
 package io.rockscript;
 
 import java.io.File;
@@ -21,8 +21,6 @@ import java.io.File;
 import io.rockscript.engine.*;
 import io.rockscript.test.TestEngine;
 import org.junit.Before;
-
-import static io.rockscript.engine.ActionResponse.endFunction;
 
 /**
  * Tests to run sample code used in the README.
