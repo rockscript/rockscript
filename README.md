@@ -76,7 +76,7 @@ A snippet of the script could look like this:
 emailService.send({
   to: [registrant.email],
   subject: 'Confirm registration',
-  body: 'Please click this link http://...'+registrant.code
+  body: 'Please click this link http://...' + registrant.code
 });
 
 timeout('24h') {
@@ -104,7 +104,7 @@ var crm = system.import('example.com/crm');
 var emailAddress = execution.input;
 
 var emailResponse = http.post({
-  url: 'http://'+server+'/email/send',
+  url: 'http://' + server + '/email/send',
   headers: {
     'Authorization': oauth.getAccessToken('Email service')
   },
@@ -414,6 +414,6 @@ We realized that developers do not need the visual diagram representation.
 
 Writing and maintaining workflow scripts becomes a lot easier when offering the underlying features of workflow systems as a scripting language.
 
-# License
+## License
 
 RockScript is licensed under the [Apache License 2.0](LICENSE).
