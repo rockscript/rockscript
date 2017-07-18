@@ -37,13 +37,12 @@ public class EventStore implements EventListener {
       .typeName(new TypeToken<StartExecutionEventJson>(){},           "startExecution")
       .typeName(new TypeToken<VariableCreatedEventJson>(){},          "variableCreated")
       .typeName(new TypeToken<ImportFunctionEventJson>(){},           "importInvocation")
-      .typeName(new TypeToken<ExternalFunctionStartEventJson>(){},    "externalFunctionStart")
-      .typeName(new TypeToken<ExternalFunctionWaitEventJson>(){},     "externalFunctionWait")
-      .typeName(new TypeToken<ExternalFunctionEndedEventJson>(){},    "externalFunctionEnd")
+      .typeName(new TypeToken<ActionStartEventJson>(){},              "actionStart")
+      .typeName(new TypeToken<ActionWaitEventJson>(){},               "actionWait")
+      .typeName(new TypeToken<ActionEndedEventJson>(){},              "actionEnd")
       .typeName(new TypeToken<IdentifierExpressionEventJson>(){},     "variableExpression")
       .typeName(new TypeToken<MemberDotExpressionEventJson>(){},      "memberDot")
       .typeName(new TypeToken<ObjectLiteralExpressionEventJson>(){},  "objectLiteralExpression")
-
     )
 
     // .setPrettyPrinting()
@@ -148,7 +147,7 @@ public class EventStore implements EventListener {
     for (String scriptExecutionId: new ArrayList<>(groupedEvents.keySet())) {
       List<EventJson> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
       EventJson lastEventJson = scriptExecutionEvents.get(scriptExecutionEvents.size()-1);
-      if (lastEventJson instanceof ExternalFunctionWaitEventJson) {
+      if (lastEventJson instanceof ActionWaitEventJson) {
         groupedEvents.remove(scriptExecutionId);
       }
     }

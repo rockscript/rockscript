@@ -26,7 +26,7 @@ public class ActionWaitEvent extends Event<ArgumentsExpressionExecution> {
 
   @Override
   public EventJson toJson() {
-    return new ExternalFunctionWaitEventJson(this);
+    return new ActionWaitEventJson(this);
   }
 
   @Override

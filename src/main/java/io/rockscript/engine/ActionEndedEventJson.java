@@ -15,11 +15,11 @@
  */
 package io.rockscript.engine;
 
-public class ExternalFunctionEndedEventJson extends RecoverableEventJson<ActionEndedEvent> {
+public class ActionEndedEventJson extends RecoverableEventJson<ActionEndedEvent> {
 
   Object result;
 
-  public ExternalFunctionEndedEventJson(ActionEndedEvent externalFunctionEndedEvent) {
+  public ActionEndedEventJson(ActionEndedEvent externalFunctionEndedEvent) {
     super(externalFunctionEndedEvent);
     result = externalFunctionEndedEvent.result;
   }

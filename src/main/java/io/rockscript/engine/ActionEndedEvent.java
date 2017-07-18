@@ -33,7 +33,7 @@ public class ActionEndedEvent extends RecoverableEvent<ArgumentsExpressionExecut
 
   @Override
   public EventJson toJson() {
-    return new ExternalFunctionEndedEventJson(this);
+    return new ActionEndedEventJson(this);
   }
 
   @Override

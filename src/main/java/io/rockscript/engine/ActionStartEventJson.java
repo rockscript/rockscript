@@ -16,14 +16,14 @@
 
 package io.rockscript.engine;
 
-public class ExternalFunctionWaitEventJson extends EventJson {
+public class ActionStartEventJson extends RecoverableEventJson<ActionStartEvent> {
 
-  public ExternalFunctionWaitEventJson(ActionWaitEvent actionWaitEvent) {
-    super(actionWaitEvent);
+  public ActionStartEventJson(ActionStartEvent externalFunctionStartEvent) {
+    super(externalFunctionStartEvent);
   }
 
   @Override
-  public Event toEvent(Execution execution) {
-    return new ActionWaitEvent((ArgumentsExpressionExecution) execution);
+  public ActionStartEvent toEvent(Execution execution) {
+    return new ActionStartEvent((ArgumentsExpressionExecution) execution);
   }
 }

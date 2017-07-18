@@ -24,7 +24,7 @@ public class ActionStartEvent extends RecoverableEvent<ArgumentsExpressionExecut
 
   @Override
   public EventJson toJson() {
-    return new ExternalFunctionStartEventJson(this);
+    return new ActionStartEventJson(this);
   }
 
   @Override
