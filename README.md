@@ -95,7 +95,7 @@ Consider a user registration user interface for new employees, with a form for e
 The user interface submits a user registration form to the back-end services, which execute a user registration script.
 Similarly, an identity service API could also trigger user creation by running the same script.
 
-```JavaScript
+```javascript
 var http = system.import('tbn.io/core/http');
 var oauth = system.import('tbn.io/core/oauth');
 var accounts = system.import('example.com/accounts');
@@ -357,7 +357,7 @@ During the wait state, the execution state is persistent so either no thread or 
 In asynchronous architectures, you are forced to work with functions or lamdas as callbacks.
 It’s easy to lose the overview. For example:
 
-```
+```javascript
 function sendUpdateRequest(payload) {
   messageQueue.send('someQueue', payload);
 }
@@ -373,7 +373,7 @@ Scripts allow you to write that overview in a much more readable way.
 
 Write:
 
-```
+```javascript
 var emailAccount = userAccountService.createEmailAddress(userDetails);
 
 var teamChatAccount = teamChatService.createAccount(emailAccount.emailAddress);
@@ -381,7 +381,7 @@ var teamChatAccount = teamChatService.createAccount(emailAccount.emailAddress);
 
 Instead of writing:
 
-```
+```javascript
 userAccountService.createEmailAddress(userDetails).done(function(emailAccount) {
   var teamChatAccount = teamChatService.createAccount(emailAccount.emailAddress);
 });
