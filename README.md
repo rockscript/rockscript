@@ -2,7 +2,7 @@
 
 ## What it is
 
-A scripting language and server runtime for building event based microservices.
+A scripting language and server runtime for orchestrating microservices.
 
 <!--
 TODO identify remarkable aspect: inspired by the TED podcast about [How things spread](http://www.npr.org/programs/ted-radio-hour/468877892/how-things-spread).
