@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.rockscript.engine;
 
-public class ActionWaitEvent extends Event<ArgumentsExpressionExecution> {
+public class ScriptStartedEvent extends ExecutableEvent<ScriptExecution> {
 
-  ArgumentsExpressionExecution argumentsExpressionExecution;
-
-  public ActionWaitEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
-    super(argumentsExpressionExecution);
+  public ScriptStartedEvent(ScriptExecution scriptExecution) {
+    super(scriptExecution);
   }
 
-  @Override
   public EventJson toJson() {
-    return new ActionWaitEventJson(this);
+    return new ScriptStartedEventJson(this);
   }
+
+  public void execute() {
+    execution.startExecute();
+  }
+
 }

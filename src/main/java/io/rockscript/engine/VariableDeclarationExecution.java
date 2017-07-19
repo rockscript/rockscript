@@ -37,17 +37,18 @@ public class VariableDeclarationExecution extends Execution<VariableDeclaration>
   }
 
   public void done() {
-    dispatch(new VariableCreatedEvent(this));
-    createVariable();
+    Variable variable = createVariable();
+    dispatch(new VariableCreatedEvent(this, variable.getValue()));
     parent.childEnded(this);
   }
 
-  private void createVariable() {
+  private Variable createVariable() {
     VariableDeclaration executable = getOperation();
     String variableName = executable.getVariableName();
     Variable variable = parent.createVariable(variableName);
     Object initialValue = getInitialValue();
     variable.setValue(initialValue);
+    return variable;
   }
 
   private Object getInitialValue() {

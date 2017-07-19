@@ -18,12 +18,17 @@ package io.rockscript.engine;
 
 public class VariableCreatedEvent extends Event<VariableDeclarationExecution> {
 
-  public VariableCreatedEvent(VariableDeclarationExecution execution) {
+  Object valueJson;
+
+  public VariableCreatedEvent(VariableDeclarationExecution execution, Object value) {
     super(execution);
+    this.valueJson = getServiceLocator()
+      .getEventStore()
+      .valueToJson(value);
   }
 
   @Override
   public EventJson toJson() {
-    return new VariableCreatedEventJson(this);
+    return new VariableCreatedEventJson(this, valueJson);
   }
 }

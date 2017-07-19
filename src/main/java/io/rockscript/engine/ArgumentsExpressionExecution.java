@@ -54,14 +54,14 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   private void invokeSystemImportFunction() {
     // import functions have to be re-executed when the events
     // are applied because they can return functions
-    dispatch(new ImportFunctionEvent(this));
     ActionResponse actionResponse = startActionInvoke();
     Object importedObject = actionResponse.getResult();
+    dispatch(new ObjectImportedEvent(this, importedObject));
     endActionExecute(importedObject);
   }
 
   private void startAction() {
-    dispatchAndExecute(new ActionStartEvent(this));
+    dispatchAndExecute(new ActionStartedEvent(this));
   }
 
   public void startActionExecute() {
@@ -70,7 +70,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
       endAction(actionResponse.getResult());
 
     } else {
-      dispatch(new ActionWaitEvent(this));
+      dispatch(new ActionWaitingEvent(this));
     }
   }
 

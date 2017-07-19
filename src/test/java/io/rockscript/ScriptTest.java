@@ -106,8 +106,6 @@ public class ScriptTest {
 
     scriptExecution = engine.endWaitingActionImpl(scriptExecutionId, waitingExecutionId, null);
 
-    System.err.println();
-    System.err.println();
     reloadedScriptExecution = engine
       .getServiceLocator()
       .getEventStore()

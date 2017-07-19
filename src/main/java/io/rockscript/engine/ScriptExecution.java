@@ -50,7 +50,7 @@ public class ScriptExecution extends BlockExecution<Script> {
 
   @Override
   public void start() {
-    dispatchAndExecute(new StartScriptEvent(this));
+    dispatchAndExecute(new ScriptStartedEvent(this));
     // Executing the event will continue with this.startExecute()
   }
 
@@ -61,7 +61,7 @@ public class ScriptExecution extends BlockExecution<Script> {
 
   @Override
   protected void end() {
-    dispatch(new EndScriptEvent(this));
+    dispatch(new ScriptEndedEvent(this));
   }
 
   @Override

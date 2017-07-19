@@ -16,14 +16,19 @@
 
 package io.rockscript.engine;
 
-public class ImportFunctionEventJson extends EventJson<ImportFunctionEvent> {
+public class IdentifierResolvedEvent extends Event<IdentifierExpressionExecution> {
 
-  public ImportFunctionEventJson(ImportFunctionEvent importFunctionEvent) {
-    super(importFunctionEvent);
+  Object identifierValueJson;
+
+  public IdentifierResolvedEvent(IdentifierExpressionExecution identifierExpressionExecution, Object identifierValue) {
+    super(identifierExpressionExecution);
+    this.identifierValueJson = getServiceLocator()
+      .getEventStore()
+      .valueToJson(identifierValue);
   }
 
   @Override
-  public ImportFunctionEvent toEvent(Execution execution) {
-    return new ImportFunctionEvent((ArgumentsExpressionExecution) execution);
+  public EventJson toJson() {
+    return new IdentifierResolvedEventJson(this, identifierValueJson);
   }
 }

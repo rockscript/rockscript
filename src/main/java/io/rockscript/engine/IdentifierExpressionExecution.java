@@ -24,8 +24,8 @@ public class IdentifierExpressionExecution extends Execution<IdentifierExpressio
 
   @Override
   public void start() {
-    dispatch(new IdentifierExpressionEvent(this));
     Object identifierValue = getIdentifierValue();
+    dispatch(new IdentifierResolvedEvent(this, identifierValue));
     setResult(identifierValue);
     end();
   }

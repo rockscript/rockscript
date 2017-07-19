@@ -144,13 +144,14 @@ public class Parse {
       ExpressionSequenceContext expressionSequenceContext = expressionStatementContext.expressionSequence();
       List<SingleExpressionContext> singleExpressionContexts = expressionSequenceContext.singleExpression();
 
+      ExpressionStatement expressionStatement = new ExpressionStatement(createId(), createLocation(statementContext));
+
       List<SingleExpression> singleExpressions = new ArrayList<>();
       for (SingleExpressionContext singleExpressionContext: singleExpressionContexts) {
         SingleExpression singleExpression = parseSingleExpression(singleExpressionContext);
         singleExpressions.add(singleExpression);
       }
 
-      ExpressionStatement expressionStatement = new ExpressionStatement(createId(), createLocation(statementContext));
       expressionStatement.setSingleExpressions(singleExpressions);
       return expressionStatement;
     }
@@ -323,7 +324,7 @@ public class Parse {
 
     IdentifierNameContext identifierNameContext = memberDotExpressionContext.identifierName();
     String identifierText = identifierNameContext.getText();
-    memberDotExpression.setIdentifier(identifierText);
+    memberDotExpression.setPropertyName(identifierText);
 
     return memberDotExpression;
   }

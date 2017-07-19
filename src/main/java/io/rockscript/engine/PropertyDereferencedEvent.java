@@ -16,14 +16,20 @@
 
 package io.rockscript.engine;
 
-public class IdentifierExpressionEvent extends Event<IdentifierExpressionExecution> {
+public class PropertyDereferencedEvent extends Event<MemberDotExpressionExecution> {
 
-  public IdentifierExpressionEvent(IdentifierExpressionExecution identifierExpressionExecution) {
-    super(identifierExpressionExecution);
+  Object propertyValueJson;
+
+  public PropertyDereferencedEvent(MemberDotExpressionExecution memberDotExpressionExecution, Object propertyValue) {
+    super(memberDotExpressionExecution);
+    this.propertyValueJson = getServiceLocator()
+      .getEventStore()
+      .valueToJson(propertyValue);
   }
 
   @Override
   public EventJson toJson() {
-    return new IdentifierExpressionEventJson(this);
+    return new PropertyDereferencedEventJson(this, propertyValueJson);
   }
+
 }

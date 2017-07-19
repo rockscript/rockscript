@@ -16,6 +16,8 @@
 
 package io.rockscript.engine;
 
+import io.rockscript.ServiceLocator;
+
 public abstract class Event<T extends Execution> {
 
   T execution;
@@ -26,6 +28,10 @@ public abstract class Event<T extends Execution> {
 
   public T getExecution() {
     return execution;
+  }
+
+  public ServiceLocator getServiceLocator() {
+    return execution.getScript().getServiceLocator();
   }
 
   public abstract EventJson toJson();

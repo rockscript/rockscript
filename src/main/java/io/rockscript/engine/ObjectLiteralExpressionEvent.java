@@ -16,6 +16,7 @@
 
 package io.rockscript.engine;
 
+@Deprecated
 public class ObjectLiteralExpressionEvent extends Event<ObjectLiteralExpressionExecution> {
 
   public ObjectLiteralExpressionEvent(ObjectLiteralExpressionExecution execution) {

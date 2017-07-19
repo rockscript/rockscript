@@ -52,7 +52,6 @@ public abstract class Execution<T extends Operation> {
   }
 
   protected void startChild(Operation childOperation) {
-    dispatch(new StartExecutionEvent(this, childOperation));
     if (childOperation==null) {
       Script script = getScript();
       String childOperationId = childOperation.getId();

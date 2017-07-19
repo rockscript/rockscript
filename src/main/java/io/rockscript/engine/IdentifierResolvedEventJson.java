@@ -16,14 +16,17 @@
 
 package io.rockscript.engine;
 
-public class ActionStartEventJson extends RecoverableEventJson<ActionStartEvent> {
+public class IdentifierResolvedEventJson extends EventJson<IdentifierResolvedEvent> {
 
-  public ActionStartEventJson(ActionStartEvent externalFunctionStartEvent) {
-    super(externalFunctionStartEvent);
+  Object identifierValue;
+
+  public IdentifierResolvedEventJson(IdentifierResolvedEvent identifierResolvedEvent, Object identifierValue) {
+    super(identifierResolvedEvent);
+    this.identifierValue = identifierValue;
   }
 
   @Override
-  public ActionStartEvent toEvent(Execution execution) {
-    return new ActionStartEvent((ArgumentsExpressionExecution) execution);
+  public IdentifierResolvedEvent toEvent(Execution execution) {
+    return new IdentifierResolvedEvent((IdentifierExpressionExecution) execution, identifierValue);
   }
 }

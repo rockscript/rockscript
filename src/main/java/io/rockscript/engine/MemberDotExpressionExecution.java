@@ -31,15 +31,15 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
 
   @Override
   public void childEnded(Execution child) {
-    dispatch(new MemberDotExpressionEvent(this));
     Object propertyValue = getPropertyValue();
+    dispatch(new PropertyDereferencedEvent(this, propertyValue));
     setResult(propertyValue);
     end();
   }
 
   private Object getPropertyValue() {
     Object target = children.get(0).getResult();
-    String identifier = getOperation().getIdentifier();
+    String identifier = getOperation().getPropertyName();
     return getFieldValue(target, identifier);
   }
 

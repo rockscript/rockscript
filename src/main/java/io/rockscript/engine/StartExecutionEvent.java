@@ -16,6 +16,7 @@
 
 package io.rockscript.engine;
 
+@Deprecated
 public class StartExecutionEvent extends Event<Execution> {
 
   String childOperationId;

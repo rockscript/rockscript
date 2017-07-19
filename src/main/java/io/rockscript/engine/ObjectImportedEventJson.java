@@ -16,14 +16,17 @@
 
 package io.rockscript.engine;
 
-public class ImportFunctionEvent extends Event<ArgumentsExpressionExecution> {
+public class ObjectImportedEventJson extends EventJson<ObjectImportedEvent> {
 
-  public ImportFunctionEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
-    super(argumentsExpressionExecution);
+  Object importedObject;
+
+  public ObjectImportedEventJson(ObjectImportedEvent importFunctionEvent, Object importedObject) {
+    super(importFunctionEvent);
+    this.importedObject = importedObject;
   }
 
   @Override
-  public EventJson toJson() {
-    return new ImportFunctionEventJson(this);
+  public ObjectImportedEvent toEvent(Execution execution) {
+    return new ObjectImportedEvent((ArgumentsExpressionExecution) execution, importedObject);
   }
 }

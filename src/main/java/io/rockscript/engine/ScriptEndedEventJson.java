@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.rockscript.engine;
 
-public class IdentifierExpressionEventJson extends EventJson<IdentifierExpressionEvent> {
+public class ScriptEndedEventJson extends EventJson {
 
-  public IdentifierExpressionEventJson(IdentifierExpressionEvent identifierExpressionEvent) {
-    super(identifierExpressionEvent);
+  public ScriptEndedEventJson(ScriptEndedEvent scriptEndedEvent) {
+    super(scriptEndedEvent);
   }
 
   @Override
-  public IdentifierExpressionEvent toEvent(Execution execution) {
-    return new IdentifierExpressionEvent((IdentifierExpressionExecution) execution);
+  public Event toEvent(Execution execution) {
+    return new ScriptEndedEvent((ScriptExecution) execution);
   }
 }

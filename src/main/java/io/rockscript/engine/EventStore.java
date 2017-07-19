@@ -33,35 +33,33 @@ public class EventStore implements EventListener {
 
   static Gson gson = new GsonBuilder()
     .registerTypeAdapterFactory(new PolymorphicTypeAdapterFactory()
-      .typeName(new TypeToken<StartScriptEventJson>(){},              "startScript")
-      .typeName(new TypeToken<EndScriptEventJson>(){},                "endScript")
-      .typeName(new TypeToken<StartExecutionEventJson>(){},           "startExecution")
-      .typeName(new TypeToken<VariableCreatedEventJson>(){},          "variableCreated")
-      .typeName(new TypeToken<ImportFunctionEventJson>(){},           "importInvocation")
-      .typeName(new TypeToken<ActionStartEventJson>(){},              "actionStart")
-      .typeName(new TypeToken<ActionWaitEventJson>(){},               "actionWait")
+      .typeName(new TypeToken<ActionStartedEventJson>(){},            "actionStarted")
+      .typeName(new TypeToken<ActionWaitingEventJson>(){},            "actionWaiting")
       .typeName(new TypeToken<ActionEndedEventJson>(){},              "actionEnd")
-      .typeName(new TypeToken<IdentifierExpressionEventJson>(){},     "variableExpression")
-      .typeName(new TypeToken<MemberDotExpressionEventJson>(){},      "memberDot")
-      .typeName(new TypeToken<ObjectLiteralExpressionEventJson>(){},  "objectLiteralExpression")
+      .typeName(new TypeToken<ScriptStartedEventJson>(){},            "scriptStarted")
+      .typeName(new TypeToken<ScriptEndedEventJson>(){},              "scriptEnded")
+      .typeName(new TypeToken<VariableCreatedEventJson>(){},          "variableCreated")
+      .typeName(new TypeToken<ObjectImportedEventJson>(){},           "objectImported")
+      .typeName(new TypeToken<IdentifierResolvedEventJson>(){},       "identifierResolved")
+      .typeName(new TypeToken<PropertyDereferencedEventJson>(){},     "propertyDereferenced")
     )
 
     // .setPrettyPrinting()
     .create();
 
   ServiceLocator serviceLocator;
+  List<EventJson> events = new ArrayList<>();
+
 
   public EventStore(ServiceLocator serviceLocator) {
     this.serviceLocator = serviceLocator;
   }
 
-  List<EventJson> events = new ArrayList<>();
-
   @Override
   public void handle(Event event) {
     EventJson gsonnable = event.toJson();
     events.add(gsonnable);
-    String jsonString = gson.toJson(gsonnable);
+    String jsonString = eventJsonToJsonString(gsonnable);
     log.debug(jsonString);
   }
 
@@ -77,7 +75,7 @@ public class EventStore implements EventListener {
     return recreateScriptExecution(eventJsons, scriptExecutionId);
   }
 
-  private static class LoadingWrapperEventListener implements EventListener {
+  private class LoadingWrapperEventListener implements EventListener {
     ScriptExecution scriptExecution;
     EventListener originalEventListener;
     int previouslyExecutedEvents;
@@ -96,7 +94,7 @@ public class EventStore implements EventListener {
       if (scriptExecution.getExecutionMode()==ExecutionMode.EXECUTING) {
         originalEventListener.handle(event);
       } else {
-        log.debug("Swallowing ("+scriptExecution.getExecutionMode()+"): "+gson.toJson(event.toJson()));
+        log.debug("Swallowing ("+scriptExecution.getExecutionMode()+"): "+ EventStore.this.eventToJsonString(event));
       }
     }
 
@@ -148,7 +146,7 @@ public class EventStore implements EventListener {
         // LoadingWrapperEventListener doesn't receive them, yet it also must keep
         // track of those to get the counting right
         loadingWrapperEventListener.eventExecuting(event);
-        log.debug("Executing ("+scriptExecution.getExecutionMode()+"): "+gson.toJson(eventJson));
+        log.debug("Executing ("+scriptExecution.getExecutionMode()+"): "+eventJsonToJsonString(eventJson));
         event.execute();
       }
     }
@@ -187,7 +185,7 @@ public class EventStore implements EventListener {
     Map<String,List<EventJson>> groupedEvents = new HashMap<>();
     for (EventJson event: events) {
       String scriptExecutionId = event.getScriptExecutionId();
-      if (event instanceof EndScriptEventJson) {
+      if (event instanceof ScriptEndedEventJson) {
         groupedEvents.remove(scriptExecutionId);
       } else {
         List<EventJson> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
@@ -210,17 +208,45 @@ public class EventStore implements EventListener {
 
   private boolean isExecutable(EventJson eventJson) {
     return eventJson!=null
-      && ( eventJson instanceof StartScriptEventJson
+      && ( eventJson instanceof ScriptStartedEventJson
            || eventJson instanceof ActionEndedEventJson);
   }
 
   private boolean isUnlocking(EventJson lastEventJson) {
     return lastEventJson!=null
-      && ( lastEventJson instanceof ActionWaitEventJson
-           || lastEventJson instanceof EndScriptEventJson);
+      && ( lastEventJson instanceof ActionWaitingEventJson
+           || lastEventJson instanceof ScriptEndedEventJson);
   }
 
-  public String toJson(Event event) {
-    return event!=null ? gson.toJson(event.toJson()) : "null";
+  public String eventToJsonString(Event event) {
+    return eventJsonToJsonString(event.toJson());
+  }
+
+  public String eventJsonToJsonString(EventJson eventJson) {
+    return eventJson!=null ? gson.toJson(eventJson) : "null";
+  }
+
+  public Object valueToJson(Object value) {
+    if (value==null) return "null";
+    if (value instanceof Action) {
+      return value.getClass().getSimpleName();
+    }
+    if (value instanceof Map) {
+      return valueMapToJson((Map)value);
+    }
+    if (value instanceof JsonObject) {
+      Map<String,Object> convertedProperties = valueMapToJson(((JsonObject)value).properties);
+      return convertedProperties;
+    }
+    return value;
+  }
+
+  private Map<String,Object> valueMapToJson(Map<String,Object> map) {
+    Map convertedMap = new LinkedHashMap();
+    for (String key: map.keySet()) {
+      Object convertedValue = valueToJson(map.get(key));
+      convertedMap.put(key, convertedValue);
+    }
+    return convertedMap;
   }
 }

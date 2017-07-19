@@ -15,14 +15,14 @@
  */
 package io.rockscript.engine;
 
-public class StartScriptEventJson extends RecoverableEventJson<StartScriptEvent> {
+public class ScriptEndedEvent extends Event<ScriptExecution> {
 
-  public StartScriptEventJson(StartScriptEvent startScriptEvent) {
-    super(startScriptEvent);
+  public ScriptEndedEvent(ScriptExecution scriptExecution) {
+    super(scriptExecution);
   }
 
-  @Override
-  public StartScriptEvent toEvent(Execution execution) {
-    return new StartScriptEvent((ScriptExecution) execution);
+  public EventJson toJson() {
+    return new ScriptEndedEventJson(this);
   }
+
 }

@@ -23,7 +23,7 @@ import io.rockscript.util.Lists;
 public class MemberDotExpression extends SingleExpression {
 
   SingleExpression baseExpression;
-  String identifier;
+  String propertyName;
 
   public MemberDotExpression(String id, Location location) {
     super(id, location);
@@ -37,12 +37,12 @@ public class MemberDotExpression extends SingleExpression {
     this.baseExpression = baseExpression;
   }
 
-  public String getIdentifier() {
-    return identifier;
+  public String getPropertyName() {
+    return propertyName;
   }
 
-  public void setIdentifier(String identifier) {
-    this.identifier = identifier;
+  public void setPropertyName(String propertyName) {
+    this.propertyName = propertyName;
   }
 
   @Override

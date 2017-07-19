@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.rockscript.engine;
 
-public class MemberDotExpressionEvent extends Event<MemberDotExpressionExecution> {
+public class ScriptStartedEventJson extends RecoverableEventJson<ScriptStartedEvent> {
 
-  public MemberDotExpressionEvent(MemberDotExpressionExecution memberDotExpressionExecution) {
-    super(memberDotExpressionExecution);
+  public ScriptStartedEventJson(ScriptStartedEvent scriptStartedEvent) {
+    super(scriptStartedEvent);
   }
 
   @Override
-  public EventJson toJson() {
-    return new MemberDotExpressionEventJson(this);
+  public ScriptStartedEvent toEvent(Execution execution) {
+    return new ScriptStartedEvent((ScriptExecution) execution);
   }
-
 }

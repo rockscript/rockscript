@@ -16,22 +16,19 @@
 
 package io.rockscript.engine;
 
-public class ActionStartEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
+public class ObjectImportedEvent extends Event<ArgumentsExpressionExecution> {
 
-  public ActionStartEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
+  Object importedObjectJson;
+
+  public ObjectImportedEvent(ArgumentsExpressionExecution argumentsExpressionExecution, Object importedObject) {
     super(argumentsExpressionExecution);
+    this.importedObjectJson = getServiceLocator()
+      .getEventStore()
+      .valueToJson(importedObject);
   }
 
   @Override
   public EventJson toJson() {
-    return new ActionStartEventJson(this);
-  }
-
-  @Override
-  public void execute() {
-    ExecutionMode executionMode = execution.getScriptExecution().getExecutionMode();
-    if (executionMode!=ExecutionMode.REBUILDING) {
-      execution.startActionExecute();
-    }
+    return new ObjectImportedEventJson(this, importedObjectJson);
   }
 }

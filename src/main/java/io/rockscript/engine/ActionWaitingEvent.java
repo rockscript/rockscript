@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package io.rockscript.engine;
 
-public class EndScriptEventJson extends EventJson {
+public class ActionWaitingEvent extends Event<ArgumentsExpressionExecution> {
 
-  public EndScriptEventJson(EndScriptEvent endScriptEvent) {
-    super(endScriptEvent);
+  ArgumentsExpressionExecution argumentsExpressionExecution;
+
+  public ActionWaitingEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
+    super(argumentsExpressionExecution);
   }
 
   @Override
-  public Event toEvent(Execution execution) {
-    return new EndScriptEvent((ScriptExecution) execution);
+  public EventJson toJson() {
+    return new ActionWaitingEventJson(this);
   }
 }

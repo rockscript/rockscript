@@ -20,15 +20,22 @@ import java.util.*;
 
 public class JsonObject {
 
-  Map<String,Object> fields = new HashMap<>();
+  Map<String,Object> properties = new HashMap<>();
+
+  public JsonObject() {
+  }
+
+  public JsonObject(Map properties) {
+    this.properties = properties;
+  }
 
   public JsonObject put(String field, Object value) {
-    fields.put(field, value);
+    properties.put(field, value);
     return this;
   }
 
   public JsonObject put(String field, java.util.function.Function<FunctionInput, ActionResponse> functionHandler) {
-    fields.put(field, new Action() {
+    properties.put(field, new Action() {
       @Override
       public ActionResponse invoke(ArgumentsExpressionExecution argumentsExpressionExecution, List<Object> args) {
         FunctionInput functionInput = new FunctionInput(argumentsExpressionExecution, args);
@@ -39,8 +46,6 @@ public class JsonObject {
   }
 
   public Object get(String field) {
-    return fields.get(field);
+    return properties.get(field);
   }
-
-
 }
