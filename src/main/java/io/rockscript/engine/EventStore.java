@@ -134,21 +134,20 @@ public class EventStore implements EventListener {
     LoadingWrapperEventListener loadingWrapperEventListener = new LoadingWrapperEventListener(scriptExecution, originalEventListener, eventJsons);
     scriptExecution.setEventListener(loadingWrapperEventListener);
 
-    for (EventJson eventJson: eventJsons) {
-      if (isExecutable(eventJson)) {
-        if (scriptExecution.getExecutionMode()==ExecutionMode.RECOVERING) {
-          scriptExecution.setExecutionMode(ExecutionMode.EXECUTING);
-        }
-        Execution execution = scriptExecution.findExecutionRecursive(eventJson.executionId);
-        ExecutableEvent event = (ExecutableEvent) eventJson.toEvent(execution);
+    eventJsons = eventJsons.stream()
+      .filter(this::isExecutable)
+      .collect(Collectors.toList());
 
-        // The events that are being executed are not dispatched and hence the
-        // LoadingWrapperEventListener doesn't receive them, yet it also must keep
-        // track of those to get the counting right
-        loadingWrapperEventListener.eventExecuting(event);
-        log.debug("Executing ("+scriptExecution.getExecutionMode()+"): "+eventJsonToJsonString(eventJson));
-        event.execute();
-      }
+    for (EventJson eventJson: eventJsons) {
+      Execution execution = scriptExecution.findExecutionRecursive(eventJson.executionId);
+      ExecutableEvent event = (ExecutableEvent) eventJson.toEvent(execution);
+
+      // The events that are being executed are not dispatched and hence the
+      // LoadingWrapperEventListener doesn't receive them, yet it also must keep
+      // track of those to get the counting right
+      loadingWrapperEventListener.eventExecuting(event);
+      log.debug("Executing ("+scriptExecution.getExecutionMode()+"): "+eventJsonToJsonString(eventJson));
+      event.execute();
     }
 
     scriptExecution.setExecutionMode(ExecutionMode.EXECUTING);
@@ -227,16 +226,17 @@ public class EventStore implements EventListener {
   }
 
   public Object valueToJson(Object value) {
-    if (value==null) return "null";
+    if (value==null) {
+      return "null";
+    }
     if (value instanceof Action) {
-      return value.getClass().getSimpleName();
+      return value.toString();
     }
     if (value instanceof Map) {
       return valueMapToJson((Map)value);
     }
     if (value instanceof JsonObject) {
-      Map<String,Object> convertedProperties = valueMapToJson(((JsonObject)value).properties);
-      return convertedProperties;
+      return valueMapToJson(((JsonObject)value).properties);
     }
     return value;
   }

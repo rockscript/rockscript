@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class CrashTest {
 
   static Logger log = LoggerFactory.getLogger(CrashTest.class);
@@ -46,17 +45,18 @@ public class CrashTest {
     return engine;
   }
 
-  private void addHelloService(TestEngine engine) {ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
-    JsonObject helloService = new JsonObject()
-      .put("aSyncFunction", functionInput->{
-        synchronousCapturedData.add("Execution was here");
-        synchronousCapturedData.add(functionInput.getArgs().get(0));
-        return ActionResponse.endFunction();})
-      .put("anAsyncFunction", functionInput->{
-        ArgumentsExpressionExecution argumentsExpressionExecution = functionInput.getArgumentsExpressionExecution();
-        waitingAsyncFunctionInvocationIds.add(argumentsExpressionExecution.getId());
-        return ActionResponse.waitForFunctionToCompleteAsync();});
-    importResolver.add("example.com/hello", helloService);
+  private void addHelloService(TestEngine engine) {
+    engine.getServiceLocator()
+      .getImportResolver()
+      .add("example.com/hello", new ImportJsonObject()
+        .put("aSyncFunction", functionInput->{
+          synchronousCapturedData.add("Execution was here");
+          synchronousCapturedData.add(functionInput.getArgs().get(0));
+          return ActionResponse.endFunction();})
+        .put("anAsyncFunction", functionInput->{
+          ArgumentsExpressionExecution argumentsExpressionExecution = functionInput.getArgumentsExpressionExecution();
+          waitingAsyncFunctionInvocationIds.add(argumentsExpressionExecution.getId());
+          return ActionResponse.waitForFunctionToCompleteAsync();}));
   }
 
   @Test

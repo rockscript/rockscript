@@ -34,4 +34,9 @@ public class SystemImportAction implements Action {
     JsonObject importedObject = serviceLocator.getImportResolver().get(url);
     return ActionResponse.endFunction(importedObject);
   }
+
+  @Override
+  public String toString() {
+    return "[system.import action]";
+  }
 }

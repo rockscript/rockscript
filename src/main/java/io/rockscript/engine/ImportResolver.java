@@ -31,6 +31,9 @@ public class ImportResolver {
   }
 
   public ImportResolver add(String url, JsonObject importObject) {
+    if (importObject instanceof ImportJsonObject) {
+      ((ImportJsonObject)importObject).resolveActionNames(url);
+    }
     importObjects.put(url, importObject);
     return this;
   }

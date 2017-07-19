@@ -29,13 +29,13 @@ public class JsonObject {
     this.properties = properties;
   }
 
-  public JsonObject put(String field, Object value) {
-    properties.put(field, value);
+  public JsonObject put(String propertyName, Object value) {
+    properties.put(propertyName, value);
     return this;
   }
 
-  public JsonObject put(String field, java.util.function.Function<FunctionInput, ActionResponse> functionHandler) {
-    properties.put(field, new Action() {
+  public JsonObject put(String propertyName, java.util.function.Function<FunctionInput, ActionResponse> functionHandler) {
+    this.put(propertyName, new Action() {
       @Override
       public ActionResponse invoke(ArgumentsExpressionExecution argumentsExpressionExecution, List<Object> args) {
         FunctionInput functionInput = new FunctionInput(argumentsExpressionExecution, args);
@@ -45,7 +45,11 @@ public class JsonObject {
     return this;
   }
 
-  public Object get(String field) {
-    return properties.get(field);
+  public Object get(String propertyName) {
+    return properties.get(propertyName);
+  }
+
+  public Set<String> getPropertyNames() {
+    return properties.keySet();
   }
 }
