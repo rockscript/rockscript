@@ -14,10 +14,12 @@
  * limitations under the License.
  *
  */
-package io.rockscript;
+package io.rockscript.action.http;
 
 import java.util.*;
 
+import io.rockscript.Engine;
+import io.rockscript.action.ActionResponse;
 import io.rockscript.engine.*;
 import io.rockscript.test.TestEngine;
 import org.junit.Test;

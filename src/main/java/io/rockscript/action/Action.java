@@ -13,17 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript.action;
 
 import java.util.List;
+
+import io.rockscript.engine.*;
 
 public interface Action {
 
   /**
+   * An executable external script action, which is a pluggable operation that scripts can use to integrate with
+   * external systems. Actions typically call microservices endpoints.
+   *
    * TODO describe how argumentsExpressionExecution.id is the current execution position within the script execution.
    *      This execution position  has to be provided in case the invocation is asynchronous when calling back
    *      the completion of this function with {@link ScriptExecution#endFunctionInvocationExecution(String, Object)}
+   *
+   * TODO Refactor to resolve how this argument list differs from ActionInput
    */
   ActionResponse invoke(ArgumentsExpressionExecution argumentsExpressionExecution, List<Object> args);
-
 }

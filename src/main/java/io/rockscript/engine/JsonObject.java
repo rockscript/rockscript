@@ -18,6 +18,9 @@ package io.rockscript.engine;
 
 import java.util.*;
 
+import io.rockscript.action.Action;
+import io.rockscript.action.ActionResponse;
+
 public class JsonObject {
 
   Map<String,Object> properties = new HashMap<>();

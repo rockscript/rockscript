@@ -19,6 +19,8 @@ package io.rockscript;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.rockscript.action.Action;
+import io.rockscript.action.ActionResponse;
 import io.rockscript.engine.*;
 import io.rockscript.test.DeepComparator;
 import io.rockscript.test.TestEngine;

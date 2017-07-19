@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package io.rockscript;
+package io.rockscript.action.http;
 
 import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
