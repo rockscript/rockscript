@@ -19,6 +19,7 @@ package io.rockscript.engine;
 import java.util.List;
 
 import io.rockscript.ServiceLocator;
+import io.rockscript.action.Action;
 
 public class SystemImportAction implements Action {
 
