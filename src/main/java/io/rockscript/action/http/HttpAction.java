@@ -3,7 +3,7 @@ package io.rockscript.action.http;
 import java.util.List;
 
 import io.rockscript.action.Action;
-import io.rockscript.engine.ActionResponse;
+import io.rockscript.action.ActionResponse;
 import io.rockscript.engine.ArgumentsExpressionExecution;
 
 public class HttpAction implements Action {

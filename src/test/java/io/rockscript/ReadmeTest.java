@@ -18,6 +18,7 @@ package io.rockscript;
 
 import java.io.File;
 
+import io.rockscript.action.ActionResponse;
 import io.rockscript.engine.*;
 import io.rockscript.test.TestEngine;
 import org.junit.Before;

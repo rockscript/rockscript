@@ -5,19 +5,18 @@ import java.util.concurrent.Executors;
 
 import io.rockscript.Engine;
 import io.rockscript.action.*;
-import io.rockscript.engine.ActionResponse;
 
 /**
- * Queues HTTP action invocations in an unbounded queue and executes them using a single thread.
+ * A work queue that queues HTTP action invocations in an unbounded queue and executes them using a single thread.
  */
-class HttpActionWorkQueue {
+class HttpActionExecutor {
 
   private static final int NUMBER_OF_THREADS = 1;
   ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
   Engine engine;
 
-  public HttpActionWorkQueue(Engine engine) {
+  public HttpActionExecutor(Engine engine) {
     this.engine = engine;
   }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  *
  */
-package io.rockscript;
+package io.rockscript.action.http;
 
 import java.util.List;
 import java.util.Map;

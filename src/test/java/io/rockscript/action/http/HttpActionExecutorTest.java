@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.rockscript.action.ActionInput;
+import io.rockscript.action.ActionResponse;
 import io.rockscript.engine.*;
 import io.rockscript.test.TestEngine;
 import org.junit.Before;
@@ -13,16 +14,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
-public class HttpActionWorkQueueTest {
+public class HttpActionExecutorTest {
 
-  private HttpActionWorkQueue workQueue;
+  private HttpActionExecutor workQueue;
   private EventStore eventStore;
   private TestEngine engine;
 
   @Before
   public void setup() throws Exception {
     engine = new TestEngine();
-    workQueue = new HttpActionWorkQueue(engine);
+    workQueue = new HttpActionExecutor(engine);
     eventStore = engine.getServiceLocator().getEventStore();
     ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
     JsonObject httpService = new JsonObject().put("get", this::queueHttpRequest);
@@ -34,6 +35,11 @@ public class HttpActionWorkQueueTest {
     String scriptExecutionId = execution.getScriptExecution().getId();
     workQueue.addActionInput(new ActionInput(scriptExecutionId, execution.getId(), input.getArgs()));
     return ActionResponse.waitForFunctionToCompleteAsync();
+  }
+
+  @Test
+  public void testHttpActionBuildsRequestFromInput() throws InterruptedException {
+    // TODO Test that the HTTP action can construct an HttpRequest object
   }
 
   @Test
