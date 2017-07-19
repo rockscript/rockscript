@@ -38,6 +38,8 @@ public class DeepComparator {
   Map<Object,Object> comparing = new HashMap<>();
   Set<Field> ignoredFields = new HashSet<>();
   Map<String, List<Class>> ignoredAnonymousClasses = new HashMap<>();
+  StringBuffer logs = new StringBuffer();
+  boolean error = false;
 
   public DeepComparator ignoreField(Class clazz, String fieldName) {
     try {
@@ -60,11 +62,18 @@ public class DeepComparator {
   }
 
   public void assertEquals(Object a, Object b) {
+    assertEqualsNoThrow(a, b);
+    if (error) {
+      throw new AssertionError("Objects are not deeply equal: \n"+logs.toString());
+    }
+  }
+
+  public void assertEqualsNoThrow(Object a, Object b) {
     if (a==null || b==null) {
       if (a!=null || b!=null) {
         fail(a, b);
       } else {
-        log.debug(getPathString());
+        ok();
       }
     } else {
       if (!alreadyComparing(a, b)) {
@@ -76,7 +85,7 @@ public class DeepComparator {
           if (!a.equals(b)) {
             fail(a, b);
           } else {
-            log.debug(getPathString());
+            ok();
           }
         } else if (Map.class.isAssignableFrom(a.getClass())) {
           assertMapEquals(a, b);
@@ -84,7 +93,6 @@ public class DeepComparator {
           assertCollectionEquals(a, b);
         } else {
           assertFieldsEqual(a.getClass(), a, b);
-          log.debug(getPathString());
         }
       }
     }
@@ -105,8 +113,7 @@ public class DeepComparator {
           path.push(field.getName());
           field.setAccessible(true);
           try {
-            assertEquals(field.get(a), field.get(b));
-
+            assertEqualsNoThrow(field.get(a), field.get(b));
           } catch (IllegalAccessException e) {
             throw new RuntimeException(path.toString(), e);
           }
@@ -138,7 +145,8 @@ public class DeepComparator {
 
   private boolean isValueClass(Class<?> clazz) {
     return VALUE_CLASSES.stream()
-      .anyMatch(element->element.isAssignableFrom(clazz));
+      .anyMatch(element->element.isAssignableFrom(clazz))
+      || clazz.isEnum();
   }
 
   private boolean isCollectionClass(Class<?> clazz) {
@@ -148,12 +156,17 @@ public class DeepComparator {
   private void assertCollectionEquals(Object a, Object b) {
     List<Object> collectionA = new ArrayList((Collection) a);
     List<Object> collectionB = new ArrayList((Collection) b);
-    if (collectionA.size()!=collectionB.size()) {
-      throw new RuntimeException("Collections not same size: "+collectionA.size()+"!="+collectionB.size()+" <- "+path.toString());
+    if (collectionB.size()!=collectionA.size()) {
+      path.push("size");
+      fail(collectionA.size(), collectionB.size());
+      path.pop();
     }
-    for (int i=0; i<collectionA.size(); i++) {
+    int maxSize = Math.max(collectionA.size(), collectionB.size());
+    for (int i=0; i<maxSize; i++) {
       path.push("["+i+"]");
-      assertEquals(collectionA.get(i), collectionB.get(i));
+      Object elementA = collectionA.size()>i ? collectionA.get(i) : "collection size mismatch";
+      Object elementB = collectionB.size()>i ? collectionB.get(i) : "collection size mismatch";
+      assertEqualsNoThrow(elementA, elementB);
       path.pop();
     }
   }
@@ -166,13 +179,18 @@ public class DeepComparator {
     }
     for (Object key: mapA.keySet()) {
       path.push("['"+key+"']");
-      assertEquals(mapA.get(key), mapB.get(key));
+      assertEqualsNoThrow(mapA.get(key), mapB.get(key));
       path.pop();
     }
   }
 
+  private void ok() {
+    logs.append("== "+getPathString()+"\n");
+  }
+
   private void fail(Object a, Object b) {
-    throw new RuntimeException(toString(a)+"!="+toString(b)+" <- "+getPathString());
+    error = true;
+    logs.append("ERROR "+getPathString()+" : "+toString(a)+" != "+toString(b)+"\n");
   }
 
   private String toString(Object o) {

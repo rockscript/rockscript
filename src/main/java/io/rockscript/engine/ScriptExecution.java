@@ -19,7 +19,7 @@ import io.rockscript.ServiceLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** The runtime state of a script execution, aka 'an execution'. */
+/** The runtime state of a script execution. */
 public class ScriptExecution extends BlockExecution<Script> {
 
   static Logger log = LoggerFactory.getLogger(ScriptExecution.class);
@@ -66,11 +66,7 @@ public class ScriptExecution extends BlockExecution<Script> {
 
   @Override
   protected void dispatch(Event event) {
-    if (eventListener!=null && this.executionMode==ExecutionMode.EXECUTING) {
-      eventListener.handle(event);
-    } else {
-      log.debug("swallowing: "+serviceLocator.getEventStore().toJson(event));
-    }
+    eventListener.handle(event);
   }
 
   @Override
@@ -81,6 +77,16 @@ public class ScriptExecution extends BlockExecution<Script> {
   @Override
   public Script getScript() {
     return operation;
+  }
+
+  public void endFunctionInvocationExecution(String executionId) {
+    endFunctionInvocationExecution(executionId, null);
+  }
+
+  public void endFunctionInvocationExecution(String executionId, Object result) {
+    ArgumentsExpressionExecution argumentsExpressionExecution = (ArgumentsExpressionExecution) findExecutionRecursive(executionId);
+    ScriptException.throwIfNull(argumentsExpressionExecution, "Couldn't find function invocation execution %s in script execution %s", executionId, id);
+    argumentsExpressionExecution.endActionExecute(result);
   }
 
   public EventListener getEventListener() {
@@ -103,13 +109,11 @@ public class ScriptExecution extends BlockExecution<Script> {
     this.id = id;
   }
 
-  public void endFunctionInvocationExecution(String executionId) {
-    endFunctionInvocationExecution(executionId, null);
+  public ExecutionMode getExecutionMode() {
+    return executionMode;
   }
 
-  public void endFunctionInvocationExecution(String executionId, Object result) {
-    ArgumentsExpressionExecution argumentsExpressionExecution = (ArgumentsExpressionExecution) findExecutionRecursive(executionId);
-    ScriptException.throwIfNull(argumentsExpressionExecution, "Couldn't find function invocation execution %s in script execution %s", executionId, id);
-    argumentsExpressionExecution.endActionExecute(result);
+  public void setExecutionMode(ExecutionMode executionMode) {
+    this.executionMode = executionMode;
   }
 }

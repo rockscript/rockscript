@@ -19,11 +19,11 @@ package io.rockscript.engine;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import io.rockscript.ServiceLocator;
-import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import io.rockscript.ServiceLocator;
+import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,6 +77,51 @@ public class EventStore implements EventListener {
     return recreateScriptExecution(eventJsons, scriptExecutionId);
   }
 
+  private static class LoadingWrapperEventListener implements EventListener {
+    ScriptExecution scriptExecution;
+    EventListener originalEventListener;
+    int previouslyExecutedEvents;
+    int replayedEvents;
+
+    public LoadingWrapperEventListener(ScriptExecution scriptExecution, EventListener originalEventListener, List<EventJson> eventJsons) {
+      this.scriptExecution = scriptExecution;
+      this.originalEventListener = originalEventListener;
+      this.previouslyExecutedEvents = eventJsons.size();
+      this.replayedEvents = 0;
+    }
+
+    @Override
+    public void handle(Event event) {
+      updateExecutionModeAndCount(event);
+      if (scriptExecution.getExecutionMode()==ExecutionMode.EXECUTING) {
+        originalEventListener.handle(event);
+      } else {
+        log.debug("Swallowing ("+scriptExecution.getExecutionMode()+"): "+gson.toJson(event.toJson()));
+      }
+    }
+
+    private void updateExecutionModeAndCount(Event event) {
+      if (replayedEvents==0) {
+        if (previouslyExecutedEvents==1) {
+          scriptExecution.setExecutionMode(ExecutionMode.RECOVERING);
+        } else {
+          scriptExecution.setExecutionMode(ExecutionMode.REBUILDING);
+        }
+      } else if (scriptExecution.getExecutionMode()==ExecutionMode.REBUILDING) {
+        if (replayedEvents==previouslyExecutedEvents-1) {
+          scriptExecution.setExecutionMode(ExecutionMode.RECOVERING);
+        }
+      } else if (scriptExecution.getExecutionMode()==ExecutionMode.RECOVERING) {
+        scriptExecution.setExecutionMode(ExecutionMode.EXECUTING);
+      }
+      replayedEvents++;
+    }
+
+    public void eventExecuting(Event event) {
+      updateExecutionModeAndCount(event);
+    }
+  }
+
   private ScriptExecution recreateScriptExecution(List<EventJson> eventJsons, String scriptExecutionId) {
     String scriptId = findScriptId(eventJsons);
     ScriptException.throwIfNull(scriptId, "Script id not found for scriptExecutionId: %s", scriptExecutionId);
@@ -86,30 +131,39 @@ public class EventStore implements EventListener {
     ScriptException.throwIfNull(scriptId, "Script not found for scriptId: %s", scriptId);
 
     ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, serviceLocator, script);
-    scriptExecution.executionMode = ExecutionMode.REBUILDING;
+
+    EventListener originalEventListener = scriptExecution.getEventListener();
+    LoadingWrapperEventListener loadingWrapperEventListener = new LoadingWrapperEventListener(scriptExecution, originalEventListener, eventJsons);
+    scriptExecution.setEventListener(loadingWrapperEventListener);
 
     for (EventJson eventJson: eventJsons) {
       if (isExecutable(eventJson)) {
+        if (scriptExecution.getExecutionMode()==ExecutionMode.RECOVERING) {
+          scriptExecution.setExecutionMode(ExecutionMode.EXECUTING);
+        }
         Execution execution = scriptExecution.findExecutionRecursive(eventJson.executionId);
         ExecutableEvent event = (ExecutableEvent) eventJson.toEvent(execution);
-        log.debug("reexecuting: "+gson.toJson(eventJson));
+
+        // The events that are being executed are not dispatched and hence the
+        // LoadingWrapperEventListener doesn't receive them, yet it also must keep
+        // track of those to get the counting right
+        loadingWrapperEventListener.eventExecuting(event);
+        log.debug("Executing ("+scriptExecution.getExecutionMode()+"): "+gson.toJson(eventJson));
         event.execute();
-      } else {
-        log.debug("skipping...: "+gson.toJson(eventJson));
       }
     }
 
-    scriptExecution.executionMode = ExecutionMode.EXECUTING;
+    scriptExecution.setExecutionMode(ExecutionMode.EXECUTING);
 
     return scriptExecution;
   }
 
   private String findScriptId(List<EventJson> scriptExecutionEventJsons) {
     return scriptExecutionEventJsons.stream()
-                                    .map(eventJson->eventJson.getScriptId())
-                                    .filter(Objects::nonNull)
-                                    .findFirst()
-                                    .get();
+      .map(eventJson->eventJson.getScriptId())
+      .filter(Objects::nonNull)
+      .findFirst()
+      .get();
   }
 
   public List<ScriptExecution> recoverCrashedScriptExecutions() {
@@ -117,20 +171,13 @@ public class EventStore implements EventListener {
     Map<String,List<EventJson>> groupedEvents = findCrashedScriptExecutionEvents();
     for (String scriptExecutionId: groupedEvents.keySet()) {
       List<EventJson> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
-      while (!lastEventIsProceedable(scriptExecutionEvents)) {
-        scriptExecutionEvents.remove(scriptExecutionEvents.size()-1);
-      }
       ScriptExecution scriptExecution = recreateScriptExecution(scriptExecutionEvents, scriptExecutionId);
-      EventJson recoverableEventJson = scriptExecutionEvents.get(scriptExecutionEvents.size()-1);
-      Execution execution = scriptExecution.findExecutionRecursive(recoverableEventJson.getExecutionId());
-      ExecutableEvent executableEvent = (ExecutableEvent) recoverableEventJson.toEvent(execution);
-      executableEvent.execute();
       scriptExecutions.add(scriptExecution);
     }
     return scriptExecutions;
   }
 
-  private boolean lastEventIsProceedable(List<EventJson> scriptExecutionEvents) {
+  private boolean lastEventIsExecutable(List<EventJson> scriptExecutionEvents) {
     EventJson lastEvent = scriptExecutionEvents.get(scriptExecutionEvents.size()-1);
     return RecoverableEventJson.class.isAssignableFrom(lastEvent.getClass());
   }

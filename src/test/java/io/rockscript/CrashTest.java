@@ -22,12 +22,11 @@ import java.util.List;
 import io.rockscript.engine.*;
 import io.rockscript.test.*;
 import io.rockscript.test.CrashTestEngine.CrashEventListener;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Ignore
+
 public class CrashTest {
 
   static Logger log = LoggerFactory.getLogger(CrashTest.class);
@@ -61,7 +60,7 @@ public class CrashTest {
   }
 
   @Test
-  public void testAsyncExecution() {
+  public void testCrashRecovery() {
     String scriptText =
       "var helloService = system.import('example.com/hello'); \n" +
       "var message = 5; \n" +
@@ -74,6 +73,7 @@ public class CrashTest {
     DeepComparator deepComparator = new DeepComparator()
       .ignoreField(ScriptExecution.class, "serviceLocator")
       .ignoreField(ScriptExecution.class, "eventListener")
+      .ignoreField(Execution.class, "operation")
       .ignoreField(Script.class, "executables")
       .ignoreField(Script.class, "serviceLocator")
       .ignoreField(SystemImportAction.class, "serviceLocator")
@@ -118,5 +118,4 @@ public class CrashTest {
     String scriptId = engine.deployScript(scriptText);
     return engine.startScriptExecutionImpl(scriptId);
   }
-
 }

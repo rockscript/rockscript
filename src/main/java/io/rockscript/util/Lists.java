@@ -24,4 +24,8 @@ public class Lists {
   public static <T> List<T> of(T... elements) {
     return Arrays.asList(elements);
   }
+
+  public static <T> T removeLast(List<T> list) {
+    return list.remove(list.size()-1);
+  }
 }

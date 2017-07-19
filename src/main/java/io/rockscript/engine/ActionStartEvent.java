@@ -29,7 +29,8 @@ public class ActionStartEvent extends ExecutableEvent<ArgumentsExpressionExecuti
 
   @Override
   public void execute() {
-    if (execution.getScriptExecution().executionMode!=ExecutionMode.REBUILDING) {
+    ExecutionMode executionMode = execution.getScriptExecution().getExecutionMode();
+    if (executionMode!=ExecutionMode.REBUILDING) {
       execution.startActionExecute();
     }
   }

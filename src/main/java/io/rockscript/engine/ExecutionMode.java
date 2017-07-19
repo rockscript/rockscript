@@ -20,5 +20,6 @@ public enum ExecutionMode {
 
   REBUILDING,
 
+  RECOVERING,
   EXECUTING
 }
