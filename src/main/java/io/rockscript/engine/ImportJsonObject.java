@@ -18,6 +18,9 @@ package io.rockscript.engine;
 
 import java.util.List;
 
+import io.rockscript.action.Action;
+import io.rockscript.action.ActionResponse;
+
 public class ImportJsonObject extends JsonObject {
 
   public void resolveActionNames(String url) {
