@@ -39,7 +39,7 @@ public class HttpActionExecutorTest {
 
   @Test
   public void testHttpActionBuildsRequestFromInput() throws InterruptedException {
-    // TODO Test that the HTTP action can construct an HttpRequest object
+    // TODO Test that the HTTP action can construct an Request object
   }
 
   @Test
@@ -58,13 +58,13 @@ public class HttpActionExecutorTest {
     List<EventJson> events = eventStore.findEventsByScriptExecutionId(scriptExecutionId);
     assertNotNull(events);
     assertFalse(events.isEmpty());
-    HttpResponse httpResponse = events.stream()
+    Response httpResponse = events.stream()
         .filter(event -> event instanceof ActionEndedEventJson)
         .map(ActionEndedEventJson.class::cast)
         .map(actionEndedEvent -> actionEndedEvent.result)
         .map(ActionResponse.class::cast)
         .map(ActionResponse::getResult)
-        .map(HttpResponse.class::cast)
+        .map(Response.class::cast)
         .findFirst().get();
     assertEquals("42", httpResponse.body);
   }
