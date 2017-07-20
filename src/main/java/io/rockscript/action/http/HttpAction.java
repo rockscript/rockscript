@@ -51,11 +51,11 @@ public class HttpAction implements Action {
 
     try {
       HttpURLConnection connection = new HttpURLConnectionBuilder(configuration, request).build();
-      // TODO Add response headers
       ResponseBodyReader responseBodyReader = new ResponseBodyReader(connection);
       String responseBody = new String(responseBodyReader.read(), Charset.forName("UTF-8"));
-      Response response = new Response(connection.getResponseCode(), connection.getResponseMessage(), responseBody,
-          new ResponseHeaders(connection.getHeaderFields()));
+      ResponseHeaders headers = new ResponseHeaders(connection.getHeaderFields());
+      int status = connection.getResponseCode();
+      Response response = new Response(status, connection.getResponseMessage(), responseBody, headers);
       return ActionResponse.endFunction(response);
     } catch (IOException e) {
       return ActionResponse.endFunction(e);

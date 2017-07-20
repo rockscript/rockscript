@@ -43,8 +43,7 @@ class HttpActionExecutor {
   }
 
   private void actionDone(ActionOutput actionOutput) {
-    // TODO engine.endWaitingExecutionId needs to be refactored
-    // to actionDone and take an ActionOutput as an argument
+    // TODO Rename engine.endWaitingExecutionId  to actionDone and take an ActionOutput as an argument
     engine.endWaitingAction(
         actionOutput.scriptExecutionId,
         actionOutput.executionId,
