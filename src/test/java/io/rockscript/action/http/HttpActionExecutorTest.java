@@ -1,8 +1,11 @@
 package io.rockscript.action.http;
 
+import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.net.HttpHeaders;
+import com.google.common.net.MediaType;
 import io.rockscript.action.ActionInput;
 import io.rockscript.action.ActionResponse;
 import io.rockscript.engine.*;
@@ -10,9 +13,7 @@ import io.rockscript.test.TestEngine;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class HttpActionExecutorTest {
 
@@ -37,9 +38,9 @@ public class HttpActionExecutorTest {
     return ActionResponse.waitForFunctionToCompleteAsync();
   }
 
-  @Test
+  // TODO Test that the HTTP action can construct a Request object
+//  @Test
   public void testHttpActionBuildsRequestFromInput() throws InterruptedException {
-    // TODO Test that the HTTP action can construct a Request object
   }
 
   @Test
@@ -69,12 +70,12 @@ public class HttpActionExecutorTest {
     assertNotNull(httpResponse);
 
     // Add the response contains the expected data
-    assertEquals(200, httpResponse.status);
-    assertEquals("42", httpResponse.textBody);
+    assertEquals(HttpURLConnection.HTTP_OK, httpResponse.status);
+    assertTrue(httpResponse.textBody.contains("\"name\":\"RockScript\""));
   }
 
-  @Test
+  // TODO Test that the HTTP action can construct an HTTP POST Request object
+//  @Test
   public void testPostRequestBody() throws InterruptedException {
-    // TODO Test that the HTTP action can construct an HTTP POST Request object
   }
 }

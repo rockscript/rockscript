@@ -21,15 +21,17 @@ import java.util.Collections;
 public class Response {
 
   final int status;
+  final String statusText;
   // TODO Extract a TextResponseBody class, then a ResponseBody interface and add a BinaryResponseBody with byte[] content
   final String contentType;
   final String textBody;
   final Collection<ResponseHeader> headers;
 
-  Response(int status) {
+  Response(int status, String statusText, String textBody) {
     this.status = status;
+    this.statusText = statusText;
+    this.textBody = textBody;
     contentType = "text/plain";
-    textBody = "42";
     headers = Collections.emptySet();
   }
 }

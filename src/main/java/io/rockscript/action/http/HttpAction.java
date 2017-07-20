@@ -16,7 +16,6 @@
 package io.rockscript.action.http;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -51,36 +50,18 @@ public class HttpAction implements Action {
     }
 
     try {
-      HttpURLConnection connection = buildConnection(request);
-      // TODO Construct a Response - add headers and body
-      Response response = new Response(connection.getResponseCode());
+      HttpURLConnection connection = new HttpURLConnectionBuilder(configuration, request).build();
+      // TODO Add response headers
+      ResponseBodyReader responseBodyReader = new ResponseBodyReader(connection);
+      String responseBody = new String(responseBodyReader.read(), Charset.forName("UTF-8"));
+      Response response = new Response(connection.getResponseCode(), connection.getResponseMessage(), responseBody);
       return ActionResponse.endFunction(response);
     } catch (IOException e) {
       return ActionResponse.endFunction(e);
     }
   }
 
-  private static HttpURLConnection buildConnection(Request request) throws IOException {
-    HttpURLConnection connection = (HttpURLConnection) request.url.openConnection();
-    connection.setRequestMethod(request.method.name());
-    connection.setConnectTimeout(configuration.connectionTimeoutMilliseconds);
-    connection.setReadTimeout(configuration.readTimeoutMilliseconds);
-    if (request.hasBody()) {
-      connection.addRequestProperty("Content-Type", request.body.contentType);
-    }
-    request.headers.forEach(header -> connection.addRequestProperty(header.name, header.value));
-
-    if (request.method.hasRequestBody()) {
-      connection.setDoOutput(true);
-      try (OutputStream output = connection.getOutputStream()) {
-        output.write(request.body.content.getBytes(Charset.forName("UTF-8")));
-      }
-    }
-
-    return connection;
-  }
-
-  private static class Configuration {
+  static class Configuration {
     int connectionTimeoutMilliseconds;
     int readTimeoutMilliseconds;
   }
