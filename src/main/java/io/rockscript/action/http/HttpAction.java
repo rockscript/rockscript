@@ -54,7 +54,8 @@ public class HttpAction implements Action {
       // TODO Add response headers
       ResponseBodyReader responseBodyReader = new ResponseBodyReader(connection);
       String responseBody = new String(responseBodyReader.read(), Charset.forName("UTF-8"));
-      Response response = new Response(connection.getResponseCode(), connection.getResponseMessage(), responseBody);
+      Response response = new Response(connection.getResponseCode(), connection.getResponseMessage(), responseBody,
+          new ResponseHeaders(connection.getHeaderFields()));
       return ActionResponse.endFunction(response);
     } catch (IOException e) {
       return ActionResponse.endFunction(e);

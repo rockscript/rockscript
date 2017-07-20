@@ -1,5 +1,6 @@
 package io.rockscript.action.http;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -44,7 +45,7 @@ public class HttpActionExecutorTest {
   }
 
   @Test
-  public void testGetRequest() throws InterruptedException {
+  public void testGetRequest() throws InterruptedException, IOException {
     // Given a script that uses an HTTP action
     String scriptId = engine.deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
@@ -71,6 +72,7 @@ public class HttpActionExecutorTest {
 
     // Add the response contains the expected data
     assertEquals(HttpURLConnection.HTTP_OK, httpResponse.status);
+    assertEquals(MediaType.JSON_UTF_8.toString(), httpResponse.contentType());
     assertTrue(httpResponse.textBody.contains("\"name\":\"RockScript\""));
   }
 
