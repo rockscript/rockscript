@@ -16,17 +16,12 @@
  */
 package io.rockscript.action.http;
 
-import java.net.HttpURLConnection;
-import java.util.concurrent.CompletableFuture;
-
-import com.google.common.net.HttpHeaders;
-import com.google.common.net.MediaType;
-import org.asynchttpclient.*;
+import org.asynchttpclient.AsyncHttpClient;
+import org.asynchttpclient.DefaultAsyncHttpClient;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.Ignore;
 
-import static org.junit.Assert.*;
-
+@Ignore
 public class HttpClientTest {
 
   private static final String ORGANISATION_URL = "https://api.github.com/orgs/RockScript";
@@ -38,47 +33,47 @@ public class HttpClientTest {
     httpClient = new DefaultAsyncHttpClient();
   }
 
-  @Test
-  public void testGetRequest() throws Exception {
-    // Given an HTTP request for the GitHub API
-    BoundRequestBuilder request = httpClient.prepareGet(ORGANISATION_URL)
-        .setHeader(HttpHeaders.ACCEPT.toString(), MediaType.JSON_UTF_8.toString());
-
-    // When I execute the request
-    ListenableFuture<Response> responseFuture = request.execute();
-
-    // Then the future does not complete immediately.
-    assertFalse(responseFuture.isDone());
-
-    // When I wait for the future to complete
-    Response response = responseFuture.get();
-
-    // Then the response has the expected data.
-    assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
-    assertEquals(MediaType.JSON_UTF_8.toString(), response.getHeader(HttpHeaders.CONTENT_TYPE));
-    assertTrue(response.getResponseBody().contains("\"name\":\"RockScript\""));
-  }
-
-  @Test
-  public void testGetRequestWithEnd() throws Exception {
-    // Given an HTTP request for the GitHub API
-    BoundRequestBuilder request = httpClient.prepareGet(ORGANISATION_URL)
-        .setHeader(HttpHeaders.ACCEPT.toString(), MediaType.JSON_UTF_8.toString());
-
-    // When I execute the request
-    CompletableFuture<Response> future = request.execute().toCompletableFuture()
-        .thenApply(response -> {
-          statusCode = response.getStatusCode();
-          return response;
-        });
-
-    // Then the future does not complete immediately.
-    assertFalse(future.isDone());
-
-    // When the future completes.
-    future.join();
-
-    // Then the status code has already been set.
-    assertEquals(200, statusCode);
-  }
+//  @Test
+//  public void testGetRequest() throws Exception {
+//    // Given an HTTP request for the GitHub API
+//    BoundRequestBuilder request = httpClient.prepareGet(ORGANISATION_URL)
+//        .setHeader(HttpHeaders.ACCEPT.toString(), MediaType.JSON_UTF_8.toString());
+//
+//    // When I execute the request
+//    ListenableFuture<Response> responseFuture = request.execute();
+//
+//    // Then the future does not complete immediately.
+//    assertFalse(responseFuture.isDone());
+//
+//    // When I wait for the future to complete
+//    Response response = responseFuture.get();
+//
+//    // Then the response has the expected data.
+//    assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
+//    assertEquals(MediaType.JSON_UTF_8.toString(), response.getHeader(HttpHeaders.CONTENT_TYPE));
+//    assertTrue(response.getResponseBody().contains("\"name\":\"RockScript\""));
+//  }
+//
+//  @Test
+//  public void testGetRequestWithEnd() throws Exception {
+//    // Given an HTTP request for the GitHub API
+//    BoundRequestBuilder request = httpClient.prepareGet(ORGANISATION_URL)
+//        .setHeader(HttpHeaders.ACCEPT.toString(), MediaType.JSON_UTF_8.toString());
+//
+//    // When I execute the request
+//    CompletableFuture<Response> future = request.execute().toCompletableFuture()
+//        .thenApply(response -> {
+//          statusCode = response.getStatusCode();
+//          return response;
+//        });
+//
+//    // Then the future does not complete immediately.
+//    assertFalse(future.isDone());
+//
+//    // When the future completes.
+//    future.join();
+//
+//    // Then the status code has already been set.
+//    assertEquals(200, statusCode);
+//  }
 }

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertFalse;
 /**
  * Pre-requisites: install (brew install rabbitmq) and run RabbitMQ on the default server and port (rabbitmq-server).
  */
+@Ignore
 public class MessageQueueClientTest {
 
   private static final String QUEUE_NAME = "test";
