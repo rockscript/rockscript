@@ -39,11 +39,11 @@ public class HttpActionExecutorTest {
 
   @Test
   public void testHttpActionBuildsRequestFromInput() throws InterruptedException {
-    // TODO Test that the HTTP action can construct an Request object
+    // TODO Test that the HTTP action can construct a Request object
   }
 
   @Test
-  public void testHttpActionExecutes() throws InterruptedException {
+  public void testGetRequest() throws InterruptedException {
     // Given a script that uses an HTTP action
     String scriptId = engine.deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
@@ -66,6 +66,15 @@ public class HttpActionExecutorTest {
         .map(ActionResponse::getResult)
         .map(Response.class::cast)
         .findFirst().get();
-    assertEquals("42", httpResponse.body);
+    assertNotNull(httpResponse);
+
+    // Add the response contains the expected data
+    assertEquals(200, httpResponse.status);
+    assertEquals("42", httpResponse.textBody);
+  }
+
+  @Test
+  public void testPostRequestBody() throws InterruptedException {
+    // TODO Test that the HTTP action can construct an HTTP POST Request object
   }
 }

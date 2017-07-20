@@ -16,10 +16,10 @@
 package io.rockscript.action.http;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
+import java.io.OutputStream;
+import java.net.*;
+import java.nio.charset.Charset;
+import java.util.*;
 
 import io.rockscript.action.Action;
 import io.rockscript.action.ActionResponse;
@@ -27,26 +27,61 @@ import io.rockscript.engine.ArgumentsExpressionExecution;
 
 public class HttpAction implements Action {
 
-  Request request;
+  private static Configuration configuration = new Configuration();
+  static {
+    configuration.connectionTimeoutMilliseconds = 0;
+    configuration.readTimeoutMilliseconds = 0;
+  }
 
   @Override
   public ActionResponse invoke(ArgumentsExpressionExecution argumentsExpressionExecution, List<Object> args) {
-    // TODO Construct the HTTP request from the inputs.
-    URL url = null;
-    Method method = Method.GET;
-    String contentType = null;
-    TextRequestBody body = new TextRequestBody(contentType, "");
-    request = new Request(url, method, Collections.emptySet(), body);
+    Request request;
+    try {
+      // TODO Construct the HTTP request from the inputs.
+      URL url = new URL("https://api.github.com/orgs/RockScript");
+      Method method = Method.GET;
+      String contentType = null;
+      TextRequestBody body = new TextRequestBody(contentType, null);
+      Set<RequestHeader> headers = new HashSet<>();
+      headers.add(new RequestHeader("Accept", "application/json"));
+      // TODO headers.add("X-Correlation-Id", scriptExecutionId);
+      request = new Request(url, method, headers, body);
+    } catch (MalformedURLException e) {
+      return ActionResponse.endFunction(e);
+    }
 
-    // TODO Send the HTTP request using java.net.HttpURLConnection
-//    try {
-//      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+    try {
+      HttpURLConnection connection = buildConnection(request);
+      // TODO Construct a Response - add headers and body
+      Response response = new Response(connection.getResponseCode());
+      return ActionResponse.endFunction(response);
+    } catch (IOException e) {
+      return ActionResponse.endFunction(e);
+    }
+  }
 
-      // TODO Construct a Response
-      return ActionResponse.endFunction(new Response());
-//    } catch (IOException e) {
-//      // TODO Return a failure response
-//      return ActionResponse.endFunction();
-//    }
+  private static HttpURLConnection buildConnection(Request request) throws IOException {
+    HttpURLConnection connection = (HttpURLConnection) request.url.openConnection();
+    connection.setRequestMethod(request.method.name());
+    connection.setConnectTimeout(configuration.connectionTimeoutMilliseconds);
+    connection.setReadTimeout(configuration.readTimeoutMilliseconds);
+    if (request.hasBody()) {
+      connection.addRequestProperty("Content-Type", request.body.contentType);
+    }
+    request.headers.forEach(header -> connection.addRequestProperty(header.name, header.value));
+
+    if (request.method.hasRequestBody()) {
+      connection.setDoOutput(true);
+      try (OutputStream output = connection.getOutputStream()) {
+        output.write(request.body.content.getBytes(Charset.forName("UTF-8")));
+      }
+    }
+
+    return connection;
+  }
+
+  private static class Configuration {
+    int connectionTimeoutMilliseconds;
+    int readTimeoutMilliseconds;
   }
 }

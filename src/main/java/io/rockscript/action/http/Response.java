@@ -15,9 +15,21 @@
  */
 package io.rockscript.action.http;
 
+import java.util.Collection;
+import java.util.Collections;
+
 public class Response {
 
-  final int status = 200;
-  final String contentType = "text/plain";
-  final String body = "42";
+  final int status;
+  // TODO Extract a TextResponseBody class, then a ResponseBody interface and add a BinaryResponseBody with byte[] content
+  final String contentType;
+  final String textBody;
+  final Collection<ResponseHeader> headers;
+
+  Response(int status) {
+    this.status = status;
+    contentType = "text/plain";
+    textBody = "42";
+    headers = Collections.emptySet();
+  }
 }

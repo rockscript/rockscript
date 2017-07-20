@@ -15,13 +15,18 @@
  */
 package io.rockscript.action.http;
 
+// TODO Extract RequestBody interface and add a BinaryRequestBody with byte[] content
 class TextRequestBody {
 
   final String contentType;
-  final String body;
+  final String content;
 
-  TextRequestBody(String contentType, String body) {
+  TextRequestBody(String contentType, String content) {
     this.contentType = contentType;
-    this.body = body;
+    this.content = content;
+  }
+
+  public boolean empty() {
+    return content == null || contentType == null;
   }
 }

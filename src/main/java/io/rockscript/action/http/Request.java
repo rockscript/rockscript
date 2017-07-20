@@ -23,7 +23,7 @@ class Request {
 
   final URL url;
   final Method method;
-  final Collection<Header> headers;
+  final Collection<RequestHeader> headers;
   final TextRequestBody body;
 
   Request(URL url, Method method) {
@@ -33,10 +33,14 @@ class Request {
     body = null;
   }
 
-  Request(URL url, Method method, Collection<Header> headers, TextRequestBody body) {
+  Request(URL url, Method method, Collection<RequestHeader> headers, TextRequestBody body) {
     this.url = url;
     this.method = method;
     this.headers = headers;
     this.body = body;
+  }
+
+  public boolean hasBody() {
+    return body != null && !body.empty();
   }
 }
