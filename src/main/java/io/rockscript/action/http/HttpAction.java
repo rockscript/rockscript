@@ -15,6 +15,9 @@
  */
 package io.rockscript.action.http;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,15 +32,21 @@ public class HttpAction implements Action {
   @Override
   public ActionResponse invoke(ArgumentsExpressionExecution argumentsExpressionExecution, List<Object> args) {
     // TODO Construct the HTTP request from the inputs.
-    String url = null;
+    URL url = null;
     Method method = Method.GET;
     String contentType = null;
     TextRequestBody body = new TextRequestBody(contentType, "");
     request = new Request(url, method, Collections.emptySet(), body);
 
     // TODO Send the HTTP request using java.net.HttpURLConnection
+    try {
+      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-    // TODO Construct a Response
-    return ActionResponse.endFunction(new Response());
+      // TODO Construct a Response
+      return ActionResponse.endFunction(new Response());
+    } catch (IOException e) {
+      // TODO Return a failure response
+      return ActionResponse.endFunction();
+    }
   }
 }

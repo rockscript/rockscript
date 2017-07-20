@@ -30,7 +30,7 @@ public class HttpActionTest {
 
   private EngineImpl engine;
   private DefaultAsyncHttpClient httpClient;
-  private CompletableFuture<Response> future;
+  private CompletableFuture<org.asynchttpclient.Response> future;
 
   @Before
   public void createHttpClient() throws Exception {
