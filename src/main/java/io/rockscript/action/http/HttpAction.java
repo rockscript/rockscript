@@ -39,14 +39,14 @@ public class HttpAction implements Action {
     request = new Request(url, method, Collections.emptySet(), body);
 
     // TODO Send the HTTP request using java.net.HttpURLConnection
-    try {
-      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//    try {
+//      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
       // TODO Construct a Response
       return ActionResponse.endFunction(new Response());
-    } catch (IOException e) {
-      // TODO Return a failure response
-      return ActionResponse.endFunction();
-    }
+//    } catch (IOException e) {
+//      // TODO Return a failure response
+//      return ActionResponse.endFunction();
+//    }
   }
 }
