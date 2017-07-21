@@ -15,22 +15,15 @@
  */
 package io.rockscript.action.http;
 
-enum Method {
-  GET(false),
-  POST(true),
-  PUT(true),
-  HEAD(false),
-  DELETE(false),
-  OPTIONS(false),
-  PATCH(true);
+import java.util.List;
 
-  private final boolean requestBody;
+class ResponseHeader {
 
-  Method(boolean requestBody) {
-    this.requestBody = requestBody;
-  }
+  final String name;
+  final List<String> values;
 
-  boolean hasRequestBody() {
-    return requestBody;
+  ResponseHeader(String name, List<String> values) {
+    this.name = name;
+    this.values = values;
   }
 }

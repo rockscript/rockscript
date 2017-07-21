@@ -15,8 +15,10 @@
  */
 package io.rockscript.action.http;
 
-import java.util.Collections;
-import java.util.List;
+import java.io.IOException;
+import java.net.*;
+import java.nio.charset.Charset;
+import java.util.*;
 
 import io.rockscript.action.Action;
 import io.rockscript.action.ActionResponse;
@@ -24,20 +26,44 @@ import io.rockscript.engine.ArgumentsExpressionExecution;
 
 public class HttpAction implements Action {
 
-  Request request;
+  private static Configuration configuration = new Configuration();
+  static {
+    configuration.connectionTimeoutMilliseconds = 0;
+    configuration.readTimeoutMilliseconds = 0;
+  }
 
   @Override
   public ActionResponse invoke(ArgumentsExpressionExecution argumentsExpressionExecution, List<Object> args) {
-    // TODO Construct the HTTP request from the inputs.
-    String url = null;
-    Method method = Method.GET;
-    String contentType = null;
-    TextRequestBody body = new TextRequestBody(contentType, "");
-    request = new Request(url, method, Collections.emptySet(), body);
+    Request request;
+    try {
+      // TODO Construct the HTTP request from the inputs.
+      URL url = new URL("https://api.github.com/orgs/RockScript");
+      Method method = Method.GET;
+      String contentType = null;
+      TextRequestBody body = new TextRequestBody(contentType, null);
+      Set<RequestHeader> headers = new HashSet<>();
+      headers.add(new RequestHeader("Accept", "application/json"));
+      // TODO headers.add("X-Correlation-Id", scriptExecutionId);
+      request = new Request(url, method, headers, body);
+    } catch (MalformedURLException e) {
+      return ActionResponse.endFunction(e);
+    }
 
-    // TODO Send the HTTP request using java.net.HttpURLConnection
+    try {
+      HttpURLConnection connection = new HttpURLConnectionBuilder(configuration, request).build();
+      ResponseBodyReader responseBodyReader = new ResponseBodyReader(connection);
+      String responseBody = new String(responseBodyReader.read(), Charset.forName("UTF-8"));
+      ResponseHeaders headers = new ResponseHeaders(connection.getHeaderFields());
+      int status = connection.getResponseCode();
+      Response response = new Response(status, connection.getResponseMessage(), responseBody, headers);
+      return ActionResponse.endFunction(response);
+    } catch (IOException e) {
+      return ActionResponse.endFunction(e);
+    }
+  }
 
-    // TODO Construct a Response
-    return ActionResponse.endFunction(new Response());
+  static class Configuration {
+    int connectionTimeoutMilliseconds;
+    int readTimeoutMilliseconds;
   }
 }

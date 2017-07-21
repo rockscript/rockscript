@@ -41,8 +41,6 @@ public class HttpWorkerTest {
       // When the action input is processed async, actionDone should be called
     }
     public void actionDone(ActionOutput actionOutput) {
-      // TODO engine.endWaitingExecutionId needs to be refactored
-      // to actionDone and take an ActionOutput as an argument
       engine.endWaitingAction(
         actionOutput.scriptExecutionId,
         actionOutput.executionId,
@@ -80,7 +78,7 @@ public class HttpWorkerTest {
     ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
     JsonObject http = new JsonObject()
       .put("get", functionInput->{
-        // TODO functionInput needs to be refactored to ActionInput
+        // TODO Rename FunctionInput to ActionInput
         ArgumentsExpressionExecution argumentsExpressionExecution = functionInput.getArgumentsExpressionExecution();
         String scriptExecutionId = argumentsExpressionExecution.getScriptExecution().getId();
         String executionId = argumentsExpressionExecution.getId();

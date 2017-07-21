@@ -1,8 +1,12 @@
 package io.rockscript.action.http;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.net.HttpHeaders;
+import com.google.common.net.MediaType;
 import io.rockscript.action.ActionInput;
 import io.rockscript.action.ActionResponse;
 import io.rockscript.engine.*;
@@ -10,9 +14,7 @@ import io.rockscript.test.TestEngine;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class HttpActionExecutorTest {
 
@@ -37,13 +39,13 @@ public class HttpActionExecutorTest {
     return ActionResponse.waitForFunctionToCompleteAsync();
   }
 
-  @Test
+  // TODO Test that the HTTP action can construct a Request object
+//  @Test
   public void testHttpActionBuildsRequestFromInput() throws InterruptedException {
-    // TODO Test that the HTTP action can construct an Request object
   }
 
   @Test
-  public void testHttpActionExecutes() throws InterruptedException {
+  public void testGetRequest() throws InterruptedException, IOException {
     // Given a script that uses an HTTP action
     String scriptId = engine.deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
@@ -66,6 +68,16 @@ public class HttpActionExecutorTest {
         .map(ActionResponse::getResult)
         .map(Response.class::cast)
         .findFirst().get();
-    assertEquals("42", httpResponse.body);
+    assertNotNull(httpResponse);
+
+    // Add the response contains the expected data
+    assertEquals(HttpURLConnection.HTTP_OK, httpResponse.status);
+    assertEquals(MediaType.JSON_UTF_8.toString(), httpResponse.contentType());
+    assertTrue(httpResponse.textBody.contains("\"name\":\"RockScript\""));
+  }
+
+  // TODO Test that the HTTP action can construct an HTTP POST Request object
+//  @Test
+  public void testPostRequestBody() throws InterruptedException {
   }
 }

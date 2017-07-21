@@ -15,27 +15,32 @@
  */
 package io.rockscript.action.http;
 
+import java.net.URL;
 import java.util.Collection;
 import java.util.Collections;
 
 class Request {
 
-  final String url;
+  final URL url;
   final Method method;
-  final Collection<Header> headers;
+  final Collection<RequestHeader> headers;
   final TextRequestBody body;
 
-  Request(String url, Method method) {
+  Request(URL url, Method method) {
     this.url = url;
     this.method = method;
     headers = Collections.emptySet();
     body = null;
   }
 
-  Request(String url, Method method, Collection<Header> headers, TextRequestBody body) {
+  Request(URL url, Method method, Collection<RequestHeader> headers, TextRequestBody body) {
     this.url = url;
     this.method = method;
     this.headers = headers;
     this.body = body;
+  }
+
+  public boolean hasBody() {
+    return body != null && !body.empty();
   }
 }

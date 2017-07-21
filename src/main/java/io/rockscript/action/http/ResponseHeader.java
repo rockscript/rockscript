@@ -15,13 +15,15 @@
  */
 package io.rockscript.action.http;
 
-class Header {
+import java.util.List;
+
+class ResponseHeader {
 
   final String name;
-  final String value;
+  final List<String> values;
 
-  Header(String name, String value) {
+  ResponseHeader(String name, List<String> values) {
     this.name = name;
-    this.value = value;
+    this.values = values;
   }
 }

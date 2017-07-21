@@ -15,9 +15,25 @@
  */
 package io.rockscript.action.http;
 
+import java.io.IOException;
+
 public class Response {
 
-  final int status = 200;
-  final String contentType = "text/plain";
-  final String body = "42";
+  final int status;
+  final String statusText;
+  // TODO Extract a TextResponseBody class, then a ResponseBody interface and add a BinaryResponseBody with byte[] content
+  final String textBody;
+  final ResponseHeaders headers;
+
+  Response(int status, String statusText, String textBody, ResponseHeaders headers) {
+    this.status = status;
+    this.statusText = statusText;
+    this.textBody = textBody;
+    this.headers = headers;
+  }
+
+  String contentType() throws IOException {
+    return headers.values("Content-Type").stream().findFirst()
+                  .orElseThrow(() -> new IOException("Missing Content-Type response header"));
+  }
 }

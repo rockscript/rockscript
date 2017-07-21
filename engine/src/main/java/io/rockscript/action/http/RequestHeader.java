@@ -15,22 +15,13 @@
  */
 package io.rockscript.action.http;
 
-enum Method {
-  GET(false),
-  POST(true),
-  PUT(true),
-  HEAD(false),
-  DELETE(false),
-  OPTIONS(false),
-  PATCH(true);
+class RequestHeader {
 
-  private final boolean requestBody;
+  final String name;
+  final String value;
 
-  Method(boolean requestBody) {
-    this.requestBody = requestBody;
-  }
-
-  boolean hasRequestBody() {
-    return requestBody;
+  RequestHeader(String name, String value) {
+    this.name = name;
+    this.value = value;
   }
 }
