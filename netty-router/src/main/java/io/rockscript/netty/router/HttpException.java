@@ -13,33 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.netty.router;
 
-package io.rockscript.engine;
+public abstract class HttpException extends RuntimeException {
 
+  private static final long serialVersionUID = 1L;
 
-public class ScriptException extends RuntimeException {
+  public HttpException() {
+    super();
+  }
 
-  public ScriptException(String message) {
+  public HttpException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    super(message, cause, enableSuppression, writableStackTrace);
+  }
+
+  public HttpException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
+  public HttpException(String message) {
     super(message);
   }
 
-  public ScriptException(Throwable cause) {
+  public HttpException(Throwable cause) {
     super(cause);
   }
 
-  public static <T> T throwIfNull(T value) {
-    return throwIfNull(value, null);
+  public String getStatusMessage() {
+    return getMessage();
   }
 
-  public static <T> T throwIfNull(T value, String message, String... messageArguments) {
-    if (value==null) {
-      if (message==null) {
-        message = "null value is invalid here";
-      } else if (messageArguments!=null) {
-        message = String.format(message, (Object[])messageArguments);
-      }
-      throw new ScriptException(message);
-    }
-    return value;
-  }
+  public abstract int getStatusCode();
 }

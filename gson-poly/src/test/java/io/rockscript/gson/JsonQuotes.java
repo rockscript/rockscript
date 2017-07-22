@@ -29,15 +29,12 @@
  */
 package io.rockscript.gson;
 
-
-
-/**
- * @author Tom Baeyens
- */
 public class JsonQuotes {
 
-  /** replaces single quotes to double quotes 
-   * for better readability of the tests. */
+  /**
+   * replaces single quotes to double quotes
+   * for better readability of the tests.
+   */
   public static String quote(String json) {
     return json.replace('\'', '"');
   }

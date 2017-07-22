@@ -36,40 +36,41 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.junit.Test;
 
+import static io.rockscript.gson.JsonQuotes.quote;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-/**
- * @author Tom Baeyens
- */
 public class BeanPolymorphicTest {
 
-  static Gson gson = new GsonBuilder()
-      .registerTypeAdapterFactory(new PolymorphicTypeAdapterFactory()
-          .typeName(new TypeToken<Shape>(){}, "shape")
-          .typeName(new TypeToken<Square>(){}, "square")
-          .typeName(new TypeToken<Circle>(){}, "circle"))
-      .create();
+  static Gson gson = new GsonBuilder().registerTypeAdapterFactory(new PolymorphicTypeAdapterFactory().typeName(new TypeToken<Shape>() {
+
+  }, "shape").typeName(new TypeToken<Square>() {
+
+  }, "square").typeName(new TypeToken<Circle>() {
+
+  }, "circle")).create();
 
   public static class Shape {
+
     String color;
   }
 
   public static class Square extends Shape {
+
     int side;
   }
 
   public static class Circle extends Shape {
+
     int radius;
   }
 
   @Test
   public void testPolymorphicSpecificClassReadAsBaseClass() {
-    String originalJson = JsonQuotes.quote(
-        "{'circle':{" +
-            "'color':'green'," +
-            "'radius':5}}");
-    Type type = new TypeToken<Shape>(){}.getType();
+    String originalJson = quote("{'circle':{"+"'color':'green',"+"'radius':5}}");
+    Type type = new TypeToken<Shape>() {
+
+    }.getType();
 
     Circle circle = gson.fromJson(originalJson, type);
 
@@ -83,11 +84,10 @@ public class BeanPolymorphicTest {
 
   @Test
   public void testPolymorphicSpecificClass() {
-    String originalJson = JsonQuotes.quote(
-        "{'circle':{" +
-            "'color':'green'," +
-            "'radius':5}}");
-    Type type = new TypeToken<Circle>(){}.getType();
+    String originalJson = quote("{'circle':{"+"'color':'green',"+"'radius':5}}");
+    Type type = new TypeToken<Circle>() {
+
+    }.getType();
 
     Circle circle = gson.fromJson(originalJson, type);
 
@@ -101,10 +101,10 @@ public class BeanPolymorphicTest {
 
   @Test
   public void testPolymorphicBaseClass() {
-    String originalJson = JsonQuotes.quote(
-        "{'shape':{" +
-            "'color':'green'}}");
-    Type type = new TypeToken<Shape>(){}.getType();
+    String originalJson = quote("{'shape':{"+"'color':'green'}}");
+    Type type = new TypeToken<Shape>() {
+
+    }.getType();
 
     Shape shape = gson.fromJson(originalJson, type);
 
@@ -115,21 +115,21 @@ public class BeanPolymorphicTest {
     assertEquals(originalJson, reserializedJson);
   }
 
-//  @Test
-//  public void testPolymorphicNonExistingFieldInBaseClass() {
-//    String originalJson = JsonQuotes.quote(
-//        "{'shape':{" +
-//            "'color':'green'," +
-//            "'nonexisting':'hello'}}");
-//    Type type = new TypeToken<Shape>(){}.getType();
-//
-//    Shape shape = gson.fromJson(originalJson, type);
-//
-//    assertNotNull(shape);
-//    assertEquals("green", shape.color);
-//
-//    String reserializedJson = gson.toJson(shape);
-//    assertEquals("{'shape':{" +
-//        "'color':'green'}}", reserializedJson);
-//  }
+  //  @Test
+  //  public void testPolymorphicNonExistingFieldInBaseClass() {
+  //    String originalJson = JsonQuotes.quote(
+  //        "{'shape':{" +
+  //            "'color':'green'," +
+  //            "'nonexisting':'hello'}}");
+  //    Type type = new TypeToken<Shape>(){}.getType();
+  //
+  //    Shape shape = gson.fromJson(originalJson, type);
+  //
+  //    assertNotNull(shape);
+  //    assertEquals("green", shape.color);
+  //
+  //    String reserializedJson = gson.toJson(shape);
+  //    assertEquals("{'shape':{" +
+  //        "'color':'green'}}", reserializedJson);
+  //  }
 }

@@ -1,0 +1,61 @@
+/*
+ * Copyright ©2017, RockScript.io. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.rockscript.netty.router;
+
+import java.util.List;
+
+public class InterceptorContext {
+
+  int index = -1;
+  List<Interceptor> interceptors;
+  RequestHandler requestHandler;
+  Request request;
+  Response response;
+  Server server;
+
+  public InterceptorContext(List<Interceptor> interceptors, RequestHandler requestHandler, Request request, Response response, Server server) {
+    this.interceptors = interceptors;
+    this.requestHandler = requestHandler;
+    this.request = request;
+    this.response = response;
+    this.server = server;
+  }
+
+  public void next() {
+    index++;
+    if (index<interceptors.size()) {
+      interceptors.get(index).intercept(this);
+    } else if (index==interceptors.size()) {
+      requestHandler.handle();
+    }
+  }
+
+  public Request getRequest() {
+    return request;
+  }
+
+  public Response getResponse() {
+    return response;
+  }
+
+  public Server getServer() {
+    return server;
+  }
+
+  public RequestHandler getRequestHandler() {
+    return requestHandler;
+  }
+}
