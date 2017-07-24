@@ -26,7 +26,7 @@ import io.rockscript.engine.ArgumentsExpressionExecution;
 
 public class HttpAction implements Action {
 
-  private static Configuration configuration = new Configuration();
+  private static HttpActionConfiguration configuration = new HttpActionConfiguration();
   static {
     configuration.connectionTimeoutMilliseconds = 0;
     configuration.readTimeoutMilliseconds = 0;
@@ -60,10 +60,5 @@ public class HttpAction implements Action {
     } catch (IOException e) {
       return ActionResponse.endFunction(e);
     }
-  }
-
-  static class Configuration {
-    int connectionTimeoutMilliseconds;
-    int readTimeoutMilliseconds;
   }
 }
