@@ -16,18 +16,8 @@
 
 package io.rockscript.netty.router;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+public interface AsyncHttpServerComponent {
 
-/** For Guice modules, this provider creates a NettyServer
- * from a NettyServerConfiguration. */
-public class NettyServerProvider implements Provider<NettyServer> {
+  void configure(AsyncHttpServerConfiguration asyncHttpServerConfiguration);
 
-  @Inject
-  NettyServerConfiguration nettyServerConfiguration;
-
-  @Override
-  public NettyServer get() {
-    return nettyServerConfiguration.build();
-  }
 }

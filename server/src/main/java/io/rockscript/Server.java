@@ -15,29 +15,44 @@
  */
 package io.rockscript;
 
-import io.rockscript.handlers.DeployScript;
-import io.rockscript.netty.router.NettyServer;
-import io.rockscript.netty.router.NettyServerConfiguration;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import io.rockscript.command.*;
+import io.rockscript.gson.PolymorphicTypeAdapterFactory;
+import io.rockscript.handlers.CommandHandler;
+import io.rockscript.netty.router.*;
 
 public class Server {
 
-  NettyServer nettyServer;
+  AsyncHttpServer asyncHttpServer;
 
   public Server(ServerConfiguration serverConfiguration) {
-    NettyServerConfiguration nettyServerConfiguration = serverConfiguration.getNettyServerConfiguration()
-      .scan(DeployScript.class);
-    this.nettyServer = new NettyServer(nettyServerConfiguration);
+    Gson gson = new GsonBuilder()
+      .registerTypeAdapterFactory(new PolymorphicTypeAdapterFactory()
+        .typeName(new TypeToken<Command>(){}, "command")
+        .typeName(new TypeToken<DeployScriptCommand>(){}, "deployScript")
+        .typeName(new TypeToken<StartScriptCommand>(){}, "startScript")
+        .typeName(new TypeToken<EndActionCommand>(){}, "endAction")
+      )
+      .create();
+
+    AsyncHttpServerConfiguration asyncHttpServerConfiguration = serverConfiguration
+      .getAsyncHttpServerConfiguration()
+      .scan(CommandHandler.class)
+      .jsonHandler(new JsonHandlerGson(gson));
+    this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
   }
 
   public void startup() {
-    nettyServer.startup();
+    asyncHttpServer.startup();
   }
 
   public void shutdown() {
-    nettyServer.shutdown();
+    asyncHttpServer.shutdown();
   }
 
   public void waitForShutdown() {
-    nettyServer.waitForShutdown();
+    asyncHttpServer.waitForShutdown();
   }
 }

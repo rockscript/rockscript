@@ -24,23 +24,18 @@ public abstract class AbstractServerTest {
 
   /**
    * if you add interceptor {@link ServerExceptionInterceptor}
-   * with {@link NettyServerConfiguration#interceptor(Interceptor)}
-   * to your test nettyServer, this member field will contain the latest
-   * nettyServer side exception.  If a test request fails or if it does
-   * not get the expected response status, this nettyServer exception is
+   * with {@link AsyncHttpServerConfiguration#interceptor(Interceptor)}
+   * to your test asyncHttpServer, this member field will contain the latest
+   * asyncHttpServer side exception.  If a test request fails or if it does
+   * not get the expected response status, this asyncHttpServer exception is
    * used as the cause.
    */
   public static Throwable serverException;
 
-  public abstract NettyServer getNettyServer();
+  public abstract AsyncHttpServer getNettyServer();
 
   @Rule
   public TestLogger testLogger = new TestLogger();
-
-  /**
-   * the http nettyServer used during test
-   */
-  public NettyServer nettyServer = null;
 
   @Before
   public void setUp() {

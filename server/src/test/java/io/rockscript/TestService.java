@@ -15,9 +15,18 @@
  */
 package io.rockscript;
 
-public class TestServer extends Server {
+import java.util.ArrayList;
+import java.util.List;
 
-  public TestServer(TestService testService) {
-    super(new TestServerConfiguration(testService));
+import io.rockscript.action.ActionInput;
+
+public class TestService {
+
+  List<ActionInput> inputs = new ArrayList<>();
+
+  public void add(ActionInput input) {
+    inputs.add(input);
   }
+
+
 }

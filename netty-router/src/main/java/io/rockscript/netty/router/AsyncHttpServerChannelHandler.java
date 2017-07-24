@@ -26,14 +26,14 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 @ChannelHandler.Sharable
-public class NettyServerChannelHandler extends SimpleChannelInboundHandler<Object> {
+public class AsyncHttpServerChannelHandler extends SimpleChannelInboundHandler<Object> {
   
-  private static final Logger log = LoggerFactory.getLogger(NettyServerChannelHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(AsyncHttpServerChannelHandler.class);
   
-  private NettyServer nettyServer;
+  private AsyncHttpServer asyncHttpServer;
 
-  public NettyServerChannelHandler(NettyServer nettyServer) {
-    this.nettyServer = nettyServer;
+  public AsyncHttpServerChannelHandler(AsyncHttpServer asyncHttpServer) {
+    this.asyncHttpServer = asyncHttpServer;
   }
 
   @Override
@@ -53,9 +53,9 @@ public class NettyServerChannelHandler extends SimpleChannelInboundHandler<Objec
       DecoderResult decoderResult = fullHttpRequest.getDecoderResult();
       if (decoderResult.isFailure()) {
         Throwable cause = decoderResult.cause();
-        nettyServer.handleDecoderFailure(cause, ctx);
+        asyncHttpServer.handleDecoderFailure(cause, ctx);
       } else {
-        nettyServer.handleRequest(fullHttpRequest, ctx);
+        asyncHttpServer.handleRequest(fullHttpRequest, ctx);
       }
     }
   }
@@ -68,6 +68,6 @@ public class NettyServerChannelHandler extends SimpleChannelInboundHandler<Objec
 
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-    nettyServer.requestException(cause, ctx);
+    asyncHttpServer.requestException(cause, ctx);
   }
 }

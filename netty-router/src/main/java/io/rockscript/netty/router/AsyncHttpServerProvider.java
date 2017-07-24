@@ -13,11 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript;
 
-public class TestServer extends Server {
+package io.rockscript.netty.router;
 
-  public TestServer(TestService testService) {
-    super(new TestServerConfiguration(testService));
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+
+/** For Guice modules, this provider creates a AsyncHttpServer
+ * from a AsyncHttpServerConfiguration. */
+public class AsyncHttpServerProvider implements Provider<AsyncHttpServer> {
+
+  @Inject
+  AsyncHttpServerConfiguration asyncHttpServerConfiguration;
+
+  @Override
+  public AsyncHttpServer get() {
+    return asyncHttpServerConfiguration.build();
   }
 }

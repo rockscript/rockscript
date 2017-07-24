@@ -19,6 +19,7 @@ package io.rockscript.netty.router;
 import java.nio.charset.Charset;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import org.slf4j.Logger;
@@ -35,16 +36,18 @@ public class Response {
 
   private static final Logger log = getLogger(Response.class);
 
-  protected NettyServer nettyServer;
+  protected AsyncHttpServer asyncHttpServer;
   protected ChannelHandlerContext channelHandlerContext;
   protected HttpVersion httpVersion = HTTP_1_1;
   protected ByteBuf byteBuf = buffer();
   protected HttpResponseStatus status = OK;
   protected HttpHeaders headers = new DefaultHttpHeaders();
   protected String contentStringForLog;
+  protected FullHttpRequest fullHttpRequest;
 
-  public Response(NettyServer nettyServer, ChannelHandlerContext channelHandlerContext) {
-    this.nettyServer = nettyServer;
+  public Response(AsyncHttpServer asyncHttpServer, FullHttpRequest fullHttpRequest, ChannelHandlerContext channelHandlerContext) {
+    this.asyncHttpServer = asyncHttpServer;
+    this.fullHttpRequest = fullHttpRequest;
     this.channelHandlerContext = channelHandlerContext;
   }
 
@@ -78,7 +81,7 @@ public class Response {
   }
 
   public Response bodyJson(Object jsonBodyObject) {
-    String jsonBodyString = nettyServer.getJsonHandler().toJsonString(jsonBodyObject);
+    String jsonBodyString = asyncHttpServer.getJsonHandler().toJsonString(jsonBodyObject);
     bodyString(jsonBodyString);
     headerContentTypeApplicationJson();
     return this;
@@ -122,5 +125,22 @@ public class Response {
   protected void autoAddContentLengthHeader() {
     int readableBytes = byteBuf.readableBytes();
     header(CONTENT_LENGTH, Integer.toString(readableBytes));
+  }
+
+  public void send() {
+    HttpResponse httpResponse = getHttpResponse();
+    if (!HttpHeaders.isKeepAlive(fullHttpRequest)) {
+      channelHandlerContext
+        .writeAndFlush(httpResponse)
+        .addListener(ChannelFutureListener.CLOSE);
+    } else {
+      HttpHeaders headers = fullHttpRequest.headers();
+      headers.set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
+      channelHandlerContext.writeAndFlush(httpResponse);
+    }
+    // when adding the ctx.close() it seems that this causes
+    // the connection to be closed on the asyncHttpServer end, causing
+    // exceptions on the client for subsequent requests.
+    // ctx.close();
   }
 }

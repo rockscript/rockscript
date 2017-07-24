@@ -24,14 +24,14 @@ public class InterceptorContext {
   RequestHandler requestHandler;
   Request request;
   Response response;
-  NettyServer nettyServer;
+  AsyncHttpServer asyncHttpServer;
 
-  public InterceptorContext(List<Interceptor> interceptors, RequestHandler requestHandler, Request request, Response response, NettyServer nettyServer) {
+  public InterceptorContext(List<Interceptor> interceptors, RequestHandler requestHandler, Request request, Response response, AsyncHttpServer asyncHttpServer) {
     this.interceptors = interceptors;
     this.requestHandler = requestHandler;
     this.request = request;
     this.response = response;
-    this.nettyServer = nettyServer;
+    this.asyncHttpServer = asyncHttpServer;
   }
 
   public void next() {
@@ -51,8 +51,8 @@ public class InterceptorContext {
     return response;
   }
 
-  public NettyServer getNettyServer() {
-    return nettyServer;
+  public AsyncHttpServer getAsyncHttpServer() {
+    return asyncHttpServer;
   }
 
   public RequestHandler getRequestHandler() {

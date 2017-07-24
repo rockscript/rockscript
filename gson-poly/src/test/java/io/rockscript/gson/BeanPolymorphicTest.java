@@ -42,13 +42,11 @@ import static org.junit.Assert.assertNotNull;
 
 public class BeanPolymorphicTest {
 
-  static Gson gson = new GsonBuilder().registerTypeAdapterFactory(new PolymorphicTypeAdapterFactory().typeName(new TypeToken<Shape>() {
-
-  }, "shape").typeName(new TypeToken<Square>() {
-
-  }, "square").typeName(new TypeToken<Circle>() {
-
-  }, "circle")).create();
+  static Gson gson = new GsonBuilder().registerTypeAdapterFactory(new PolymorphicTypeAdapterFactory()
+    .typeName(new TypeToken<Shape>(){}, "shape")
+    .typeName(new TypeToken<Square>(){}, "square")
+    .typeName(new TypeToken<Circle>(){}, "circle"))
+  .create();
 
   public static class Shape {
 

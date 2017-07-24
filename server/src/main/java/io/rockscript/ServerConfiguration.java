@@ -15,14 +15,14 @@
  */
 package io.rockscript;
 
-import io.rockscript.netty.router.NettyServerConfiguration;
+import io.rockscript.netty.router.AsyncHttpServerConfiguration;
 
 public class ServerConfiguration {
 
-  NettyServerConfiguration nettyServerConfiguration = new NettyServerConfiguration();
+  AsyncHttpServerConfiguration asyncHttpServerConfiguration = new AsyncHttpServerConfiguration();
 
   public ServerConfiguration port(int port) {
-    nettyServerConfiguration.port(port);
+    asyncHttpServerConfiguration.port(port);
     return this;
   }
 
@@ -30,7 +30,7 @@ public class ServerConfiguration {
     return new Server(this);
   }
 
-  NettyServerConfiguration getNettyServerConfiguration() {
-    return nettyServerConfiguration;
+  AsyncHttpServerConfiguration getAsyncHttpServerConfiguration() {
+    return asyncHttpServerConfiguration;
   }
 }

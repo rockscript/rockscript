@@ -29,9 +29,9 @@ import io.netty.handler.codec.http.router.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NettyServer {
+public class AsyncHttpServer {
 
-  static Logger log = LoggerFactory.getLogger(NettyServer.class);
+  static Logger log = LoggerFactory.getLogger(AsyncHttpServer.class);
 
   protected Router<Class<?>> router;
   protected int port;
@@ -44,15 +44,15 @@ public class NettyServer {
   protected Channel channel;
   protected Context context;
 
-  public NettyServer(NettyServerConfiguration nettyServerConfiguration) {
-    this.router = nettyServerConfiguration.getRouter();
-    this.port = nettyServerConfiguration.getPort();
-    this.services = nettyServerConfiguration.getServices();
-    this.interceptors = nettyServerConfiguration.getInterceptors();
-    this.jsonHandler = nettyServerConfiguration.getJsonHandler();
+  public AsyncHttpServer(AsyncHttpServerConfiguration asyncHttpServerConfiguration) {
+    this.router = asyncHttpServerConfiguration.getRouter();
+    this.port = asyncHttpServerConfiguration.getPort();
+    this.services = asyncHttpServerConfiguration.getServices();
+    this.interceptors = asyncHttpServerConfiguration.getInterceptors();
+    this.jsonHandler = asyncHttpServerConfiguration.getJsonHandler();
   }
 
-  public NettyServer startup() {
+  public AsyncHttpServer startup() {
     bossGroup = new NioEventLoopGroup(1);
     workerGroup = new NioEventLoopGroup();
 
@@ -71,7 +71,7 @@ public class NettyServer {
         .sync()
         .channel();
       
-      log.debug("NettyServer started: http://127.0.0.1:" + port + "/\n" + router);
+      log.debug("AsyncHttpServer started: http://127.0.0.1:" + port + "/\n" + router);
 
     } catch (Throwable t) {
       t.printStackTrace();
@@ -85,7 +85,7 @@ public class NettyServer {
     BadRequestException.checkNotNull(route, "No route for %s %s", fullHttpRequest.getMethod(), fullHttpRequest.getUri());
     
     Request request = new Request(this, fullHttpRequest, route);
-    Response response = new Response(this, ctx);
+    Response response = new Response(this, fullHttpRequest, ctx);
 
     try {
       System.err.println();
@@ -110,24 +110,11 @@ public class NettyServer {
       }
       response.bodyString("{ \"message\": \"oops\" }");
       response.headerContentTypeApplicationJson();
+      response.send();
       requestException(e, ctx);
     } finally {
-
-      // TODO Make responses properly async. This writeAndFlush code should be callable by the request handlers in an async callback.
-
-      HttpResponse httpResponse = response.getHttpResponse();
-      if (!HttpHeaders.isKeepAlive(fullHttpRequest)) {
-        ctx.writeAndFlush(httpResponse).addListener(ChannelFutureListener.CLOSE);
-      } else {
-        HttpHeaders headers = fullHttpRequest.headers();
-        headers.set(HttpHeaders.Names.CONNECTION, HttpHeaders.Values.KEEP_ALIVE);
-        ctx.writeAndFlush(httpResponse);
-      }
-      // when adding the ctx.close() it seems that this causes
-      // the connection to be closed on the nettyServer end, causing
-      // exceptions on the client for subsequent requests.
-      // ctx.close();
-    }      
+      // ?
+    }
   }
 
   public <T> T instantiate(Class<?> clazz) {
@@ -147,8 +134,8 @@ public class NettyServer {
     }
   }
   
-  protected NettyServerChannelInitializer createServerChannelInitializer() {
-    return new NettyServerChannelInitializer(this);
+  protected AsyncHttpServerChannelInitializer createServerChannelInitializer() {
+    return new AsyncHttpServerChannelInitializer(this);
   }
   
   public void waitForShutdown() {

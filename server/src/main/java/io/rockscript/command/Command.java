@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.command;
 
-package io.rockscript.netty.router;
+import io.rockscript.netty.router.Request;
+import io.rockscript.netty.router.Response;
 
-public interface NettyServerComponent {
+public interface Command {
 
-  void configure(NettyServerConfiguration nettyServerConfiguration);
-
+  void execute(Request request, Response response);
 }

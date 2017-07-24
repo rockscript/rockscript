@@ -23,7 +23,7 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import io.netty.handler.codec.http.router.Router;
 
-public class NettyServerConfiguration {
+public class AsyncHttpServerConfiguration {
 
   protected Router<Class<?>> router = new Router<>();
   protected int port = 8888;
@@ -32,11 +32,11 @@ public class NettyServerConfiguration {
   protected Injector services;
   protected JsonHandler jsonHandler;
 
-  public NettyServer build() {
-    return new NettyServer(this);
+  public AsyncHttpServer build() {
+    return new AsyncHttpServer(this);
   }
 
-  public NettyServerConfiguration component(NettyServerComponent component) {
+  public AsyncHttpServerConfiguration component(AsyncHttpServerComponent component) {
     component.configure(this);
     return this;
   }
@@ -53,7 +53,7 @@ public class NettyServerConfiguration {
     this.port = port;
   }
 
-  public NettyServerConfiguration port(int port) {
+  public AsyncHttpServerConfiguration port(int port) {
     this.port = port;
     return this;
   }
@@ -66,7 +66,7 @@ public class NettyServerConfiguration {
     this.services = services;
   }
 
-  public NettyServerConfiguration services(Injector services) {
+  public AsyncHttpServerConfiguration services(Injector services) {
     this.services = services;
     return this;
   }
@@ -87,12 +87,12 @@ public class NettyServerConfiguration {
     this.jsonHandler = jsonHandler;
   }
 
-  public NettyServerConfiguration jsonHandler(JsonHandler jsonHandler) {
+  public AsyncHttpServerConfiguration jsonHandler(JsonHandler jsonHandler) {
     this.jsonHandler = jsonHandler;
     return this;
   }
 
-  public NettyServerConfiguration interceptor(Interceptor interceptor) {
+  public AsyncHttpServerConfiguration interceptor(Interceptor interceptor) {
     if (interceptors==null) {
       interceptors = new ArrayList<>();
     }
@@ -100,7 +100,7 @@ public class NettyServerConfiguration {
     return this;
   }
 
-  public NettyServerConfiguration scan(Class... classes) {
+  public AsyncHttpServerConfiguration scan(Class... classes) {
     if (classes!=null) {
       for (Class clazz : classes) {
         scan(clazz);
@@ -109,7 +109,7 @@ public class NettyServerConfiguration {
     return this;
   }
 
-  public NettyServerConfiguration scan(Class<?> clazz) {
+  public AsyncHttpServerConfiguration scan(Class<?> clazz) {
     Gets repeatableAnnotation = clazz.getDeclaredAnnotation(Gets.class);
     Get[] annotations = repeatableAnnotation!=null ? repeatableAnnotation.value() : null;
     for (Get annotation : list(clazz.getDeclaredAnnotation(Get.class), annotations)) {
@@ -150,132 +150,132 @@ public class NettyServerConfiguration {
     return list;
   }
 
-  public NettyServerConfiguration DELETE(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration DELETE(String path, Class<?> target) {
     router.DELETE(path, target);
     return this;
   }
 
-  public NettyServerConfiguration GET(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration GET(String path, Class<?> target) {
     router.GET(path, target);
     return this;
   }
 
-  public NettyServerConfiguration HEAD(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration HEAD(String path, Class<?> target) {
     router.HEAD(path, target);
     return this;
   }
 
-  public NettyServerConfiguration OPTIONS(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration OPTIONS(String path, Class<?> target) {
     router.OPTIONS(path, target);
     return this;
   }
 
-  public NettyServerConfiguration PATCH(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration PATCH(String path, Class<?> target) {
     router.PATCH(path, target);
     return this;
   }
 
-  public NettyServerConfiguration POST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration POST(String path, Class<?> target) {
     router.POST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration PUT(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration PUT(String path, Class<?> target) {
     router.PUT(path, target);
     return this;
   }
 
-  public NettyServerConfiguration TRACE(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration TRACE(String path, Class<?> target) {
     router.TRACE(path, target);
     return this;
   }
 
-  public NettyServerConfiguration DELETE_FIRST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration DELETE_FIRST(String path, Class<?> target) {
     router.DELETE_FIRST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration GET_FIRST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration GET_FIRST(String path, Class<?> target) {
     router.GET_FIRST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration HEAD_FIRST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration HEAD_FIRST(String path, Class<?> target) {
     router.HEAD_FIRST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration OPTIONS_FIRST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration OPTIONS_FIRST(String path, Class<?> target) {
     router.OPTIONS_FIRST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration PATCH_FIRST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration PATCH_FIRST(String path, Class<?> target) {
     router.PATCH_FIRST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration POST_FIRST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration POST_FIRST(String path, Class<?> target) {
     router.POST_FIRST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration PUT_FIRST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration PUT_FIRST(String path, Class<?> target) {
     router.PUT_FIRST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration TRACE_FIRST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration TRACE_FIRST(String path, Class<?> target) {
     router.TRACE_FIRST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration DELETE_LAST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration DELETE_LAST(String path, Class<?> target) {
     router.DELETE_LAST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration GET_LAST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration GET_LAST(String path, Class<?> target) {
     router.GET_LAST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration HEAD_LAST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration HEAD_LAST(String path, Class<?> target) {
     router.HEAD_LAST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration OPTIONS_LAST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration OPTIONS_LAST(String path, Class<?> target) {
     router.OPTIONS_LAST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration PATCH_LAST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration PATCH_LAST(String path, Class<?> target) {
     router.PATCH_LAST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration POST_LAST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration POST_LAST(String path, Class<?> target) {
     router.POST_LAST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration PUT_LAST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration PUT_LAST(String path, Class<?> target) {
     router.PUT_LAST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration TRACE_LAST(String path, Class<?> target) {
+  public AsyncHttpServerConfiguration TRACE_LAST(String path, Class<?> target) {
     router.TRACE_LAST(path, target);
     return this;
   }
 
-  public NettyServerConfiguration notFound(Class<?> target) {
+  public AsyncHttpServerConfiguration notFound(Class<?> target) {
     router.notFound(target);
     return this;
   }
 
-  public NettyServerConfiguration defaultNotFoundHandler() {
+  public AsyncHttpServerConfiguration defaultNotFoundHandler() {
     router.notFound(DefaultNotFoundHandler.class);
     return this;
   }

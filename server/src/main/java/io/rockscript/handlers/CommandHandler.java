@@ -13,11 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript;
+package io.rockscript.handlers;
 
-public class TestServer extends Server {
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import io.rockscript.command.Command;
+import io.rockscript.netty.router.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-  public TestServer(TestService testService) {
-    super(new TestServerConfiguration(testService));
+@Post("/command")
+public class CommandHandler implements RequestHandler {
+
+  static Logger log = LoggerFactory.getLogger(CommandHandler.class);
+
+  @Inject
+  Injector injector;
+
+  @Override
+  public void handle(Request request, Response response) {
+    Command command = request.getBodyJson(Command.class);
+    injector.injectMembers(command);
+    command.execute(request, response);
   }
 }

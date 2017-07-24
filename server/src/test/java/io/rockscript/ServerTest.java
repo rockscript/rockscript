@@ -15,41 +15,61 @@
  */
 package io.rockscript;
 
+import io.rockscript.command.DeployScriptCommand;
+import io.rockscript.command.StartScriptCommand;
 import io.rockscript.http.test.AbstractServerTest;
-import io.rockscript.netty.router.NettyServer;
-import org.apache.http.entity.ContentType;
+import io.rockscript.netty.router.AsyncHttpServer;
 import org.junit.*;
 
 import static org.junit.Assert.assertEquals;
 
 public class ServerTest extends AbstractServerTest {
 
+  TestService testService;
   Server server;
 
   @Before
   public void setUp() {
-    server = new TestServer();
+    testService = new TestService();
+    server = new TestServer(testService);
     server.startup();
   }
 
   @After
   public void tearDown() {
     server.shutdown();
+    server.waitForShutdown();
   }
 
   @Test
   public void testServer() {
-    String responseBody = POST("scripts")
-      .bodyString("var a = 'msg';", ContentType.create("application/rockscript"))
+    DeployScriptCommand.ResponseJson deployScriptResponse = POST("command")
+      .bodyJson(new DeployScriptCommand()
+         .script(
+           "var t = system.import('rockscript.io/test-service'); "+
+           "t.doLongRunning('hello'); "))
       .execute()
       .assertStatusOk()
-      .bodyStringUtf8();
+      .body(DeployScriptCommand.ResponseJson.class);
 
-    assertEquals("goodby", responseBody);
+    String scriptId = deployScriptResponse.scriptId;
+
+    assertEquals("1", scriptId);
+
+    StartScriptCommand.ResponseJson startScriptResponse = POST("command")
+      .bodyJson(new StartScriptCommand()
+                .scriptId(scriptId))
+      .execute()
+      .assertStatusOk()
+      .body(StartScriptCommand.ResponseJson.class);
+
+    String scriptExecutionId = startScriptResponse.scriptExecutionId;
+
+    assertEquals(1, testService.inputs.size());
   }
 
   @Override
-  public NettyServer getNettyServer() {
-    return server.nettyServer;
+  public AsyncHttpServer getNettyServer() {
+    return server.asyncHttpServer;
   }
 }

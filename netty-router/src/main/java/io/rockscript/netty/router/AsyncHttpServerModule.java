@@ -19,27 +19,27 @@ package io.rockscript.netty.router;
 import com.google.inject.AbstractModule;
 
 
-public class NettyServerModule extends AbstractModule {
+public class AsyncHttpServerModule extends AbstractModule {
 
-  NettyServerConfiguration nettyServerConfiguration = null;
+  AsyncHttpServerConfiguration asyncHttpServerConfiguration = null;
 
-  public NettyServerModule() {
-    this(new NettyServerConfiguration()
+  public AsyncHttpServerModule() {
+    this(new AsyncHttpServerConfiguration()
         .defaultNotFoundHandler());
   }
 
-  public NettyServerModule(NettyServerConfiguration nettyServerConfiguration) {
-    this.nettyServerConfiguration = nettyServerConfiguration;
+  public AsyncHttpServerModule(AsyncHttpServerConfiguration asyncHttpServerConfiguration) {
+    this.asyncHttpServerConfiguration = asyncHttpServerConfiguration;
   }
 
-  public NettyServerModule requestHandlerClass(Class<? extends RequestHandler> requestHandlerClass) {
-    nettyServerConfiguration.scan(requestHandlerClass);
+  public AsyncHttpServerModule requestHandlerClass(Class<? extends RequestHandler> requestHandlerClass) {
+    asyncHttpServerConfiguration.scan(requestHandlerClass);
     return this;
   }
 
   @Override
   protected void configure() {
-    bind(NettyServerConfiguration.class).toInstance(nettyServerConfiguration);
-    bind(NettyServer.class).toProvider(new NettyServerProvider());
+    bind(AsyncHttpServerConfiguration.class).toInstance(asyncHttpServerConfiguration);
+    bind(AsyncHttpServer.class).toProvider(new AsyncHttpServerProvider());
   }
 }
