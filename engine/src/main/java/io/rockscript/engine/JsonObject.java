@@ -38,13 +38,7 @@ public class JsonObject {
   }
 
   public JsonObject put(String propertyName, Function<ActionInput, ActionResponse> actionFunction) {
-    this.put(propertyName, new Action() {
-      @Override
-      public ActionResponse invoke(ArgumentsExpressionExecution argumentsExpressionExecution, List<Object> args) {
-        ActionInput functionInput = new ActionInput(argumentsExpressionExecution, args);
-        return actionFunction.apply(functionInput);
-      }
-    });
+    put(propertyName, (Action) (input) -> actionFunction.apply(input));
     return this;
   }
 

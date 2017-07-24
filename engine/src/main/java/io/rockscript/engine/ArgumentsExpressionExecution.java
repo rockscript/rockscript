@@ -18,8 +18,7 @@ package io.rockscript.engine;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.rockscript.action.Action;
-import io.rockscript.action.ActionResponse;
+import io.rockscript.action.*;
 
 public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression> {
 
@@ -93,7 +92,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     Action action = (Action) actionExecution.getResult();
     List<Object> args = collectArgs();
     // TODO Construct ActionInput and pass that instead
-    return action.invoke(this, args);
+    return action.invoke(new ActionInput(this, args));
   }
 
   private List<Object> collectArgs() {

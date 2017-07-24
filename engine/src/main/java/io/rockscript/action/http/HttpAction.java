@@ -18,11 +18,10 @@ package io.rockscript.action.http;
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
-import io.rockscript.action.Action;
-import io.rockscript.action.ActionResponse;
-import io.rockscript.engine.ArgumentsExpressionExecution;
+import io.rockscript.action.*;
 
 public class HttpAction implements Action {
 
@@ -33,7 +32,7 @@ public class HttpAction implements Action {
   }
 
   @Override
-  public ActionResponse invoke(ArgumentsExpressionExecution argumentsExpressionExecution, List<Object> args) {
+  public ActionResponse invoke(ActionInput input) {
     Request request;
     try {
       // TODO Construct the HTTP request from the inputs.
