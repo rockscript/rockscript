@@ -35,16 +35,8 @@ public class HttpAction implements Action {
   public ActionOutput invoke(ActionInput input) {
     Request request;
     try {
-      // TODO Construct the HTTP request from the inputs.
-      URL url = new URL("https://api.github.com/orgs/RockScript");
-      Method method = Method.GET;
-      String contentType = null;
-      TextRequestBody body = new TextRequestBody(contentType, null);
-      Set<RequestHeader> headers = new HashSet<>();
-      headers.add(new RequestHeader("Accept", "application/json"));
-      // TODO headers.add("X-Correlation-Id", scriptExecutionId);
-      request = new Request(url, method, headers, body);
-    } catch (MalformedURLException e) {
+      request = new RequestBuilder(input).build();
+    } catch (IllegalArgumentException e) {
       return ActionOutput.endFunction(e);
     }
 

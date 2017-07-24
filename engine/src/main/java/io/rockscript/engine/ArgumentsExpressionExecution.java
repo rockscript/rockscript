@@ -91,7 +91,6 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     Execution actionExecution = children.get(0);
     Action action = (Action) actionExecution.getResult();
     List<Object> args = collectArgs();
-    // TODO Construct ActionInput and pass that instead
     return action.invoke(new ActionInput(this, args));
   }
 

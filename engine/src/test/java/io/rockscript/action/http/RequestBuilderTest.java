@@ -13,27 +13,33 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class HttpActionTest {
+public class RequestBuilderTest {
 
   private EventStore eventStore;
   private TestEngine engine;
+
+  private static class RequestBuilderAction implements Action {
+    @Override
+    public ActionOutput invoke(ActionInput input) {
+      return ActionOutput.endFunction(new RequestBuilder(input).build());
+    }
+  }
 
   @Before
   public void setup() throws Exception {
     engine = new TestEngine();
     eventStore = engine.getServiceLocator().getEventStore();
     ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
-    JsonObject httpService = new JsonObject()
-        .put("get", new HttpAction());
+    JsonObject httpService = new JsonObject().put("request", new RequestBuilderAction());
     importResolver.add("rockscript.io/http", httpService);
   }
 
   @Test
-  public void testGetRequest() throws InterruptedException, IOException {
+  public void testHttpActionBuildsGetRequest() throws InterruptedException {
     // Given a script that uses an HTTP action
     String scriptId = engine.deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
-            "http.get({ " +
+            "http.request({ " +
             "  url: 'https://api.github.com/orgs/RockScript',"  +
             "  headers: { " +
             "    Accept: 'application/json' " +
@@ -47,17 +53,23 @@ public class HttpActionTest {
     List<EventJson> events = eventStore.findEventsByScriptExecutionId(scriptExecutionId);
     assertNotNull(events);
     assertFalse(events.isEmpty());
-    Response httpResponse = events.stream()
+    Request httpRequest = events.stream()
         .filter(event -> event instanceof ActionEndedEventJson)
         .map(ActionEndedEventJson.class::cast)
         .map(actionEndedEvent -> actionEndedEvent.result)
-        .map(Response.class::cast)
+        .map(Request.class::cast)
         .findFirst().get();
-    assertNotNull(httpResponse);
+    assertNotNull(httpRequest);
 
     // Add the response contains the expected data
-    assertEquals(HttpURLConnection.HTTP_OK, httpResponse.status);
-    assertEquals(MediaType.JSON_UTF_8.toString(), httpResponse.contentType());
-    assertTrue(httpResponse.textBody.contains("\"name\":\"RockScript\""));
+    assertEquals("https://api.github.com/orgs/RockScript", httpRequest.url.toString());
+    assertEquals(Method.GET, httpRequest.method);
+    assertEquals(scriptExecutionId, httpRequest.getHeader("X-Correlation-Id").get());
+    assertEquals("application/json", httpRequest.getHeader("Accept").get());
+  }
+
+  // TODO Test that the HTTP action can construct an HTTP POST Request object
+//  @Test
+  public void testPostRequestBody() throws InterruptedException {
   }
 }
