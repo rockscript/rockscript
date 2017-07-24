@@ -18,8 +18,7 @@ package io.rockscript.engine;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.rockscript.action.Action;
-import io.rockscript.action.ActionResponse;
+import io.rockscript.action.*;
 
 public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression> {
 
@@ -57,8 +56,8 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   private void invokeSystemImportFunction() {
     // import functions have to be re-executed when the events
     // are applied because they can return functions
-    ActionResponse actionResponse = startActionInvoke();
-    Object importedObject = actionResponse.getResult();
+    ActionOutput output = startActionInvoke();
+    Object importedObject = output.getResult();
     dispatch(new ObjectImportedEvent(this, importedObject));
     endActionExecute(importedObject);
   }
@@ -68,9 +67,9 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   }
 
   public void startActionExecute() {
-    ActionResponse actionResponse = startActionInvoke();
-    if (actionResponse.isEnded()) {
-      endAction(actionResponse.getResult());
+    ActionOutput actionOutput = startActionInvoke();
+    if (actionOutput.isEnded()) {
+      endAction(actionOutput.getResult());
 
     } else {
       dispatch(new ActionWaitingEvent(this));
@@ -88,11 +87,11 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     end();
   }
 
-  public ActionResponse startActionInvoke() {
+  public ActionOutput startActionInvoke() {
     Execution actionExecution = children.get(0);
     Action action = (Action) actionExecution.getResult();
     List<Object> args = collectArgs();
-    return action.invoke(this, args);
+    return action.invoke(new ActionInput(this, args));
   }
 
   private List<Object> collectArgs() {

@@ -16,24 +16,23 @@
 package io.rockscript.action.http;
 
 import java.net.URL;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Optional;
 
 class Request {
 
   final URL url;
   final Method method;
-  final Collection<RequestHeader> headers;
+  final RequestHeaders headers;
   final TextRequestBody body;
 
-  Request(URL url, Method method) {
+  Request(URL url, Method method, RequestHeaders headers) {
     this.url = url;
     this.method = method;
-    headers = Collections.emptySet();
+    this.headers = headers;
     body = null;
   }
 
-  Request(URL url, Method method, Collection<RequestHeader> headers, TextRequestBody body) {
+  Request(URL url, Method method, RequestHeaders headers, TextRequestBody body) {
     this.url = url;
     this.method = method;
     this.headers = headers;
@@ -42,5 +41,9 @@ class Request {
 
   public boolean hasBody() {
     return body != null && !body.empty();
+  }
+
+  Optional<String> getHeader(String name) {
+    return headers.get(name);
   }
 }

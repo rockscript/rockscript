@@ -19,7 +19,7 @@ package io.rockscript.action.http;
 import java.util.*;
 
 import io.rockscript.Engine;
-import io.rockscript.action.ActionResponse;
+import io.rockscript.action.*;
 import io.rockscript.engine.*;
 import io.rockscript.test.TestEngine;
 import org.junit.Test;
@@ -40,36 +40,7 @@ public class HttpWorkerTest {
       actionInputQueue.add(actionInput);
       // When the action input is processed async, actionDone should be called
     }
-    public void actionDone(ActionOutput actionOutput) {
-      engine.endWaitingAction(
-        actionOutput.scriptExecutionId,
-        actionOutput.executionId,
-        actionOutput.result);
-    }
   }
-
-  public static class ActionInput {
-    String scriptExecutionId;
-    String executionId;
-    List<Object> args;
-    public ActionInput(String scriptExecutionId, String executionId, List<Object> args) {
-      this.scriptExecutionId = scriptExecutionId;
-      this.executionId = executionId;
-      this.args = args;
-    }
-  }
-
-  public static class ActionOutput {
-    String scriptExecutionId;
-    String executionId;
-    Object result;
-    public ActionOutput(ActionInput actionInput, Object result) {
-      this.scriptExecutionId = actionInput.scriptExecutionId;
-      this.executionId = actionInput.executionId;
-      this.result = result;
-    }
-  }
-
 
   @Test
   public void testAsyncExecution() {
@@ -77,14 +48,9 @@ public class HttpWorkerTest {
     HttpActionWorker httpActionWorker = new HttpActionWorker(engine);
     ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
     JsonObject http = new JsonObject()
-      .put("get", functionInput->{
-        // TODO Rename FunctionInput to ActionInput
-        ArgumentsExpressionExecution argumentsExpressionExecution = functionInput.getArgumentsExpressionExecution();
-        String scriptExecutionId = argumentsExpressionExecution.getScriptExecution().getId();
-        String executionId = argumentsExpressionExecution.getId();
-        ActionInput actionInput = new ActionInput(scriptExecutionId, executionId, functionInput.getArgs());
-        httpActionWorker.addActionInput(actionInput);
-        return ActionResponse.waitForFunctionToCompleteAsync();});
+      .put("get", input -> {
+        httpActionWorker.addActionInput(input);
+        return ActionOutput.waitForFunctionToCompleteAsync();});
     importResolver.add("rockscript.io/http", http);
 
     String scriptId = engine.deployScript(
@@ -97,18 +63,16 @@ public class HttpWorkerTest {
 
     ActionInput actionInput = httpActionWorker.actionInputQueue.get(0);
 
-    assertNotNull(actionInput.scriptExecutionId);
-    assertNotNull(actionInput.executionId);
+    assertNotNull(actionInput.context.scriptExecutionId);
+    assertNotNull(actionInput.context.executionId);
 
     Map<String,Object> actionInputArgs = (Map<String, Object>) actionInput.args.get(0);
     assertEquals("http://rockscript.io/interesting/data", actionInputArgs.get("url"));
 
     Map<String,Object> result = new HashMap<>();
     result.put("status", "200");
-    ActionOutput actionOutput = new ActionOutput(actionInput, result);
-    httpActionWorker.actionDone(actionOutput);
+    httpActionWorker.engine.endWaitingAction(actionInput.context, result);
 
     // TODO check the script
   }
-
 }

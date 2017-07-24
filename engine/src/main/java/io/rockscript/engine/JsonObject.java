@@ -17,9 +17,9 @@
 package io.rockscript.engine;
 
 import java.util.*;
+import java.util.function.Function;
 
-import io.rockscript.action.Action;
-import io.rockscript.action.ActionResponse;
+import io.rockscript.action.*;
 
 public class JsonObject {
 
@@ -37,14 +37,8 @@ public class JsonObject {
     return this;
   }
 
-  public JsonObject put(String propertyName, java.util.function.Function<FunctionInput, ActionResponse> functionHandler) {
-    this.put(propertyName, new Action() {
-      @Override
-      public ActionResponse invoke(ArgumentsExpressionExecution argumentsExpressionExecution, List<Object> args) {
-        FunctionInput functionInput = new FunctionInput(argumentsExpressionExecution, args);
-        return functionHandler.apply(functionInput);
-      }
-    });
+  public JsonObject put(String propertyName, Function<ActionInput, ActionOutput> actionFunction) {
+    put(propertyName, (Action) (input) -> actionFunction.apply(input));
     return this;
   }
 

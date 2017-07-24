@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.rockscript.action.Action;
-import io.rockscript.action.ActionResponse;
+import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.*;
 import io.rockscript.test.*;
 import io.rockscript.test.CrashTestEngine.CrashEventListener;
@@ -51,14 +51,13 @@ public class CrashTest {
     engine.getServiceLocator()
       .getImportResolver()
       .add("example.com/hello", new ImportJsonObject()
-        .put("aSyncFunction", functionInput->{
+        .put("aSyncFunction", input -> {
           synchronousCapturedData.add("Execution was here");
-          synchronousCapturedData.add(functionInput.getArgs().get(0));
-          return ActionResponse.endFunction();})
-        .put("anAsyncFunction", functionInput->{
-          ArgumentsExpressionExecution argumentsExpressionExecution = functionInput.getArgumentsExpressionExecution();
-          waitingAsyncFunctionInvocationIds.add(argumentsExpressionExecution.getId());
-          return ActionResponse.waitForFunctionToCompleteAsync();}));
+          synchronousCapturedData.add(input.args.get(0));
+          return ActionOutput.endFunction();})
+        .put("anAsyncFunction", input -> {
+          waitingAsyncFunctionInvocationIds.add(input.context.executionId);
+          return ActionOutput.waitForFunctionToCompleteAsync();}));
   }
 
   @Test

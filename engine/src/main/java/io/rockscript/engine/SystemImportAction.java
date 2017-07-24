@@ -16,11 +16,8 @@
 
 package io.rockscript.engine;
 
-import java.util.List;
-
 import io.rockscript.ServiceLocator;
-import io.rockscript.action.Action;
-import io.rockscript.action.ActionResponse;
+import io.rockscript.action.*;
 
 public class SystemImportAction implements Action {
 
@@ -31,10 +28,10 @@ public class SystemImportAction implements Action {
   }
 
   @Override
-  public ActionResponse invoke(ArgumentsExpressionExecution argumentsExpressionExecution, List<Object> args) {
-    String url = (String) args.get(0);
+  public ActionOutput invoke(ActionInput input) {
+    String url = (String) input.args.get(0);
     JsonObject importedObject = serviceLocator.getImportResolver().get(url);
-    return ActionResponse.endFunction(importedObject);
+    return ActionOutput.endFunction(importedObject);
   }
 
   @Override

@@ -5,14 +5,12 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 
-import io.rockscript.action.http.HttpAction.Configuration;
-
 class HttpURLConnectionBuilder {
 
-  private final Configuration configuration;
+  private final HttpActionConfiguration configuration;
   private final Request request;
 
-  HttpURLConnectionBuilder(Configuration configuration, Request request) {
+  HttpURLConnectionBuilder(HttpActionConfiguration configuration, Request request) {
     this.configuration = configuration;
     this.request = request;
   }
@@ -25,7 +23,7 @@ class HttpURLConnectionBuilder {
     if (request.hasBody()) {
       connection.addRequestProperty("Content-Type", request.body.contentType);
     }
-    request.headers.forEach(header -> connection.addRequestProperty(header.name, header.value));
+    request.headers.values().forEach(header -> connection.addRequestProperty(header.name, header.value));
 
     if (request.method.hasRequestBody()) {
       connection.setDoOutput(true);
@@ -36,5 +34,4 @@ class HttpURLConnectionBuilder {
 
     return connection;
   }
-
 }

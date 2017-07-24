@@ -85,20 +85,21 @@ public class EngineImpl implements Engine {
   }
 
   @Override
-  public void endWaitingAction(String scriptExecutionId, String waitingExecutionId) {
-    endWaitingAction(scriptExecutionId, waitingExecutionId, null);
+  public void endWaitingAction(ScriptExecutionContext context) {
+    endWaitingAction(context, null);
   }
 
   @Override
-  public void endWaitingAction(String scriptExecutionId, String waitingExecutionId, Object result) {
-    endWaitingActionImpl(scriptExecutionId, waitingExecutionId, result);
+  public void endWaitingAction(ScriptExecutionContext context, Object result) {
+    endWaitingActionImpl(context, result);
   }
 
-  public ScriptExecution endWaitingActionImpl(String scriptExecutionId, String waitingExecutionId, Object result) {
+  public ScriptExecution endWaitingActionImpl(ScriptExecutionContext context, Object result) {
     ScriptExecution scriptExecution = serviceLocator
       .getEventStore()
-      .loadScriptExecution(scriptExecutionId);
+      .loadScriptExecution(context.scriptExecutionId);
 
+    String waitingExecutionId = context.executionId;
     ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) scriptExecution
       .findExecutionRecursive(waitingExecutionId);
 

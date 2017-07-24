@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.rockscript.action.Action;
-import io.rockscript.action.ActionResponse;
+import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.*;
 import io.rockscript.test.DeepComparator;
 import io.rockscript.test.TestEngine;
@@ -43,14 +43,13 @@ public class ScriptTest {
     TestEngine engine = new TestEngine();
     ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
     JsonObject helloService = new JsonObject()
-      .put("aSyncFunction", functionInput->{
+      .put("aSyncFunction", input -> {
           synchronousCapturedData.add("Execution was here");
-          synchronousCapturedData.add(functionInput.getArgs().get(0));
-          return ActionResponse.endFunction();})
-      .put("anAsyncFunction", functionInput->{
-          ArgumentsExpressionExecution argumentsExpressionExecution = functionInput.getArgumentsExpressionExecution();
-          waitingAsyncFunctionInvocationIds.add(argumentsExpressionExecution.getId());
-          return ActionResponse.waitForFunctionToCompleteAsync();});
+          synchronousCapturedData.add(input.args.get(0));
+          return ActionOutput.endFunction();})
+      .put("anAsyncFunction", input -> {
+          waitingAsyncFunctionInvocationIds.add(input.context.executionId);
+          return ActionOutput.waitForFunctionToCompleteAsync();});
     importResolver.add("example.com/hello", helloService);
     return engine;
   }
@@ -73,7 +72,7 @@ public class ScriptTest {
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
     assertNotNull(waitingExecutionId);
 
-    engine.endWaitingAction(scriptExecutionId, waitingExecutionId);
+    engine.endWaitingAction(new ScriptExecutionContext(scriptExecutionId, waitingExecutionId));
 
     assertEquals("Execution was here", synchronousCapturedData.get(2));
     assertEquals("hello", synchronousCapturedData.get(3));
@@ -106,7 +105,7 @@ public class ScriptTest {
 
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
 
-    scriptExecution = engine.endWaitingActionImpl(scriptExecutionId, waitingExecutionId, null);
+    scriptExecution = engine.endWaitingActionImpl(new ScriptExecutionContext(scriptExecutionId, waitingExecutionId), null);
 
     reloadedScriptExecution = engine
       .getServiceLocator()

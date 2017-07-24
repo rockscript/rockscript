@@ -18,35 +18,26 @@ package io.rockscript.action.http;
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
-import io.rockscript.action.Action;
-import io.rockscript.action.ActionResponse;
-import io.rockscript.engine.ArgumentsExpressionExecution;
+import io.rockscript.action.*;
 
 public class HttpAction implements Action {
 
-  private static Configuration configuration = new Configuration();
+  private static HttpActionConfiguration configuration = new HttpActionConfiguration();
   static {
     configuration.connectionTimeoutMilliseconds = 0;
     configuration.readTimeoutMilliseconds = 0;
   }
 
   @Override
-  public ActionResponse invoke(ArgumentsExpressionExecution argumentsExpressionExecution, List<Object> args) {
+  public ActionOutput invoke(ActionInput input) {
     Request request;
     try {
-      // TODO Construct the HTTP request from the inputs.
-      URL url = new URL("https://api.github.com/orgs/RockScript");
-      Method method = Method.GET;
-      String contentType = null;
-      TextRequestBody body = new TextRequestBody(contentType, null);
-      Set<RequestHeader> headers = new HashSet<>();
-      headers.add(new RequestHeader("Accept", "application/json"));
-      // TODO headers.add("X-Correlation-Id", scriptExecutionId);
-      request = new Request(url, method, headers, body);
-    } catch (MalformedURLException e) {
-      return ActionResponse.endFunction(e);
+      request = new RequestBuilder(input).build();
+    } catch (IllegalArgumentException e) {
+      return ActionOutput.endFunction(e);
     }
 
     try {
@@ -56,14 +47,9 @@ public class HttpAction implements Action {
       ResponseHeaders headers = new ResponseHeaders(connection.getHeaderFields());
       int status = connection.getResponseCode();
       Response response = new Response(status, connection.getResponseMessage(), responseBody, headers);
-      return ActionResponse.endFunction(response);
+      return ActionOutput.endFunction(response);
     } catch (IOException e) {
-      return ActionResponse.endFunction(e);
+      return ActionOutput.endFunction(e);
     }
-  }
-
-  static class Configuration {
-    int connectionTimeoutMilliseconds;
-    int readTimeoutMilliseconds;
   }
 }

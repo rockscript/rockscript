@@ -15,10 +15,7 @@
  */
 package io.rockscript.engine;
 
-import java.util.List;
-
-import io.rockscript.action.Action;
-import io.rockscript.action.ActionResponse;
+import io.rockscript.action.*;
 
 public class ImportJsonObject extends JsonObject {
 
@@ -39,8 +36,8 @@ public class ImportJsonObject extends JsonObject {
       this.action = action;
     }
     @Override
-    public ActionResponse invoke(ArgumentsExpressionExecution argumentsExpressionExecution, List<Object> args) {
-      return action.invoke(argumentsExpressionExecution, args);
+    public ActionOutput invoke(ActionInput input) {
+      return action.invoke(input);
     }
     public String getName() {
       return name;

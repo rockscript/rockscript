@@ -15,6 +15,9 @@
  */
 package io.rockscript.action.http;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 enum Method {
   GET(false),
   POST(true),
@@ -32,5 +35,9 @@ enum Method {
 
   boolean hasRequestBody() {
     return requestBody;
+  }
+
+  public static String names() {
+    return String.join(", ", Arrays.stream(values()).map(Method::toString).collect(Collectors.toList()));
   }
 }

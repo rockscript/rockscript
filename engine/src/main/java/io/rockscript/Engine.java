@@ -19,6 +19,7 @@ package io.rockscript;
 import java.util.List;
 
 import io.rockscript.engine.ScriptExecution;
+import io.rockscript.engine.ScriptExecutionContext;
 
 public interface Engine {
 
@@ -26,9 +27,9 @@ public interface Engine {
 
   String startScriptExecution(String scriptId);
 
-  void endWaitingAction(String scriptExecutionId, String waitingExecutionId);
+  void endWaitingAction(ScriptExecutionContext context);
 
-  void endWaitingAction(String scriptExecutionId, String waitingExecutionId, Object result);
+  void endWaitingAction(ScriptExecutionContext context, Object result);
 
   ServiceLocator getServiceLocator();
 

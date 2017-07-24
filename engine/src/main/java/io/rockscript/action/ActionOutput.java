@@ -17,13 +17,31 @@ package io.rockscript.action;
 
 public class ActionOutput {
 
-  public final String scriptExecutionId;
-  public final String executionId;
-  public final Object result;
+  private final boolean ended;
+  private final Object result;
 
-  public ActionOutput(ActionInput actionInput, Object result) {
-    scriptExecutionId = actionInput.scriptExecutionId;
-    executionId = actionInput.executionId;
+  protected ActionOutput(boolean ended, Object result) {
+    this.ended = ended;
     this.result = result;
+  }
+
+  public static ActionOutput endFunction() {
+    return endFunction(null);
+  }
+
+  public static ActionOutput endFunction(Object result) {
+    return new ActionOutput(true, result);
+  }
+
+  public static ActionOutput waitForFunctionToCompleteAsync() {
+    return new ActionOutput(false, null);
+  }
+
+  public boolean isEnded() {
+    return ended;
+  }
+
+  public Object getResult() {
+    return result;
   }
 }

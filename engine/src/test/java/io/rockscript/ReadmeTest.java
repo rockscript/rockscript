@@ -18,7 +18,7 @@ package io.rockscript;
 
 import java.io.File;
 
-import io.rockscript.action.ActionResponse;
+import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.*;
 import io.rockscript.test.TestEngine;
 import org.junit.Before;
@@ -37,7 +37,7 @@ public class ReadmeTest {
     engine = new TestEngine();
     ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
     JsonObject httpService = new JsonObject()
-        .put("get", functionInput -> ActionResponse.endFunction());
+        .put("get", functionInput -> ActionOutput.endFunction());
     importResolver.add("core/http", httpService);
   }
 
