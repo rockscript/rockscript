@@ -29,7 +29,7 @@ public interface Action {
    *      This execution position  has to be provided in case the invocation is asynchronous when calling back
    *      the completion of this function with {@link ScriptExecution#endFunctionInvocationExecution(String, Object)}
    *
-   * TODO Refactor to resolve how this argument list differs from ActionInput
+   * TODO Change args to ActionInput
    */
   ActionResponse invoke(ArgumentsExpressionExecution argumentsExpressionExecution, List<Object> args);
 }

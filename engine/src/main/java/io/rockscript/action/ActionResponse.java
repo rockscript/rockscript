@@ -15,6 +15,7 @@
  */
 package io.rockscript.action;
 
+// TODO Rename to ActionOutput
 public class ActionResponse {
 
   private boolean ended;
