@@ -44,10 +44,7 @@ class HttpActionExecutor {
 
   private void actionDone(ActionOutput actionOutput) {
     // TODO Rename engine.endWaitingExecutionId  to actionDone and take an ActionOutput as an argument
-    engine.endWaitingAction(
-        actionOutput.scriptExecutionId,
-        actionOutput.executionId,
-        actionOutput.result);
+    engine.endWaitingAction(actionOutput.context, actionOutput.result);
   }
 
   /**

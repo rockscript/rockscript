@@ -17,16 +17,16 @@ package io.rockscript.action;
 
 import java.util.List;
 
+import io.rockscript.engine.Execution;
+import io.rockscript.engine.ScriptExecutionContext;
+
 public class ActionInput {
 
-  public final String scriptExecutionId;
-  public final String executionId;
+  final ScriptExecutionContext context;
   public final List<Object> args;
 
-  // TODO Combine scriptExecutionId and executionId into a ScriptContext parameter.
-  public ActionInput(String scriptExecutionId, String executionId, List<Object> args) {
-    this.scriptExecutionId = scriptExecutionId;
-    this.executionId = executionId;
+  public ActionInput(Execution<?> execution, List<Object> args) {
+    context = new ScriptExecutionContext(execution.getScriptExecution().getId(), execution.getId());
     this.args = args;
   }
 }

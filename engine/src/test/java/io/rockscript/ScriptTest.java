@@ -73,7 +73,7 @@ public class ScriptTest {
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
     assertNotNull(waitingExecutionId);
 
-    engine.endWaitingAction(scriptExecutionId, waitingExecutionId);
+    engine.endWaitingAction(new ScriptExecutionContext(scriptExecutionId, waitingExecutionId));
 
     assertEquals("Execution was here", synchronousCapturedData.get(2));
     assertEquals("hello", synchronousCapturedData.get(3));
@@ -106,7 +106,7 @@ public class ScriptTest {
 
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
 
-    scriptExecution = engine.endWaitingActionImpl(scriptExecutionId, waitingExecutionId, null);
+    scriptExecution = engine.endWaitingActionImpl(new ScriptExecutionContext(scriptExecutionId, waitingExecutionId), null);
 
     reloadedScriptExecution = engine
       .getServiceLocator()

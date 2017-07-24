@@ -15,15 +15,15 @@
  */
 package io.rockscript.action;
 
+import io.rockscript.engine.ScriptExecutionContext;
+
 public class ActionOutput {
 
-  public final String scriptExecutionId;
-  public final String executionId;
   public final Object result;
+  public final ScriptExecutionContext context;
 
   public ActionOutput(ActionInput actionInput, Object result) {
-    scriptExecutionId = actionInput.scriptExecutionId;
-    executionId = actionInput.executionId;
+    context = actionInput.context;
     this.result = result;
   }
 }

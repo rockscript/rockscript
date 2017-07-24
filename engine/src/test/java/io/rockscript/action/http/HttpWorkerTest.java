@@ -41,31 +41,24 @@ public class HttpWorkerTest {
       // When the action input is processed async, actionDone should be called
     }
     public void actionDone(ActionOutput actionOutput) {
-      engine.endWaitingAction(
-        actionOutput.scriptExecutionId,
-        actionOutput.executionId,
-        actionOutput.result);
+      engine.endWaitingAction(actionOutput.context, actionOutput.result);
     }
   }
 
   public static class ActionInput {
-    String scriptExecutionId;
-    String executionId;
+    public final ScriptExecutionContext context;
     List<Object> args;
     public ActionInput(String scriptExecutionId, String executionId, List<Object> args) {
-      this.scriptExecutionId = scriptExecutionId;
-      this.executionId = executionId;
+      context = new ScriptExecutionContext(scriptExecutionId, executionId);
       this.args = args;
     }
   }
 
   public static class ActionOutput {
-    String scriptExecutionId;
-    String executionId;
+    public final ScriptExecutionContext context;
     Object result;
     public ActionOutput(ActionInput actionInput, Object result) {
-      this.scriptExecutionId = actionInput.scriptExecutionId;
-      this.executionId = actionInput.executionId;
+      context = actionInput.context;
       this.result = result;
     }
   }
@@ -97,8 +90,8 @@ public class HttpWorkerTest {
 
     ActionInput actionInput = httpActionWorker.actionInputQueue.get(0);
 
-    assertNotNull(actionInput.scriptExecutionId);
-    assertNotNull(actionInput.executionId);
+    assertNotNull(actionInput.context.scriptExecutionId);
+    assertNotNull(actionInput.context.executionId);
 
     Map<String,Object> actionInputArgs = (Map<String, Object>) actionInput.args.get(0);
     assertEquals("http://rockscript.io/interesting/data", actionInputArgs.get("url"));
