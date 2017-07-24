@@ -21,5 +21,5 @@ package io.rockscript.action;
  */
 public interface Action {
 
-  ActionResponse invoke(ActionInput input);
+  ActionOutput invoke(ActionInput input);
 }

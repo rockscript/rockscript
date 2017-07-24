@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.rockscript.action.Action;
-import io.rockscript.action.ActionResponse;
+import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.*;
 import io.rockscript.test.*;
 import io.rockscript.test.CrashTestEngine.CrashEventListener;
@@ -54,10 +54,10 @@ public class CrashTest {
         .put("aSyncFunction", input -> {
           synchronousCapturedData.add("Execution was here");
           synchronousCapturedData.add(input.args.get(0));
-          return ActionResponse.endFunction();})
+          return ActionOutput.endFunction();})
         .put("anAsyncFunction", input -> {
           waitingAsyncFunctionInvocationIds.add(input.context.executionId);
-          return ActionResponse.waitForFunctionToCompleteAsync();}));
+          return ActionOutput.waitForFunctionToCompleteAsync();}));
   }
 
   @Test

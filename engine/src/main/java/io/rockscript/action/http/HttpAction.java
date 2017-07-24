@@ -32,7 +32,7 @@ public class HttpAction implements Action {
   }
 
   @Override
-  public ActionResponse invoke(ActionInput input) {
+  public ActionOutput invoke(ActionInput input) {
     Request request;
     try {
       // TODO Construct the HTTP request from the inputs.
@@ -45,7 +45,7 @@ public class HttpAction implements Action {
       // TODO headers.add("X-Correlation-Id", scriptExecutionId);
       request = new Request(url, method, headers, body);
     } catch (MalformedURLException e) {
-      return ActionResponse.endFunction(e);
+      return ActionOutput.endFunction(e);
     }
 
     try {
@@ -55,9 +55,9 @@ public class HttpAction implements Action {
       ResponseHeaders headers = new ResponseHeaders(connection.getHeaderFields());
       int status = connection.getResponseCode();
       Response response = new Response(status, connection.getResponseMessage(), responseBody, headers);
-      return ActionResponse.endFunction(response);
+      return ActionOutput.endFunction(response);
     } catch (IOException e) {
-      return ActionResponse.endFunction(e);
+      return ActionOutput.endFunction(e);
     }
   }
 }

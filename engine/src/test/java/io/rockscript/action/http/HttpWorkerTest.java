@@ -40,9 +40,6 @@ public class HttpWorkerTest {
       actionInputQueue.add(actionInput);
       // When the action input is processed async, actionDone should be called
     }
-    public void actionDone(ActionOutput actionOutput) {
-      engine.endWaitingAction(actionOutput.context, actionOutput.result);
-    }
   }
 
   @Test
@@ -53,7 +50,7 @@ public class HttpWorkerTest {
     JsonObject http = new JsonObject()
       .put("get", input -> {
         httpActionWorker.addActionInput(input);
-        return ActionResponse.waitForFunctionToCompleteAsync();});
+        return ActionOutput.waitForFunctionToCompleteAsync();});
     importResolver.add("rockscript.io/http", http);
 
     String scriptId = engine.deployScript(
@@ -74,10 +71,8 @@ public class HttpWorkerTest {
 
     Map<String,Object> result = new HashMap<>();
     result.put("status", "200");
-    ActionOutput actionOutput = new ActionOutput(actionInput, result);
-    httpActionWorker.actionDone(actionOutput);
+    httpActionWorker.engine.endWaitingAction(actionInput.context, result);
 
     // TODO check the script
   }
-
 }

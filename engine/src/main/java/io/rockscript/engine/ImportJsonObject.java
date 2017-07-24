@@ -36,7 +36,7 @@ public class ImportJsonObject extends JsonObject {
       this.action = action;
     }
     @Override
-    public ActionResponse invoke(ActionInput input) {
+    public ActionOutput invoke(ActionInput input) {
       return action.invoke(input);
     }
     public String getName() {

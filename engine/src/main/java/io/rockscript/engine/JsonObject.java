@@ -37,7 +37,7 @@ public class JsonObject {
     return this;
   }
 
-  public JsonObject put(String propertyName, Function<ActionInput, ActionResponse> actionFunction) {
+  public JsonObject put(String propertyName, Function<ActionInput, ActionOutput> actionFunction) {
     put(propertyName, (Action) (input) -> actionFunction.apply(input));
     return this;
   }

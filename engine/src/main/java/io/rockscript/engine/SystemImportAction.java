@@ -28,10 +28,10 @@ public class SystemImportAction implements Action {
   }
 
   @Override
-  public ActionResponse invoke(ActionInput input) {
+  public ActionOutput invoke(ActionInput input) {
     String url = (String) input.args.get(0);
     JsonObject importedObject = serviceLocator.getImportResolver().get(url);
-    return ActionResponse.endFunction(importedObject);
+    return ActionOutput.endFunction(importedObject);
   }
 
   @Override

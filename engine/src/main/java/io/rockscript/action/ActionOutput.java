@@ -15,15 +15,33 @@
  */
 package io.rockscript.action;
 
-import io.rockscript.engine.ScriptExecutionContext;
-
 public class ActionOutput {
 
-  public final Object result;
-  public final ScriptExecutionContext context;
+  private final boolean ended;
+  private final Object result;
 
-  public ActionOutput(ActionInput actionInput, Object result) {
-    context = actionInput.context;
+  protected ActionOutput(boolean ended, Object result) {
+    this.ended = ended;
     this.result = result;
+  }
+
+  public static ActionOutput endFunction() {
+    return endFunction(null);
+  }
+
+  public static ActionOutput endFunction(Object result) {
+    return new ActionOutput(true, result);
+  }
+
+  public static ActionOutput waitForFunctionToCompleteAsync() {
+    return new ActionOutput(false, null);
+  }
+
+  public boolean isEnded() {
+    return ended;
+  }
+
+  public Object getResult() {
+    return result;
   }
 }

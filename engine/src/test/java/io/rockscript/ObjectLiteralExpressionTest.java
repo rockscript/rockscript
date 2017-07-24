@@ -18,7 +18,7 @@ package io.rockscript;
 
 import java.util.*;
 
-import io.rockscript.action.ActionResponse;
+import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.*;
 import io.rockscript.test.TestEngine;
 import org.junit.Test;
@@ -40,7 +40,7 @@ public class ObjectLiteralExpressionTest {
     JsonObject helloService = new JsonObject()
       .put("assertLiteralValue", input -> {
           capturedValues.add(input.args.get(0));
-          return ActionResponse.endFunction();});
+          return ActionOutput.endFunction();});
     importResolver.add("example.com/assert", helloService);
     return engine;
   }
