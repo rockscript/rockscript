@@ -19,7 +19,7 @@ package io.rockscript.action.http;
 import java.util.*;
 
 import io.rockscript.Engine;
-import io.rockscript.action.ActionResponse;
+import io.rockscript.action.*;
 import io.rockscript.engine.*;
 import io.rockscript.test.TestEngine;
 import org.junit.Test;
@@ -45,38 +45,14 @@ public class HttpWorkerTest {
     }
   }
 
-  public static class ActionInput {
-    public final ScriptExecutionContext context;
-    List<Object> args;
-    public ActionInput(String scriptExecutionId, String executionId, List<Object> args) {
-      context = new ScriptExecutionContext(scriptExecutionId, executionId);
-      this.args = args;
-    }
-  }
-
-  public static class ActionOutput {
-    public final ScriptExecutionContext context;
-    Object result;
-    public ActionOutput(ActionInput actionInput, Object result) {
-      context = actionInput.context;
-      this.result = result;
-    }
-  }
-
-
   @Test
   public void testAsyncExecution() {
     TestEngine engine = new TestEngine();
     HttpActionWorker httpActionWorker = new HttpActionWorker(engine);
     ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
     JsonObject http = new JsonObject()
-      .put("get", functionInput->{
-        // TODO Rename FunctionInput to ActionInput
-        ArgumentsExpressionExecution argumentsExpressionExecution = functionInput.getArgumentsExpressionExecution();
-        String scriptExecutionId = argumentsExpressionExecution.getScriptExecution().getId();
-        String executionId = argumentsExpressionExecution.getId();
-        ActionInput actionInput = new ActionInput(scriptExecutionId, executionId, functionInput.getArgs());
-        httpActionWorker.addActionInput(actionInput);
+      .put("get", input -> {
+        httpActionWorker.addActionInput(input);
         return ActionResponse.waitForFunctionToCompleteAsync();});
     importResolver.add("rockscript.io/http", http);
 

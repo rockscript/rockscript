@@ -43,13 +43,12 @@ public class ScriptTest {
     TestEngine engine = new TestEngine();
     ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
     JsonObject helloService = new JsonObject()
-      .put("aSyncFunction", functionInput->{
+      .put("aSyncFunction", input -> {
           synchronousCapturedData.add("Execution was here");
-          synchronousCapturedData.add(functionInput.getArgs().get(0));
+          synchronousCapturedData.add(input.args.get(0));
           return ActionResponse.endFunction();})
-      .put("anAsyncFunction", functionInput->{
-          ArgumentsExpressionExecution argumentsExpressionExecution = functionInput.getArgumentsExpressionExecution();
-          waitingAsyncFunctionInvocationIds.add(argumentsExpressionExecution.getId());
+      .put("anAsyncFunction", input -> {
+          waitingAsyncFunctionInvocationIds.add(input.context.executionId);
           return ActionResponse.waitForFunctionToCompleteAsync();});
     importResolver.add("example.com/hello", helloService);
     return engine;

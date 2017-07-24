@@ -20,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
+import io.rockscript.action.ActionInput;
 import io.rockscript.action.ActionResponse;
 import io.rockscript.engine.*;
 import io.rockscript.test.TestEngine;
@@ -50,18 +51,14 @@ public class HttpActionTest {
     importResolver.add("rockscript.io/http", httpService);
   }
 
-  private ActionResponse sendHttpGetRequest(FunctionInput input) {
-    BoundRequestBuilder request = httpClient.prepareGet(input.getArg(0).toString())
+  private ActionResponse sendHttpGetRequest(ActionInput input) {
+    BoundRequestBuilder request = httpClient.prepareGet(input.args.get(0).toString())
         .setHeader(HttpHeaders.ACCEPT.toString(), MediaType.JSON_UTF_8.toString());
 
     future = request.execute()
         .toCompletableFuture()
         .thenApply(response -> {
-          ArgumentsExpressionExecution argumentsExpressionExecution = input.getArgumentsExpressionExecution();
-          String httpActionId = argumentsExpressionExecution.getId();
-          String scriptExecutionId = argumentsExpressionExecution.getScriptExecution().getId();
-          ScriptExecutionContext context = new ScriptExecutionContext(scriptExecutionId, httpActionId);
-          engine.endWaitingAction(context, new HttpResponseJson(response));
+          engine.endWaitingAction(input.context, new HttpResponseJson(response));
           return response;
         });
     return ActionResponse.waitForFunctionToCompleteAsync();

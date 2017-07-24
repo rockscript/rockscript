@@ -33,9 +33,8 @@ public class HttpActionExecutorTest {
   }
 
   // TODO Change to use an HttpAction object that was created by the import
-  private ActionResponse queueHttpRequest(FunctionInput input) {
-    ArgumentsExpressionExecution execution = input.getArgumentsExpressionExecution();
-    workQueue.addActionInput(new ActionInput(execution, input.getArgs()));
+  private ActionResponse queueHttpRequest(ActionInput input) {
+    workQueue.addActionInput(input);
     return ActionResponse.waitForFunctionToCompleteAsync();
   }
 

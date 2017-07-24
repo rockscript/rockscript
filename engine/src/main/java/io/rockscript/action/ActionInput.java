@@ -22,7 +22,7 @@ import io.rockscript.engine.ScriptExecutionContext;
 
 public class ActionInput {
 
-  final ScriptExecutionContext context;
+  public final ScriptExecutionContext context;
   public final List<Object> args;
 
   public ActionInput(Execution<?> execution, List<Object> args) {
