@@ -3,8 +3,6 @@ package io.rockscript.action.http;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import io.rockscript.action.ActionInput;
 
@@ -23,7 +21,22 @@ public class RequestBuilder {
       throw new IllegalArgumentException("No arguments - pass an object with at least a ‘url’ property");
     }
     arguments = (Map<String, Object>) rawArguments.get(0);
-    return new Request(url(), method(), headers(), null);
+    RequestHeaders headers = headers();
+    if (hasBody()) {
+      return new Request(url(), method(), headers, body(headers.get("Content-Type")));
+    }
+    else {
+      return new Request(url(), method(), headers);
+    }
+  }
+
+  private boolean hasBody() {
+    return arguments.containsKey("body") && arguments.get("body") != null && !arguments.get("body").toString().isEmpty();
+  }
+
+  private TextRequestBody body(Optional<String> contentType) {
+    // TODO Create the body type based on the Content-Type
+    return new TextRequestBody("application/json", arguments.get("body").toString());
   }
 
   private URL url() {
@@ -52,22 +65,14 @@ public class RequestBuilder {
     }
   }
 
-  private RequestHeader correlationId() {
-    return new RequestHeader("X-Correlation-Id", input.context.scriptExecutionId);
-  }
-
-  private Set<RequestHeader> headers() {
+  private RequestHeaders headers() {
     if (!arguments.containsKey("headers")) {
-      Set<RequestHeader> headers = new HashSet<>();
-      headers.add(correlationId());
-      return headers;
+      return new RequestHeaders(input.context.scriptExecutionId);
     }
     if (arguments.get("headers") == null || !(arguments.get("headers") instanceof Map)) {
       throw new IllegalArgumentException("Invalid ‘headers’ argument. Expected an object with string properties.");
     }
     Map<String, String> headers = (Map<String, String>) arguments.get("headers");
-    return Stream.concat(Stream.of(correlationId()),
-        headers.entrySet().stream().map(entry -> new RequestHeader(entry.getKey(), entry.getValue())))
-        .collect(Collectors.toSet());
+    return new RequestHeaders(input.context.scriptExecutionId, headers);
   }
 }

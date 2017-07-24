@@ -23,7 +23,7 @@ class HttpURLConnectionBuilder {
     if (request.hasBody()) {
       connection.addRequestProperty("Content-Type", request.body.contentType);
     }
-    request.headers.forEach(header -> connection.addRequestProperty(header.name, header.value));
+    request.headers.values().forEach(header -> connection.addRequestProperty(header.name, header.value));
 
     if (request.method.hasRequestBody()) {
       connection.setDoOutput(true);
@@ -34,5 +34,4 @@ class HttpURLConnectionBuilder {
 
     return connection;
   }
-
 }
