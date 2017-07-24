@@ -15,10 +15,20 @@
  */
 package io.rockscript;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import io.rockscript.http.test.ServerExceptionInterceptor;
+import io.rockscript.test.TestEngine;
+
 public class TestServerConfiguration extends ServerConfiguration {
 
   public TestServerConfiguration() {
+    nettyServerConfiguration.interceptor(new ServerExceptionInterceptor());
+    nettyServerConfiguration.services(Guice.createInjector(new AbstractModule() {
+      @Override
+      protected void configure() {
+        bind(Engine.class).toInstance(new TestEngine());
+      }
+    }));
   }
-
-
 }

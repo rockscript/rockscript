@@ -5,7 +5,6 @@ import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
 import io.rockscript.action.ActionInput;
 import io.rockscript.action.ActionResponse;

@@ -24,14 +24,14 @@ public class InterceptorContext {
   RequestHandler requestHandler;
   Request request;
   Response response;
-  Server server;
+  NettyServer nettyServer;
 
-  public InterceptorContext(List<Interceptor> interceptors, RequestHandler requestHandler, Request request, Response response, Server server) {
+  public InterceptorContext(List<Interceptor> interceptors, RequestHandler requestHandler, Request request, Response response, NettyServer nettyServer) {
     this.interceptors = interceptors;
     this.requestHandler = requestHandler;
     this.request = request;
     this.response = response;
-    this.server = server;
+    this.nettyServer = nettyServer;
   }
 
   public void next() {
@@ -39,7 +39,7 @@ public class InterceptorContext {
     if (index<interceptors.size()) {
       interceptors.get(index).intercept(this);
     } else if (index==interceptors.size()) {
-      requestHandler.handle();
+      requestHandler.handle(request, response);
     }
   }
 
@@ -51,8 +51,8 @@ public class InterceptorContext {
     return response;
   }
 
-  public Server getServer() {
-    return server;
+  public NettyServer getNettyServer() {
+    return nettyServer;
   }
 
   public RequestHandler getRequestHandler() {

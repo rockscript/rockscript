@@ -15,7 +15,6 @@
  */
 package io.rockscript.http.test;
 
-import com.google.inject.Injector;
 import io.rockscript.http.test.client.TestRequest;
 import io.rockscript.netty.router.*;
 import org.junit.Before;
@@ -25,79 +24,31 @@ public abstract class AbstractServerTest {
 
   /**
    * if you add interceptor {@link ServerExceptionInterceptor}
-   * with {@link io.rockscript.netty.router.ServerConfiguration#interceptor(Interceptor)}
-   * to your test server, this member field will contain the latest
-   * server side exception.  If a test request fails or if it does
-   * not get the expected response status, this server exception is
+   * with {@link NettyServerConfiguration#interceptor(Interceptor)}
+   * to your test nettyServer, this member field will contain the latest
+   * nettyServer side exception.  If a test request fails or if it does
+   * not get the expected response status, this nettyServer exception is
    * used as the cause.
    */
   public static Throwable serverException;
+
+  public abstract NettyServer getNettyServer();
 
   @Rule
   public TestLogger testLogger = new TestLogger();
 
   /**
-   * lazy initialized during first test {@link #setUp()}
-   * and then cached for all subsequent test executions
+   * the http nettyServer used during test
    */
-  protected static Injector cachedServices = null;
-
-  /**
-   * service locator for application level objects
-   */
-  public Injector services;
-
-  /**
-   * the http server used during test
-   */
-  public Server server = null;
+  public NettyServer nettyServer = null;
 
   @Before
   public void setUp() {
-    this.services = initializeServices();
-    this.server = services.getInstance(Server.class);
-
     serverException = null;
   }
 
-  /**
-   * the services used in this test.
-   * <p>
-   * This default implementation will {@link #cachedServices cache}
-   * the services object after it has been
-   * {@link #createServices() created} the first time.
-   * <p>
-   * Individual tests can overwrite this method if they need
-   * customized services.
-   */
-  protected Injector initializeServices() {
-    if (cachedServices==null) {
-      cachedServices = createServices();
-      startServices(cachedServices);
-    }
-    return cachedServices;
-  }
-
-  /**
-   * creates the services object and is typically
-   * just called once in the setUp of the first test
-   * and then cached so that subsequent tests can
-   * leverage the same services.
-   */
-  protected abstract Injector createServices();
-
-  /**
-   * only invoked once during lazy initialization of
-   * the services.
-   *
-   * @see #initializeServices()
-   */
-  protected void startServices(Injector services) {
-    services.getInstance(Server.class).startup();
-  }
-
   public String createUri(final String path) {
-    return "http://localhost:"+server.getPort()+"/"+path;
+    return "http://localhost:"+getNettyServer().getPort()+"/"+path;
   }
 
   public TestRequest GET(final String path) {
@@ -126,16 +77,9 @@ public abstract class AbstractServerTest {
     return testRequest;
   }
 
-  public JsonHandler getJson() {
-    throwIfNull(services, "Services are not configured");
-    JsonHandler jsonHandler = server.getJsonHandler();
-    throwIfNull(jsonHandler, "Services doesn't contain Json");
-    return jsonHandler;
-  }
-
   protected void throwIfNull(Object o, String message, String... messageArgs) {
     if (o==null) {
-      throw new RuntimeException(String.format(message, messageArgs));
+      throw new RuntimeException(String.format(message, (String[])messageArgs));
     }
   }
 

@@ -23,12 +23,12 @@ import io.netty.handler.codec.http.BadClientSilencer;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 
-public class ServerChannelInitializer extends ChannelInitializer<SocketChannel> {
+public class NettyServerChannelInitializer extends ChannelInitializer<SocketChannel> {
 
-  protected Server server;
+  protected NettyServer nettyServer;
 
-  public ServerChannelInitializer(Server server) {
-    this.server = server;
+  public NettyServerChannelInitializer(NettyServer nettyServer) {
+    this.nettyServer = nettyServer;
   }
 
   @Override
@@ -40,7 +40,7 @@ public class ServerChannelInitializer extends ChannelInitializer<SocketChannel> 
     pipeline.addLast(new BadClientSilencer());
   }
 
-  protected ServerChannelHandler createServerChannelHandler() {
-    return new ServerChannelHandler(server);
+  protected NettyServerChannelHandler createServerChannelHandler() {
+    return new NettyServerChannelHandler(nettyServer);
   }
 }

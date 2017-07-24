@@ -19,28 +19,27 @@ package io.rockscript.netty.router;
 import com.google.inject.AbstractModule;
 
 
-/** Guice IoC module for testing */
-public class ServerModule extends AbstractModule {
+public class NettyServerModule extends AbstractModule {
 
-  ServerConfiguration serverConfiguration = null;
+  NettyServerConfiguration nettyServerConfiguration = null;
 
-  public ServerModule() {
-    this(new ServerConfiguration()
+  public NettyServerModule() {
+    this(new NettyServerConfiguration()
         .defaultNotFoundHandler());
   }
 
-  public ServerModule(ServerConfiguration serverConfiguration) {
-    this.serverConfiguration = serverConfiguration;
+  public NettyServerModule(NettyServerConfiguration nettyServerConfiguration) {
+    this.nettyServerConfiguration = nettyServerConfiguration;
   }
 
-  public ServerModule requestHandlerClass(Class<? extends RequestHandler> requestHandlerClass) {
-    serverConfiguration.scan(requestHandlerClass);
+  public NettyServerModule requestHandlerClass(Class<? extends RequestHandler> requestHandlerClass) {
+    nettyServerConfiguration.scan(requestHandlerClass);
     return this;
   }
 
   @Override
   protected void configure() {
-    bind(ServerConfiguration.class).toInstance(serverConfiguration);
-    bind(Server.class).toProvider(new ServerProvider());
+    bind(NettyServerConfiguration.class).toInstance(nettyServerConfiguration);
+    bind(NettyServer.class).toProvider(new NettyServerProvider());
   }
 }

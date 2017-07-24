@@ -15,27 +15,22 @@
  */
 package io.rockscript;
 
-import java.util.Arrays;
-import java.util.List;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Module;
-import io.rockscript.netty.router.ServerModule;
+import io.rockscript.netty.router.NettyServerConfiguration;
 
 public class ServerConfiguration {
 
-  private class ConfigurationModule extends AbstractModule {
-    @Override
-    protected void configure() {
+  NettyServerConfiguration nettyServerConfiguration = new NettyServerConfiguration();
 
-    }
+  public ServerConfiguration port(int port) {
+    nettyServerConfiguration.port(port);
+    return this;
   }
 
-  ConfigurationModule configurationModule = new ConfigurationModule();
+  public Server build() {
+    return new Server(this);
+  }
 
-  public List<Module> getModules() {
-    ServerModule serverModule = new ServerModule();
-
-    return Arrays.asList();
+  NettyServerConfiguration getNettyServerConfiguration() {
+    return nettyServerConfiguration;
   }
 }

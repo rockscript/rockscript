@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript;
 
-package io.rockscript.netty.router;
+public class TestServer extends Server {
 
-public interface RequestHandler {
-
-  void handle(Request request, Response response);
+  public TestServer() {
+    super(new TestServerConfiguration());
+  }
 }

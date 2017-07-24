@@ -15,9 +15,10 @@
  */
 package io.rockscript.netty.router;
 
-public class DefaultNotFoundHandler extends RequestHandler {
+public class DefaultNotFoundHandler implements RequestHandler {
 
-  public void handle() {
+  @Override
+  public void handle(Request request, Response response) {
     response.bodyString("oops").statusNotFound();
   }
 }

@@ -21,6 +21,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import io.rockscript.http.test.AbstractServerTest;
+import io.rockscript.netty.router.JsonHandler;
 import javafx.util.Pair;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
@@ -225,7 +226,8 @@ public class TestRequest {
   }
 
   public TestRequest bodyJson(Object bodyObject) {
-    String jsonString = test.getJson().toJsonString(bodyObject);
+    JsonHandler jsonHandler = test.getNettyServer().getJsonHandler();
+    String jsonString = jsonHandler.toJsonString(bodyObject);
     bodyString(jsonString, APPLICATION_JSON);
     return this;
   }

@@ -18,14 +18,13 @@ package io.rockscript.netty.router;
 import java.lang.reflect.Type;
 
 import com.google.gson.Gson;
-import com.google.inject.Injector;
 
 public class JsonHandlerGson implements JsonHandler {
 
   Gson gson;
 
-  public JsonHandlerGson(Injector injector) {
-    this.gson = injector.getInstance(Gson.class);
+  public JsonHandlerGson(Gson gson) {
+    this.gson = gson;
   }
 
   @Override

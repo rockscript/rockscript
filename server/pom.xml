@@ -36,7 +36,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>rockscript-server</artifactId>
+    <artifactId>rockscript-nettyServer</artifactId>
 
     <parent>
         <groupId>io.rockscript</groupId>
@@ -49,6 +49,19 @@
             <groupId>io.rockscript</groupId>
             <artifactId>rockscript-netty-router</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.rockscript</groupId>
+            <artifactId>rockscript-engine</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.rockscript</groupId>
+            <artifactId>rockscript-http-test</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>

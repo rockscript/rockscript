@@ -15,14 +15,41 @@
  */
 package io.rockscript;
 
-import org.junit.Test;
+import io.rockscript.http.test.AbstractServerTest;
+import io.rockscript.netty.router.NettyServer;
+import org.apache.http.entity.ContentType;
+import org.junit.*;
 
-public class ServerTest {
+import static org.junit.Assert.assertEquals;
 
-  Server server = new Server(new TestServerConfiguration());
+public class ServerTest extends AbstractServerTest {
+
+  Server server;
+
+  @Before
+  public void setUp() {
+    server = new TestServer();
+    server.startup();
+  }
+
+  @After
+  public void tearDown() {
+    server.shutdown();
+  }
 
   @Test
   public void testServer() {
+    String responseBody = POST("scripts")
+      .bodyString("var a = 'msg';", ContentType.create("application/rockscript"))
+      .execute()
+      .assertStatusOk()
+      .bodyStringUtf8();
 
+    assertEquals("goodby", responseBody);
+  }
+
+  @Override
+  public NettyServer getNettyServer() {
+    return server.nettyServer;
   }
 }

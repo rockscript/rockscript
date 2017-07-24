@@ -31,12 +31,12 @@ public class Request {
 
   static final Logger log = getLogger(Request.class);
 
-  Server server;
+  NettyServer nettyServer;
   FullHttpRequest fullHttpRequest;
   RouteResult<?> route;
 
-  public Request(Server server, FullHttpRequest fullHttpRequest, RouteResult<?> route) {
-    this.server = server;
+  public Request(NettyServer nettyServer, FullHttpRequest fullHttpRequest, RouteResult<?> route) {
+    this.nettyServer = nettyServer;
     this.fullHttpRequest = fullHttpRequest;
     this.route = route;
   }
@@ -63,7 +63,7 @@ public class Request {
 
   public <T> T getBodyJson(Class<T> type) {
     String jsonBodyString = getBodyStringUtf8();
-    return server.getJsonHandler().fromJsonString(jsonBodyString, type);
+    return nettyServer.getJsonHandler().fromJsonString(jsonBodyString, type);
   }
 
   public String getBodyStringUtf8() {
@@ -85,8 +85,8 @@ public class Request {
     return headers.get(name);
   }
 
-  public Server getServer() {
-    return server;
+  public NettyServer getNettyServer() {
+    return nettyServer;
   }
 
   public FullHttpRequest getFullHttpRequest() {

@@ -23,19 +23,20 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import io.netty.handler.codec.http.router.Router;
 
-public class ServerConfiguration {
+public class NettyServerConfiguration {
 
   protected Router<Class<?>> router = new Router<>();
   protected int port = 8888;
   protected List<Interceptor> interceptors;
   @Inject
   protected Injector services;
+  protected JsonHandler jsonHandler;
 
-  public Server build() {
-    return new Server(this);
+  public NettyServer build() {
+    return new NettyServer(this);
   }
 
-  public ServerConfiguration component(ServerComponent component) {
+  public NettyServerConfiguration component(NettyServerComponent component) {
     component.configure(this);
     return this;
   }
@@ -52,7 +53,7 @@ public class ServerConfiguration {
     this.port = port;
   }
 
-  public ServerConfiguration port(int port) {
+  public NettyServerConfiguration port(int port) {
     this.port = port;
     return this;
   }
@@ -65,7 +66,7 @@ public class ServerConfiguration {
     this.services = services;
   }
 
-  public ServerConfiguration services(Injector services) {
+  public NettyServerConfiguration services(Injector services) {
     this.services = services;
     return this;
   }
@@ -78,7 +79,20 @@ public class ServerConfiguration {
     this.interceptors = interceptors;
   }
 
-  public ServerConfiguration interceptor(Interceptor interceptor) {
+  public JsonHandler getJsonHandler() {
+    return jsonHandler;
+  }
+
+  public void setJsonHandler(JsonHandler jsonHandler) {
+    this.jsonHandler = jsonHandler;
+  }
+
+  public NettyServerConfiguration jsonHandler(JsonHandler jsonHandler) {
+    this.jsonHandler = jsonHandler;
+    return this;
+  }
+
+  public NettyServerConfiguration interceptor(Interceptor interceptor) {
     if (interceptors==null) {
       interceptors = new ArrayList<>();
     }
@@ -86,7 +100,7 @@ public class ServerConfiguration {
     return this;
   }
 
-  public ServerConfiguration scan(Class... classes) {
+  public NettyServerConfiguration scan(Class... classes) {
     if (classes!=null) {
       for (Class clazz : classes) {
         scan(clazz);
@@ -95,7 +109,7 @@ public class ServerConfiguration {
     return this;
   }
 
-  public ServerConfiguration scan(Class<?> clazz) {
+  public NettyServerConfiguration scan(Class<?> clazz) {
     Gets repeatableAnnotation = clazz.getDeclaredAnnotation(Gets.class);
     Get[] annotations = repeatableAnnotation!=null ? repeatableAnnotation.value() : null;
     for (Get annotation : list(clazz.getDeclaredAnnotation(Get.class), annotations)) {
@@ -136,132 +150,132 @@ public class ServerConfiguration {
     return list;
   }
 
-  public ServerConfiguration DELETE(String path, Class<?> target) {
+  public NettyServerConfiguration DELETE(String path, Class<?> target) {
     router.DELETE(path, target);
     return this;
   }
 
-  public ServerConfiguration GET(String path, Class<?> target) {
+  public NettyServerConfiguration GET(String path, Class<?> target) {
     router.GET(path, target);
     return this;
   }
 
-  public ServerConfiguration HEAD(String path, Class<?> target) {
+  public NettyServerConfiguration HEAD(String path, Class<?> target) {
     router.HEAD(path, target);
     return this;
   }
 
-  public ServerConfiguration OPTIONS(String path, Class<?> target) {
+  public NettyServerConfiguration OPTIONS(String path, Class<?> target) {
     router.OPTIONS(path, target);
     return this;
   }
 
-  public ServerConfiguration PATCH(String path, Class<?> target) {
+  public NettyServerConfiguration PATCH(String path, Class<?> target) {
     router.PATCH(path, target);
     return this;
   }
 
-  public ServerConfiguration POST(String path, Class<?> target) {
+  public NettyServerConfiguration POST(String path, Class<?> target) {
     router.POST(path, target);
     return this;
   }
 
-  public ServerConfiguration PUT(String path, Class<?> target) {
+  public NettyServerConfiguration PUT(String path, Class<?> target) {
     router.PUT(path, target);
     return this;
   }
 
-  public ServerConfiguration TRACE(String path, Class<?> target) {
+  public NettyServerConfiguration TRACE(String path, Class<?> target) {
     router.TRACE(path, target);
     return this;
   }
 
-  public ServerConfiguration DELETE_FIRST(String path, Class<?> target) {
+  public NettyServerConfiguration DELETE_FIRST(String path, Class<?> target) {
     router.DELETE_FIRST(path, target);
     return this;
   }
 
-  public ServerConfiguration GET_FIRST(String path, Class<?> target) {
+  public NettyServerConfiguration GET_FIRST(String path, Class<?> target) {
     router.GET_FIRST(path, target);
     return this;
   }
 
-  public ServerConfiguration HEAD_FIRST(String path, Class<?> target) {
+  public NettyServerConfiguration HEAD_FIRST(String path, Class<?> target) {
     router.HEAD_FIRST(path, target);
     return this;
   }
 
-  public ServerConfiguration OPTIONS_FIRST(String path, Class<?> target) {
+  public NettyServerConfiguration OPTIONS_FIRST(String path, Class<?> target) {
     router.OPTIONS_FIRST(path, target);
     return this;
   }
 
-  public ServerConfiguration PATCH_FIRST(String path, Class<?> target) {
+  public NettyServerConfiguration PATCH_FIRST(String path, Class<?> target) {
     router.PATCH_FIRST(path, target);
     return this;
   }
 
-  public ServerConfiguration POST_FIRST(String path, Class<?> target) {
+  public NettyServerConfiguration POST_FIRST(String path, Class<?> target) {
     router.POST_FIRST(path, target);
     return this;
   }
 
-  public ServerConfiguration PUT_FIRST(String path, Class<?> target) {
+  public NettyServerConfiguration PUT_FIRST(String path, Class<?> target) {
     router.PUT_FIRST(path, target);
     return this;
   }
 
-  public ServerConfiguration TRACE_FIRST(String path, Class<?> target) {
+  public NettyServerConfiguration TRACE_FIRST(String path, Class<?> target) {
     router.TRACE_FIRST(path, target);
     return this;
   }
 
-  public ServerConfiguration DELETE_LAST(String path, Class<?> target) {
+  public NettyServerConfiguration DELETE_LAST(String path, Class<?> target) {
     router.DELETE_LAST(path, target);
     return this;
   }
 
-  public ServerConfiguration GET_LAST(String path, Class<?> target) {
+  public NettyServerConfiguration GET_LAST(String path, Class<?> target) {
     router.GET_LAST(path, target);
     return this;
   }
 
-  public ServerConfiguration HEAD_LAST(String path, Class<?> target) {
+  public NettyServerConfiguration HEAD_LAST(String path, Class<?> target) {
     router.HEAD_LAST(path, target);
     return this;
   }
 
-  public ServerConfiguration OPTIONS_LAST(String path, Class<?> target) {
+  public NettyServerConfiguration OPTIONS_LAST(String path, Class<?> target) {
     router.OPTIONS_LAST(path, target);
     return this;
   }
 
-  public ServerConfiguration PATCH_LAST(String path, Class<?> target) {
+  public NettyServerConfiguration PATCH_LAST(String path, Class<?> target) {
     router.PATCH_LAST(path, target);
     return this;
   }
 
-  public ServerConfiguration POST_LAST(String path, Class<?> target) {
+  public NettyServerConfiguration POST_LAST(String path, Class<?> target) {
     router.POST_LAST(path, target);
     return this;
   }
 
-  public ServerConfiguration PUT_LAST(String path, Class<?> target) {
+  public NettyServerConfiguration PUT_LAST(String path, Class<?> target) {
     router.PUT_LAST(path, target);
     return this;
   }
 
-  public ServerConfiguration TRACE_LAST(String path, Class<?> target) {
+  public NettyServerConfiguration TRACE_LAST(String path, Class<?> target) {
     router.TRACE_LAST(path, target);
     return this;
   }
 
-  public ServerConfiguration notFound(Class<?> target) {
+  public NettyServerConfiguration notFound(Class<?> target) {
     router.notFound(target);
     return this;
   }
 
-  public ServerConfiguration defaultNotFoundHandler() {
+  public NettyServerConfiguration defaultNotFoundHandler() {
     router.notFound(DefaultNotFoundHandler.class);
     return this;
   }

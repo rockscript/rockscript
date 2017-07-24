@@ -26,14 +26,14 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CONTINUE;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 @ChannelHandler.Sharable
-public class ServerChannelHandler extends SimpleChannelInboundHandler<Object> {
+public class NettyServerChannelHandler extends SimpleChannelInboundHandler<Object> {
   
-  private static final Logger log = LoggerFactory.getLogger(ServerChannelHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(NettyServerChannelHandler.class);
   
-  private Server server;
+  private NettyServer nettyServer;
 
-  public ServerChannelHandler(Server server) {
-    this.server = server;
+  public NettyServerChannelHandler(NettyServer nettyServer) {
+    this.nettyServer = nettyServer;
   }
 
   @Override
@@ -53,9 +53,9 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Object> {
       DecoderResult decoderResult = fullHttpRequest.getDecoderResult();
       if (decoderResult.isFailure()) {
         Throwable cause = decoderResult.cause();
-        server.handleDecoderFailure(cause, ctx);
+        nettyServer.handleDecoderFailure(cause, ctx);
       } else {
-        server.handleRequest(fullHttpRequest, ctx);
+        nettyServer.handleRequest(fullHttpRequest, ctx);
       }
     }
   }
@@ -68,6 +68,6 @@ public class ServerChannelHandler extends SimpleChannelInboundHandler<Object> {
 
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-    server.requestException(cause, ctx);
+    nettyServer.requestException(cause, ctx);
   }
 }

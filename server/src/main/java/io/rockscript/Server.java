@@ -15,17 +15,29 @@
  */
 package io.rockscript;
 
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import io.rockscript.handlers.DeployScript;
+import io.rockscript.netty.router.NettyServer;
+import io.rockscript.netty.router.NettyServerConfiguration;
 
 public class Server {
 
-  Injector configuration;
+  NettyServer nettyServer;
 
   public Server(ServerConfiguration serverConfiguration) {
-    this.configuration = Guice.createInjector(
-      serverConfiguration.getModules());
+    NettyServerConfiguration nettyServerConfiguration = serverConfiguration.getNettyServerConfiguration()
+      .scan(DeployScript.class);
+    this.nettyServer = new NettyServer(nettyServerConfiguration);
   }
 
+  public void startup() {
+    nettyServer.startup();
+  }
 
+  public void shutdown() {
+    nettyServer.shutdown();
+  }
+
+  public void waitForShutdown() {
+    nettyServer.waitForShutdown();
+  }
 }

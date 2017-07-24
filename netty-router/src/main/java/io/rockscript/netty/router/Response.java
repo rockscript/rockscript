@@ -35,7 +35,7 @@ public class Response {
 
   private static final Logger log = getLogger(Response.class);
 
-  protected Server server;
+  protected NettyServer nettyServer;
   protected ChannelHandlerContext channelHandlerContext;
   protected HttpVersion httpVersion = HTTP_1_1;
   protected ByteBuf byteBuf = buffer();
@@ -43,8 +43,8 @@ public class Response {
   protected HttpHeaders headers = new DefaultHttpHeaders();
   protected String contentStringForLog;
 
-  public Response(Server server, ChannelHandlerContext channelHandlerContext) {
-    this.server = server;
+  public Response(NettyServer nettyServer, ChannelHandlerContext channelHandlerContext) {
+    this.nettyServer = nettyServer;
     this.channelHandlerContext = channelHandlerContext;
   }
 
@@ -78,7 +78,7 @@ public class Response {
   }
 
   public Response bodyJson(Object jsonBodyObject) {
-    String jsonBodyString = server.getJsonHandler().toJsonString(jsonBodyObject);
+    String jsonBodyString = nettyServer.getJsonHandler().toJsonString(jsonBodyObject);
     bodyString(jsonBodyString);
     headerContentTypeApplicationJson();
     return this;

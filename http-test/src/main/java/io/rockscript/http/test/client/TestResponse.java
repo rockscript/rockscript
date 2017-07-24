@@ -18,6 +18,7 @@ package io.rockscript.http.test.client;
 import java.io.*;
 import java.nio.charset.Charset;
 
+import io.rockscript.netty.router.JsonHandler;
 import org.apache.http.*;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.ResponseHandler;
@@ -112,7 +113,8 @@ public class TestResponse {
 
     public <T> T body(Class<T> type) {
         String jsonBodyString = bodyStringUtf8();
-        return (T) testRequest.test.getJson().fromJsonString(jsonBodyString, type);
+        JsonHandler jsonHandler = testRequest.test.getNettyServer().getJsonHandler();
+        return (T) jsonHandler.fromJsonString(jsonBodyString, type);
     }
 
     public TestResponse assertStatusCreated() {

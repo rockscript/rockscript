@@ -16,8 +16,18 @@
 
 package io.rockscript.netty.router;
 
-public interface ServerComponent {
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
-  void configure(ServerConfiguration serverConfiguration);
+/** For Guice modules, this provider creates a NettyServer
+ * from a NettyServerConfiguration. */
+public class NettyServerProvider implements Provider<NettyServer> {
 
+  @Inject
+  NettyServerConfiguration nettyServerConfiguration;
+
+  @Override
+  public NettyServer get() {
+    return nettyServerConfiguration.build();
+  }
 }

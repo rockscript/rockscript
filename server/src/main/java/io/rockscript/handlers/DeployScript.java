@@ -13,10 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.handlers;
 
-package io.rockscript.netty.router;
+import com.google.inject.Inject;
+import io.rockscript.Engine;
+import io.rockscript.netty.router.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public interface RequestHandler {
+@Post("/scripts")
+public class DeployScript implements RequestHandler {
 
-  void handle(Request request, Response response);
+  static Logger log = LoggerFactory.getLogger(DeployScript.class);
+
+  @Inject
+  Engine engine;
+
+  @Override
+  public void handle(Request request, Response response) {
+    log.debug("hello");
+    response.bodyString("goodby");
+    response.statusOk();
+  }
 }

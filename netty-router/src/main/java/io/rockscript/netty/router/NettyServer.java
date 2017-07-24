@@ -29,9 +29,9 @@ import io.netty.handler.codec.http.router.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Server {
+public class NettyServer {
 
-  static Logger log = LoggerFactory.getLogger(Server.class);
+  static Logger log = LoggerFactory.getLogger(NettyServer.class);
 
   protected Router<Class<?>> router;
   protected int port;
@@ -44,19 +44,15 @@ public class Server {
   protected Channel channel;
   protected Context context;
 
-  public Server(ServerConfiguration serverConfiguration) {
-    this.router = serverConfiguration.getRouter();
-    this.port = serverConfiguration.getPort();
-    this.services = serverConfiguration.getServices();
-    this.interceptors = serverConfiguration.getInterceptors();
-
-    // The jsonHandler could be configured and fetched from the services (Injector/guice container)
-    // but for now I skipped that to limit the amount of configuration that has to create
-    // a container.  For now there is only one implementation.
-    this.jsonHandler = new JsonHandlerGson(services);
+  public NettyServer(NettyServerConfiguration nettyServerConfiguration) {
+    this.router = nettyServerConfiguration.getRouter();
+    this.port = nettyServerConfiguration.getPort();
+    this.services = nettyServerConfiguration.getServices();
+    this.interceptors = nettyServerConfiguration.getInterceptors();
+    this.jsonHandler = nettyServerConfiguration.getJsonHandler();
   }
 
-  public Server startup() {
+  public NettyServer startup() {
     bossGroup = new NioEventLoopGroup(1);
     workerGroup = new NioEventLoopGroup();
 
@@ -75,7 +71,7 @@ public class Server {
         .sync()
         .channel();
       
-      log.debug("Server started: http://127.0.0.1:" + port + "/\n" + router);
+      log.debug("NettyServer started: http://127.0.0.1:" + port + "/\n" + router);
 
     } catch (Throwable t) {
       t.printStackTrace();
@@ -96,13 +92,13 @@ public class Server {
       Request.log.debug(">>> "+fullHttpRequest.getMethod()+" "+fullHttpRequest.getUri());
       Class<?> requestHandlerClass = route.target();
       
-      RequestHandler requestHandler = createRequestHandler(requestHandlerClass, request, response);
+      RequestHandler requestHandler = instantiate(requestHandlerClass);
       if (interceptors!=null) {
         InterceptorContext intercepterContext = new InterceptorContext(interceptors, requestHandler, request, response, this);
         intercepterContext.next();
 
       } else {
-        requestHandler.handle();
+        requestHandler.handle(request, response);
       }
       
 
@@ -116,6 +112,9 @@ public class Server {
       response.headerContentTypeApplicationJson();
       requestException(e, ctx);
     } finally {
+
+      // TODO Make responses properly async. This writeAndFlush code should be callable by the request handlers in an async callback.
+
       HttpResponse httpResponse = response.getHttpResponse();
       if (!HttpHeaders.isKeepAlive(fullHttpRequest)) {
         ctx.writeAndFlush(httpResponse).addListener(ChannelFutureListener.CLOSE);
@@ -125,18 +124,10 @@ public class Server {
         ctx.writeAndFlush(httpResponse);
       }
       // when adding the ctx.close() it seems that this causes
-      // the connection to be closed on the server end, causing
+      // the connection to be closed on the nettyServer end, causing
       // exceptions on the client for subsequent requests.
       // ctx.close();
     }      
-  }
-
-  public RequestHandler createRequestHandler(Class<?> requestHandlerClass, Request request, Response response) {
-    RequestHandler requestHandler = instantiate(requestHandlerClass);
-    requestHandler.request = request;
-    requestHandler.response = response;
-    services.injectMembers(requestHandler);
-    return requestHandler;
   }
 
   public <T> T instantiate(Class<?> clazz) {
@@ -156,8 +147,8 @@ public class Server {
     }
   }
   
-  protected ServerChannelInitializer createServerChannelInitializer() {
-    return new ServerChannelInitializer(this);
+  protected NettyServerChannelInitializer createServerChannelInitializer() {
+    return new NettyServerChannelInitializer(this);
   }
   
   public void waitForShutdown() {
@@ -182,7 +173,6 @@ public class Server {
   
   public void requestException(Throwable t, ChannelHandlerContext ctx) {
     log.error("Request exception: "+t.getMessage(), t);
-    t.printStackTrace();
   }
 
   public Context getContext() {
