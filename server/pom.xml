@@ -45,7 +45,11 @@
     </parent>
 
     <dependencies>
-
+        <dependency>
+            <groupId>io.rockscript</groupId>
+            <artifactId>rockscript-netty-router</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 
