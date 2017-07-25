@@ -41,7 +41,7 @@ public class ServerTest extends AbstractServerTest {
     if (server==null) {
       TestEngine testEngine = createTestEngine();
       testService = new TestService(testEngine);
-      server = new TestServer(testEngine, testService);
+      server = new DevServer(testEngine, testService);
       server.startup();
     } else {
       testService.reset();
