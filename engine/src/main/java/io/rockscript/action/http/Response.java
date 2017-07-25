@@ -16,6 +16,9 @@
 package io.rockscript.action.http;
 
 import java.io.IOException;
+import java.util.Map;
+
+import com.google.gson.Gson;
 
 public class Response {
 
@@ -30,6 +33,14 @@ public class Response {
     this.statusText = statusText;
     this.textBody = textBody;
     this.headers = headers;
+  }
+
+  Map<String,Object> json() throws IOException {
+    if (!contentType().startsWith("application/json")) {
+      throw new IllegalStateException("Cannot access non-JSON content as JSON");
+    }
+    Gson gson = new Gson();
+    return gson.fromJson(textBody, Map.class);
   }
 
   String contentType() throws IOException {
