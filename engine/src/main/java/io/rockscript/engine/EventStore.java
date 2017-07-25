@@ -32,25 +32,29 @@ public class EventStore implements EventListener {
 
   static Logger log = LoggerFactory.getLogger(EventStore.class);
 
+  // TODO Merge this Gson with the server Gson
   static Gson gson = new GsonBuilder()
-    .registerTypeAdapterFactory(new PolymorphicTypeAdapterFactory()
-      .typeName(new TypeToken<ActionStartedEventJson>(){},            "actionStarted")
-      .typeName(new TypeToken<ActionWaitingEventJson>(){},            "actionWaiting")
-      .typeName(new TypeToken<ActionEndedEventJson>(){},              "actionEnd")
-      .typeName(new TypeToken<ScriptStartedEventJson>(){},            "scriptStarted")
-      .typeName(new TypeToken<ScriptEndedEventJson>(){},              "scriptEnded")
-      .typeName(new TypeToken<VariableCreatedEventJson>(){},          "variableCreated")
-      .typeName(new TypeToken<ObjectImportedEventJson>(){},           "objectImported")
-      .typeName(new TypeToken<IdentifierResolvedEventJson>(){},       "identifierResolved")
-      .typeName(new TypeToken<PropertyDereferencedEventJson>(){},     "propertyDereferenced")
-    )
-
+    .registerTypeAdapterFactory(createEventsTypeAdapterFactory())
     // .setPrettyPrinting()
     .create();
 
+  public static PolymorphicTypeAdapterFactory createEventsTypeAdapterFactory() {
+    return new PolymorphicTypeAdapterFactory()
+      .typeName(new TypeToken<EventJson>(){}, "event")
+      .typeName(new TypeToken<ScriptDeployedEventJson>(){}, "scriptDeployed")
+      .typeName(new TypeToken<ActionStartedEventJson>(){}, "actionStarted")
+      .typeName(new TypeToken<ActionWaitingEventJson>(){}, "actionWaiting")
+      .typeName(new TypeToken<ActionEndedEventJson>(){}, "actionEnd")
+      .typeName(new TypeToken<ScriptStartedEventJson>(){}, "scriptStarted")
+      .typeName(new TypeToken<ScriptEndedEventJson>(){}, "scriptEnded")
+      .typeName(new TypeToken<VariableCreatedEventJson>(){}, "variableCreated")
+      .typeName(new TypeToken<ObjectImportedEventJson>(){}, "objectImported")
+      .typeName(new TypeToken<IdentifierResolvedEventJson>(){}, "identifierResolved")
+      .typeName(new TypeToken<PropertyDereferencedEventJson>(){}, "propertyDereferenced");
+  }
+
   ServiceLocator serviceLocator;
   List<EventJson> events = new ArrayList<>();
-
 
   public EventStore(ServiceLocator serviceLocator) {
     this.serviceLocator = serviceLocator;
@@ -64,16 +68,22 @@ public class EventStore implements EventListener {
     log.debug(jsonString);
   }
 
-  public List<EventJson> findEventsByScriptExecutionId(String scriptExecutionId) {
+  public List<ExecutionEventJson> findEventsByScriptExecutionId(String scriptExecutionId) {
     return events.stream()
-      .filter(event->scriptExecutionId.equals(event.getScriptExecutionId()))
+      .filter(event-> event instanceof ExecutionEventJson)
+      .map(event->((ExecutionEventJson)event))
+      .filter(executionEvent->scriptExecutionId.equals(executionEvent.getScriptExecutionId()))
       .collect(Collectors.toList());
   }
 
   public ScriptExecution loadScriptExecution(String scriptExecutionId) {
-    List<EventJson> eventJsons = findEventsByScriptExecutionId(scriptExecutionId);
+    List<ExecutionEventJson> eventJsons = findEventsByScriptExecutionId(scriptExecutionId);
 
     return recreateScriptExecution(eventJsons, scriptExecutionId);
+  }
+
+  public List<EventJson> getEvents() {
+    return events;
   }
 
   private class LoadingWrapperEventListener implements EventListener {
@@ -82,7 +92,7 @@ public class EventStore implements EventListener {
     int previouslyExecutedEvents;
     int replayedEvents;
 
-    public LoadingWrapperEventListener(ScriptExecution scriptExecution, EventListener originalEventListener, List<EventJson> eventJsons) {
+    public LoadingWrapperEventListener(ScriptExecution scriptExecution, EventListener originalEventListener, List<ExecutionEventJson> eventJsons) {
       this.scriptExecution = scriptExecution;
       this.originalEventListener = originalEventListener;
       this.previouslyExecutedEvents = eventJsons.size();
@@ -91,15 +101,18 @@ public class EventStore implements EventListener {
 
     @Override
     public void handle(Event event) {
-      updateExecutionModeAndCount(event);
-      if (scriptExecution.getExecutionMode()==ExecutionMode.EXECUTING) {
-        originalEventListener.handle(event);
-      } else {
-        log.debug("Swallowing ("+scriptExecution.getExecutionMode()+"): "+ EventStore.this.eventToJsonString(event));
+      if (event instanceof ExecutionEvent) {
+        ExecutionEvent executionEvent = (ExecutionEvent) event;
+        updateExecutionModeAndCount(executionEvent);
+        if (scriptExecution.getExecutionMode()==ExecutionMode.EXECUTING) {
+          originalEventListener.handle(event);
+        } else {
+          log.debug("Swallowing ("+scriptExecution.getExecutionMode()+"): "+ EventStore.this.eventToJsonString(executionEvent));
+        }
       }
     }
 
-    private void updateExecutionModeAndCount(Event event) {
+    private void updateExecutionModeAndCount(ExecutionEvent event) {
       if (replayedEvents==0) {
         if (previouslyExecutedEvents==1) {
           scriptExecution.setExecutionMode(ExecutionMode.RECOVERING);
@@ -116,12 +129,12 @@ public class EventStore implements EventListener {
       replayedEvents++;
     }
 
-    public void eventExecuting(Event event) {
+    public void eventExecuting(ExecutionEvent event) {
       updateExecutionModeAndCount(event);
     }
   }
 
-  private ScriptExecution recreateScriptExecution(List<EventJson> eventJsons, String scriptExecutionId) {
+  private ScriptExecution recreateScriptExecution(List<ExecutionEventJson> eventJsons, String scriptExecutionId) {
     String scriptId = findScriptId(eventJsons);
     ScriptException.throwIfNull(scriptId, "Script id not found for scriptExecutionId: %s", scriptExecutionId);
     Script script = serviceLocator
@@ -139,7 +152,7 @@ public class EventStore implements EventListener {
       .filter(this::isExecutable)
       .collect(Collectors.toList());
 
-    for (EventJson eventJson: eventJsons) {
+    for (ExecutionEventJson eventJson: eventJsons) {
       Execution execution = scriptExecution.findExecutionRecursive(eventJson.executionId);
       ExecutableEvent event = (ExecutableEvent) eventJson.toEvent(execution);
 
@@ -156,7 +169,7 @@ public class EventStore implements EventListener {
     return scriptExecution;
   }
 
-  private String findScriptId(List<EventJson> scriptExecutionEventJsons) {
+  private String findScriptId(List<ExecutionEventJson> scriptExecutionEventJsons) {
     return scriptExecutionEventJsons.stream()
       .map(eventJson->eventJson.getScriptId())
       .filter(Objects::nonNull)
@@ -166,39 +179,42 @@ public class EventStore implements EventListener {
 
   public List<ScriptExecution> recoverCrashedScriptExecutions() {
     List<ScriptExecution> scriptExecutions = new ArrayList<>();
-    Map<String,List<EventJson>> groupedEvents = findCrashedScriptExecutionEvents();
+    Map<String,List<ExecutionEventJson>> groupedEvents = findCrashedScriptExecutionEvents();
     for (String scriptExecutionId: groupedEvents.keySet()) {
-      List<EventJson> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
+      List<ExecutionEventJson> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
       ScriptExecution scriptExecution = recreateScriptExecution(scriptExecutionEvents, scriptExecutionId);
       scriptExecutions.add(scriptExecution);
     }
     return scriptExecutions;
   }
 
-  private boolean lastEventIsExecutable(List<EventJson> scriptExecutionEvents) {
-    EventJson lastEvent = scriptExecutionEvents.get(scriptExecutionEvents.size()-1);
+  private boolean lastEventIsExecutable(List<ExecutionEventJson> scriptExecutionEvents) {
+    ExecutionEventJson lastEvent = scriptExecutionEvents.get(scriptExecutionEvents.size()-1);
     return RecoverableEventJson.class.isAssignableFrom(lastEvent.getClass());
   }
 
   /** @return a list of events grouped by script execution. */
-  public Map<String,List<EventJson>> findCrashedScriptExecutionEvents() {
-    Map<String,List<EventJson>> groupedEvents = new HashMap<>();
+  public Map<String,List<ExecutionEventJson>> findCrashedScriptExecutionEvents() {
+    Map<String,List<ExecutionEventJson>> groupedEvents = new HashMap<>();
     for (EventJson event: events) {
-      String scriptExecutionId = event.getScriptExecutionId();
-      if (event instanceof ScriptEndedEventJson) {
-        groupedEvents.remove(scriptExecutionId);
-      } else {
-        List<EventJson> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
-        if (scriptExecutionEvents==null) {
-          scriptExecutionEvents = new ArrayList<>();
-          groupedEvents.put(scriptExecutionId, scriptExecutionEvents);
+      if (event instanceof ExecutionEventJson) {
+        ExecutionEventJson executableEvent = (ExecutionEventJson) event;
+        String scriptExecutionId = executableEvent.getScriptExecutionId();
+        if (executableEvent instanceof ScriptEndedEventJson) {
+          groupedEvents.remove(scriptExecutionId);
+        } else {
+          List<ExecutionEventJson> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
+          if (scriptExecutionEvents==null) {
+            scriptExecutionEvents = new ArrayList<>();
+            groupedEvents.put(scriptExecutionId, scriptExecutionEvents);
+          }
+          scriptExecutionEvents.add(executableEvent);
         }
-        scriptExecutionEvents.add(event);
       }
     }
     for (String scriptExecutionId: new ArrayList<>(groupedEvents.keySet())) {
-      List<EventJson> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
-      EventJson lastEventJson = scriptExecutionEvents.get(scriptExecutionEvents.size()-1);
+      List<ExecutionEventJson> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
+      ExecutionEventJson lastEventJson = scriptExecutionEvents.get(scriptExecutionEvents.size()-1);
       if (isUnlocking(lastEventJson)) {
         groupedEvents.remove(scriptExecutionId);
       }
@@ -206,19 +222,19 @@ public class EventStore implements EventListener {
     return groupedEvents;
   }
 
-  private boolean isExecutable(EventJson eventJson) {
+  private boolean isExecutable(ExecutionEventJson eventJson) {
     return eventJson!=null
       && ( eventJson instanceof ScriptStartedEventJson
            || eventJson instanceof ActionEndedEventJson);
   }
 
-  private boolean isUnlocking(EventJson lastEventJson) {
+  private boolean isUnlocking(ExecutionEventJson lastEventJson) {
     return lastEventJson!=null
       && ( lastEventJson instanceof ActionWaitingEventJson
            || lastEventJson instanceof ScriptEndedEventJson);
   }
 
-  public String eventToJsonString(Event event) {
+  public String eventToJsonString(ExecutionEvent event) {
     return eventJsonToJsonString(event.toJson());
   }
 

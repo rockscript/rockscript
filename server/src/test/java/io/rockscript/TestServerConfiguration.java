@@ -17,8 +17,7 @@ package io.rockscript;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
-import io.rockscript.action.ActionOutput;
-import io.rockscript.engine.JsonObject;
+import io.rockscript.engine.EngineImpl;
 import io.rockscript.http.test.ServerExceptionInterceptor;
 import io.rockscript.test.TestEngine;
 
@@ -26,29 +25,16 @@ public class TestServerConfiguration extends ServerConfiguration {
 
   TestService testService;
 
-  public TestServerConfiguration(TestService testService) {
+  public TestServerConfiguration(TestEngine testEngine, TestService testService) {
     this.testService = testService;
     asyncHttpServerConfiguration
       .interceptor(new ServerExceptionInterceptor())
       .services(Guice.createInjector(new AbstractModule() {
         @Override
         protected void configure() {
-          bind(Engine.class).toInstance(createTestEngine());
+          bind(Engine.class).toInstance(testEngine);
+          bind(EngineImpl.class).toInstance(testEngine);
         }
       }));
-  }
-
-  private TestEngine createTestEngine() {
-    TestEngine engine = new TestEngine();
-    engine.getServiceLocator()
-      .getImportResolver()
-      .add("rockscript.io/test-service", new JsonObject()
-        .put("doLongRunning", input -> {
-            testService.add(input);
-            return ActionOutput.waitForFunctionToCompleteAsync();
-          }
-        )
-      );
-    return engine;
   }
 }

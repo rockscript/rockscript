@@ -16,9 +16,12 @@
 
 package io.rockscript.engine;
 
-public class IdentifierResolvedEventJson extends EventJson<IdentifierResolvedEvent> {
+public class IdentifierResolvedEventJson extends ExecutionEventJson<IdentifierResolvedEvent> {
 
   Object identifierValue;
+
+  public IdentifierResolvedEventJson() {
+  }
 
   public IdentifierResolvedEventJson(IdentifierResolvedEvent identifierResolvedEvent, Object identifierValue) {
     super(identifierResolvedEvent);

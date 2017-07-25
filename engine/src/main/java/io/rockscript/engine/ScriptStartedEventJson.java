@@ -17,6 +17,9 @@ package io.rockscript.engine;
 
 public class ScriptStartedEventJson extends RecoverableEventJson<ScriptStartedEvent> {
 
+  public ScriptStartedEventJson() {
+  }
+
   public ScriptStartedEventJson(ScriptStartedEvent scriptStartedEvent) {
     super(scriptStartedEvent);
   }

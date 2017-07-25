@@ -21,7 +21,7 @@ public class ScriptStartedEvent extends ExecutableEvent<ScriptExecution> {
     super(scriptExecution);
   }
 
-  public EventJson toJson() {
+  public ExecutionEventJson toJson() {
     return new ScriptStartedEventJson(this);
   }
 

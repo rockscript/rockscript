@@ -20,6 +20,9 @@ public class ActionEndedEventJson extends RecoverableEventJson<ActionEndedEvent>
   // TODO Is there a better way to access this from HttpActionWorkQueueTest than public or getter access?
   public Object result;
 
+  public ActionEndedEventJson() {
+  }
+
   public ActionEndedEventJson(ActionEndedEvent externalFunctionEndedEvent) {
     super(externalFunctionEndedEvent);
     result = externalFunctionEndedEvent.result;

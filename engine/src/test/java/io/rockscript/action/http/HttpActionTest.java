@@ -5,7 +5,6 @@ import java.net.HttpURLConnection;
 import java.util.List;
 
 import com.google.common.net.MediaType;
-import io.rockscript.action.*;
 import io.rockscript.engine.*;
 import io.rockscript.test.TestEngine;
 import org.junit.Before;
@@ -44,7 +43,7 @@ public class HttpActionTest {
     String scriptExecutionId = engine.startScriptExecution(scriptId);
 
     // Then the action execution created an action ended event with the result
-    List<EventJson> events = eventStore.findEventsByScriptExecutionId(scriptExecutionId);
+    List<ExecutionEventJson> events = eventStore.findEventsByScriptExecutionId(scriptExecutionId);
     assertNotNull(events);
     assertFalse(events.isEmpty());
     Response httpResponse = events.stream()

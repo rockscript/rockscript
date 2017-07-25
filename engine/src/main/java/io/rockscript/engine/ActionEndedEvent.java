@@ -31,7 +31,7 @@ public class ActionEndedEvent extends ExecutableEvent<ArgumentsExpressionExecuti
   }
 
   @Override
-  public EventJson toJson() {
+  public ExecutionEventJson toJson() {
     return new ActionEndedEventJson(this);
   }
 }

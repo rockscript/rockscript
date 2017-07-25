@@ -48,7 +48,7 @@ public class RequestBuilderTest {
     String scriptExecutionId = engine.startScriptExecution(scriptId);
 
     // Then the action execution created an action ended event with the result
-    List<EventJson> events = eventStore.findEventsByScriptExecutionId(scriptExecutionId);
+    List<ExecutionEventJson> events = eventStore.findEventsByScriptExecutionId(scriptExecutionId);
     assertNotNull(events);
     assertFalse(events.isEmpty());
     Request httpRequest = events.stream()
@@ -87,7 +87,7 @@ public class RequestBuilderTest {
     String scriptExecutionId = engine.startScriptExecution(scriptId);
 
     // Then the action execution created an action ended event with the result
-    List<EventJson> events = eventStore.findEventsByScriptExecutionId(scriptExecutionId);
+    List<ExecutionEventJson> events = eventStore.findEventsByScriptExecutionId(scriptExecutionId);
     assertNotNull(events);
     assertFalse(events.isEmpty());
     Request httpRequest = events.stream()

@@ -16,14 +16,17 @@
 
 package io.rockscript.engine;
 
-public class ActionWaitingEventJson extends EventJson {
+public class ActionWaitingEventJson extends ExecutionEventJson {
+
+  public ActionWaitingEventJson() {
+  }
 
   public ActionWaitingEventJson(ActionWaitingEvent actionWaitingEvent) {
     super(actionWaitingEvent);
   }
 
   @Override
-  public Event toEvent(Execution execution) {
+  public ExecutionEvent toEvent(Execution execution) {
     return new ActionWaitingEvent((ArgumentsExpressionExecution) execution);
   }
 }

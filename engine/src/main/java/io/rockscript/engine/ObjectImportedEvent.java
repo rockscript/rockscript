@@ -16,7 +16,7 @@
 
 package io.rockscript.engine;
 
-public class ObjectImportedEvent extends Event<ArgumentsExpressionExecution> {
+public class ObjectImportedEvent extends ExecutionEvent<ArgumentsExpressionExecution> {
 
   Object importedObjectJson;
 
@@ -28,7 +28,7 @@ public class ObjectImportedEvent extends Event<ArgumentsExpressionExecution> {
   }
 
   @Override
-  public EventJson toJson() {
+  public ExecutionEventJson toJson() {
     return new ObjectImportedEventJson(this, importedObjectJson);
   }
 }

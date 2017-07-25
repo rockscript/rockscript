@@ -15,28 +15,55 @@
  */
 package io.rockscript;
 
+import java.util.List;
+
+import com.google.gson.reflect.TypeToken;
+import io.rockscript.action.ActionOutput;
 import io.rockscript.command.DeployScriptCommand;
 import io.rockscript.command.StartScriptCommand;
+import io.rockscript.engine.EventJson;
+import io.rockscript.engine.JsonObject;
 import io.rockscript.http.test.AbstractServerTest;
 import io.rockscript.netty.router.AsyncHttpServer;
+import io.rockscript.test.TestEngine;
 import org.junit.*;
 
 import static org.junit.Assert.assertEquals;
 
 public class ServerTest extends AbstractServerTest {
 
-  TestService testService;
-  Server server;
+  static TestService testService;
+  static Server server;
 
   @Before
   public void setUp() {
-    testService = new TestService();
-    server = new TestServer(testService);
-    server.startup();
+    super.setUp();
+    if (server==null) {
+      TestEngine testEngine = createTestEngine();
+      testService = new TestService(testEngine);
+      server = new TestServer(testEngine, testService);
+      server.startup();
+    } else {
+      testService.reset();
+    }
   }
 
-  @After
-  public void tearDown() {
+  static TestEngine createTestEngine() {
+    TestEngine engine = new TestEngine();
+    engine.getServiceLocator()
+      .getImportResolver()
+      .add("rockscript.io/test-service", new JsonObject()
+        .put("doLongRunning", input -> {
+            testService.add(input);
+            return ActionOutput.waitForFunctionToCompleteAsync();
+          }
+        )
+      );
+    return engine;
+  }
+
+  @AfterClass
+  public static void tearDownStatic() {
     server.shutdown();
     server.waitForShutdown();
   }
@@ -66,6 +93,36 @@ public class ServerTest extends AbstractServerTest {
     String scriptExecutionId = startScriptResponse.scriptExecutionId;
 
     assertEquals(1, testService.inputs.size());
+
+    testService.endAction(0, "by");
+  }
+
+  @Test
+  public void testEvents() {
+    DeployScriptCommand.ResponseJson deployScriptResponse = POST("command")
+      .bodyJson(new DeployScriptCommand()
+        .script(
+          "var t = system.import('rockscript.io/test-service'); "+
+          "t.doLongRunning('hello'); "))
+      .execute()
+      .assertStatusOk()
+      .body(DeployScriptCommand.ResponseJson.class);
+
+    String scriptId = deployScriptResponse.scriptId;
+
+    StartScriptCommand.ResponseJson startScriptResponse = POST("command")
+      .bodyJson(new StartScriptCommand()
+                  .scriptId(scriptId))
+      .execute()
+      .assertStatusOk()
+      .body(StartScriptCommand.ResponseJson.class);
+
+    List<EventJson> eventJsons = GET("events")
+      .execute()
+      .assertStatusOk()
+      .body(new TypeToken<List<EventJson>>(){}.getType());
+
+    assertEquals(10, eventJsons.size());
   }
 
   @Override

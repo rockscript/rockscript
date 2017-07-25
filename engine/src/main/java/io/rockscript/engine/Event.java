@@ -13,26 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.rockscript.engine;
 
-import io.rockscript.ServiceLocator;
 
-public abstract class Event<T extends Execution> {
+public interface Event {
 
-  T execution;
-
-  public Event(T execution) {
-    this.execution = execution;
-  }
-
-  public T getExecution() {
-    return execution;
-  }
-
-  public ServiceLocator getServiceLocator() {
-    return execution.getScript().getServiceLocator();
-  }
-
-  public abstract EventJson toJson();
+  EventJson toJson();
 }

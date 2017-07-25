@@ -16,12 +16,18 @@
 
 package io.rockscript.engine;
 
-public abstract class RecoverableEventJson<T extends ExecutableEvent> extends ExecutionEventJson<T> {
+public class ScriptDeployedEvent implements Event {
 
-  public RecoverableEventJson() {
+  String scriptId;
+  String script;
+
+  public ScriptDeployedEvent(String scriptId, String script) {
+    this.scriptId = scriptId;
+    this.script = script;
   }
 
-  public RecoverableEventJson(T recoverableEvent) {
-    super(recoverableEvent);
+  @Override
+  public EventJson toJson() {
+    return new ScriptDeployedEventJson(scriptId, script);
   }
 }

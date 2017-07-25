@@ -21,13 +21,17 @@ import com.google.gson.reflect.TypeToken;
 import io.rockscript.command.*;
 import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.handlers.CommandHandler;
+import io.rockscript.handlers.EventsHandler;
 import io.rockscript.netty.router.*;
+
+import static io.rockscript.engine.EventStore.createEventsTypeAdapterFactory;
 
 public class Server {
 
   AsyncHttpServer asyncHttpServer;
 
   public Server(ServerConfiguration serverConfiguration) {
+    // TODO Merge this Gson with the EventStore Gson
     Gson gson = new GsonBuilder()
       .registerTypeAdapterFactory(new PolymorphicTypeAdapterFactory()
         .typeName(new TypeToken<Command>(){}, "command")
@@ -35,11 +39,13 @@ public class Server {
         .typeName(new TypeToken<StartScriptCommand>(){}, "startScript")
         .typeName(new TypeToken<EndActionCommand>(){}, "endAction")
       )
+      .registerTypeAdapterFactory(createEventsTypeAdapterFactory())
       .create();
 
     AsyncHttpServerConfiguration asyncHttpServerConfiguration = serverConfiguration
       .getAsyncHttpServerConfiguration()
       .scan(CommandHandler.class)
+      .scan(EventsHandler.class)
       .jsonHandler(new JsonHandlerGson(gson));
     this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
   }

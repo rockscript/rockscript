@@ -16,9 +16,12 @@
 
 package io.rockscript.engine;
 
-public class PropertyDereferencedEventJson extends EventJson<PropertyDereferencedEvent> {
+public class PropertyDereferencedEventJson extends ExecutionEventJson<PropertyDereferencedEvent> {
 
   Object propertyValue;
+
+  public PropertyDereferencedEventJson() {
+  }
 
   public PropertyDereferencedEventJson(PropertyDereferencedEvent memberDotExpressionEvent, Object propertyValue) {
     super(memberDotExpressionEvent);

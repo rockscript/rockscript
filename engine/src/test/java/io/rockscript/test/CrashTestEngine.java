@@ -16,8 +16,7 @@
  */
 package io.rockscript.test;
 
-import io.rockscript.engine.Event;
-import io.rockscript.engine.EventListener;
+import io.rockscript.engine.*;
 
 public class CrashTestEngine extends TestEngine {
 

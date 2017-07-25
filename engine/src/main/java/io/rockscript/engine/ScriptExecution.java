@@ -65,7 +65,7 @@ public class ScriptExecution extends BlockExecution<Script> {
   }
 
   @Override
-  protected void dispatch(Event event) {
+  protected void dispatch(ExecutionEvent event) {
     eventListener.handle(event);
   }
 

@@ -22,11 +22,27 @@ import io.rockscript.action.ActionInput;
 
 public class TestService {
 
+  Engine engine;
   List<ActionInput> inputs = new ArrayList<>();
+
+  public TestService(Engine engine) {
+    this.engine = engine;
+  }
 
   public void add(ActionInput input) {
     inputs.add(input);
   }
 
+  public ActionInput getActionInput(int index) {
+    return inputs.get(index);
+  }
 
+  public void endAction(int index, Object result) {
+    ActionInput actionInput = getActionInput(index);
+    engine.endWaitingAction(actionInput.context, result);
+  }
+
+  public void reset() {
+    inputs = new ArrayList<>();
+  }
 }

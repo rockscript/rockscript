@@ -44,6 +44,9 @@ public class EngineImpl implements Engine {
   public Script deployScriptImpl(String scriptText) {
     Script script = parseScript(scriptText);
     storeScript(script, scriptText);
+    serviceLocator
+      .getEventStore()
+      .handle(new ScriptDeployedEvent(script.getId(), scriptText));
     return script;
   }
 

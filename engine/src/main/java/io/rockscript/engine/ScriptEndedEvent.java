@@ -15,13 +15,13 @@
  */
 package io.rockscript.engine;
 
-public class ScriptEndedEvent extends Event<ScriptExecution> {
+public class ScriptEndedEvent extends ExecutionEvent<ScriptExecution> {
 
   public ScriptEndedEvent(ScriptExecution scriptExecution) {
     super(scriptExecution);
   }
 
-  public EventJson toJson() {
+  public ExecutionEventJson toJson() {
     return new ScriptEndedEventJson(this);
   }
 

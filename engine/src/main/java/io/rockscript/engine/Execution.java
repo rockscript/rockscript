@@ -127,7 +127,7 @@ public abstract class Execution<T extends Operation> {
     return null;
   }
 
-  protected void dispatch(Event event) {
+  protected void dispatch(ExecutionEvent event) {
     parent.dispatch(event);
   }
 

@@ -23,7 +23,7 @@ public class ActionStartedEvent extends ExecutableEvent<ArgumentsExpressionExecu
   }
 
   @Override
-  public EventJson toJson() {
+  public ExecutionEventJson toJson() {
     return new ActionStartedEventJson(this);
   }
 

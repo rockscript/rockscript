@@ -15,9 +15,11 @@
  */
 package io.rockscript;
 
+import io.rockscript.test.TestEngine;
+
 public class TestServer extends Server {
 
-  public TestServer(TestService testService) {
-    super(new TestServerConfiguration(testService));
+  public TestServer(TestEngine testEngine, TestService testService) {
+    super(new TestServerConfiguration(testEngine, testService));
   }
 }

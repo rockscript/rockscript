@@ -16,6 +16,7 @@
 package io.rockscript.http.test.client;
 
 import java.io.*;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 
 import io.rockscript.netty.router.JsonHandler;
@@ -111,7 +112,7 @@ public class TestResponse {
         return returnContent().asString(UTF8);
     }
 
-    public <T> T body(Class<T> type) {
+    public <T> T body(Type type) {
         String jsonBodyString = bodyStringUtf8();
         JsonHandler jsonHandler = testRequest.test.getNettyServer().getJsonHandler();
         return (T) jsonHandler.fromJsonString(jsonBodyString, type);

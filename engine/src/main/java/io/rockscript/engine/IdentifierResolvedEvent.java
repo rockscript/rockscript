@@ -16,7 +16,7 @@
 
 package io.rockscript.engine;
 
-public class IdentifierResolvedEvent extends Event<IdentifierExpressionExecution> {
+public class IdentifierResolvedEvent extends ExecutionEvent<IdentifierExpressionExecution> {
 
   Object identifierValueJson;
 
@@ -28,7 +28,7 @@ public class IdentifierResolvedEvent extends Event<IdentifierExpressionExecution
   }
 
   @Override
-  public EventJson toJson() {
+  public ExecutionEventJson toJson() {
     return new IdentifierResolvedEventJson(this, identifierValueJson);
   }
 }

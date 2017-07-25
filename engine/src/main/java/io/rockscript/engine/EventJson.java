@@ -13,40 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.rockscript.engine;
 
-public abstract class EventJson<T extends Event> {
-
-  String scriptId;
-  String scriptExecutionId;
-  String executableId;
-  String executionId;
-
-  public EventJson(Event event) {
-    Execution execution = event.getExecution();
-    ScriptExecution scriptExecution = execution.getScriptExecution();
-    this.scriptId = scriptExecution.getOperation().getId();
-    this.scriptExecutionId = scriptExecution.getId();
-    this.executableId = execution.getOperation().getId();
-    this.executionId = execution.getId();
-  }
-
-  public String getScriptId() {
-    return scriptId;
-  }
-
-  public String getScriptExecutionId() {
-    return scriptExecutionId;
-  }
-
-  public String getExecutableId() {
-    return executableId;
-  }
-
-  public String getExecutionId() {
-    return executionId;
-  }
-
-  public abstract T toEvent(Execution execution);
+public class EventJson {
 }

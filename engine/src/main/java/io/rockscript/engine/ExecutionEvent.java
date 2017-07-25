@@ -16,12 +16,23 @@
 
 package io.rockscript.engine;
 
-public abstract class RecoverableEventJson<T extends ExecutableEvent> extends ExecutionEventJson<T> {
+import io.rockscript.ServiceLocator;
 
-  public RecoverableEventJson() {
+public abstract class ExecutionEvent<T extends Execution> implements Event {
+
+  T execution;
+
+  public ExecutionEvent(T execution) {
+    this.execution = execution;
   }
 
-  public RecoverableEventJson(T recoverableEvent) {
-    super(recoverableEvent);
+  public T getExecution() {
+    return execution;
   }
+
+  public ServiceLocator getServiceLocator() {
+    return execution.getScript().getServiceLocator();
+  }
+
+  public abstract ExecutionEventJson toJson();
 }

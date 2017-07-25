@@ -16,7 +16,7 @@
 
 package io.rockscript.engine;
 
-public class ActionWaitingEvent extends Event<ArgumentsExpressionExecution> {
+public class ActionWaitingEvent extends ExecutionEvent<ArgumentsExpressionExecution> {
 
   ArgumentsExpressionExecution argumentsExpressionExecution;
 
@@ -25,7 +25,7 @@ public class ActionWaitingEvent extends Event<ArgumentsExpressionExecution> {
   }
 
   @Override
-  public EventJson toJson() {
+  public ExecutionEventJson toJson() {
     return new ActionWaitingEventJson(this);
   }
 }

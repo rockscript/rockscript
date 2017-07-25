@@ -16,7 +16,7 @@
 
 package io.rockscript.engine;
 
-public abstract class ExecutableEvent<T extends Execution> extends Event<T> {
+public abstract class ExecutableEvent<T extends Execution> extends ExecutionEvent<T> {
 
   public ExecutableEvent(T execution) {
     super(execution);

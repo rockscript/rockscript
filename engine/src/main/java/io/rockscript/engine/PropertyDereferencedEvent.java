@@ -16,7 +16,7 @@
 
 package io.rockscript.engine;
 
-public class PropertyDereferencedEvent extends Event<MemberDotExpressionExecution> {
+public class PropertyDereferencedEvent extends ExecutionEvent<MemberDotExpressionExecution> {
 
   Object propertyValueJson;
 
@@ -28,7 +28,7 @@ public class PropertyDereferencedEvent extends Event<MemberDotExpressionExecutio
   }
 
   @Override
-  public EventJson toJson() {
+  public ExecutionEventJson toJson() {
     return new PropertyDereferencedEventJson(this, propertyValueJson);
   }
 

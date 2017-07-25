@@ -15,14 +15,17 @@
  */
 package io.rockscript.engine;
 
-public class ScriptEndedEventJson extends EventJson {
+public class ScriptEndedEventJson extends ExecutionEventJson {
+
+  public ScriptEndedEventJson() {
+  }
 
   public ScriptEndedEventJson(ScriptEndedEvent scriptEndedEvent) {
     super(scriptEndedEvent);
   }
 
   @Override
-  public Event toEvent(Execution execution) {
+  public ExecutionEvent toEvent(Execution execution) {
     return new ScriptEndedEvent((ScriptExecution) execution);
   }
 }
