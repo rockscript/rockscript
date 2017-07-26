@@ -23,7 +23,7 @@ public class HttpImportProvider implements ImportProvider {
 
   public void provideImport(ImportResolver importResolver) {
     ImportJsonObject http = new ImportJsonObject();
-    http.put("get", new HttpAction());
+    http.put("request", new HttpAction());
     importResolver.add("rockscript.io/http", http);
   }
 }
