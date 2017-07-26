@@ -19,8 +19,13 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.google.gson.Gson;
+import io.rockscript.engine.JsonReadable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class Response {
+public class Response implements JsonReadable {
+
+  private static Logger log = LoggerFactory.getLogger(Response.class);
 
   final int status;
   final String statusText;
@@ -46,5 +51,30 @@ public class Response {
   String contentType() throws IOException {
     return headers.values("Content-Type").stream().findFirst()
                   .orElseThrow(() -> new IOException("Missing Content-Type response header"));
+  }
+
+  public void log() {
+    StringBuilder message = new StringBuilder();
+    message.append("HTTP ").append(status).append(" ").append(statusText).append("\n");
+    message.append(headers);
+    if (textBody != null && !textBody.isEmpty()) {
+      message.append("\n");
+      message.append(textBody);
+    }
+    log.debug(message.toString());
+  }
+
+  @Override
+  public Object get(String propertyName) {
+    switch (propertyName) {
+      case "json":
+        try {
+          return json();
+        } catch (IOException e) {
+          throw new IllegalArgumentException("Cannot read ‘json’ property: " + e.getMessage());
+        }
+      default:
+        throw new IllegalArgumentException("Unsupported response property: " + propertyName);
+    }
   }
 }

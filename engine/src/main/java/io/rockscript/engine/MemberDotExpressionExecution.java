@@ -45,14 +45,14 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
 
   public Object getFieldValue(Object target, String identifier) {
     Object fieldValue = null;
-    if (target instanceof JsonObject) {
-      JsonObject jsonObject = (JsonObject) target;
+    if (target instanceof JsonReadable) {
+      JsonReadable jsonObject = (JsonReadable) target;
       fieldValue = jsonObject.get(identifier);
     } else if (target instanceof Map) {
       Map<String,Object> map = (Map) target;
       fieldValue = map.get(identifier);
     } else {
-      throw new RuntimeException("TODO: target="+target);
+      throw new RuntimeException("Could not read field value from type " + target.getClass());
     }
     return fieldValue;
   }

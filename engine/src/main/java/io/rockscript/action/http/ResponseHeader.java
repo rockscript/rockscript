@@ -16,6 +16,7 @@
 package io.rockscript.action.http;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 class ResponseHeader {
 
@@ -25,5 +26,10 @@ class ResponseHeader {
   ResponseHeader(String name, List<String> values) {
     this.name = name;
     this.values = values;
+  }
+
+  @Override
+  public String toString() {
+    return values.stream().map(value -> String.format("%s: %s", name, value)).collect(Collectors.joining("\n"));
   }
 }

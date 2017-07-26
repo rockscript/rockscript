@@ -18,7 +18,12 @@ package io.rockscript.action.http;
 import java.net.URL;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 class Request {
+
+  private static Logger log = LoggerFactory.getLogger(Request.class);
 
   final URL url;
   final Method method;
@@ -45,5 +50,16 @@ class Request {
 
   Optional<String> getHeader(String name) {
     return headers.get(name);
+  }
+
+  public void log() {
+    StringBuilder message = new StringBuilder();
+    message.append("HTTP ").append(method).append(" ").append(url).append("\n");
+    message.append(headers);
+    if (hasBody()) {
+      message.append("\n");
+      message.append(body);
+    }
+    log.debug(message.toString());
   }
 }

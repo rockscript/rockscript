@@ -21,4 +21,9 @@ class ResponseHeaders {
         .filter(header -> headerName.equals(header.name)).findFirst();
     return responseHeader.map(header -> header.values).orElse(Collections.emptyList());
   }
+
+  @Override
+  public String toString() {
+    return headers.stream().map(Object::toString).collect(Collectors.joining("\n"));
+  }
 }

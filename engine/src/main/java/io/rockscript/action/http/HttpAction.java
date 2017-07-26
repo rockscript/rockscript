@@ -16,12 +16,12 @@
 package io.rockscript.action.http;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
-import java.util.HashSet;
-import java.util.Set;
 
 import io.rockscript.action.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class HttpAction implements Action {
 
@@ -41,12 +41,14 @@ public class HttpAction implements Action {
     }
 
     try {
+      request.log();
       HttpURLConnection connection = new HttpURLConnectionBuilder(configuration, request).build();
       ResponseBodyReader responseBodyReader = new ResponseBodyReader(connection);
       String responseBody = new String(responseBodyReader.read(), Charset.forName("UTF-8"));
       ResponseHeaders headers = new ResponseHeaders(connection.getHeaderFields());
       int status = connection.getResponseCode();
       Response response = new Response(status, connection.getResponseMessage(), responseBody, headers);
+      response.log();
       return ActionOutput.endFunction(response);
     } catch (IOException e) {
       return ActionOutput.endFunction(e);
