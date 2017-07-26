@@ -18,6 +18,7 @@ package io.rockscript.netty.router;
 
 import java.util.List;
 
+import com.google.gson.JsonObject;
 import com.google.inject.Injector;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -108,8 +109,10 @@ public class AsyncHttpServer {
       } else {
         response.statusInternalServerError();
       }
-      response.bodyString("{ \"message\": \"oops\" }");
-      response.headerContentTypeApplicationJson();
+      JsonObject body = new JsonObject();
+      body.addProperty("message", e.getMessage());
+      response.bodyJson(body);
+      response.contentTypeApplicationJson();
       response.send();
       requestException(e, ctx);
     } finally {

@@ -31,7 +31,7 @@ public class HttpActionTest {
     // Given a script that uses an HTTP action
     String scriptId = engine.deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
-            "http.get({ " +
+            "http.request({ " +
             "  url: 'https://github.com/RockScript',"  +
             "  headers: { " +
             "    Accept: 'text/html' " +
@@ -64,7 +64,7 @@ public class HttpActionTest {
     // Given a script that uses an HTTP action
     String scriptId = engine.deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
-            "http.get({ " +
+            "http.request({ " +
             "  url: 'https://api.github.com/orgs/RockScript',"  +
             "  headers: { " +
             "    Accept: 'application/json' " +

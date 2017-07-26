@@ -18,8 +18,8 @@ package io.rockscript;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import io.rockscript.action.ActionOutput;
-import io.rockscript.engine.EngineImpl;
-import io.rockscript.engine.JsonObject;
+import io.rockscript.action.http.HttpImportProvider;
+import io.rockscript.engine.*;
 import io.rockscript.test.TestEngine;
 
 public class DevServer extends Server {
@@ -54,8 +54,8 @@ public class DevServer extends Server {
   }
 
   private static void configureTestEngine(TestEngine testEngine, TestService testService) {
-    testEngine.getServiceLocator()
-      .getImportResolver()
+    ImportResolver importResolver = testEngine.getServiceLocator().getImportResolver();
+    importResolver
       .add("rockscript.io/test-service", new JsonObject()
         .put("doLongRunning", input -> {
                testService.add(input);
@@ -63,5 +63,6 @@ public class DevServer extends Server {
              }
         )
       );
+    new HttpImportProvider().provideImport(importResolver);
   }
 }

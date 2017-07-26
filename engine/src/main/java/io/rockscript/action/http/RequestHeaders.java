@@ -16,10 +16,15 @@ public class RequestHeaders {
     this.headers = Stream.concat(
         Stream.of(new RequestHeader("X-Correlation-Id", scriptExecutionId)),
         headers.entrySet().stream().map(entry -> new RequestHeader(entry.getKey(), entry.getValue())))
-        .collect(Collectors.toSet());
+          .collect(Collectors.toSet());
   }
 
   Optional<String> get(String name) {
     return headers.stream().filter(header -> header.name.equals(name)).map(header -> header.value).findFirst();
+  }
+
+  @Override
+  public String toString() {
+    return headers.stream().map(Object::toString).collect(Collectors.joining("\n"));
   }
 }
