@@ -44,6 +44,9 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
   }
 
   public Object getFieldValue(Object target, String identifier) {
+    if (target == null) {
+      throw new NullPointerException("Cannot evaluate null." + identifier);
+    }
     Object fieldValue = null;
     if (target instanceof JsonReadable) {
       JsonReadable jsonObject = (JsonReadable) target;

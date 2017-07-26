@@ -13,6 +13,10 @@ class ResponseHeaders {
         .collect(Collectors.toSet());
   }
 
+  ResponseHeaders(ResponseHeader... headers) {
+    this.headers = Arrays.stream(headers).collect(Collectors.toSet());
+  }
+
   List<String> values(String headerName) {
     if (headerName == null || headers == null || headers.isEmpty()) {
       return Collections.emptyList();

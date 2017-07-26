@@ -18,10 +18,17 @@ package io.rockscript.action.http;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.rockscript.util.Lists;
+
 class ResponseHeader {
 
   final String name;
   final List<String> values;
+
+  ResponseHeader(String name, String value) {
+    this.name = name;
+    values = Lists.of(value);
+  }
 
   ResponseHeader(String name, List<String> values) {
     this.name = name;

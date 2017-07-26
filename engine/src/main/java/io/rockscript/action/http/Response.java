@@ -40,7 +40,7 @@ public class Response implements JsonReadable {
     this.headers = headers;
   }
 
-  Map<String,Object> json() throws IOException {
+  Map<String, Object> json() throws IOException {
     if (!contentType().startsWith("application/json")) {
       throw new IllegalStateException("Cannot access non-JSON content as JSON");
     }
@@ -50,14 +50,14 @@ public class Response implements JsonReadable {
 
   String contentType() throws IOException {
     return headers.values("Content-Type").stream().findFirst()
-                  .orElseThrow(() -> new IOException("Missing Content-Type response header"));
+      .orElseThrow(() -> new IOException("Missing Content-Type response header"));
   }
 
   public void log() {
     StringBuilder message = new StringBuilder();
     message.append("HTTP ").append(status).append(" ").append(statusText).append("\n");
     message.append(headers);
-    if (textBody != null && !textBody.isEmpty()) {
+    if (textBody!=null && !textBody.isEmpty()) {
       message.append("\n");
       message.append(textBody);
     }
@@ -65,16 +65,16 @@ public class Response implements JsonReadable {
   }
 
   @Override
-  public Object get(String propertyName) {
+  public Map<String, Object> get(String propertyName) {
     switch (propertyName) {
-      case "json":
+      case "body":
         try {
           return json();
         } catch (IOException e) {
-          throw new IllegalArgumentException("Cannot read ‘json’ property: " + e.getMessage());
+          throw new IllegalArgumentException("Cannot read ‘body’ property: "+e.getMessage());
         }
       default:
-        throw new IllegalArgumentException("Unsupported response property: " + propertyName);
+        throw new IllegalArgumentException("Unsupported response property: "+propertyName);
     }
   }
 }
