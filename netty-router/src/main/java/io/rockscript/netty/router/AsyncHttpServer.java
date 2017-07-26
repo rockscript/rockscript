@@ -112,7 +112,7 @@ public class AsyncHttpServer {
       JsonObject body = new JsonObject();
       body.addProperty("message", e.getMessage());
       response.bodyJson(body);
-      response.headerContentTypeApplicationJson();
+      response.contentTypeApplicationJson();
       response.send();
       requestException(e, ctx);
     } finally {

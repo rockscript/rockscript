@@ -83,7 +83,7 @@ public class Response {
   public Response bodyJson(Object jsonBodyObject) {
     String jsonBodyString = asyncHttpServer.getJsonHandler().toJsonString(jsonBodyObject);
     bodyString(jsonBodyString);
-    headerContentTypeApplicationJson();
+    contentTypeApplicationJson();
     return this;
   }
 
@@ -104,17 +104,17 @@ public class Response {
     return this;
   }
 
-  public Response headerContentTypeApplicationJson() {
-    headerContentType("application/json");
+  public Response contentTypeApplicationJson() {
+    contentType("application/json");
     return this;
   }
 
-  public Response headerContentType(String contentType) {
+  public Response contentType(String contentType) {
     header(CONTENT_TYPE, contentType);
     return this;
   }
 
-  public HttpResponse getHttpResponse() {
+  public HttpResponse buildHttpResponse() {
     autoAddContentLengthHeader();
     log.debug("<<< "+status+(contentStringForLog!=null ? " "+contentStringForLog : ""));
     DefaultFullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(httpVersion, status, byteBuf);
@@ -128,7 +128,7 @@ public class Response {
   }
 
   public void send() {
-    HttpResponse httpResponse = getHttpResponse();
+    HttpResponse httpResponse = buildHttpResponse();
     if (!HttpHeaders.isKeepAlive(fullHttpRequest)) {
       channelHandlerContext
         .writeAndFlush(httpResponse)
