@@ -20,8 +20,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.rockscript.command.*;
 import io.rockscript.gson.PolymorphicTypeAdapterFactory;
-import io.rockscript.handlers.CommandHandler;
-import io.rockscript.handlers.EventsHandler;
+import io.rockscript.handlers.*;
 import io.rockscript.netty.router.*;
 
 import static io.rockscript.engine.EventStore.createEventsTypeAdapterFactory;
@@ -46,6 +45,7 @@ public class Server {
       .getAsyncHttpServerConfiguration()
       .scan(CommandHandler.class)
       .scan(EventsHandler.class)
+      .scan(DeployScriptHandler.class)
       .jsonHandler(new JsonHandlerGson(gson));
     this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
   }
