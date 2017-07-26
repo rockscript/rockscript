@@ -23,10 +23,14 @@ import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.handlers.CommandHandler;
 import io.rockscript.handlers.EventsHandler;
 import io.rockscript.netty.router.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static io.rockscript.engine.EventStore.createEventsTypeAdapterFactory;
 
 public class Server {
+
+  private static Logger log = LoggerFactory.getLogger(Server.class);
 
   AsyncHttpServer asyncHttpServer;
 
@@ -51,6 +55,13 @@ public class Server {
   }
 
   public void startup() {
+    log.info("Starting RockScript Server\n"
+        + "    ____            _     ____            _       _   \n"
+        + "   |  _ \\ ___   ___| | __/ ___|  ___ _ __(_)_ __ | |_ \n"
+        + "   | |_) / _ \\ / __| |/ /\\___ \\ / __| '__| | '_ \\| __|\n"
+        + "   |  _ < (_) | (__|   <  ___) | (__| |  | | |_) | |_ \n"
+        + "   |_| \\_\\___/ \\___|_|\\_\\|____/ \\___|_|  |_| .__/ \\__|\n"
+        + "                                           |_|        ");
     asyncHttpServer.startup();
   }
 
