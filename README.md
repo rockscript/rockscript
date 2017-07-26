@@ -40,8 +40,9 @@ Write a script `hello.script` that imports an HTTP service and executes an HTTP 
 ```javascript
 var http = system.import('core/http');
 
-http.post({
+http.request({
   url: 'http://api.example.com/greetings',
+  method: 'post',
   content-type: 'application/json; charset=utf-8',
   body: {
     message = 'Hello, world!'
@@ -49,12 +50,39 @@ http.post({
 });
 ```
 
-Then deploy and run the script using the HTTP API, e.g. via cURL on the command line:
+Build and start the development server:
 
 ```
-curl --request PUT --header "Content-Type: application/json" http://localhost:7789/script/hello --data @hello.script
+mvn clean install
+java -jar server/target/rockscript-server-*-jar-with-dependencies.jar
+```
 
-curl --request POST --header "Content-Type: application/json" http://localhost:7789/script/hello/executions --data '{"message":"Hello, world!"}'
+To deploy and run the script, first wrap it in a `deployScript` command, save it has `hello.deployScript.json`:
+
+```json
+{
+  "deployScript": {
+    "script": "
+      var http = system.import('core/http');
+
+      http.request({
+        url: 'http://api.example.com/greetings',
+        method: 'post',
+        content-type: 'application/json; charset=utf-8',
+        body: {
+          message = 'Hello, world!'
+        }
+      });
+    "
+  }
+}
+```
+
+Now deploy and run the script using the HTTP command API, e.g. via [HTTPie](https://httpie.org) on the command line:
+
+```
+http POST localhost:8888/command < hello.deployScript.json
+http POST localhost:8888/command startScript:='{"scriptId": 1}'
 ```
 
 ## Examples
