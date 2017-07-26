@@ -22,9 +22,8 @@ public class HttpActionTest {
     engine = new TestEngine();
     eventStore = engine.getServiceLocator().getEventStore();
     ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
-    JsonObject httpService = new JsonObject()
-        .put("get", new HttpAction());
-    importResolver.add("rockscript.io/http", httpService);
+    // TODO this should move into some EngineConfiguration thorugh ServiceLoader
+    new HttpImportProvider().provideImport(importResolver);
   }
 
   @Test

@@ -13,10 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript.action;
 
-import io.rockscript.action.*;
+import io.rockscript.engine.JsonObject;
 
+/** Special JsonObject used as import object that ensures automatic
+ * capturing of the propertyName of Actions and wraps the actions so
+ * that the toString shows the property name. */
 public class ImportJsonObject extends JsonObject {
 
   public void resolveActionNames(String url) {
@@ -47,5 +50,4 @@ public class ImportJsonObject extends JsonObject {
       return "["+name+" action]";
     }
   }
-
 }

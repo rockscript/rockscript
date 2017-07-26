@@ -13,33 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.action.http;
 
-package io.rockscript.engine;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import io.rockscript.ServiceLocator;
 import io.rockscript.action.ImportJsonObject;
+import io.rockscript.action.ImportProvider;
+import io.rockscript.engine.ImportResolver;
 
-public class ImportResolver {
+public class HttpImportProvider implements ImportProvider {
 
-  ServiceLocator serviceLocator;
-  Map<String,JsonObject> importObjects = new HashMap<>();
-
-  public ImportResolver(ServiceLocator serviceLocator) {
-    this.serviceLocator = serviceLocator;
-  }
-
-  public ImportResolver add(String url, JsonObject importObject) {
-    if (importObject instanceof ImportJsonObject) {
-      ((ImportJsonObject)importObject).resolveActionNames(url);
-    }
-    importObjects.put(url, importObject);
-    return this;
-  }
-
-  public JsonObject get(String url) {
-    return importObjects.get(url);
+  public void provideImport(ImportResolver importResolver) {
+    ImportJsonObject http = new ImportJsonObject();
+    http.put("get", new HttpAction());
+    importResolver.add("rockscript.io/http", http);
   }
 }
