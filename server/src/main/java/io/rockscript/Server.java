@@ -19,9 +19,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.rockscript.command.*;
+import io.rockscript.engine.JsonObject;
+import io.rockscript.engine.JsonObjectSerialiser;
 import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.handlers.*;
 import io.rockscript.netty.router.*;
+import io.rockscript.rest.ScriptsPostHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,13 +46,14 @@ public class Server {
         .typeName(new TypeToken<EndActionCommand>(){}, "endAction")
       )
       .registerTypeAdapterFactory(createEventsTypeAdapterFactory())
+      .registerTypeAdapter(JsonObject.class, new JsonObjectSerialiser())
       .create();
 
     AsyncHttpServerConfiguration asyncHttpServerConfiguration = serverConfiguration
       .getAsyncHttpServerConfiguration()
       .scan(CommandHandler.class)
       .scan(EventsHandler.class)
-      .scan(DeployScriptHandler.class)
+      .scan(ScriptsPostHandler.class)
       .jsonHandler(new JsonHandlerGson(gson));
     this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
   }
@@ -63,6 +67,7 @@ public class Server {
         + "   |_| \\_\\___/ \\___|_|\\_\\|____/ \\___|_|  |_| .__/ \\__|\n"
         + "                                           |_|        ");
     asyncHttpServer.startup();
+    log.info("Server started");
   }
 
   public void shutdown() {
