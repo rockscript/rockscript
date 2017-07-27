@@ -18,8 +18,8 @@ package io.rockscript.engine;
 
 public class IdentifierExpressionExecution extends Execution<IdentifierExpression> {
 
-  public IdentifierExpressionExecution(IdentifierExpression executable, Execution parent) {
-    super(parent.createInternalExecutionId(), executable, parent);
+  public IdentifierExpressionExecution(IdentifierExpression element, Execution parent) {
+    super(parent.createInternalExecutionId(), element, parent);
   }
 
   @Override

@@ -97,7 +97,7 @@ public class ScriptTest {
     DeepComparator deepComparator = new DeepComparator()
       .ignoreField(ScriptExecution.class, "serviceLocator")
       .ignoreField(ScriptExecution.class, "eventListener")
-      .ignoreField(Script.class, "executables")
+      .ignoreField(Script.class, "elements")
       .ignoreField(Script.class, "serviceLocator")
       .ignoreField(SystemImportAction.class, "serviceLocator")
       .ignoreAnonymousField(Action.class, "val$functionHandler");

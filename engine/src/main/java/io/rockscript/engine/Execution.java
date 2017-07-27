@@ -55,8 +55,8 @@ public abstract class Execution<T extends ScriptElement> {
     if (childScriptElement==null) {
       Script script = getScript();
       Integer childScriptElementId = childScriptElement.getIndex();
-      childScriptElement = script.findExecutable(childScriptElementId);
-      ScriptException.throwIfNull(childScriptElement, "Couldn't find executable %s in script %s", childScriptElementId, script.getIndex());
+      childScriptElement = script.findScriptElement(childScriptElementId);
+      ScriptException.throwIfNull(childScriptElement, "Couldn't find script element %s in script %s", childScriptElementId, script.getIndex());
     }
     Execution child = createChild(childScriptElement);
     child.start();

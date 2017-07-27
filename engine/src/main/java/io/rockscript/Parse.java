@@ -111,7 +111,7 @@ public class Parse {
     SourceElementsContext sourceElementsContext = programContext.sourceElements();
     List<SourceElement> sourceElements = parseSourceElements(sourceElementsContext);
     this.script.setSourceElements(sourceElements);
-    this.script.initializeExecutables(scriptText);
+    this.script.initializeScriptElements(scriptText);
   }
 
   private List<SourceElement> parseSourceElements(SourceElementsContext sourceElementsContext) {
@@ -354,10 +354,10 @@ public class Parse {
     return new RuntimeException("Unsupported "+elementName+": "+(object!=null ? object.getText()+" ("+object.getClass().getSimpleName()+")" : "null"));
   }
 
-  private <T extends ScriptElement> T initExecutable(T executable, ParserRuleContext parserRuleContext) {
-    executable.setIndex(createNextScriptElementId());
-    executable.setLocation(createLocation(parserRuleContext));
-    return executable;
+  private <T extends ScriptElement> T initScriptElement(T scriptElement, ParserRuleContext parserRuleContext) {
+    scriptElement.setIndex(createNextScriptElementId());
+    scriptElement.setLocation(createLocation(parserRuleContext));
+    return scriptElement;
   }
 
   private Integer createNextScriptElementId() {

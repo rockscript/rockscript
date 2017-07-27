@@ -29,9 +29,9 @@ public class ScriptDeployedEvent implements Event {
   public ScriptDeployedEvent(Script script, String scriptText) {
     this.scriptId = script.getIndex().toString();
     this.script = scriptText;
-    List<ScriptElement> executablesList = script.getExecutables();
+    List<ScriptElement> elementsList = script.getElements();
     this.elements = new ArrayList<>();
-    for (ScriptElement scriptElement: executablesList) {
+    for (ScriptElement scriptElement: elementsList) {
       this.elements.add(scriptElement.toJson());
     }
   }

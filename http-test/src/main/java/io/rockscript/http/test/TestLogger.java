@@ -23,17 +23,27 @@ public class TestLogger extends TestName {
   @Override
   protected void starting(Description d) {
     super.starting(d);
-    System.err.println("\n["+getClass().getSimpleName()+"."+getMethodName()+"]>-- starting");
+    logStarting();
   }
+
   @Override
   protected void succeeded(Description description) {
     super.succeeded(description);
-    System.err.println("--<["+getClass().getSimpleName()+"."+getMethodName()+"]\n");
+    logEnded();
   }
+
   @Override
   protected void failed(Throwable e, Description description) {
     super.failed(e, description);
-    System.err.println("--FAILED--<["+getClass().getSimpleName()+"."+getMethodName()+"]\n");
+    logEnded();
     e.printStackTrace();
+  }
+
+  private void logStarting() {
+    System.err.println("=== starting "+getClass().getSimpleName()+"."+getMethodName()+" ====================== \n");
+  }
+
+  private void logEnded() {
+    System.err.println("====================== "+getClass().getSimpleName()+"."+getMethodName()+" ended === \n");
   }
 }

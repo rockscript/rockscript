@@ -74,7 +74,7 @@ public class CrashTest {
       .ignoreField(ScriptExecution.class, "serviceLocator")
       .ignoreField(ScriptExecution.class, "eventListener")
       .ignoreField(Execution.class, "element")
-      .ignoreField(Script.class, "executables")
+      .ignoreField(Script.class, "elements")
       .ignoreField(Script.class, "serviceLocator")
       .ignoreField(SystemImportAction.class, "serviceLocator")
       .ignoreAnonymousField(Action.class, "val$functionHandler");

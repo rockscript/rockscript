@@ -43,8 +43,8 @@ public class VariableDeclarationExecution extends Execution<VariableDeclaration>
   }
 
   private Variable createVariable() {
-    VariableDeclaration executable = getElement();
-    String variableName = executable.getVariableName();
+    VariableDeclaration element = getElement();
+    String variableName = element.getVariableName();
     Variable variable = parent.createVariable(variableName);
     Object initialValue = getInitialValue();
     variable.setValue(initialValue);

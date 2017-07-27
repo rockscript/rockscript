@@ -28,7 +28,7 @@ public class Script extends SourceElements {
 
   String id;
   ServiceLocator serviceLocator;
-  List<ScriptElement> executables;
+  List<ScriptElement> elements;
 
   public Script(Integer index, Location location) {
     super(index, location);
@@ -47,29 +47,29 @@ public class Script extends SourceElements {
     this.serviceLocator = serviceLocator;
   }
 
-  public ScriptElement findExecutable(int executableIndex) {
-    return executables.get(executableIndex);
+  public ScriptElement findScriptElement(int executableIndex) {
+    return elements.get(executableIndex);
   }
 
-  public void initializeExecutables(String scriptText) {
-    executables = new ArrayList<>();
-    addExecutable(this, scriptText);
-    initializeExecutables(getChildren(), scriptText);
+  public void initializeScriptElements(String scriptText) {
+    elements = new ArrayList<>();
+    addScriptElement(this, scriptText);
+    initializeScriptElements(getChildren(), scriptText);
   }
 
-  void initializeExecutables(List<? extends ScriptElement> children, String scriptText) {
+  void initializeScriptElements(List<? extends ScriptElement> children, String scriptText) {
     if (children!=null) {
       for (ScriptElement child: children) {
-        addExecutable(child, scriptText);
-        initializeExecutables(child.getChildren(), scriptText);
+        addScriptElement(child, scriptText);
+        initializeScriptElements(child.getChildren(), scriptText);
       }
     }
   }
 
-  void addExecutable(ScriptElement scriptElement, String scriptText) {
-    int executableIndex = executables.size();
+  void addScriptElement(ScriptElement scriptElement, String scriptText) {
+    int executableIndex = elements.size();
     scriptElement.setIndex(executableIndex);
-    executables.add(scriptElement);
+    elements.add(scriptElement);
 
     Location location = scriptElement.getLocation();
     int start = location.getStartIndex();
@@ -79,8 +79,8 @@ public class Script extends SourceElements {
     scriptElement.setText(scriptPiece);
   }
 
-  public List<ScriptElement> getExecutables() {
-    return executables;
+  public List<ScriptElement> getElements() {
+    return elements;
   }
 
   public String getId() {

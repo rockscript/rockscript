@@ -67,10 +67,10 @@ public abstract class ScriptElement {
     Integer index;
     String text;
     Location location;
-    public ScriptElementJson(ScriptElement executable) {
-      this.index = executable.getIndex();
-      this.text = executable.getText();
-      this.location = executable.getLocation();
+    public ScriptElementJson(ScriptElement element) {
+      this.index = element.getIndex();
+      this.text = element.getText();
+      this.location = element.getLocation();
     }
     public ScriptElementJson() {
     }
