@@ -13,7 +13,7 @@ var luke = http.request({
 });
 
 var planet = http.request({
-  url: luke.json.homeworld,
+  url: luke.body.homeworld,
   headers: {
     'Accept': 'application/json',
     'User-Agent': 'HTTPie/0.8.0'
@@ -28,6 +28,6 @@ http.request({
     'Content-Type': 'application/json'
   },
   body: {
-    destination: planet.json.name
+    destination: planet.body.name
   }
 });

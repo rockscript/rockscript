@@ -35,7 +35,7 @@ This software is intended for service developers, systems integrators and enterp
 
 ## Usage
 
-Write a script `hello.script` that imports an HTTP service and executes an HTTP POST action:
+Write a script `hello.js` that imports an HTTP service and executes an HTTP POST action:
 
 ```javascript
 var http = system.import('core/http');
@@ -57,31 +57,25 @@ mvn clean install
 java -jar server/target/rockscript-server-*-jar-with-dependencies.jar
 ```
 
-To deploy and run the script, first wrap it in a `deployScript` command, save it has `hello.deployScript.json`:
-
-```json
-{
-  "deployScript": {
-    "script": "
-      var http = system.import('core/http');
-
-      http.request({
-        url: 'http://api.example.com/greetings',
-        method: 'post',
-        content-type: 'application/json; charset=utf-8',
-        body: {
-          message = 'Hello, world!'
-        }
-      });
-    "
-  }
-}
-```
-
-Now deploy and run the script using the HTTP command API, e.g. via [HTTPie](https://httpie.org) on the command line:
+Deploy the script using the script REST API, e.g. via [HTTPie](https://httpie.org) on the command line:
 
 ```
-http POST localhost:8888/command < hello.deployScript.json
+http POST localhost:8888/scripts < hello.js
+```
+
+The response gives you the deployed script’s `scriptId`:
+
+```
+HTTP/1.1 200 OK
+Content-Length: 16
+Content-Type: application/json
+
+{"scriptId":"1"}
+```
+
+Run the script using the HTTP command API, passing the same script ID JSON to as the argument to the `startScript` command in the JSON:
+
+```
 http POST localhost:8888/command startScript:='{"scriptId": 1}'
 ```
 
