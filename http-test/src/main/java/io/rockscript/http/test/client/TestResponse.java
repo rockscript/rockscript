@@ -112,6 +112,7 @@ public class TestResponse {
         return returnContent().asString(UTF8);
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T body(Type type) {
         String jsonBodyString = bodyStringUtf8();
         JsonHandler jsonHandler = testRequest.test.getNettyServer().getJsonHandler();

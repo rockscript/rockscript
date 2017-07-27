@@ -49,11 +49,11 @@ public class SourceElements extends Operation {
 
   @Override
   public Execution createExecution(Execution parent) {
-    return new BlockExecution(parent.createInternalExecutionId(), this, parent);
+    return new BlockExecution<SourceElements>(parent.createInternalExecutionId(), this, parent);
   }
 
   @Override
-  protected List<Operation> getChildren() {
-    return (List) sourceElements;
+  protected List<? extends Operation> getChildren() {
+    return sourceElements;
   }
 }

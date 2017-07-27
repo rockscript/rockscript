@@ -73,6 +73,7 @@ public class PolymorphicTypeFields {
       Type concreteFieldType = concretize(fieldType, actualTypeArguments);
       TypeToken<?> concreteFieldTypeToken = TypeToken.get(concreteFieldType);
       TypeAdapter<?> fieldTypeAdapter = gson.getAdapter(concreteFieldTypeToken);
+      @SuppressWarnings("unchecked")
       PolymorphicField polymorphicField = new PolymorphicField(field, fieldTypeAdapter);
       polymorphicFields.put(field.getName(), polymorphicField);
     }
@@ -140,10 +141,10 @@ public class PolymorphicTypeFields {
   }
 
   /** knows how to serialize and deserialize a field in a polymorphic type */
-  public static class PolymorphicField {
+  public static class PolymorphicField<T> {
     Field field;
-    TypeAdapter fieldTypeAdapter;
-    public PolymorphicField(Field field, TypeAdapter fieldTypeAdapter) {
+    TypeAdapter<T> fieldTypeAdapter;
+    public PolymorphicField(Field field, TypeAdapter<T> fieldTypeAdapter) {
       this.field = field;
       field.setAccessible(true);
       this.fieldTypeAdapter = fieldTypeAdapter;
@@ -153,7 +154,8 @@ public class PolymorphicTypeFields {
       field.set(bean, fieldValue);
     }
     public void write(JsonWriter out, Object bean) throws Exception {
-      Object fieldValue = field.get(bean);
+      @SuppressWarnings("unchecked")
+      T fieldValue = (T) field.get(bean);
       fieldTypeAdapter.write(out, fieldValue);
     }
   }

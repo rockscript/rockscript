@@ -26,7 +26,6 @@ import org.apache.http.client.*;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.LayeredConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -247,7 +246,7 @@ public class Executor {
      * @deprecated (4.3) do not use.
      */
     @Deprecated
-    public static void registerScheme(final Scheme scheme) {
+    public static void registerScheme(final org.apache.http.conn.scheme.Scheme scheme) {
     }
 
     /**

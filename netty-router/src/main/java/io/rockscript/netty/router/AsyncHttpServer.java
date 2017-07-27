@@ -120,6 +120,7 @@ public class AsyncHttpServer {
     }
   }
 
+  @SuppressWarnings("unchecked")
   public <T> T instantiate(Class<?> clazz) {
     // if a Guice IoC container (services) is configured,
     if (services!=null) {

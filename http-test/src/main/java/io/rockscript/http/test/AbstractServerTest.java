@@ -72,9 +72,9 @@ public abstract class AbstractServerTest {
     return testRequest;
   }
 
-  protected void throwIfNull(Object o, String message, String... messageArgs) {
+  protected void throwIfNull(Object o, String message, Object... messageArgs) {
     if (o==null) {
-      throw new RuntimeException(String.format(message, (String[])messageArgs));
+      throw new RuntimeException(String.format(message, (Object[])messageArgs));
     }
   }
 

@@ -51,7 +51,7 @@ public class MemberDotExpression extends SingleExpression {
   }
 
   @Override
-  protected List<Operation> getChildren() {
+  protected List<? extends Operation> getChildren() {
     return Lists.of(baseExpression);
   }
 }

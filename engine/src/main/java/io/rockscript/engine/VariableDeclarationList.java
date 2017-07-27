@@ -32,8 +32,8 @@ public class VariableDeclarationList extends Statement {
   }
 
   @Override
-  protected List<Operation> getChildren() {
-    return (List) variableDeclarations;
+  protected List<? extends Operation> getChildren() {
+    return variableDeclarations;
   }
 
   public List<VariableDeclaration> getVariableDeclarations() {

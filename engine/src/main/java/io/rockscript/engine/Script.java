@@ -56,7 +56,7 @@ public class Script extends SourceElements {
     initializeExecutables(getChildren(), scriptText);
   }
 
-  void initializeExecutables(List<Operation> children, String scriptText) {
+  void initializeExecutables(List<? extends Operation> children, String scriptText) {
     if (children!=null) {
       for (Operation child: children) {
         addExecutable(child, scriptText);

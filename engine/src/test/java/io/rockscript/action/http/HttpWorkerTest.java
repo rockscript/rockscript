@@ -66,6 +66,7 @@ public class HttpWorkerTest {
     assertNotNull(actionInput.context.scriptExecutionId);
     assertNotNull(actionInput.context.executionId);
 
+    @SuppressWarnings("unchecked")
     Map<String,Object> actionInputArgs = (Map<String, Object>) actionInput.args.get(0);
     assertEquals("http://rockscript.io/interesting/data", actionInputArgs.get("url"));
 

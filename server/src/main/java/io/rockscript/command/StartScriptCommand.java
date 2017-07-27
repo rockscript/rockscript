@@ -48,7 +48,9 @@ public class StartScriptCommand implements Command {
     if (!(input instanceof Map)) {
       throw new RuntimeException("inputProperty can only be used with maps / script objects");
     }
-    ((Map<String,Object>)this.input).put(propertyName, propertyValue);
+    @SuppressWarnings("unchecked")
+    Map<String, Object> objectMap = (Map<String, Object>) this.input;
+    objectMap.put(propertyName, propertyValue);
     return this;
   }
 

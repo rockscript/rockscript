@@ -36,6 +36,7 @@ public class Context {
     return get(clazz!=null ? clazz.getName() : null);
   }
 
+  @SuppressWarnings("unchecked")
   public <T> T get(String name) {
     return (T) objects.get(name);
   }

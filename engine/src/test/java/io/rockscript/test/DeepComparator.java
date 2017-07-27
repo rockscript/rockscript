@@ -29,7 +29,7 @@ public class DeepComparator {
 
   static Logger log = LoggerFactory.getLogger(DeepComparator.class);
 
-  public static final Set<Class> VALUE_CLASSES = new HashSet<>(Arrays.asList(
+  public static final Set<Class<?>> VALUE_CLASSES = new HashSet<>(Arrays.asList(
     String.class,
     Number.class
   ));
@@ -37,7 +37,7 @@ public class DeepComparator {
   Stack<String> path = new Stack<>();
   Map<Object,Object> comparing = new HashMap<>();
   Set<Field> ignoredFields = new HashSet<>();
-  Map<String, List<Class>> ignoredAnonymousClasses = new HashMap<>();
+  Map<String, List<Class<?>>> ignoredAnonymousClasses = new HashMap<>();
   StringBuffer logs = new StringBuffer();
   boolean error = false;
 
@@ -52,7 +52,7 @@ public class DeepComparator {
   }
 
   public DeepComparator ignoreAnonymousField(Class clazz, String fieldName) {
-    List<Class> classes = ignoredAnonymousClasses.get(fieldName);
+    List<Class<?>> classes = ignoredAnonymousClasses.get(fieldName);
     if (classes==null) {
       classes = new ArrayList<>();
       ignoredAnonymousClasses.put(fieldName, classes);
@@ -131,11 +131,12 @@ public class DeepComparator {
     return ignoredFields.contains(field);
   }
 
+  // @SuppressWarnings("unchecked")
   private boolean ignoredAnonymousField(Field field) {
-    List<Class> classes = ignoredAnonymousClasses.get(field.getName());
+    List<Class<?>> classes = (List<Class<?>>)ignoredAnonymousClasses.get(field.getName());
     if (classes!=null) {
-      for (Class clazz: classes) {
-        if (clazz.isAssignableFrom(field.getDeclaringClass())) {
+      for (Class<?> clazz: classes) {
+        if (clazz.isAssignableFrom((Class<?>)field.getDeclaringClass())) {
           return true;
         }
       }
@@ -153,9 +154,10 @@ public class DeepComparator {
     return Collection.class.isAssignableFrom(clazz);
   }
 
+  @SuppressWarnings("unchecked")
   private void assertCollectionEquals(Object a, Object b) {
-    List<Object> collectionA = new ArrayList((Collection) a);
-    List<Object> collectionB = new ArrayList((Collection) b);
+    List<Object> collectionA = new ArrayList<Object>((Collection<Object>) a);
+    List<Object> collectionB = new ArrayList<Object>((Collection<Object>) b);
     if (collectionB.size()!=collectionA.size()) {
       path.push("size");
       fail(collectionA.size(), collectionB.size());
@@ -171,9 +173,10 @@ public class DeepComparator {
     }
   }
 
+  @SuppressWarnings("unchecked")
   private void assertMapEquals(Object a, Object b) {
-    Map<Object, Object> mapA = new HashMap((Map) a);
-    Map<Object, Object> mapB = new HashMap((Map) b);
+    Map<Object, Object> mapA = new HashMap<Object, Object>((Map<Object, Object>) a);
+    Map<Object, Object> mapB = new HashMap<Object, Object>((Map<Object, Object>) b);
     if (mapA.size()!=mapB.size()) {
       throw new RuntimeException("Maps not same size: "+mapA.size()+"!="+mapB.size()+" <- "+path.toString());
     }

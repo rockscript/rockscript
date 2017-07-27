@@ -35,11 +35,11 @@ public class ExpressionStatement extends Statement {
 
   @Override
   public Execution createExecution(Execution parent) {
-    return new BlockExecution(parent.createInternalExecutionId(), this, parent);
+    return new BlockExecution<ExpressionStatement>(parent.createInternalExecutionId(), this, parent);
   }
 
   @Override
-  protected List<Operation> getChildren() {
-    return (List) singleExpressions;
+  protected List<? extends Operation> getChildren() {
+    return singleExpressions;
   }
 }

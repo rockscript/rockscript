@@ -28,7 +28,7 @@ public class JsonObject implements JsonReadable {
   public JsonObject() {
   }
 
-  public JsonObject(Map properties) {
+  public JsonObject(Map<String,Object> properties) {
     this.properties = properties;
   }
 

@@ -250,7 +250,9 @@ public class EventStore implements EventListener {
       return value.toString();
     }
     if (value instanceof Map) {
-      return valueMapToJson((Map)value);
+      @SuppressWarnings("unchecked")
+      Map<String,Object> map = (Map<String,Object>) value;
+      return valueMapToJson(map);
     }
     if (value instanceof JsonObject) {
       return valueMapToJson(((JsonObject)value).properties);
@@ -259,7 +261,7 @@ public class EventStore implements EventListener {
   }
 
   private Map<String,Object> valueMapToJson(Map<String,Object> map) {
-    Map convertedMap = new LinkedHashMap();
+    Map<String,Object> convertedMap = new LinkedHashMap<>();
     for (String key: map.keySet()) {
       Object convertedValue = valueToJson(map.get(key));
       convertedMap.put(key, convertedValue);

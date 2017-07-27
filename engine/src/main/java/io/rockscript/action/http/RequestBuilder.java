@@ -20,7 +20,9 @@ public class RequestBuilder {
     if (rawArguments == null || rawArguments.size() != 1 || !(rawArguments.get(0) instanceof Map)) {
       throw new IllegalArgumentException("No arguments - pass an object with at least a ‘url’ property");
     }
-    arguments = (Map<String, Object>) rawArguments.get(0);
+    @SuppressWarnings("unchecked")
+    Map<String, Object> artumentsMap = (Map<String, Object>) rawArguments.get(0);
+    arguments = artumentsMap;
     RequestHeaders headers = headers();
     if (hasBody()) {
       return new Request(url(), method(), headers, body(headers.get("Content-Type")));
@@ -72,7 +74,9 @@ public class RequestBuilder {
     if (arguments.get("headers") == null || !(arguments.get("headers") instanceof Map)) {
       throw new IllegalArgumentException("Invalid ‘headers’ argument. Expected an object with string properties.");
     }
-    Map<String, String> headers = (Map<String, String>) arguments.get("headers");
+    @SuppressWarnings("unchecked")
+    Map<String, String> headersMap = (Map<String, String>) arguments.get("headers");
+    Map<String, String> headers = headersMap;
     return new RequestHeaders(input.context.scriptExecutionId, headers);
   }
 }

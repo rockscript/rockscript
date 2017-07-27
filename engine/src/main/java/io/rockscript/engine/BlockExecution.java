@@ -30,7 +30,7 @@ public class BlockExecution<T extends Operation> extends Execution<T> {
 
   public void executeNextStatement() {
     int index = children!=null ? children.size() : 0;
-    List<Operation> childOperations = operation.getChildren();
+    List<? extends Operation> childOperations = operation.getChildren();
     if (index < childOperations.size()) {
       Operation nextStatement = childOperations.get(index);
       startChild(nextStatement);

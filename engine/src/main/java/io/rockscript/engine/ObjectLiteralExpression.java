@@ -33,8 +33,8 @@ public class ObjectLiteralExpression extends SingleExpression {
   }
 
   @Override
-  protected List<Operation> getChildren() {
-    return (List) valueExpressions;
+  protected List<? extends Operation> getChildren() {
+    return valueExpressions;
   }
 
   public void addProperty(String propertyName, SingleExpression valueExpression) {

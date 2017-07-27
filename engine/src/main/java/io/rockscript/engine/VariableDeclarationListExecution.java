@@ -31,7 +31,7 @@ public class VariableDeclarationListExecution extends Execution<VariableDeclarat
 
   public void executeNextStatement() {
     int index = children!=null ? children.size() : 0;
-    List<Operation> childOperations = operation.getChildren();
+    List<? extends Operation> childOperations = operation.getChildren();
     if (index < childOperations.size()) {
       Operation nextStatement = childOperations.get(index);
       startChild(nextStatement);

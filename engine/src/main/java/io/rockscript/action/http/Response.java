@@ -45,7 +45,9 @@ public class Response implements JsonReadable {
       throw new IllegalStateException("Cannot access non-JSON content as JSON");
     }
     Gson gson = new Gson();
-    return gson.fromJson(textBody, Map.class);
+    @SuppressWarnings("unchecked")
+    Map<String, Object> map = gson.fromJson(textBody, Map.class);
+    return map;
   }
 
   String contentType() throws IOException {

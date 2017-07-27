@@ -26,7 +26,7 @@ public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
   PolymorphicTypeNameStrategy typeNameStrategy = PolymorphicTypeNameStrategy.WRAPPER_OBJECT;
 
   Set<TypeToken<?>> matchingTypes = new HashSet<>();
-  PolymorphicTypeAdapter typeAdapter = null;
+  PolymorphicTypeAdapter<?> typeAdapter = null;
 
   public PolymorphicTypeAdapterFactory typeName(Class<?> clazz, String name) {
     return typeName(TypeToken.get(clazz), name);
@@ -50,6 +50,7 @@ public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
     return this;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
     // TODO check if GSON does caching of the created TypeAdapter for the given type
@@ -64,7 +65,7 @@ public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
       if (typeAdapter==null) {
         typeAdapter = new PolymorphicTypeAdapter<T>(type, this, gson);
       }
-      return typeAdapter;
+      return (TypeAdapter<T>) this.typeAdapter;
     }
 
     return null;

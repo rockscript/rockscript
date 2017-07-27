@@ -49,7 +49,9 @@ public class EndActionCommand implements Command {
     if (!(result instanceof Map)) {
       throw new RuntimeException("resultProperty can only be used with maps / script objects");
     }
-    ((Map<String,Object>)this.result).put(propertyName, propertyValue);
+    @SuppressWarnings("unchecked")
+    Map<String, Object> resultMap = (Map<String, Object>) this.result;
+    resultMap.put(propertyName, propertyValue);
     return this;
   }
 

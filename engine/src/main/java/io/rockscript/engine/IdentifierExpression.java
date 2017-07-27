@@ -39,7 +39,7 @@ public class IdentifierExpression extends SingleExpression {
   }
 
   @Override
-  protected List<Operation> getChildren() {
+  protected List<? extends Operation> getChildren() {
     return null;
   }
 }

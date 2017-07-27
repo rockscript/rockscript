@@ -52,6 +52,7 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
       JsonReadable jsonObject = (JsonReadable) target;
       fieldValue = jsonObject.get(identifier);
     } else if (target instanceof Map) {
+      @SuppressWarnings("unchecked")
       Map<String,Object> map = (Map) target;
       fieldValue = map.get(identifier);
     } else {

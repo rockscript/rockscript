@@ -90,7 +90,9 @@ public class PolymorphicTypeAdapter<T> extends TypeAdapter<T> {
       return null;
     }
     try {
-      return (T) typeNameStrategy.read(in, new FieldsReader(in, this));
+      @SuppressWarnings("unchecked")
+      T object = (T) typeNameStrategy.read(in, new FieldsReader(in, this));
+      return object;
     } catch (IOException e) {
       throw e;
     } catch (RuntimeException e) {

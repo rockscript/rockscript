@@ -49,7 +49,7 @@ public class ArgumentsExpression extends SingleExpression {
   }
 
   @Override
-  protected List<Operation> getChildren() {
+  protected List<? extends Operation> getChildren() {
     List<Operation> children = new ArrayList<>();
     children.addAll(argumentExpressions);
     children.add(functionExpression);

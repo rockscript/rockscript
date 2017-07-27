@@ -32,7 +32,7 @@ public abstract class Operation {
 
   public abstract Execution createExecution(Execution parent);
   /** null or empty list is allowed */
-  protected abstract List<Operation> getChildren();
+  protected abstract List<? extends Operation> getChildren();
 
   public String getId() {
     return id;
