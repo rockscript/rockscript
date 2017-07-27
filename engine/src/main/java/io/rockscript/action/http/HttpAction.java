@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 
+import com.google.gson.Gson;
 import io.rockscript.action.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,9 @@ public class HttpAction implements Action {
     configuration.connectionTimeoutMilliseconds = 0;
     configuration.readTimeoutMilliseconds = 0;
   }
+
+  // Share JSON serialisers between HttpAction instances.
+  static Gson gson = new Gson();
 
   @Override
   public ActionOutput invoke(ActionInput input) {

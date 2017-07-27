@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.handlers;
+package io.rockscript.rest;
 
 import com.google.inject.Inject;
 import io.rockscript.Engine;
+import io.rockscript.engine.JsonObject;
 import io.rockscript.netty.router.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Post("/deploy")
-public class DeployScriptHandler implements RequestHandler {
-
-  static Logger log = LoggerFactory.getLogger(DeployScriptHandler.class);
+@Post("/scripts")
+public class ScriptsPostHandler implements RequestHandler {
 
   @Inject
   Engine engine;
@@ -35,7 +34,7 @@ public class DeployScriptHandler implements RequestHandler {
     String scriptId = engine.deployScript(script);
 
     response.statusOk();
-    response.bodyString(scriptId);
+    response.bodyJson(new JsonObject().put("scriptId", scriptId));
     response.send();
   }
 }

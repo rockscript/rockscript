@@ -44,9 +44,8 @@ public class Response implements JsonReadable {
     if (!contentType().startsWith("application/json")) {
       throw new IllegalStateException("Cannot access non-JSON content as JSON");
     }
-    Gson gson = new Gson();
     @SuppressWarnings("unchecked")
-    Map<String, Object> map = gson.fromJson(textBody, Map.class);
+    Map<String, Object> map = HttpAction.gson.fromJson(textBody, Map.class);
     return map;
   }
 
