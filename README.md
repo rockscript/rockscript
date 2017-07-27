@@ -53,8 +53,8 @@ http.request({
 Build and start the development server:
 
 ```
-mvn clean install
-java -jar server/target/rockscript-server-*-jar-with-dependencies.jar
+mvn -Pizza clean install
+java -jar server/target/rockscript.jar
 ```
 
 Deploy the script using the script REST API, e.g. via [HTTPie](https://httpie.org) on the command line:
