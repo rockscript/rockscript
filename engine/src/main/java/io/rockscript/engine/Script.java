@@ -72,8 +72,8 @@ public class Script extends SourceElements {
     elements.add(scriptElement);
 
     Location location = scriptElement.getLocation();
-    int start = location.getStartIndex();
-    int end = location.getEndIndex()+1;
+    int start = location.getStart();
+    int end = location.getEnd()+1;
     String scriptPiece = scriptText.substring(start, end).replaceAll("\\s", " ");
     log.debug(scriptElement.getIndex()+" - "+scriptElement.getClass().getSimpleName()+" - "+scriptPiece);
     scriptElement.setText(scriptPiece);

@@ -21,45 +21,45 @@ import org.antlr.v4.runtime.Token;
 
 public class Location {
 
-  private int startIndex;
-  private int startLine;
-  private int startColumn;
-  private int endIndex;
-  private int endLine;
-  private int endColumn;
+  private int start;
+  private int end;
+  //  private int startLine;
+  //  private int startColumn;
+  //  private int endLine;
+  //  private int endColumn;
 
   public Location(ParserRuleContext parserRuleContext) {
     Token start = parserRuleContext.getStart();
-    startIndex = start.getStartIndex();
-    startLine = start.getLine();
-    startColumn = start.getCharPositionInLine();
+    this.start = start.getStartIndex();
     Token stop = parserRuleContext.getStop();
-    endIndex = stop.getStopIndex();
-    endLine = stop.getLine();
-    endColumn = stop.getCharPositionInLine();
+    end = stop.getStopIndex();
+//    startLine = start.getLine();
+//    startColumn = start.getCharPositionInLine();
+//    endLine = stop.getLine();
+//    endColumn = stop.getCharPositionInLine();
   }
 
-  public int getStartIndex() {
-    return startIndex;
+  public int getStart() {
+    return start;
   }
 
-  public int getStartLine() {
-    return startLine;
+  public int getEnd() {
+    return end;
   }
 
-  public int getStartColumn() {
-    return startColumn;
-  }
-
-  public int getEndIndex() {
-    return endIndex;
-  }
-
-  public int getEndLine() {
-    return endLine;
-  }
-
-  public int getEndColumn() {
-    return endColumn;
-  }
+//  public int getStartLine() {
+//    return startLine;
+//  }
+//
+//  public int getStartColumn() {
+//    return startColumn;
+//  }
+//
+//  public int getEndLine() {
+//    return endLine;
+//  }
+//
+//  public int getEndColumn() {
+//    return endColumn;
+//  }
 }

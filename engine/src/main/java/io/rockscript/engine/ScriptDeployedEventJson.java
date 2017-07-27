@@ -24,14 +24,14 @@ public class ScriptDeployedEventJson extends EventJson {
 
   String scriptId;
   String script;
-  List<ScriptElementJson> scriptElements;
+  List<ScriptElementJson> elements;
 
   public ScriptDeployedEventJson() {
   }
 
-  public ScriptDeployedEventJson(String scriptId, String script, List<ScriptElementJson> scriptElements) {
+  public ScriptDeployedEventJson(String scriptId, String script, List<ScriptElementJson> elements) {
     this.scriptId = scriptId;
     this.script = script;
-    this.scriptElements = scriptElements;
+    this.elements = elements;
   }
 }
