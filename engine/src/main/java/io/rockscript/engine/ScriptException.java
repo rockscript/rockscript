@@ -31,7 +31,7 @@ public class ScriptException extends RuntimeException {
     return throwIfNull(value, null);
   }
 
-  public static <T> T throwIfNull(T value, String message, String... messageArguments) {
+  public static <T> T throwIfNull(T value, String message, Object... messageArguments) {
     if (value==null) {
       if (message==null) {
         message = "null value is invalid here";

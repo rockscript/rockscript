@@ -18,11 +18,11 @@ package io.rockscript.test;
 
 import io.rockscript.ServiceLocator;
 import io.rockscript.engine.EngineImpl;
-import io.rockscript.engine.ScriptExecutionIdGenerator;
+import io.rockscript.engine.IdGenerator;
 
 public class TestEngine extends EngineImpl {
 
-  private static int nextUniqueId = 1;
+  private static int nextTestEngineId = 1;
 
   public TestEngine() {
     super(new TestServiceLocator(), nextUniqueId());
@@ -33,20 +33,25 @@ public class TestEngine extends EngineImpl {
   }
 
   private static String nextUniqueId() {
-    return "t"+nextUniqueId++;
+    return "TestEngine"+nextTestEngineId++;
   }
 
   public static class TestServiceLocator extends ServiceLocator {
     public TestServiceLocator() {
-      scriptExecutionIdGenerator = new TestIdGenerator();
+      scriptIdGenerator = new TestIdGenerator("s");
+      scriptExecutionIdGenerator = new TestIdGenerator("e");
     }
   }
 
-  public static class TestIdGenerator implements ScriptExecutionIdGenerator {
+  public static class TestIdGenerator implements IdGenerator {
     int nextId = 1;
+    String prefix;
+    public TestIdGenerator(String prefix) {
+      this.prefix = prefix;
+    }
     @Override
-    public String generateId() {
-      return "se"+Integer.toString(nextId++);
+    public String createId() {
+      return prefix+Integer.toString(nextId++);
     }
   }
 }

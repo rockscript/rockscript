@@ -16,9 +16,9 @@
 
 package io.rockscript.engine;
 
-public abstract class SingleExpression extends Operation {
+public abstract class SingleExpression extends ScriptElement {
 
-  public SingleExpression(String id, Location location) {
+  public SingleExpression(Integer id, Location location) {
     super(id, location);
   }
 }

@@ -19,8 +19,8 @@ package io.rockscript.engine;
 public abstract class ExecutionEventJson<T extends ExecutionEvent> extends EventJson {
 
   String scriptId;
+  Integer elementIndex;
   String scriptExecutionId;
-  String executableId;
   String executionId;
 
   public ExecutionEventJson() {
@@ -29,9 +29,9 @@ public abstract class ExecutionEventJson<T extends ExecutionEvent> extends Event
   public ExecutionEventJson(ExecutionEvent event) {
     Execution execution = event.getExecution();
     ScriptExecution scriptExecution = execution.getScriptExecution();
-    this.scriptId = scriptExecution.getOperation().getId();
+    this.scriptId = scriptExecution.getScript().getId();
     this.scriptExecutionId = scriptExecution.getId();
-    this.executableId = execution.getOperation().getId();
+    this.elementIndex = execution.getElement().getIndex();
     this.executionId = execution.getId();
   }
 
@@ -43,8 +43,8 @@ public abstract class ExecutionEventJson<T extends ExecutionEvent> extends Event
     return scriptExecutionId;
   }
 
-  public String getExecutableId() {
-    return executableId;
+  public Integer getElementIndex() {
+    return elementIndex;
   }
 
   public String getExecutionId() {

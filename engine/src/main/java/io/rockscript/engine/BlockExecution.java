@@ -17,10 +17,10 @@ package io.rockscript.engine;
 
 import java.util.List;
 
-public class BlockExecution<T extends Operation> extends Execution<T> {
+public class BlockExecution<T extends ScriptElement> extends Execution<T> {
 
-  public BlockExecution(String id, T operation, Execution parent) {
-    super(id, operation, parent);
+  public BlockExecution(String id, T element, Execution parent) {
+    super(id, element, parent);
   }
 
   @Override
@@ -30,9 +30,9 @@ public class BlockExecution<T extends Operation> extends Execution<T> {
 
   public void executeNextStatement() {
     int index = children!=null ? children.size() : 0;
-    List<? extends Operation> childOperations = operation.getChildren();
-    if (index < childOperations.size()) {
-      Operation nextStatement = childOperations.get(index);
+    List<? extends ScriptElement> childElements = element.getChildren();
+    if (index < childElements.size()) {
+      ScriptElement nextStatement = childElements.get(index);
       startChild(nextStatement);
     } else {
       end();

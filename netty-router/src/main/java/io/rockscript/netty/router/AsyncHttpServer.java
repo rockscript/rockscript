@@ -89,7 +89,6 @@ public class AsyncHttpServer {
     Response response = new Response(this, fullHttpRequest, ctx);
 
     try {
-      System.err.println();
       Request.log.debug(">>> "+fullHttpRequest.getMethod()+" "+fullHttpRequest.getUri());
       Class<?> requestHandlerClass = route.target();
       

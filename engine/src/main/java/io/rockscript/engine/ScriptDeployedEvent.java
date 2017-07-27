@@ -16,18 +16,29 @@
 
 package io.rockscript.engine;
 
+import java.util.*;
+
+import io.rockscript.engine.ScriptElement.ScriptElementJson;
+
 public class ScriptDeployedEvent implements Event {
 
   String scriptId;
   String script;
+  List<ScriptElementJson> elements;
 
-  public ScriptDeployedEvent(String scriptId, String script) {
-    this.scriptId = scriptId;
-    this.script = script;
+  public ScriptDeployedEvent(Script script, String scriptText) {
+    this.scriptId = script.getIndex().toString();
+    this.script = scriptText;
+    List<ScriptElement> executablesList = script.getExecutables();
+    this.elements = new ArrayList<>();
+    for (ScriptElement scriptElement: executablesList) {
+      this.elements.add(scriptElement.toJson());
+    }
   }
 
   @Override
   public EventJson toJson() {
-    return new ScriptDeployedEventJson(scriptId, script);
+    return new ScriptDeployedEventJson(scriptId, script, elements);
   }
+
 }

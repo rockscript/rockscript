@@ -21,8 +21,8 @@ public class Literal extends SingleExpression {
 
   Object value;
 
-  public Literal(String id, Location location) {
-    super(id, location);
+  public Literal(Integer index, Location location) {
+    super(index, location);
   }
 
   public Object getValue() {
@@ -39,7 +39,7 @@ public class Literal extends SingleExpression {
   }
 
   @Override
-  protected List<? extends Operation> getChildren() {
+  protected List<? extends ScriptElement> getChildren() {
     return null;
   }
 }

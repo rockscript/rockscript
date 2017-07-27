@@ -50,7 +50,7 @@ public class Parse {
 
   Script script;      // initialized in enterScript
   List<String> errors;
-  int nextOperationId = 1;
+  int nextScriptElementId = 1;
 
   /** The parsed script */
   public Script getScript() {
@@ -107,7 +107,7 @@ public class Parse {
   }
 
   private void parseScript(ProgramContext programContext, String scriptText) {
-    this.script = new Script(createId(), createLocation(programContext));
+    this.script = new Script(null, createLocation(programContext));
     SourceElementsContext sourceElementsContext = programContext.sourceElements();
     List<SourceElement> sourceElements = parseSourceElements(sourceElementsContext);
     this.script.setSourceElements(sourceElements);
@@ -144,7 +144,7 @@ public class Parse {
       ExpressionSequenceContext expressionSequenceContext = expressionStatementContext.expressionSequence();
       List<SingleExpressionContext> singleExpressionContexts = expressionSequenceContext.singleExpression();
 
-      ExpressionStatement expressionStatement = new ExpressionStatement(createId(), createLocation(statementContext));
+      ExpressionStatement expressionStatement = new ExpressionStatement(createNextScriptElementId(), createLocation(statementContext));
 
       List<SingleExpression> singleExpressions = new ArrayList<>();
       for (SingleExpressionContext singleExpressionContext: singleExpressionContexts) {
@@ -171,7 +171,7 @@ public class Parse {
       VariableDeclaration variableDeclaration = parseVariableDeclaration(variableDeclarationContext);
       return variableDeclaration;
     }
-    VariableDeclarationList variableDeclarationList = new VariableDeclarationList(createId(), createLocation(variableDeclarationListContext));
+    VariableDeclarationList variableDeclarationList = new VariableDeclarationList(createNextScriptElementId(), createLocation(variableDeclarationListContext));
     List<VariableDeclaration> variableDeclarations = new ArrayList<>();
     for (VariableDeclarationContext variableDeclarationContext: variableDeclarationContexts) {
       VariableDeclaration variableDeclaration = parseVariableDeclaration(variableDeclarationContext);
@@ -182,7 +182,7 @@ public class Parse {
   }
 
   private VariableDeclaration parseVariableDeclaration(VariableDeclarationContext variableDeclarationContext) {
-    VariableDeclaration variableDeclarationStatement = new VariableDeclaration(createId(), createLocation(variableDeclarationContext));
+    VariableDeclaration variableDeclarationStatement = new VariableDeclaration(createNextScriptElementId(), createLocation(variableDeclarationContext));
     String variableName = variableDeclarationContext.Identifier().getText();
     variableDeclarationStatement.setVariableName(variableName);
     InitialiserContext initialiser = variableDeclarationContext.initialiser();
@@ -214,7 +214,7 @@ public class Parse {
   }
 
   private SingleExpression parseObjectLiteralExpression(ObjectLiteralExpressionContext objectLiteralExpressionContext) {
-    ObjectLiteralExpression objectLiteralExpression = new ObjectLiteralExpression(createId(), createLocation(objectLiteralExpressionContext));
+    ObjectLiteralExpression objectLiteralExpression = new ObjectLiteralExpression(createNextScriptElementId(), createLocation(objectLiteralExpressionContext));
     ObjectLiteralContext objectLiteralContext = objectLiteralExpressionContext.objectLiteral();
     PropertyNameAndValueListContext propertyNameAndValueListContext = objectLiteralContext.propertyNameAndValueList();
     List<PropertyAssignmentContext> propertyAssignmentContexts = propertyNameAndValueListContext.propertyAssignment();
@@ -258,7 +258,7 @@ public class Parse {
 
     TerminalNode nullLiteral = literalContext.NullLiteral();
     if (nullLiteral!=null) {
-      return new Literal(createId(), createLocation(literalContext));
+      return new Literal(createNextScriptElementId(), createLocation(literalContext));
     }
 
     NumericLiteralContext numericLiteralContext = literalContext.numericLiteral();
@@ -287,13 +287,13 @@ public class Parse {
   }
 
   private Literal parseBooleanLiteral(LiteralContext literalContext, boolean value) {
-    Literal literal = new Literal(createId(), createLocation(literalContext));
+    Literal literal = new Literal(createNextScriptElementId(), createLocation(literalContext));
     literal.setValue(value);
     return literal;
   }
 
   private Literal parseStringLiteral(LiteralContext literalContext) {
-    Literal literal = new Literal(createId(), createLocation(literalContext));
+    Literal literal = new Literal(createNextScriptElementId(), createLocation(literalContext));
     String textWithQuotes = literalContext.getText();
     String textWithoutQuotes = removeQuotesFromString(textWithQuotes);
     literal.setValue(textWithoutQuotes);
@@ -301,7 +301,7 @@ public class Parse {
   }
 
   private Literal parseDecimalNumberLiteral(NumericLiteralContext decimalNumberNode) {
-    Literal literal = new Literal(createId(), createLocation(decimalNumberNode));
+    Literal literal = new Literal(createNextScriptElementId(), createLocation(decimalNumberNode));
     String numberText = decimalNumberNode.getText();
     Double number = new Double(numberText);
     literal.setValue(number);
@@ -310,7 +310,7 @@ public class Parse {
 
   private SingleExpression parseIdentifier(IdentifierExpressionContext singleExpressionContext) {
     String identifier = singleExpressionContext.getText();
-    IdentifierExpression identifierExpression = new IdentifierExpression(createId(), createLocation(singleExpressionContext));
+    IdentifierExpression identifierExpression = new IdentifierExpression(createNextScriptElementId(), createLocation(singleExpressionContext));
     identifierExpression.setIdentifier(identifier);
     return identifierExpression;
   }
@@ -318,7 +318,7 @@ public class Parse {
   private SingleExpression parseMemberDotExpression(MemberDotExpressionContext memberDotExpressionContext) {
     SingleExpressionContext baseExpressionContext = memberDotExpressionContext.singleExpression();
 
-    MemberDotExpression memberDotExpression = new MemberDotExpression(createId(), createLocation(memberDotExpressionContext));
+    MemberDotExpression memberDotExpression = new MemberDotExpression(createNextScriptElementId(), createLocation(memberDotExpressionContext));
     SingleExpression baseExpression = parseSingleExpression(baseExpressionContext);
     memberDotExpression.setBaseExpression(baseExpression);
 
@@ -330,7 +330,7 @@ public class Parse {
   }
 
   private SingleExpression parseArgumentsExpression(ArgumentsExpressionContext argumentsExpressionContext) {
-    ArgumentsExpression argumentsExpression = new ArgumentsExpression(createId(), createLocation(argumentsExpressionContext));
+    ArgumentsExpression argumentsExpression = new ArgumentsExpression(createNextScriptElementId(), createLocation(argumentsExpressionContext));
 
     List<SingleExpression> argumentExpressions = new ArrayList<>();
     ArgumentsContext argumentsContext = argumentsExpressionContext.arguments();
@@ -354,14 +354,14 @@ public class Parse {
     return new RuntimeException("Unsupported "+elementName+": "+(object!=null ? object.getText()+" ("+object.getClass().getSimpleName()+")" : "null"));
   }
 
-  private <T extends Operation> T initExecutable(T executable, ParserRuleContext parserRuleContext) {
-    executable.setId(createId());
+  private <T extends ScriptElement> T initExecutable(T executable, ParserRuleContext parserRuleContext) {
+    executable.setIndex(createNextScriptElementId());
     executable.setLocation(createLocation(parserRuleContext));
     return executable;
   }
 
-  private String createId() {
-    return Integer.toString(nextOperationId++);
+  private Integer createNextScriptElementId() {
+    return nextScriptElementId++;
   }
 
   private Location createLocation(ParserRuleContext parserRuleContext) {

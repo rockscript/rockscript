@@ -15,7 +15,7 @@
  */
 package io.rockscript.engine;
 
-public interface ScriptExecutionIdGenerator {
+public interface IdGenerator {
 
-  String generateId();
+  String createId();
 }

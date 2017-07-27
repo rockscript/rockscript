@@ -32,7 +32,7 @@ public class ObjectLiteralExpressionExecution extends BlockExecution<ObjectLiter
 
   protected void applyResult() {
     Map<String,Object> properties = new LinkedHashMap<>();
-    List<String> propertyNames = operation.getPropertyNames();
+    List<String> propertyNames = element.getPropertyNames();
     for (int i=0; i<children.size(); i++) {
       String propertyName = propertyNames.get(i);
       Object value = children.get(i).getResult();

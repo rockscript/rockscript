@@ -16,16 +16,22 @@
 
 package io.rockscript.engine;
 
+import java.util.List;
+
+import io.rockscript.engine.ScriptElement.ScriptElementJson;
+
 public class ScriptDeployedEventJson extends EventJson {
 
   String scriptId;
   String script;
+  List<ScriptElementJson> scriptElements;
 
   public ScriptDeployedEventJson() {
   }
 
-  public ScriptDeployedEventJson(String scriptId, String script) {
+  public ScriptDeployedEventJson(String scriptId, String script, List<ScriptElementJson> scriptElements) {
     this.scriptId = scriptId;
     this.script = script;
+    this.scriptElements = scriptElements;
   }
 }

@@ -19,18 +19,18 @@ package io.rockscript.engine;
 import java.util.*;
 
 /** Base class for the runtime state of operations. */
-public abstract class Execution<T extends Operation> {
+public abstract class Execution<T extends ScriptElement> {
 
   String id;
-  T operation;
+  T element;
   Execution parent;
   List<Execution> children;
   Map<String, Variable> variables;
   Object result;
 
-  protected Execution(String id, T operation, Execution parent) {
+  protected Execution(String id, T element, Execution parent) {
     this.id = id;
-    this.operation = operation;
+    this.element = element;
     this.parent = parent;
   }
 
@@ -51,19 +51,19 @@ public abstract class Execution<T extends Operation> {
   public void childEnded(Execution child) {
   }
 
-  protected void startChild(Operation childOperation) {
-    if (childOperation==null) {
+  protected void startChild(ScriptElement childScriptElement) {
+    if (childScriptElement==null) {
       Script script = getScript();
-      String childOperationId = childOperation.getId();
-      childOperation = script.findExecutable(childOperationId);
-      ScriptException.throwIfNull(childOperation, "Couldn't find executable %s in script %s", childOperationId, script.getId());
+      Integer childScriptElementId = childScriptElement.getIndex();
+      childScriptElement = script.findExecutable(childScriptElementId);
+      ScriptException.throwIfNull(childScriptElement, "Couldn't find executable %s in script %s", childScriptElementId, script.getIndex());
     }
-    Execution child = createChild(childOperation);
+    Execution child = createChild(childScriptElement);
     child.start();
   }
 
-  Execution createChild(Operation operation) {
-    Execution child = operation.createExecution(this);
+  Execution createChild(ScriptElement scriptElement) {
+    Execution child = scriptElement.createExecution(this);
     addChild(child);
     return child;
   }
@@ -144,8 +144,8 @@ public abstract class Execution<T extends Operation> {
     this.id = id;
   }
 
-  public T getOperation() {
-    return operation;
+  public T getElement() {
+    return element;
   }
 
   public Execution getParent() {

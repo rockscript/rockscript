@@ -22,8 +22,8 @@ public class VariableDeclarationList extends Statement {
 
   List<VariableDeclaration> variableDeclarations;
 
-  public VariableDeclarationList(String id, Location location) {
-    super(id, location);
+  public VariableDeclarationList(Integer index, Location location) {
+    super(index, location);
   }
 
   @Override
@@ -32,7 +32,7 @@ public class VariableDeclarationList extends Statement {
   }
 
   @Override
-  protected List<? extends Operation> getChildren() {
+  protected List<? extends ScriptElement> getChildren() {
     return variableDeclarations;
   }
 

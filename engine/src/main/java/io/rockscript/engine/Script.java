@@ -26,11 +26,12 @@ public class Script extends SourceElements {
 
   static Logger log = LoggerFactory.getLogger(Script.class);
 
+  String id;
   ServiceLocator serviceLocator;
-  Map<String, Operation> executables;
+  List<ScriptElement> executables;
 
-  public Script(String id, Location location) {
-    super(id, location);
+  public Script(Integer index, Location location) {
+    super(index, location);
   }
 
   @Override
@@ -46,31 +47,47 @@ public class Script extends SourceElements {
     this.serviceLocator = serviceLocator;
   }
 
-  public Operation findExecutable(String executableId) {
-    return executables.get(executableId);
+  public ScriptElement findExecutable(int executableIndex) {
+    return executables.get(executableIndex);
   }
 
   public void initializeExecutables(String scriptText) {
-    executables = new HashMap<>();
+    executables = new ArrayList<>();
     addExecutable(this, scriptText);
     initializeExecutables(getChildren(), scriptText);
   }
 
-  void initializeExecutables(List<? extends Operation> children, String scriptText) {
+  void initializeExecutables(List<? extends ScriptElement> children, String scriptText) {
     if (children!=null) {
-      for (Operation child: children) {
+      for (ScriptElement child: children) {
         addExecutable(child, scriptText);
         initializeExecutables(child.getChildren(), scriptText);
       }
     }
   }
 
-  void addExecutable(Operation operation, String scriptText) {
-    executables.put(operation.getId(), operation);
-    Location location = operation.getLocation();
+  void addExecutable(ScriptElement scriptElement, String scriptText) {
+    int executableIndex = executables.size();
+    scriptElement.setIndex(executableIndex);
+    executables.add(scriptElement);
+
+    Location location = scriptElement.getLocation();
     int start = location.getStartIndex();
     int end = location.getEndIndex()+1;
     String scriptPiece = scriptText.substring(start, end).replaceAll("\\s", " ");
-    log.debug(operation.getId()+" - "+operation.getClass().getSimpleName()+" - "+scriptPiece);
+    log.debug(scriptElement.getIndex()+" - "+scriptElement.getClass().getSimpleName()+" - "+scriptPiece);
+    scriptElement.setText(scriptPiece);
+  }
+
+  public List<ScriptElement> getExecutables() {
+    return executables;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
   }
 }

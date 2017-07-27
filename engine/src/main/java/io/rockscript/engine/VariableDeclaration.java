@@ -24,8 +24,8 @@ public class VariableDeclaration extends Statement {
   String variableName;
   SingleExpression initialiser;
 
-  public VariableDeclaration(String id, Location location) {
-    super(id, location);
+  public VariableDeclaration(Integer index, Location location) {
+    super(index, location);
   }
 
   public String getVariableName() {
@@ -47,7 +47,7 @@ public class VariableDeclaration extends Statement {
   }
 
   @Override
-  protected List<? extends Operation> getChildren() {
+  protected List<? extends ScriptElement> getChildren() {
     return Lists.of(initialiser);
   }
 }

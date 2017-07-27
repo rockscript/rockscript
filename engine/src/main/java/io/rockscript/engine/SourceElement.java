@@ -16,9 +16,9 @@
 
 package io.rockscript.engine;
 
-public abstract class SourceElement extends Operation {
+public abstract class SourceElement extends ScriptElement {
 
-  public SourceElement(String id, Location location) {
-    super(id, location);
+  public SourceElement(Integer index, Location location) {
+    super(index, location);
   }
 }

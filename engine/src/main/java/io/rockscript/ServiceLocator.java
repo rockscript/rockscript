@@ -26,7 +26,8 @@ public class ServiceLocator {
   protected ScriptStore scriptStore = new ScriptStore();
   protected ImportResolver importResolver = new ImportResolver(this);
   protected EventListener eventListener = eventStore;
-  protected ScriptExecutionIdGenerator scriptExecutionIdGenerator;
+  protected IdGenerator scriptIdGenerator;
+  protected IdGenerator scriptExecutionIdGenerator;
   protected LockService lockService = new LockServiceImpl();
 
   public void throwIfNotProperlyConfigured() {
@@ -58,11 +59,15 @@ public class ServiceLocator {
     return eventListener;
   }
 
-  public ScriptExecutionIdGenerator getScriptExecutionIdGenerator() {
+  public IdGenerator getScriptExecutionIdGenerator() {
     return scriptExecutionIdGenerator;
   }
 
   public LockService getLockService() {
     return lockService;
+  }
+
+  public IdGenerator getScriptIdGenerator() {
+    return scriptIdGenerator;
   }
 }

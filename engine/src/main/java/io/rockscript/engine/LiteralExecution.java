@@ -18,8 +18,8 @@ package io.rockscript.engine;
 
 public class LiteralExecution extends Execution<Literal> {
 
-  public LiteralExecution(Literal operation, Execution parent) {
-    super(parent.createInternalExecutionId(), operation, parent);
+  public LiteralExecution(Literal element, Execution parent) {
+    super(parent.createInternalExecutionId(), element, parent);
   }
 
   @Override
@@ -29,6 +29,6 @@ public class LiteralExecution extends Execution<Literal> {
 
   @Override
   public Object getResult() {
-    return operation.getValue();
+    return element.getValue();
   }
 }

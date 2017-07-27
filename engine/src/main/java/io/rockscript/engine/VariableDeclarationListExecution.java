@@ -20,8 +20,8 @@ import java.util.List;
 
 public class VariableDeclarationListExecution extends Execution<VariableDeclarationList> {
 
-  public VariableDeclarationListExecution(VariableDeclarationList operation, Execution parent) {
-    super(parent.createInternalExecutionId(), operation, parent);
+  public VariableDeclarationListExecution(VariableDeclarationList element, Execution parent) {
+    super(parent.createInternalExecutionId(), element, parent);
   }
 
   @Override
@@ -31,9 +31,9 @@ public class VariableDeclarationListExecution extends Execution<VariableDeclarat
 
   public void executeNextStatement() {
     int index = children!=null ? children.size() : 0;
-    List<? extends Operation> childOperations = operation.getChildren();
-    if (index < childOperations.size()) {
-      Operation nextStatement = childOperations.get(index);
+    List<? extends ScriptElement> childElements = element.getChildren();
+    if (index < childElements.size()) {
+      ScriptElement nextStatement = childElements.get(index);
       startChild(nextStatement);
     } else {
       end();

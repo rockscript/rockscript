@@ -19,12 +19,12 @@ import java.util.List;
 
 /** A list of source elements.  A source element is
  * either a statement or a function declaration. */
-public class SourceElements extends Operation {
+public class SourceElements extends ScriptElement {
 
   List<SourceElement> sourceElements;
 
-  public SourceElements(String id, Location location) {
-    super(id, location);
+  public SourceElements(Integer index, Location location) {
+    super(index, location);
   }
 
   public List<SourceElement> getSourceElements() {
@@ -43,7 +43,7 @@ public class SourceElements extends Operation {
     return sourceElements.size();
   }
 
-  public Operation getSourceElement(int position) {
+  public ScriptElement getSourceElement(int position) {
     return sourceElements.get(position);
   }
 
@@ -53,7 +53,7 @@ public class SourceElements extends Operation {
   }
 
   @Override
-  protected List<? extends Operation> getChildren() {
+  protected List<? extends ScriptElement> getChildren() {
     return sourceElements;
   }
 }

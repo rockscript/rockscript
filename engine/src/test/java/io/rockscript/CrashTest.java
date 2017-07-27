@@ -73,7 +73,7 @@ public class CrashTest {
     DeepComparator deepComparator = new DeepComparator()
       .ignoreField(ScriptExecution.class, "serviceLocator")
       .ignoreField(ScriptExecution.class, "eventListener")
-      .ignoreField(Execution.class, "operation")
+      .ignoreField(Execution.class, "element")
       .ignoreField(Script.class, "executables")
       .ignoreField(Script.class, "serviceLocator")
       .ignoreField(SystemImportAction.class, "serviceLocator")

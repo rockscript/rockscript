@@ -17,14 +17,14 @@ package io.rockscript.engine;
 
 public class VariableDeclarationExecution extends Execution<VariableDeclaration> {
 
-  public VariableDeclarationExecution(VariableDeclaration operation, Execution parent) {
-    super(parent.createInternalExecutionId(), operation, parent);
+  public VariableDeclarationExecution(VariableDeclaration element, Execution parent) {
+    super(parent.createInternalExecutionId(), element, parent);
   }
 
   @Override
   public void start() {
-    String variableName = operation.getVariableName();
-    Operation initialValueExpression = operation.getInitialiser();
+    String variableName = element.getVariableName();
+    ScriptElement initialValueExpression = element.getInitialiser();
     if (initialValueExpression!=null) {
       startChild(initialValueExpression); // execution will proceed when #childEnded is called
     } else {
@@ -43,7 +43,7 @@ public class VariableDeclarationExecution extends Execution<VariableDeclaration>
   }
 
   private Variable createVariable() {
-    VariableDeclaration executable = getOperation();
+    VariableDeclaration executable = getElement();
     String variableName = executable.getVariableName();
     Variable variable = parent.createVariable(variableName);
     Object initialValue = getInitialValue();

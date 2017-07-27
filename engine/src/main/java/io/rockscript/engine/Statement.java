@@ -18,7 +18,7 @@ package io.rockscript.engine;
 
 public abstract class Statement extends SourceElement {
 
-  public Statement(String id, Location location) {
-    super(id, location);
+  public Statement(Integer index, Location location) {
+    super(index, location);
   }
 }

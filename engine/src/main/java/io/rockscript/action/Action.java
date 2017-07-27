@@ -15,10 +15,8 @@
  */
 package io.rockscript.action;
 
-/**
- * An executable external script action, which is a pluggable operation that scripts can use to integrate with
- * external systems. Actions typically call microservices endpoints.
- */
+/** The interface to plug external function into the script engine.
+ * Actions typically call microservices endpoints. */
 public interface Action {
 
   ActionOutput invoke(ActionInput input);

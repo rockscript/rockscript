@@ -76,7 +76,7 @@ public class ScriptExecution extends BlockExecution<Script> {
 
   @Override
   public Script getScript() {
-    return operation;
+    return element;
   }
 
   public void endFunctionInvocationExecution(String executionId) {
@@ -97,8 +97,8 @@ public class ScriptExecution extends BlockExecution<Script> {
     this.eventListener = eventListener;
   }
 
-  public Script getOperation() {
-    return operation;
+  public Script getElement() {
+    return element;
   }
 
   public String getId() {

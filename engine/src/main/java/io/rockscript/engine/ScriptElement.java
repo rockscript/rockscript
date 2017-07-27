@@ -20,26 +20,27 @@ import java.util.List;
 
 
 /** Base class for a node in the abstract syntax tree of a {@link Script} */
-public abstract class Operation {
+public abstract class ScriptElement {
 
-  protected String id;
+  protected Integer index;
   protected Location location;
+  protected String text;
 
-  public Operation(String id, Location location) {
-    this.id = id;
+  public ScriptElement(Integer index, Location location) {
+    this.index = index;
     this.location = location;
   }
 
   public abstract Execution createExecution(Execution parent);
   /** null or empty list is allowed */
-  protected abstract List<? extends Operation> getChildren();
+  protected abstract List<? extends ScriptElement> getChildren();
 
-  public String getId() {
-    return id;
+  public Integer getIndex() {
+    return index;
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public void setIndex(Integer index) {
+    this.index = index;
   }
 
   public Location getLocation() {
@@ -49,4 +50,30 @@ public abstract class Operation {
   public void setLocation(Location location) {
     this.location = location;
   }
+
+  public String getText() {
+    return text;
+  }
+
+  public void setText(String text) {
+    this.text = text;
+  }
+
+  public ScriptElementJson toJson() {
+    return new ScriptElementJson(this);
+  }
+
+  public static class ScriptElementJson {
+    Integer index;
+    String text;
+    Location location;
+    public ScriptElementJson(ScriptElement executable) {
+      this.index = executable.getIndex();
+      this.text = executable.getText();
+      this.location = executable.getLocation();
+    }
+    public ScriptElementJson() {
+    }
+  }
+
 }

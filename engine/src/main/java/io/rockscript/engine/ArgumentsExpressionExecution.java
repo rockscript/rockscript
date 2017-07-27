@@ -22,13 +22,13 @@ import io.rockscript.action.*;
 
 public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression> {
 
-  public ArgumentsExpressionExecution(ArgumentsExpression operation, Execution parent) {
-    super(parent.createInternalExecutionId(), operation, parent);
+  public ArgumentsExpressionExecution(ArgumentsExpression element, Execution parent) {
+    super(parent.createInternalExecutionId(), element, parent);
   }
 
   @Override
   public void start() {
-    startChild(operation.getFunctionExpression());
+    startChild(element.getFunctionExpression());
   }
 
   @Override
@@ -38,9 +38,9 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
 
   private void startNextParameter() {
     int parameterIndex = children.size()-1; // -1 because the first one is the function expression
-    List<SingleExpression> parameters = operation.getArgumentExpressions();
+    List<SingleExpression> parameters = element.getArgumentExpressions();
     if (parameterIndex < parameters.size()) {
-      Operation piece = parameters.get(parameterIndex);
+      ScriptElement piece = parameters.get(parameterIndex);
       startChild(piece);
     } else {
       Execution functionExpressionExecution = children.get(0);

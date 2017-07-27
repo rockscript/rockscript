@@ -21,8 +21,8 @@ public class ExpressionStatement extends Statement {
 
   List<SingleExpression> singleExpressions;
 
-  public ExpressionStatement(String id, Location location) {
-    super(id, location);
+  public ExpressionStatement(Integer index, Location location) {
+    super(index, location);
   }
 
   public List<SingleExpression> getSingleExpressions() {
@@ -39,7 +39,7 @@ public class ExpressionStatement extends Statement {
   }
 
   @Override
-  protected List<? extends Operation> getChildren() {
+  protected List<? extends ScriptElement> getChildren() {
     return singleExpressions;
   }
 }

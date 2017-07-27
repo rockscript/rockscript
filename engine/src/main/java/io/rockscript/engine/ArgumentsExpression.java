@@ -23,8 +23,8 @@ public class ArgumentsExpression extends SingleExpression {
   SingleExpression functionExpression;
   List<SingleExpression> argumentExpressions;
 
-  public ArgumentsExpression(String id, Location location) {
-    super(id, location);
+  public ArgumentsExpression(Integer index, Location location) {
+    super(index, location);
   }
 
   @Override
@@ -49,8 +49,8 @@ public class ArgumentsExpression extends SingleExpression {
   }
 
   @Override
-  protected List<? extends Operation> getChildren() {
-    List<Operation> children = new ArrayList<>();
+  protected List<? extends ScriptElement> getChildren() {
+    List<ScriptElement> children = new ArrayList<>();
     children.addAll(argumentExpressions);
     children.add(functionExpression);
     return children;

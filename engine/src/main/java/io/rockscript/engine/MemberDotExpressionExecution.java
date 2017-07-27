@@ -20,13 +20,13 @@ import java.util.Map;
 
 public class MemberDotExpressionExecution extends Execution<MemberDotExpression> {
 
-  public MemberDotExpressionExecution(MemberDotExpression operation, Execution parent) {
-    super(parent.createInternalExecutionId(), operation, parent);
+  public MemberDotExpressionExecution(MemberDotExpression element, Execution parent) {
+    super(parent.createInternalExecutionId(), element, parent);
   }
 
   @Override
   public void start() {
-    startChild(operation.getBaseExpression());
+    startChild(element.getBaseExpression());
   }
 
   @Override
@@ -39,7 +39,7 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
 
   private Object getPropertyValue() {
     Object target = children.get(0).getResult();
-    String identifier = getOperation().getPropertyName();
+    String identifier = getElement().getPropertyName();
     return getFieldValue(target, identifier);
   }
 

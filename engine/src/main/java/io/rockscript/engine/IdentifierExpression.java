@@ -21,8 +21,8 @@ public class IdentifierExpression extends SingleExpression {
 
   String identifier;
 
-  public IdentifierExpression(String id, Location location) {
-    super(id, location);
+  public IdentifierExpression(Integer index, Location location) {
+    super(index, location);
   }
 
   public String getIdentifier() {
@@ -39,7 +39,7 @@ public class IdentifierExpression extends SingleExpression {
   }
 
   @Override
-  protected List<? extends Operation> getChildren() {
+  protected List<? extends ScriptElement> getChildren() {
     return null;
   }
 }

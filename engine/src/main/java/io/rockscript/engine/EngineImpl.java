@@ -42,11 +42,13 @@ public class EngineImpl implements Engine {
   }
 
   public Script deployScriptImpl(String scriptText) {
+    String scriptId = serviceLocator.getScriptIdGenerator().createId();
     Script script = parseScript(scriptText);
+    script.setId(scriptId);
     storeScript(script, scriptText);
     serviceLocator
       .getEventStore()
-      .handle(new ScriptDeployedEvent(script.getId(), scriptText));
+      .handle(new ScriptDeployedEvent(script, scriptText));
     return script;
   }
 
@@ -74,7 +76,7 @@ public class EngineImpl implements Engine {
 
     String scriptExecutionId = serviceLocator
         .getScriptExecutionIdGenerator()
-        .generateId();
+        .createId();
 
     ScriptExecution scriptState = new ScriptExecution(scriptExecutionId, serviceLocator, script);
 

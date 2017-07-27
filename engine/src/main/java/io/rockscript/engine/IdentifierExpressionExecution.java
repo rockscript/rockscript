@@ -31,7 +31,7 @@ public class IdentifierExpressionExecution extends Execution<IdentifierExpressio
   }
 
   public Object getIdentifierValue() {
-    String variableName = operation.getIdentifier();
+    String variableName = element.getIdentifier();
     Variable variable = parent.getVariable(variableName);
     return variable!=null ? variable.getValue() : null;
   }

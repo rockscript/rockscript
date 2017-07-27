@@ -30,7 +30,8 @@ import org.slf4j.LoggerFactory;
 
 public class EventStore implements EventListener {
 
-  static Logger log = LoggerFactory.getLogger(EventStore.class);
+  static final Logger log = LoggerFactory.getLogger(EventStore.class);
+  static final Logger eventLog = LoggerFactory.getLogger(EventStore.class.getName()+".events");
 
   // TODO Merge this Gson with the server Gson
   static Gson gson = new GsonBuilder()
@@ -65,7 +66,7 @@ public class EventStore implements EventListener {
     EventJson gsonnable = event.toJson();
     events.add(gsonnable);
     String jsonString = eventJsonToJsonString(gsonnable);
-    log.debug(jsonString);
+    eventLog.debug(jsonString);
   }
 
   public List<ExecutionEventJson> findEventsByScriptExecutionId(String scriptExecutionId) {

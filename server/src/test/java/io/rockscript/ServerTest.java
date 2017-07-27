@@ -29,6 +29,7 @@ import io.rockscript.test.TestEngine;
 import org.junit.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ServerTest extends AbstractServerTest {
 
@@ -81,7 +82,7 @@ public class ServerTest extends AbstractServerTest {
 
     String scriptId = deployScriptResponse.scriptId;
 
-    assertEquals("1", scriptId);
+    assertNotNull(scriptId);
 
     StartScriptCommand.ResponseJson startScriptResponse = POST("command")
       .bodyJson(new StartScriptCommand()

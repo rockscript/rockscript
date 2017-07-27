@@ -23,8 +23,8 @@ public class ObjectLiteralExpression extends SingleExpression {
   List<String> propertyNames = new ArrayList<>();
   List<SingleExpression> valueExpressions = new ArrayList<>();
 
-  public ObjectLiteralExpression(String id, Location location) {
-    super(id, location);
+  public ObjectLiteralExpression(Integer index, Location location) {
+    super(index, location);
   }
 
   @Override
@@ -33,7 +33,7 @@ public class ObjectLiteralExpression extends SingleExpression {
   }
 
   @Override
-  protected List<? extends Operation> getChildren() {
+  protected List<? extends ScriptElement> getChildren() {
     return valueExpressions;
   }
 

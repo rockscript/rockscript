@@ -25,8 +25,8 @@ public class MemberDotExpression extends SingleExpression {
   SingleExpression baseExpression;
   String propertyName;
 
-  public MemberDotExpression(String id, Location location) {
-    super(id, location);
+  public MemberDotExpression(Integer index, Location location) {
+    super(index, location);
   }
 
   public SingleExpression getBaseExpression() {
@@ -51,7 +51,7 @@ public class MemberDotExpression extends SingleExpression {
   }
 
   @Override
-  protected List<? extends Operation> getChildren() {
+  protected List<? extends ScriptElement> getChildren() {
     return Lists.of(baseExpression);
   }
 }
