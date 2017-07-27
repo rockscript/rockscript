@@ -22,7 +22,7 @@ import java.util.List;
 import io.rockscript.action.*;
 import io.rockscript.engine.*;
 import io.rockscript.test.*;
-import io.rockscript.test.CrashTestEngine.CrashEventListener;
+import io.rockscript.test.CrashDevEngine.CrashEventListener;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,19 +34,19 @@ public class CrashTest {
   List<Object> synchronousCapturedData = new ArrayList<>();
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
-  public CrashTestEngine createCrashTestEngine() {
-    CrashTestEngine engine = new CrashTestEngine();
+  public CrashDevEngine createCrashTestEngine() {
+    CrashDevEngine engine = new CrashDevEngine();
     addHelloService(engine);
     return engine;
   }
 
-  public TestEngine createNormalTestEngine() {
-    TestEngine engine = new TestEngine();
+  public DevEngine createNormalTestEngine() {
+    DevEngine engine = new DevEngine();
     addHelloService(engine);
     return engine;
   }
 
-  private void addHelloService(TestEngine engine) {
+  private void addHelloService(DevEngine engine) {
     engine.getServiceLocator()
       .getImportResolver()
       .add("example.com/hello", new ImportJsonObject()
@@ -71,18 +71,18 @@ public class CrashTest {
     ScriptExecution expectedScriptExecutionState = createExpectedScriptExecutionState(scriptText);
 
     DeepComparator deepComparator = new DeepComparator()
-      .ignoreField(ScriptExecution.class, "serviceLocator")
       .ignoreField(ScriptExecution.class, "eventListener")
       .ignoreField(Execution.class, "element")
       .ignoreField(Script.class, "elements")
       .ignoreField(Script.class, "serviceLocator")
       .ignoreField(SystemImportAction.class, "serviceLocator")
-      .ignoreAnonymousField(Action.class, "val$functionHandler");
+      .ignoreAnonymousField(Action.class, "val$functionHandler")
+      .ignoreAnonymousField(Action.class, "arg$1");
 
     int eventsWithoutCrash = 1;
     boolean crashOccurred = false;
-    CrashTestEngine engine = createCrashTestEngine();
-    CrashEventListener eventListener = engine.getServiceLocator().getEventListener();
+    CrashDevEngine engine = createCrashTestEngine();
+    CrashEventListener eventListener = (CrashEventListener) engine.getServiceLocator().getEventListener();
 
     String scriptId = engine.deployScript(scriptText);
     do {
@@ -114,7 +114,7 @@ public class CrashTest {
   }
 
   private ScriptExecution createExpectedScriptExecutionState(String scriptText) {
-    TestEngine engine = createNormalTestEngine();
+    DevEngine engine = createNormalTestEngine();
     String scriptId = engine.deployScript(scriptText);
     return engine.startScriptExecutionImpl(scriptId);
   }

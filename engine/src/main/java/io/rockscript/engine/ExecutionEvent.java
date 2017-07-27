@@ -16,8 +16,6 @@
 
 package io.rockscript.engine;
 
-import io.rockscript.ServiceLocator;
-
 public abstract class ExecutionEvent<T extends Execution> implements Event {
 
   T execution;

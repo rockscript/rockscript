@@ -16,27 +16,21 @@
  */
 package io.rockscript.test;
 
+import com.google.inject.*;
+import io.rockscript.DevEngine;
 import io.rockscript.engine.*;
 
-public class CrashTestEngine extends TestEngine {
-
-  public CrashTestEngine() {
-    super(new CrashServiceLocator());
-  }
+public class CrashDevEngine extends DevEngine {
 
   @Override
-  public CrashServiceLocator getServiceLocator() {
-    return (CrashServiceLocator) super.getServiceLocator();
+  protected Module createGuiceModule() {
+    return new CrashDevEngineModule();
   }
 
-  public static class CrashServiceLocator extends TestServiceLocator {
-    public CrashServiceLocator() {
-      this.eventListener = new CrashEventListener(eventListener);
-    }
-
+  public static class CrashDevEngineModule extends DevEngineModule {
     @Override
-    public CrashEventListener getEventListener() {
-      return (CrashEventListener) super.getEventListener();
+    protected void configureEventListener() {
+      bind(EventListener.class).to(CrashEventListener.class).in(Singleton.class);
     }
   }
 
@@ -44,11 +38,11 @@ public class CrashTestEngine extends TestEngine {
     boolean throwing = false;
     int eventsWithoutCrash;
     int eventCount;
-    EventListener target;
+    @Inject
+    EventStore target;
 
-    public CrashEventListener(EventListener target) {
+    public CrashEventListener() {
       this.eventCount = 0;
-      this.target = target;
     }
 
     public void throwAfterEventCount(int eventsWithoutCrash) {

@@ -20,7 +20,6 @@ import java.util.*;
 
 import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.*;
-import io.rockscript.test.TestEngine;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +34,7 @@ public class ObjectLiteralExpressionTest {
   List<Object> capturedValues = new ArrayList<>();
 
   public EngineImpl createTestEngine() {
-    TestEngine engine = new TestEngine();
+    DevEngine engine = new DevEngine();
     ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
     JsonObject helloService = new JsonObject()
       .put("assertLiteralValue", input -> {

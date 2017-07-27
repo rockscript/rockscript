@@ -18,12 +18,12 @@ package io.rockscript;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import io.rockscript.action.Action;
 import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.*;
 import io.rockscript.test.DeepComparator;
-import io.rockscript.test.TestEngine;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class ScriptTest {
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
   public EngineImpl createTestEngine() {
-    TestEngine engine = new TestEngine();
+    DevEngine engine = new DevEngine();
     ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
     JsonObject helloService = new JsonObject()
       .put("aSyncFunction", input -> {
@@ -95,12 +95,12 @@ public class ScriptTest {
       .loadScriptExecution(scriptExecutionId);
 
     DeepComparator deepComparator = new DeepComparator()
-      .ignoreField(ScriptExecution.class, "serviceLocator")
       .ignoreField(ScriptExecution.class, "eventListener")
       .ignoreField(Script.class, "elements")
       .ignoreField(Script.class, "serviceLocator")
       .ignoreField(SystemImportAction.class, "serviceLocator")
-      .ignoreAnonymousField(Action.class, "val$functionHandler");
+      .ignoreAnonymousField(Action.class, "val$functionHandler")
+      .ignoreAnonymousField(Function.class, "arg$1");
     deepComparator.assertEquals(scriptExecution, reloadedScriptExecution);
 
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);

@@ -23,7 +23,7 @@ import com.google.common.net.MediaType;
 import io.rockscript.action.ActionInput;
 import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.*;
-import io.rockscript.test.TestEngine;
+import io.rockscript.DevEngine;
 import org.asynchttpclient.BoundRequestBuilder;
 import org.asynchttpclient.DefaultAsyncHttpClient;
 import org.junit.*;
@@ -44,7 +44,7 @@ public class HttpActionAsyncTest {
 
   @Before
   public void createTestEngine() {
-    engine = new TestEngine();
+    engine = new DevEngine();
     ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
     JsonObject httpService = new JsonObject()
         .put("get", this::sendHttpGetRequest);

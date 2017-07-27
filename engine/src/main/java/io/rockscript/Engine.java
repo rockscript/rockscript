@@ -18,8 +18,7 @@ package io.rockscript;
 
 import java.util.List;
 
-import io.rockscript.engine.ScriptExecution;
-import io.rockscript.engine.ScriptExecutionContext;
+import io.rockscript.engine.*;
 
 public interface Engine {
 

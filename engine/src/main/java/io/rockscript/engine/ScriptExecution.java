@@ -15,7 +15,6 @@
  */
 package io.rockscript.engine;
 
-import io.rockscript.ServiceLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,14 +23,12 @@ public class ScriptExecution extends BlockExecution<Script> {
 
   static Logger log = LoggerFactory.getLogger(ScriptExecution.class);
 
-  ServiceLocator serviceLocator;
   EventListener eventListener;
   int nextInternalExecutionId = 1;
   ExecutionMode executionMode;
 
   public ScriptExecution(String scriptExecutionId, ServiceLocator serviceLocator, Script script) {
     super(scriptExecutionId, script, null);
-    this.serviceLocator = serviceLocator;
     this.eventListener = serviceLocator.getEventListener();
     this.executionMode = ExecutionMode.EXECUTING;
     initializeSystemVariable(serviceLocator);

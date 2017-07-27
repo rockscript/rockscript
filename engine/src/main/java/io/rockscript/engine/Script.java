@@ -17,7 +17,6 @@ package io.rockscript.engine;
 
 import java.util.*;
 
-import io.rockscript.ServiceLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

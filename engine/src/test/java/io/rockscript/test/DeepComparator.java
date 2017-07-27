@@ -188,7 +188,9 @@ public class DeepComparator {
   }
 
   private void ok() {
-    logs.append("== "+getPathString()+"\n");
+    String okMsg = "== "+getPathString()+"\n";
+    logs.append(okMsg);
+    log.debug(okMsg);
   }
 
   private void fail(Object a, Object b) {

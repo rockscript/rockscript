@@ -14,27 +14,29 @@
  * limitations under the License.
  */
 
-package io.rockscript.engine;
+package io.rockscript;
 
-import io.rockscript.action.*;
+import com.google.inject.*;
+import io.rockscript.engine.*;
 
-public class SystemImportAction implements Action {
+public class DevEngine extends EngineImpl implements Engine {
 
-  ServiceLocator serviceLocator;
-
-  public SystemImportAction(ServiceLocator serviceLocator) {
-    this.serviceLocator = serviceLocator;
+  protected Module createGuiceModule() {
+    return new DevEngineModule();
   }
 
-  @Override
-  public ActionOutput invoke(ActionInput input) {
-    String url = (String) input.args.get(0);
-    JsonObject importedObject = serviceLocator.getImportResolver().get(url);
-    return ActionOutput.endFunction(importedObject);
-  }
+  public static class DevEngineModule extends EngineModule {
+    @Override
+    protected void configure() {
+      super.configure();
 
-  @Override
-  public String toString() {
-    return "[system.import action]";
+      bind(IdGenerator.class)
+        .annotatedWith(IdGenerator.Script.class)
+        .toInstance(new DevIdGenerator("s"));
+
+      bind(IdGenerator.class)
+        .annotatedWith(IdGenerator.ScriptExecution.class)
+        .toInstance(new DevIdGenerator("e"));
+    }
   }
 }

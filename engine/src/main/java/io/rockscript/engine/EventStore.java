@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import io.rockscript.ServiceLocator;
+import com.google.inject.Inject;
 import io.rockscript.action.Action;
 import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import org.slf4j.Logger;
@@ -54,12 +54,13 @@ public class EventStore implements EventListener {
       .typeName(new TypeToken<PropertyDereferencedEventJson>(){}, "propertyDereferenced");
   }
 
-  ServiceLocator serviceLocator;
-  List<EventJson> events = new ArrayList<>();
+  @Inject
+  ScriptStore scriptStore;
 
-  public EventStore(ServiceLocator serviceLocator) {
-    this.serviceLocator = serviceLocator;
-  }
+  @Inject
+  ServiceLocator serviceLocator;
+
+  List<EventJson> events = new ArrayList<>();
 
   @Override
   public void handle(Event event) {

@@ -13,28 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.rockscript.engine;
 
-import io.rockscript.action.*;
+public class DevIdGenerator implements IdGenerator {
 
-public class SystemImportAction implements Action {
+  int nextId = 1;
+  String prefix;
 
-  ServiceLocator serviceLocator;
-
-  public SystemImportAction(ServiceLocator serviceLocator) {
-    this.serviceLocator = serviceLocator;
+  public DevIdGenerator(String prefix) {
+    this.prefix = prefix;
   }
 
   @Override
-  public ActionOutput invoke(ActionInput input) {
-    String url = (String) input.args.get(0);
-    JsonObject importedObject = serviceLocator.getImportResolver().get(url);
-    return ActionOutput.endFunction(importedObject);
+  public String createId() {
+    return prefix+Integer.toString(nextId++);
   }
 
-  @Override
-  public String toString() {
-    return "[system.import action]";
-  }
 }

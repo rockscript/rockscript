@@ -16,21 +16,43 @@
 
 package io.rockscript.engine;
 
-import java.util.List;
 import java.io.File;
+import java.util.List;
 
-import io.rockscript.*;
+import com.google.inject.*;
+import io.rockscript.Engine;
 
-public class EngineImpl implements Engine {
+import static jdk.nashorn.internal.objects.NativeFunction.bind;
 
-  String lockClientId;
+public abstract class EngineImpl implements Engine {
+
   protected ServiceLocator serviceLocator;
 
-  public EngineImpl(ServiceLocator serviceLocator, String lockClientId) {
-    serviceLocator.throwIfNotProperlyConfigured();
-    this.serviceLocator = serviceLocator;
-    this.lockClientId = lockClientId;
+  public EngineImpl() {
+    Injector serviceInjector = Guice.createInjector(createGuiceModule());
+    this.serviceLocator = serviceInjector.getInstance(ServiceLocator.class);
   }
+
+  protected abstract Module createGuiceModule();
+
+  public static class EngineModule extends AbstractModule {
+
+    @Override
+    protected void configure() {
+      bind(ServiceLocator.class).toInstance(new ServiceLocator());
+      bind(EventStore.class).toInstance(new EventStore());
+      bind(ScriptStore.class).toInstance(new ScriptStore());
+      bind(ImportResolver.class).toInstance(new ImportResolver());
+      bind(LockService.class).to(LockServiceImpl.class).in(Singleton.class);
+
+      configureEventListener();
+    }
+
+    protected void configureEventListener() {
+      bind(EventListener.class).to(EventStore.class).in(Singleton.class);
+    }
+  }
+
 
   public String deployScript(String scriptText) {
     Script script = deployScriptImpl(scriptText);
@@ -82,7 +104,7 @@ public class EngineImpl implements Engine {
 
     serviceLocator
       .getLockService()
-      .newScriptExecution(scriptState, lockClientId);
+      .newScriptExecution(scriptState, "localhost");
 
     scriptState.start();
 

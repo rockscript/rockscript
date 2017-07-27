@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript;
+package io.rockscript.engine;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.rockscript.engine.*;
 import io.rockscript.parser.ECMAScriptLexer;
 import io.rockscript.parser.ECMAScriptParser;
 import io.rockscript.parser.ECMAScriptParser.*;

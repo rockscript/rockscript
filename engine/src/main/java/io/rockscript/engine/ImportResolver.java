@@ -19,17 +19,15 @@ package io.rockscript.engine;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.rockscript.ServiceLocator;
+import com.google.inject.Inject;
 import io.rockscript.action.ImportJsonObject;
 
 public class ImportResolver {
 
+  @Inject
   ServiceLocator serviceLocator;
-  Map<String,JsonObject> importObjects = new HashMap<>();
 
-  public ImportResolver(ServiceLocator serviceLocator) {
-    this.serviceLocator = serviceLocator;
-  }
+  Map<String,JsonObject> importObjects = new HashMap<>();
 
   public ImportResolver add(String url, JsonObject importObject) {
     if (importObject instanceof ImportJsonObject) {

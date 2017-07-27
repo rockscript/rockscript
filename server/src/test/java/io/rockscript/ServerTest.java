@@ -25,7 +25,6 @@ import io.rockscript.engine.EventJson;
 import io.rockscript.engine.JsonObject;
 import io.rockscript.http.test.AbstractServerTest;
 import io.rockscript.netty.router.AsyncHttpServer;
-import io.rockscript.test.TestEngine;
 import org.junit.*;
 
 import static org.junit.Assert.assertEquals;
@@ -40,17 +39,17 @@ public class ServerTest extends AbstractServerTest {
   public void setUp() {
     super.setUp();
     if (server==null) {
-      TestEngine testEngine = createTestEngine();
-      testService = new TestService(testEngine);
-      server = new DevServer(testEngine, testService);
+      DevEngine devEngine = createTestEngine();
+      testService = new TestService(devEngine);
+      server = new DevServer(devEngine, testService);
       server.startup();
     } else {
       testService.reset();
     }
   }
 
-  static TestEngine createTestEngine() {
-    TestEngine engine = new TestEngine();
+  static DevEngine createTestEngine() {
+    DevEngine engine = new DevEngine();
     engine.getServiceLocator()
       .getImportResolver()
       .add("rockscript.io/test-service", new JsonObject()

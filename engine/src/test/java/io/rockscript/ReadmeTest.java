@@ -20,7 +20,6 @@ import java.io.File;
 
 import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.*;
-import io.rockscript.test.TestEngine;
 import org.junit.Before;
 
 /**
@@ -34,7 +33,7 @@ public class ReadmeTest {
 
   @Before
   public void createTestEngine() {
-    engine = new TestEngine();
+    engine = new DevEngine();
     ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
     JsonObject httpService = new JsonObject()
         .put("get", functionInput -> ActionOutput.endFunction());
