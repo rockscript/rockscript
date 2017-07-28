@@ -18,6 +18,7 @@ package io.rockscript.action.http;
 
 import java.util.concurrent.CompletableFuture;
 
+import io.rockscript.Engine;
 import io.rockscript.TestEngine;
 import io.rockscript.action.ActionInput;
 import io.rockscript.action.ActionOutput;
@@ -31,7 +32,7 @@ import static org.junit.Assert.*;
 @Ignore
 public class HttpActionAsyncTest {
 
-  private EngineImpl engine;
+  private Engine engine;
   private DefaultAsyncHttpClient httpClient;
   private CompletableFuture<org.asynchttpclient.Response> future;
 
@@ -65,12 +66,17 @@ public class HttpActionAsyncTest {
   @Test
   public void testHttpAction() {
     // Given a script that requests a GitHub organisation
-    String scriptId = engine.deployScript(
+    String scriptId = engine
+      .deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
-            "var organisation = http.get('https://api.github.com/orgs/RockScript');");
+        "var organisation = http.get('https://api.github.com/orgs/RockScript');")
+      .getId();
 
     // When I execute the script and wait for the response
-    String scriptExecutionId = engine.startScriptExecution(scriptId);
+    String scriptExecutionId = engine
+      .startScriptExecution(scriptId)
+      .getId();
+
     future.join();
 
     // Then the script result is stored in a variable.

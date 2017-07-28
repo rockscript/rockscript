@@ -35,17 +35,21 @@ public class RequestBuilderTest {
   @Test
   public void testHttpActionBuildsGetRequest() throws InterruptedException {
     // Given a script that uses an HTTP action
-    String scriptId = engine.deployScript(
+    String scriptId = engine
+      .deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
-            "http.request({ " +
-            "  url: 'https://api.github.com/orgs/RockScript'," +
-            "  headers: { " +
-            "    Accept: 'application/json' " +
-            "  }" +
-            "});");
+        "http.request({ " +
+        "  url: 'https://api.github.com/orgs/RockScript'," +
+        "  headers: { " +
+        "    Accept: 'application/json' " +
+        "  }" +
+        "});")
+      .getId();
 
     // When I execute the script
-    String scriptExecutionId = engine.startScriptExecution(scriptId);
+    String scriptExecutionId = engine
+      .startScriptExecution(scriptId)
+      .getId();
 
     // Then the action execution created an action ended event with the result
     List<ExecutionEventJson> events = eventStore.findEventsByScriptExecutionId(scriptExecutionId);
@@ -69,22 +73,26 @@ public class RequestBuilderTest {
   @Test
   public void testPostRequestBody() throws InterruptedException {
     // Given a script that uses an HTTP action
-    String scriptId = engine.deployScript(
+    String scriptId = engine
+      .deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
-            "http.request({ " +
-            "  url: 'http://api.example.com/'," +
-            "  method: 'post'," +
-            "  headers: { " +
-            "    'Content-Type': 'application/json' " +
-            "  }," +
-            "  body: { " +
-            "    name: 'RockScript', " +
-            "    url: 'http://rockscript.github.io/' " +
-            "  }" +
-            "});");
+        "http.request({ " +
+        "  url: 'http://api.example.com/'," +
+        "  method: 'post'," +
+        "  headers: { " +
+        "    'Content-Type': 'application/json' " +
+        "  }," +
+        "  body: { " +
+        "    name: 'RockScript', " +
+        "    url: 'http://rockscript.github.io/' " +
+        "  }" +
+        "});")
+      .getId();
 
     // When I execute the script
-    String scriptExecutionId = engine.startScriptExecution(scriptId);
+    String scriptExecutionId = engine
+      .startScriptExecution(scriptId)
+      .getId();
 
     // Then the action execution created an action ended event with the result
     List<ExecutionEventJson> events = eventStore.findEventsByScriptExecutionId(scriptExecutionId);

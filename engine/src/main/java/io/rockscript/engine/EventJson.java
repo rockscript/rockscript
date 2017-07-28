@@ -15,5 +15,23 @@
  */
 package io.rockscript.engine;
 
+import com.google.gson.reflect.TypeToken;
+import io.rockscript.gson.PolymorphicTypeAdapterFactory;
+
 public class EventJson {
+
+  public static PolymorphicTypeAdapterFactory createEventJsonTypeAdapterFactory() {
+    return new PolymorphicTypeAdapterFactory()
+      .typeName(new TypeToken<EventJson>(){}, "event")
+      .typeName(new TypeToken<ScriptDeployedEventJson>(){}, "scriptDeployed")
+      .typeName(new TypeToken<ActionStartedEventJson>(){}, "actionStarted")
+      .typeName(new TypeToken<ActionWaitingEventJson>(){}, "actionWaiting")
+      .typeName(new TypeToken<ActionEndedEventJson>(){}, "actionEnd")
+      .typeName(new TypeToken<ScriptStartedEventJson>(){}, "scriptStarted")
+      .typeName(new TypeToken<ScriptEndedEventJson>(){}, "scriptEnded")
+      .typeName(new TypeToken<VariableCreatedEventJson>(){}, "variableCreated")
+      .typeName(new TypeToken<ObjectImportedEventJson>(){}, "objectImported")
+      .typeName(new TypeToken<IdentifierResolvedEventJson>(){}, "identifierResolved")
+      .typeName(new TypeToken<PropertyDereferencedEventJson>(){}, "propertyDereferenced");
+  }
 }

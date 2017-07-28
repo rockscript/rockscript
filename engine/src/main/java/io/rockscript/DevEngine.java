@@ -26,4 +26,7 @@ public class DevEngine extends EngineImpl implements Engine {
     super(new DevEngineConfiguration());
   }
 
+  public DevEngine(DevEngineConfiguration engineConfiguration) {
+    super(engineConfiguration);
+  }
 }

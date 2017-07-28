@@ -35,11 +35,11 @@ public class ScriptTest {
 
   protected static Logger log = LoggerFactory.getLogger(ScriptTest.class);
 
-  EngineImpl engine = createTestEngine();
+  Engine engine = createTestEngine();
   List<Object> synchronousCapturedData = new ArrayList<>();
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
-  public EngineImpl createTestEngine() {
+  public Engine createTestEngine() {
     TestEngine engine = new TestEngine();
     ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
     JsonObject helloService = new JsonObject()
@@ -56,14 +56,18 @@ public class ScriptTest {
 
   @Test
   public void testAsyncExecution() {
-    String scriptId = engine.deployScript(
+    String scriptId = engine
+      .deployScript(
         "var helloService = system.import('example.com/hello'); \n" +
         "var message = 5; \n" +
         "helloService.aSyncFunction(message); \n"+
         "helloService.anAsyncFunction(); \n" +
-        "helloService.aSyncFunction('hello');");
+        "helloService.aSyncFunction('hello');")
+      .getId();
 
-    String scriptExecutionId = engine.startScriptExecution(scriptId);
+    String scriptExecutionId = engine
+      .startScriptExecution(scriptId)
+      .getId();
 
     assertEquals("Execution was here", synchronousCapturedData.get(0));
     assertEquals(5d, synchronousCapturedData.get(1));
@@ -81,12 +85,16 @@ public class ScriptTest {
 
   @Test
   public void testSerialization() {
-    String scriptId = engine.deployScript(
-      "var helloService = system.import('example.com/hello'); \n" +
+    String scriptId = engine
+      .deployScript(
+        "var helloService = system.import('example.com/hello'); \n" +
         "helloService.anAsyncFunction(); \n" +
-        "helloService.aSyncFunction('hello');");
+        "helloService.aSyncFunction('hello');")
+      .getId();
 
-    ScriptExecution scriptExecution = engine.startScriptExecutionImpl(scriptId);
+    ScriptExecution scriptExecution = engine
+      .startScriptExecution(scriptId);
+
     String scriptExecutionId = scriptExecution.getId();
 
     ScriptExecution reloadedScriptExecution = engine
@@ -105,7 +113,8 @@ public class ScriptTest {
 
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
 
-    scriptExecution = engine.endWaitingActionImpl(new ScriptExecutionContext(scriptExecutionId, waitingExecutionId), null);
+    ScriptExecutionContext scriptExecutionContext = new ScriptExecutionContext(scriptExecutionId, waitingExecutionId);
+    scriptExecution = engine.endWaitingAction(scriptExecutionContext, null);
 
     reloadedScriptExecution = engine
       .getEngineConfiguration()

@@ -84,7 +84,9 @@ public class CrashTest {
     CrashTestEngine engine = createCrashTestEngine();
     CrashEventListener eventListener = (CrashEventListener) engine.getEngineConfiguration().getEventListener();
 
-    String scriptId = engine.deployScript(scriptText);
+    String scriptId = engine
+      .deployScript(scriptText)
+      .getId();
     do {
       try  {
         crashOccurred = false;
@@ -92,7 +94,8 @@ public class CrashTest {
         eventListener.throwAfterEventCount(eventsWithoutCrash);
 
         log.debug("----- Starting script execution and throwing after "+eventsWithoutCrash+" events ------");
-        ScriptExecution scriptExecution = engine.startScriptExecutionImpl(scriptId);
+        ScriptExecution scriptExecution = engine
+          .startScriptExecution(scriptId);
 
       } catch (RuntimeException e) {
         log.debug("----- Recovering script execution and throwing after "+eventsWithoutCrash+" events ------");
@@ -115,7 +118,9 @@ public class CrashTest {
 
   private ScriptExecution createExpectedScriptExecutionState(String scriptText) {
     TestEngine engine = createNormalTestEngine();
-    String scriptId = engine.deployScript(scriptText);
-    return engine.startScriptExecutionImpl(scriptId);
+    String scriptId = engine
+      .deployScript(scriptText)
+      .getId();
+    return engine.startScriptExecution(scriptId);
   }
 }

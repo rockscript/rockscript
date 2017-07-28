@@ -37,13 +37,17 @@ public class ResponseTest {
   @Test
   public void testJsonResponseBody() throws InterruptedException, IOException {
     // Given a script that references a JSON property in a JSON request body
-    String scriptId = engine.deployScript(
-      "var answers = system.import('example.com/answers'); \n" +
+    String scriptId = engine
+      .deployScript(
+        "var answers = system.import('example.com/answers'); \n" +
         "var response = answers.ask();" +
-        "answers.log(response.body.answer);");
+        "answers.log(response.body.answer);")
+      .getId();
 
     // When I execute the script
-    engine.startScriptExecution(scriptId);
+    engine
+      .startScriptExecution(scriptId)
+      .getId();
 
     // Then the answer value was extracted from response.body
     assertEquals(42.0, answer);

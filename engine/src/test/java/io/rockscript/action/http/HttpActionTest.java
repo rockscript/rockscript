@@ -28,17 +28,21 @@ public class HttpActionTest {
   @Test
   public void testGetRequest() throws InterruptedException, IOException {
     // Given a script that uses an HTTP action
-    String scriptId = engine.deployScript(
+    String scriptId = engine
+      .deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
-            "http.request({ " +
-            "  url: 'https://github.com/RockScript',"  +
-            "  headers: { " +
-            "    Accept: 'text/html' " +
-            "  }" +
-            "});");
+        "http.request({ " +
+        "  url: 'https://github.com/RockScript',"  +
+        "  headers: { " +
+        "    Accept: 'text/html' " +
+        "  }" +
+        "});")
+      .getId();
 
     // When I execute the script
-    String scriptExecutionId = engine.startScriptExecution(scriptId);
+    String scriptExecutionId = engine
+      .startScriptExecution(scriptId)
+      .getId();
 
     // Then the action execution created an action ended event with the result
     List<ExecutionEventJson> events = eventStore.findEventsByScriptExecutionId(scriptExecutionId);
@@ -61,17 +65,21 @@ public class HttpActionTest {
   @Test
   public void testJsonResponse() throws InterruptedException, IOException {
     // Given a script that uses an HTTP action
-    String scriptId = engine.deployScript(
+    String scriptId = engine
+      .deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
-            "http.request({ " +
-            "  url: 'https://api.github.com/orgs/RockScript',"  +
-            "  headers: { " +
-            "    Accept: 'application/json' " +
-            "  }" +
-            "});");
+        "http.request({ " +
+        "  url: 'https://api.github.com/orgs/RockScript',"  +
+        "  headers: { " +
+        "    Accept: 'application/json' " +
+        "  }" +
+        "});")
+      .getId();
 
     // When I execute the script
-    String scriptExecutionId = engine.startScriptExecution(scriptId);
+    String scriptExecutionId = engine
+      .startScriptExecution(scriptId)
+      .getId();
 
     // Then the action execution created an action ended event with the result
     List<ExecutionEventJson> events = eventStore.findEventsByScriptExecutionId(scriptExecutionId);

@@ -18,17 +18,17 @@ package io.rockscript;
 import io.rockscript.action.ActionOutput;
 import io.rockscript.action.http.HttpImportProvider;
 import io.rockscript.engine.*;
+import io.rockscript.engine.dev.DevEngineConfiguration;
 
 public class DevServer extends Server {
 
   public DevServer() {
-    super(new DevServerConfiguration(new DevEngine()));
+    super(new DevServerConfiguration());
   }
 
   public static class DevServerConfiguration extends ServerConfiguration {
-    public DevServerConfiguration(DevEngine devEngine) {
-      context(Engine.class, devEngine);
-      context(EngineImpl.class, devEngine);
+    public DevServerConfiguration() {
+      super(new DevEngineConfiguration());
     }
   }
 

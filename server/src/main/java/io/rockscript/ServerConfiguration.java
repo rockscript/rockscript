@@ -15,12 +15,18 @@
  */
 package io.rockscript;
 
+import io.rockscript.engine.EngineConfiguration;
 import io.rockscript.netty.router.AsyncHttpServerConfiguration;
 import io.rockscript.netty.router.Context;
 
 public class ServerConfiguration {
 
   protected AsyncHttpServerConfiguration asyncHttpServerConfiguration = new AsyncHttpServerConfiguration();
+  protected EngineConfiguration engineConfiguration;
+
+  public ServerConfiguration(EngineConfiguration engineConfiguration) {
+    this.engineConfiguration = engineConfiguration;
+  }
 
   public ServerConfiguration port(int port) {
     asyncHttpServerConfiguration.port(port);
@@ -35,8 +41,7 @@ public class ServerConfiguration {
     return asyncHttpServerConfiguration;
   }
 
-  public ServerConfiguration context(Object key, Object value) {
-    this.asyncHttpServerConfiguration.context(key, value);
-    return this;
+  public EngineConfiguration getEngineConfiguration() {
+    return engineConfiguration;
   }
 }

@@ -21,43 +21,35 @@ import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import io.rockscript.action.Action;
-import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static io.rockscript.engine.EventJson.createEventJsonTypeAdapterFactory;
 
 public class EventStore implements EventListener {
 
   static final Logger log = LoggerFactory.getLogger(EventStore.class);
   static final Logger eventLog = LoggerFactory.getLogger(EventStore.class.getName()+".events");
 
-  // TODO Merge this Gson with the server Gson
-  static Gson gson = new GsonBuilder()
-    .registerTypeAdapterFactory(createEventsTypeAdapterFactory())
-    // .setPrettyPrinting()
-    .create();
-
-  public static PolymorphicTypeAdapterFactory createEventsTypeAdapterFactory() {
-    return new PolymorphicTypeAdapterFactory()
-      .typeName(new TypeToken<EventJson>(){}, "event")
-      .typeName(new TypeToken<ScriptDeployedEventJson>(){}, "scriptDeployed")
-      .typeName(new TypeToken<ActionStartedEventJson>(){}, "actionStarted")
-      .typeName(new TypeToken<ActionWaitingEventJson>(){}, "actionWaiting")
-      .typeName(new TypeToken<ActionEndedEventJson>(){}, "actionEnd")
-      .typeName(new TypeToken<ScriptStartedEventJson>(){}, "scriptStarted")
-      .typeName(new TypeToken<ScriptEndedEventJson>(){}, "scriptEnded")
-      .typeName(new TypeToken<VariableCreatedEventJson>(){}, "variableCreated")
-      .typeName(new TypeToken<ObjectImportedEventJson>(){}, "objectImported")
-      .typeName(new TypeToken<IdentifierResolvedEventJson>(){}, "identifierResolved")
-      .typeName(new TypeToken<PropertyDereferencedEventJson>(){}, "propertyDereferenced");
-  }
-
+  Gson eventsGson;
   EngineConfiguration engineConfiguration;
   List<EventJson> events = new ArrayList<>();
 
   public EventStore(EngineConfiguration engineConfiguration) {
     this.engineConfiguration = engineConfiguration;
+
+    this.eventsGson = engineConfiguration.getEventsGson();
+    if (eventsGson==null) {
+      eventsGson = createDefaultEventsGson();
+    }
+  }
+
+  private Gson createDefaultEventsGson() {
+    return new GsonBuilder()
+      .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
+      // .setPrettyPrinting()
+      .create();
   }
 
   @Override
@@ -239,7 +231,7 @@ public class EventStore implements EventListener {
   }
 
   public String eventJsonToJsonString(EventJson eventJson) {
-    return eventJson!=null ? gson.toJson(eventJson) : "null";
+    return eventJson!=null ? eventsGson.toJson(eventJson) : "null";
   }
 
   public Object valueToJson(Object value) {

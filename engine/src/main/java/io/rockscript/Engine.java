@@ -22,13 +22,13 @@ import io.rockscript.engine.*;
 
 public interface Engine {
 
-  String deployScript(String scriptText);
+  Script deployScript(String scriptText);
 
-  String startScriptExecution(String scriptId);
+  ScriptExecution startScriptExecution(String scriptId);
 
-  void endWaitingAction(ScriptExecutionContext context);
+  ScriptExecution endWaitingAction(ScriptExecutionContext context);
 
-  void endWaitingAction(ScriptExecutionContext context, Object result);
+  ScriptExecution endWaitingAction(ScriptExecutionContext context, Object result);
 
   EngineConfiguration getEngineConfiguration();
 

@@ -31,16 +31,7 @@ public abstract class EngineImpl implements Engine {
     this.engineConfiguration.throwIfNotProperlyConfigured();
   }
 
-  public String deployScript(String scriptText) {
-    Script script = deployScriptImpl(scriptText);
-    return script.getId();
-  }
-
-  public String deployScript(File script) {
-    throw new RuntimeException("deployScript(File) not implemented");
-  }
-
-  public Script deployScriptImpl(String scriptText) {
+  public Script deployScript(String scriptText) {
     String scriptId = engineConfiguration.getScriptIdGenerator().createId();
     Script script = parseScript(scriptText);
     script.setId(scriptId);
@@ -63,12 +54,7 @@ public abstract class EngineImpl implements Engine {
       .saveScript(script, scriptText);
   }
 
-  public String startScriptExecution(String scriptId) {
-    ScriptExecution scriptExecution = startScriptExecutionImpl(scriptId);
-    return scriptExecution.getId();
-  }
-
-  public ScriptExecution startScriptExecutionImpl(String scriptId) {
+  public ScriptExecution startScriptExecution(String scriptId) {
     Script script = engineConfiguration
       .getScriptStore()
       .loadScript(scriptId);
@@ -77,28 +63,24 @@ public abstract class EngineImpl implements Engine {
         .getScriptExecutionIdGenerator()
         .createId();
 
-    ScriptExecution scriptState = new ScriptExecution(scriptExecutionId, engineConfiguration, script);
+    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, engineConfiguration, script);
 
     engineConfiguration
       .getLockService()
-      .newScriptExecution(scriptState, "localhost");
+      .newScriptExecution(scriptExecution, "localhost");
 
-    scriptState.start();
+    scriptExecution.start();
 
-    return scriptState;
+    return scriptExecution;
   }
 
   @Override
-  public void endWaitingAction(ScriptExecutionContext context) {
-    endWaitingAction(context, null);
+  public ScriptExecution endWaitingAction(ScriptExecutionContext context) {
+    return endWaitingAction(context, null);
   }
 
   @Override
-  public void endWaitingAction(ScriptExecutionContext context, Object result) {
-    endWaitingActionImpl(context, result);
-  }
-
-  public ScriptExecution endWaitingActionImpl(ScriptExecutionContext context, Object result) {
+  public ScriptExecution endWaitingAction(ScriptExecutionContext context, Object result) {
     ScriptExecution scriptExecution = engineConfiguration
       .getEventStore()
       .loadScriptExecution(context.scriptExecutionId);

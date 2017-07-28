@@ -30,10 +30,10 @@ public class ObjectLiteralExpressionTest {
 
   protected static Logger log = LoggerFactory.getLogger(ObjectLiteralExpressionTest.class);
 
-  EngineImpl engine = createTestEngine();
+  Engine engine = createTestEngine();
   List<Object> capturedValues = new ArrayList<>();
 
-  public EngineImpl createTestEngine() {
+  public Engine createTestEngine() {
     TestEngine engine = new TestEngine();
     ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
     JsonObject helloService = new JsonObject()
@@ -46,10 +46,11 @@ public class ObjectLiteralExpressionTest {
 
   @Test
   public void testSimpleStaticObjectLiteralExpressionWithIdentifier() {
-    String scriptId = engine.deployScript(
-        "var o = {msg: 'hello'};");
+    String scriptId = engine
+      .deployScript("var o = {msg: 'hello'};")
+      .getId();
 
-    ScriptExecution scriptExecution = engine.startScriptExecutionImpl(scriptId);
+    ScriptExecution scriptExecution = engine.startScriptExecution(scriptId);
     @SuppressWarnings("unchecked")
     Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariable("o").getValue();
     assertEquals("hello", o.get("msg"));
@@ -57,10 +58,11 @@ public class ObjectLiteralExpressionTest {
 
   @Test
   public void testSimpleStaticObjectLiteralExpressionWithPropertyString() {
-    String scriptId = engine.deployScript(
-      "var o = {'m s g': 'hello'};");
+    String scriptId = engine
+      .deployScript("var o = {'m s g': 'hello'};")
+      .getId();
 
-    ScriptExecution scriptExecution = engine.startScriptExecutionImpl(scriptId);
+    ScriptExecution scriptExecution = engine.startScriptExecution(scriptId);
     @SuppressWarnings("unchecked")
     Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariable("o").getValue();
     assertEquals("hello", o.get("m s g"));
@@ -68,11 +70,13 @@ public class ObjectLiteralExpressionTest {
 
   @Test
   public void testDynamicObjectLiteralExpression() {
-    String scriptId = engine.deployScript(
-      "var greeting = 'hello'; \n"+
-      "var o = {msg: greeting}; ");
+    String scriptId = engine
+      .deployScript(
+        "var greeting = 'hello'; \n"+
+        "var o = {msg: greeting}; ")
+      .getId();
 
-    ScriptExecution scriptExecution = engine.startScriptExecutionImpl(scriptId);
+    ScriptExecution scriptExecution = engine.startScriptExecution(scriptId);
     @SuppressWarnings("unchecked")
     Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariable("o").getValue();
     assertEquals("hello", o.get("msg"));

@@ -15,6 +15,8 @@
  */
 package io.rockscript.engine.test;
 
+import io.rockscript.Engine;
+import io.rockscript.TestEngine;
 import io.rockscript.engine.*;
 
 public class TestEngineConfiguration extends EngineConfiguration {
@@ -29,4 +31,8 @@ public class TestEngineConfiguration extends EngineConfiguration {
     this.importResolver = new ImportResolver(this);
   }
 
+  @Override
+  public Engine build() {
+    return new TestEngine(this);
+  }
 }

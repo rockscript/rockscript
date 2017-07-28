@@ -15,9 +15,19 @@
  */
 package io.rockscript.command;
 
+import com.google.gson.reflect.TypeToken;
+import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.netty.router.*;
 
 public interface Command {
+
+  public static PolymorphicTypeAdapterFactory createCommandsTypeAdapterFactory() {
+    return new PolymorphicTypeAdapterFactory()
+      .typeName(new TypeToken<Command>(){}, "command")
+      .typeName(new TypeToken<DeployScriptCommand>(){}, "deployScript")
+      .typeName(new TypeToken<StartScriptCommand>(){}, "startScript")
+      .typeName(new TypeToken<EndActionCommand>(){}, "endAction");
+  }
 
   void execute(Request request, Response response, Context context);
 }

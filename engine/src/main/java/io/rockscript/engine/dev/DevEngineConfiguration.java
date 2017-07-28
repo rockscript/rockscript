@@ -15,6 +15,8 @@
  */
 package io.rockscript.engine.dev;
 
+import io.rockscript.DevEngine;
+import io.rockscript.Engine;
 import io.rockscript.engine.*;
 import io.rockscript.engine.test.TestIdGenerator;
 import io.rockscript.engine.test.TestLockService;
@@ -38,4 +40,8 @@ public class DevEngineConfiguration extends EngineConfiguration {
     this.importResolver = new DevImportResolver(this);
   }
 
+  @Override
+  public Engine build() {
+    return new DevEngine(this);
+  }
 }

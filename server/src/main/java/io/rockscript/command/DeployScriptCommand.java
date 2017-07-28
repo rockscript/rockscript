@@ -15,7 +15,7 @@
  */
 package io.rockscript.command;
 
-import io.rockscript.engine.EngineImpl;
+import io.rockscript.Engine;
 import io.rockscript.netty.router.*;
 
 public class DeployScriptCommand implements Command {
@@ -41,8 +41,9 @@ public class DeployScriptCommand implements Command {
   @Override
   public void execute(Request request, Response response, Context context) {
     String scriptId = context
-      .get(EngineImpl.class)
-      .deployScript(script);
+      .get(Engine.class)
+      .deployScript(script)
+      .getId();
 
     response.bodyJson(new ResponseJson()
       .scriptId(scriptId));

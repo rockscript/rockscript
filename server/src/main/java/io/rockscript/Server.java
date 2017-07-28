@@ -17,18 +17,15 @@ package io.rockscript;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
-import io.rockscript.command.*;
-import io.rockscript.engine.JsonObject;
-import io.rockscript.engine.JsonObjectSerialiser;
-import io.rockscript.gson.PolymorphicTypeAdapterFactory;
+import io.rockscript.engine.*;
 import io.rockscript.handlers.*;
 import io.rockscript.netty.router.*;
 import io.rockscript.rest.ScriptsPostHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.rockscript.engine.EventStore.createEventsTypeAdapterFactory;
+import static io.rockscript.command.Command.createCommandsTypeAdapterFactory;
+import static io.rockscript.engine.EventJson.createEventJsonTypeAdapterFactory;
 
 public class Server {
 
@@ -37,24 +34,24 @@ public class Server {
   AsyncHttpServer asyncHttpServer;
 
   public Server(ServerConfiguration serverConfiguration) {
-    // TODO Merge this Gson with the EventStore Gson
-    Gson gson = new GsonBuilder()
-      .registerTypeAdapterFactory(new PolymorphicTypeAdapterFactory()
-        .typeName(new TypeToken<Command>(){}, "command")
-        .typeName(new TypeToken<DeployScriptCommand>(){}, "deployScript")
-        .typeName(new TypeToken<StartScriptCommand>(){}, "startScript")
-        .typeName(new TypeToken<EndActionCommand>(){}, "endAction")
-      )
-      .registerTypeAdapterFactory(createEventsTypeAdapterFactory())
+    Gson commonGson = new GsonBuilder()
+      .registerTypeAdapterFactory(createCommandsTypeAdapterFactory())
+      .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
       .registerTypeAdapter(JsonObject.class, new JsonObjectSerialiser())
       .create();
+
+    EngineConfiguration engineConfiguration = serverConfiguration.getEngineConfiguration();
+    engineConfiguration.eventsGson(commonGson);
+    Engine engine = engineConfiguration.build();
 
     AsyncHttpServerConfiguration asyncHttpServerConfiguration = serverConfiguration
       .getAsyncHttpServerConfiguration()
       .scan(CommandHandler.class)
       .scan(EventsHandler.class)
       .scan(ScriptsPostHandler.class)
-      .jsonHandler(new JsonHandlerGson(gson));
+      .jsonHandler(new JsonHandlerGson(commonGson))
+      .context(Engine.class, engine);
+
     this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
   }
 

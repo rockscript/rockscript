@@ -53,13 +53,17 @@ public class HttpWorkerTest {
         return ActionOutput.waitForFunctionToCompleteAsync();});
     importResolver.add("rockscript.io/http", http);
 
-    String scriptId = engine.deployScript(
-      "var http = system.import('rockscript.io/http'); \n" +
-      "var interestingData = http.get({ " +
-      "  url: 'http://rockscript.io/interesting/data' " +
-      "});");
+    String scriptId = engine
+      .deployScript(
+        "var http = system.import('rockscript.io/http'); \n" +
+        "var interestingData = http.get({ " +
+        "  url: 'http://rockscript.io/interesting/data' " +
+        "});")
+      .getId();
 
-    String scriptExecutionId = engine.startScriptExecution(scriptId);
+    String scriptExecutionId = engine
+      .startScriptExecution(scriptId)
+      .getId();
 
     ActionInput actionInput = httpActionWorker.actionInputQueue.get(0);
 

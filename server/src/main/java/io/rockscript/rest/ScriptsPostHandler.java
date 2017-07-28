@@ -16,7 +16,6 @@
 package io.rockscript.rest;
 
 import io.rockscript.Engine;
-import io.rockscript.engine.EngineImpl;
 import io.rockscript.engine.JsonObject;
 import io.rockscript.netty.router.*;
 
@@ -28,8 +27,9 @@ public class ScriptsPostHandler implements RequestHandler {
     String script = request.getBodyStringUtf8();
 
     String scriptId = context
-      .get(EngineImpl.class)
-      .deployScript(script);
+      .get(Engine.class)
+      .deployScript(script)
+      .getId();
 
     response.statusOk();
     response.bodyJson(new JsonObject().put("scriptId", scriptId));

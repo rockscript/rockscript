@@ -17,8 +17,15 @@
 package io.rockscript.engine;
 
 import java.lang.reflect.Field;
+import java.util.HashSet;
+import java.util.Set;
 
-public class EngineConfiguration {
+import com.google.gson.Gson;
+import io.rockscript.Engine;
+
+public abstract class EngineConfiguration {
+
+  private static Set<String> OPTIONAL_FIELDS = new HashSet<>();
 
   protected EventStore eventStore;
   protected ScriptStore scriptStore;
@@ -27,6 +34,9 @@ public class EngineConfiguration {
   protected IdGenerator scriptExecutionIdGenerator;
   protected LockService lockService;
   protected ImportResolver importResolver;
+
+  static { OPTIONAL_FIELDS.add("eventsGson"); }
+  protected Gson eventsGson;
 
   protected EngineConfiguration() {
   }
@@ -45,17 +55,26 @@ public class EngineConfiguration {
     this.lockService = lockService;
   }
 
+  public abstract Engine build();
+
   public void throwIfNotProperlyConfigured() {
     for (Field field: getClass().getDeclaredFields()) {
-      Object value = null;
-      try {
-        field.setAccessible(true);
-        value = field.get(this);
-      } catch (IllegalAccessException e) {
-        throw new ScriptException(e);
+      if (!OPTIONAL_FIELDS.contains(field.getName())) {
+        Object value = null;
+        try {
+          field.setAccessible(true);
+          value = field.get(this);
+        } catch (IllegalAccessException e) {
+          throw new ScriptException(e);
+        }
+        ScriptException.throwIfNull(value, "ServiceLocator field '%s' is null", field.getName());
       }
-      ScriptException.throwIfNull(value, "ServiceLocator field '%s' is null", field.getName());
     }
+  }
+
+  public EngineConfiguration eventsGson(Gson eventsGson) {
+    this.eventsGson = eventsGson;
+    return this;
   }
 
   public EventStore getEventStore() {
@@ -85,4 +104,9 @@ public class EngineConfiguration {
   public ImportResolver getImportResolver() {
     return importResolver;
   }
+
+  public Gson getEventsGson() {
+    return eventsGson;
+  }
+
 }
