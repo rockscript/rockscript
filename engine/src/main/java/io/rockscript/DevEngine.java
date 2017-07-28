@@ -16,16 +16,14 @@
 
 package io.rockscript;
 
-import io.rockscript.engine.*;
-import io.rockscript.engine.test.TestEngineConfiguration;
+import io.rockscript.engine.EngineConfiguration;
+import io.rockscript.engine.EngineImpl;
+import io.rockscript.engine.dev.DevEngineConfiguration;
 
-public class TestEngine extends EngineImpl implements Engine {
+public class DevEngine extends EngineImpl implements Engine {
 
-  public TestEngine() {
-    super(new TestEngineConfiguration());
+  public DevEngine() {
+    super(new DevEngineConfiguration());
   }
 
-  public TestEngine(TestEngineConfiguration testEngineConfiguration) {
-    super(testEngineConfiguration);
-  }
 }

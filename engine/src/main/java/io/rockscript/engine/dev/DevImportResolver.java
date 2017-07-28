@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.engine.dev;
 
-package io.rockscript;
+import java.util.ServiceLoader;
 
-import io.rockscript.engine.*;
-import io.rockscript.engine.test.TestEngineConfiguration;
+import io.rockscript.action.ImportProvider;
+import io.rockscript.engine.ImportResolver;
 
-public class TestEngine extends EngineImpl implements Engine {
 
-  public TestEngine() {
-    super(new TestEngineConfiguration());
-  }
+public class DevImportResolver extends ImportResolver {
 
-  public TestEngine(TestEngineConfiguration testEngineConfiguration) {
-    super(testEngineConfiguration);
+  public DevImportResolver(DevEngineConfiguration devEngineConfiguration) {
+    super(devEngineConfiguration);
+
+    ServiceLoader<ImportProvider> importProviderLoader = ServiceLoader.load(ImportProvider.class);
+    for (ImportProvider importProvider: importProviderLoader) {
+      importProvider.provideImport(this);
+    }
   }
 }

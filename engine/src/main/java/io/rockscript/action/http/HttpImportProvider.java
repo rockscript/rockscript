@@ -21,9 +21,11 @@ import io.rockscript.engine.ImportResolver;
 
 public class HttpImportProvider implements ImportProvider {
 
+  public static final String HTTP_ACTION_URL = "rockscript.io/http";
+
   public void provideImport(ImportResolver importResolver) {
     ImportJsonObject http = new ImportJsonObject();
     http.put("request", new HttpAction());
-    importResolver.add("rockscript.io/http", http);
+    importResolver.add(HTTP_ACTION_URL, http);
   }
 }

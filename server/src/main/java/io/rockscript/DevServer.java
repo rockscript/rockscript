@@ -18,42 +18,23 @@ package io.rockscript;
 import io.rockscript.action.ActionOutput;
 import io.rockscript.action.http.HttpImportProvider;
 import io.rockscript.engine.*;
-import io.rockscript.netty.router.MapContext;
 
 public class DevServer extends Server {
 
-  public DevServer(TestEngine testEngine, TestService testService) {
-    super(new TestServerConfiguration(testEngine, testService));
+  public DevServer() {
+    super(new DevServerConfiguration(new DevEngine()));
   }
 
-  public static class TestServerConfiguration extends ServerConfiguration {
-    TestService testService;
-    public TestServerConfiguration(TestEngine testEngine, TestService testService) {
-      this.testService = testService;
-      this.context = new MapContext()
-        .put(Engine.class, testEngine)
-        .put(EngineImpl.class, testEngine);
+  public static class DevServerConfiguration extends ServerConfiguration {
+    public DevServerConfiguration(DevEngine devEngine) {
+      context(Engine.class, devEngine);
+      context(EngineImpl.class, devEngine);
     }
   }
 
   public static void main(String[] args) {
-    TestEngine testEngine = new TestEngine();
-    TestService testService = new TestService(testEngine);
-    configureTestEngine(testEngine, testService);
-    DevServer server = new DevServer(testEngine, testService);
+    DevServer server = new DevServer();
     server.startup();
   }
 
-  private static void configureTestEngine(TestEngine testEngine, TestService testService) {
-    ImportResolver importResolver = testEngine.getEngineConfiguration().getImportResolver();
-    importResolver
-      .add("rockscript.io/test-service", new JsonObject()
-        .put("doLongRunning", input -> {
-               testService.add(input);
-               return ActionOutput.waitForFunctionToCompleteAsync();
-             }
-        )
-      );
-    new HttpImportProvider().provideImport(importResolver);
-  }
 }

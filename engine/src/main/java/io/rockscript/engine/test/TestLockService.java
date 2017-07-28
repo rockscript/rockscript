@@ -23,7 +23,7 @@ public class TestLockService implements LockService {
 
   Map<String, Lock> locks = Collections.synchronizedMap(new HashMap<String, Lock>());
 
-  public TestLockService(TestEngineConfiguration testEngineConfiguration) {
+  public TestLockService(EngineConfiguration engineConfiguration) {
   }
 
   @Override

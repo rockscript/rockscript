@@ -32,34 +32,15 @@ import static org.junit.Assert.assertNotNull;
 
 public class ServerTest extends AbstractServerTest {
 
-  static TestService testService;
   static Server server;
 
   @Before
   public void setUp() {
     super.setUp();
     if (server==null) {
-      TestEngine testEngine = createTestEngine();
-      testService = new TestService(testEngine);
-      server = new DevServer(testEngine, testService);
+      server = new DevServer();
       server.startup();
-    } else {
-      testService.reset();
     }
-  }
-
-  static TestEngine createTestEngine() {
-    TestEngine engine = new TestEngine();
-    engine.getEngineConfiguration()
-      .getImportResolver()
-      .add("rockscript.io/test-service", new JsonObject()
-        .put("doLongRunning", input -> {
-            testService.add(input);
-            return ActionOutput.waitForFunctionToCompleteAsync();
-          }
-        )
-      );
-    return engine;
   }
 
   @AfterClass
@@ -72,8 +53,8 @@ public class ServerTest extends AbstractServerTest {
   public void testServer() {
     DeployScriptCommand.ResponseJson deployScriptResponse = POST("command")
       .bodyJson(new DeployScriptCommand(
-           "var t = system.import('rockscript.io/test-service'); "+
-           "t.doLongRunning('hello'); "))
+           "var http = system.import('rockscript.io/http'); "+
+           "http.request({method:'GET', url:'rockscript.github.io'}); "))
       .execute()
       .assertStatusOk()
       .body(DeployScriptCommand.ResponseJson.class);
@@ -90,17 +71,14 @@ public class ServerTest extends AbstractServerTest {
 
     String scriptExecutionId = startScriptResponse.scriptExecutionId;
 
-    assertEquals(1, testService.inputs.size());
-
-    testService.endAction(0, "by");
   }
 
   @Test
   public void testEvents() {
     DeployScriptCommand.ResponseJson deployScriptResponse = POST("command")
       .bodyJson(new DeployScriptCommand(
-          "var t = system.import('rockscript.io/test-service'); "+
-          "t.doLongRunning('hello'); "))
+        "var http = system.import('rockscript.io/http'); "+
+        "http.request({method:'GET', url:'rockscript.github.io'}); "))
       .execute()
       .assertStatusOk()
       .body(DeployScriptCommand.ResponseJson.class);
@@ -118,7 +96,7 @@ public class ServerTest extends AbstractServerTest {
       .assertStatusOk()
       .body(new TypeToken<List<EventJson>>(){}.getType());
 
-    assertEquals(10, eventJsons.size());
+    assertEquals(11, eventJsons.size());
   }
 
   @Override

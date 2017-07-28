@@ -26,7 +26,7 @@ public class AsyncHttpServerConfiguration {
   protected Router<Class<?>> router = new Router<>();
   protected int port = 8888;
   protected List<Interceptor> interceptors;
-  protected Context context;
+  protected MapContext context = new MapContext();
   protected JsonHandler jsonHandler;
 
   public AsyncHttpServer build() {
@@ -42,12 +42,8 @@ public class AsyncHttpServerConfiguration {
     return context;
   }
 
-  public void setContext(Context context) {
-    this.context = context;
-  }
-
-  public AsyncHttpServerConfiguration context(Context context) {
-    this.context = context;
+  public AsyncHttpServerConfiguration context(Object key, Object value) {
+    this.context.put(key, value);
     return this;
   }
 

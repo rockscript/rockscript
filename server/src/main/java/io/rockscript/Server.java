@@ -54,8 +54,7 @@ public class Server {
       .scan(CommandHandler.class)
       .scan(EventsHandler.class)
       .scan(ScriptsPostHandler.class)
-      .jsonHandler(new JsonHandlerGson(gson))
-      .context(serverConfiguration.getContext());
+      .jsonHandler(new JsonHandlerGson(gson));
     this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
   }
 
