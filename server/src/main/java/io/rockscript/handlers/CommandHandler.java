@@ -15,8 +15,6 @@
  */
 package io.rockscript.handlers;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
 import io.rockscript.command.Command;
 import io.rockscript.netty.router.*;
 import org.slf4j.Logger;
@@ -27,13 +25,9 @@ public class CommandHandler implements RequestHandler {
 
   static Logger log = LoggerFactory.getLogger(CommandHandler.class);
 
-  @Inject
-  Injector injector;
-
   @Override
-  public void handle(Request request, Response response) {
+  public void handle(Request request, Response response, Context context) {
     Command command = request.getBodyJson(Command.class);
-    injector.injectMembers(command);
-    command.execute(request, response);
+    command.execute(request, response, context);
   }
 }

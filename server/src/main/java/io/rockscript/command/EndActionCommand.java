@@ -18,23 +18,21 @@ package io.rockscript.command;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.google.inject.Inject;
-import io.rockscript.Engine;
+import io.rockscript.engine.EngineImpl;
 import io.rockscript.engine.ScriptExecutionContext;
-import io.rockscript.netty.router.Request;
-import io.rockscript.netty.router.Response;
+import io.rockscript.netty.router.*;
 
 public class EndActionCommand implements Command {
-
-  @Inject
-  Engine engine;
 
   ScriptExecutionContext scriptExecutionContext;
   Object result;
 
-  public EndActionCommand scriptExecutionContext(ScriptExecutionContext scriptExecutionContext) {
+  /** constructor for json deserialization */
+  public EndActionCommand() {
+  }
+
+  public EndActionCommand(ScriptExecutionContext scriptExecutionContext) {
     this.scriptExecutionContext = scriptExecutionContext;
-    return this;
   }
 
   public EndActionCommand result(Object result) {
@@ -56,8 +54,11 @@ public class EndActionCommand implements Command {
   }
 
   @Override
-  public void execute(Request request, Response response) {
-    engine.endWaitingAction(scriptExecutionContext, result);
+  public void execute(Request request, Response response, Context context) {
+    context
+      .get(EngineImpl.class)
+      .endWaitingAction(scriptExecutionContext, result);
+
     response.statusOk();
     response.send();
   }

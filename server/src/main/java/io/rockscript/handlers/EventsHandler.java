@@ -17,7 +17,7 @@ package io.rockscript.handlers;
 
 import java.util.List;
 
-import com.google.inject.Inject;
+import io.rockscript.Engine;
 import io.rockscript.engine.EngineImpl;
 import io.rockscript.engine.EventJson;
 import io.rockscript.netty.router.*;
@@ -29,12 +29,10 @@ public class EventsHandler implements RequestHandler {
 
   static Logger log = LoggerFactory.getLogger(EventsHandler.class);
 
-  @Inject
-  EngineImpl engine;
-
   @Override
-  public void handle(Request request, Response response) {
-    List<EventJson> events = engine
+  public void handle(Request request, Response response, Context context) {
+    List<EventJson> events = context
+      .get(EngineImpl.class)
       .getEngineConfiguration()
       .getEventStore()
       .getEvents();

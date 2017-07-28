@@ -19,7 +19,6 @@ package io.rockscript.netty.router;
 import java.util.List;
 
 import com.google.gson.JsonObject;
-import com.google.inject.Injector;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -36,19 +35,18 @@ public class AsyncHttpServer {
 
   protected Router<Class<?>> router;
   protected int port;
-  protected Injector services;
+  protected Context context;
   protected JsonHandler jsonHandler;
   protected List<Interceptor> interceptors;
 
   protected NioEventLoopGroup bossGroup;
   protected NioEventLoopGroup workerGroup;
   protected Channel channel;
-  protected Context context;
 
   public AsyncHttpServer(AsyncHttpServerConfiguration asyncHttpServerConfiguration) {
     this.router = asyncHttpServerConfiguration.getRouter();
     this.port = asyncHttpServerConfiguration.getPort();
-    this.services = asyncHttpServerConfiguration.getServices();
+    this.context = asyncHttpServerConfiguration.getContext();
     this.interceptors = asyncHttpServerConfiguration.getInterceptors();
     this.jsonHandler = asyncHttpServerConfiguration.getJsonHandler();
   }
@@ -98,7 +96,7 @@ public class AsyncHttpServer {
         intercepterContext.next();
 
       } else {
-        requestHandler.handle(request, response);
+        requestHandler.handle(request, response, context);
       }
       
 
@@ -121,15 +119,6 @@ public class AsyncHttpServer {
 
   @SuppressWarnings("unchecked")
   public <T> T instantiate(Class<?> clazz) {
-    // if a Guice IoC container (services) is configured,
-    if (services!=null) {
-      // Use the services to instantiate the request handler.
-      // This will inject services from the container into the
-      // request handler.
-      return (T) services.getInstance(clazz);
-    }
-    // If no services object is configured, we just
-    // use plain java reflection to instantiate the object
     try {
       return (T) clazz.newInstance();
     } catch (Exception e) {
@@ -166,9 +155,6 @@ public class AsyncHttpServer {
   }
 
   public Context getContext() {
-    if (context==null) {
-      context = new Context();
-    }
     return context;
   }
 
@@ -182,10 +168,6 @@ public class AsyncHttpServer {
   
   public List<Interceptor> getInterceptors() {
     return interceptors;
-  }
-
-  public Injector getServices() {
-    return services;
   }
 
   public JsonHandler getJsonHandler() {

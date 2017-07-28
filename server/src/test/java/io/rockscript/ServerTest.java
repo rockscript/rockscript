@@ -71,8 +71,7 @@ public class ServerTest extends AbstractServerTest {
   @Test
   public void testServer() {
     DeployScriptCommand.ResponseJson deployScriptResponse = POST("command")
-      .bodyJson(new DeployScriptCommand()
-         .script(
+      .bodyJson(new DeployScriptCommand(
            "var t = system.import('rockscript.io/test-service'); "+
            "t.doLongRunning('hello'); "))
       .execute()
@@ -84,8 +83,7 @@ public class ServerTest extends AbstractServerTest {
     assertNotNull(scriptId);
 
     StartScriptCommand.ResponseJson startScriptResponse = POST("command")
-      .bodyJson(new StartScriptCommand()
-                .scriptId(scriptId))
+      .bodyJson(new StartScriptCommand(scriptId))
       .execute()
       .assertStatusOk()
       .body(StartScriptCommand.ResponseJson.class);
@@ -100,8 +98,7 @@ public class ServerTest extends AbstractServerTest {
   @Test
   public void testEvents() {
     DeployScriptCommand.ResponseJson deployScriptResponse = POST("command")
-      .bodyJson(new DeployScriptCommand()
-        .script(
+      .bodyJson(new DeployScriptCommand(
           "var t = system.import('rockscript.io/test-service'); "+
           "t.doLongRunning('hello'); "))
       .execute()
@@ -111,8 +108,7 @@ public class ServerTest extends AbstractServerTest {
     String scriptId = deployScriptResponse.scriptId;
 
     StartScriptCommand.ResponseJson startScriptResponse = POST("command")
-      .bodyJson(new StartScriptCommand()
-                  .scriptId(scriptId))
+      .bodyJson(new StartScriptCommand(scriptId))
       .execute()
       .assertStatusOk()
       .body(StartScriptCommand.ResponseJson.class);

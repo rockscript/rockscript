@@ -18,22 +18,20 @@ package io.rockscript.command;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.google.inject.Inject;
-import io.rockscript.Engine;
-import io.rockscript.netty.router.Request;
-import io.rockscript.netty.router.Response;
+import io.rockscript.engine.EngineImpl;
+import io.rockscript.netty.router.*;
 
 public class StartScriptCommand implements Command {
-
-  @Inject
-  Engine engine;
 
   String scriptId;
   Object input;
 
-  public StartScriptCommand scriptId(String scriptId) {
+  /** constructor for json deserialization */
+  public StartScriptCommand() {
+  }
+
+  public StartScriptCommand(String scriptId) {
     this.scriptId = scriptId;
-    return this;
   }
 
   public StartScriptCommand input(Object input) {
@@ -63,8 +61,10 @@ public class StartScriptCommand implements Command {
   }
 
   @Override
-  public void execute(Request request, Response response) {
-    String scriptExecutionId = engine.startScriptExecution(scriptId);
+  public void execute(Request request, Response response, Context context) {
+    String scriptExecutionId = context
+      .get(EngineImpl.class)
+      .startScriptExecution(scriptId);
 
     response.bodyJson(new ResponseJson()
       .scriptExecutionId(scriptExecutionId));

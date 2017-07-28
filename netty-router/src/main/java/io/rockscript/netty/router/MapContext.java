@@ -13,21 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.rockscript.netty.router;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.HashMap;
+import java.util.Map;
 
-/** For Guice modules, this provider creates a AsyncHttpServer
- * from a AsyncHttpServerConfiguration. */
-public class AsyncHttpServerProvider implements Provider<AsyncHttpServer> {
+public class MapContext implements Context {
 
-  @Inject
-  AsyncHttpServerConfiguration asyncHttpServerConfiguration;
+  Map<Object,Object> map = new HashMap<>();
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T> T get(Object key) {
+    return (T) map.get(key);
+  }
 
   @Override
-  public AsyncHttpServer get() {
-    return asyncHttpServerConfiguration.build();
+  public <T> T get(Class<T> clazz) {
+    return get((Object) clazz);
+  }
+
+  public MapContext put(Object key, Object value) {
+    map.put(key, value);
+    return this;
   }
 }

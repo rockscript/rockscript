@@ -15,21 +15,19 @@
  */
 package io.rockscript.command;
 
-import com.google.inject.Inject;
-import io.rockscript.Engine;
-import io.rockscript.netty.router.Request;
-import io.rockscript.netty.router.Response;
+import io.rockscript.engine.EngineImpl;
+import io.rockscript.netty.router.*;
 
 public class DeployScriptCommand implements Command {
 
-  @Inject
-  Engine engine;
-
   String script;
 
-  public DeployScriptCommand script(String script) {
+  /** constructor for json deserialization */
+  public DeployScriptCommand() {
+  }
+
+  public DeployScriptCommand(String script) {
     this.script = script;
-    return this;
   }
 
   public static class ResponseJson {
@@ -41,8 +39,10 @@ public class DeployScriptCommand implements Command {
   }
 
   @Override
-  public void execute(Request request, Response response) {
-    String scriptId = engine.deployScript(script);
+  public void execute(Request request, Response response, Context context) {
+    String scriptId = context
+      .get(EngineImpl.class)
+      .deployScript(script);
 
     response.bodyJson(new ResponseJson()
       .scriptId(scriptId));

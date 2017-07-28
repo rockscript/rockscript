@@ -16,10 +16,12 @@
 package io.rockscript;
 
 import io.rockscript.netty.router.AsyncHttpServerConfiguration;
+import io.rockscript.netty.router.Context;
 
 public class ServerConfiguration {
 
-  AsyncHttpServerConfiguration asyncHttpServerConfiguration = new AsyncHttpServerConfiguration();
+  protected AsyncHttpServerConfiguration asyncHttpServerConfiguration = new AsyncHttpServerConfiguration();
+  protected Context context;
 
   public ServerConfiguration port(int port) {
     asyncHttpServerConfiguration.port(port);
@@ -32,5 +34,9 @@ public class ServerConfiguration {
 
   AsyncHttpServerConfiguration getAsyncHttpServerConfiguration() {
     return asyncHttpServerConfiguration;
+  }
+
+  public Context getContext() {
+    return context;
   }
 }

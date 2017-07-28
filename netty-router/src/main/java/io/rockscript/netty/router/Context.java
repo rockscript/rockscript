@@ -15,29 +15,8 @@
  */
 package io.rockscript.netty.router;
 
-import java.util.HashMap;
-import java.util.Map;
+public interface Context {
 
-public class Context {
-
-  protected Map<String,Object> objects = new HashMap<>();
-
-  public void set(Object o) {
-    if (o!=null) {
-      objects.put(o.getClass().getName(), o);
-    }
-  }
-
-  public void set(String name, Object o) {
-    objects.put(name, o);
-  }
-
-  public <T> T get(Class<T> clazz) {
-    return get(clazz!=null ? clazz.getName() : null);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T> T get(String name) {
-    return (T) objects.get(name);
-  }
+  <T> T get(Object key);
+  <T> T get(Class<T> clazz);
 }

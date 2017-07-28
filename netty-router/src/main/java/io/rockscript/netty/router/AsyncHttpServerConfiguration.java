@@ -19,8 +19,6 @@ package io.rockscript.netty.router;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
 import io.netty.handler.codec.http.router.Router;
 
 public class AsyncHttpServerConfiguration {
@@ -28,8 +26,7 @@ public class AsyncHttpServerConfiguration {
   protected Router<Class<?>> router = new Router<>();
   protected int port = 8888;
   protected List<Interceptor> interceptors;
-  @Inject
-  protected Injector services;
+  protected Context context;
   protected JsonHandler jsonHandler;
 
   public AsyncHttpServer build() {
@@ -38,6 +35,19 @@ public class AsyncHttpServerConfiguration {
 
   public AsyncHttpServerConfiguration component(AsyncHttpServerComponent component) {
     component.configure(this);
+    return this;
+  }
+
+  public Context getContext() {
+    return context;
+  }
+
+  public void setContext(Context context) {
+    this.context = context;
+  }
+
+  public AsyncHttpServerConfiguration context(Context context) {
+    this.context = context;
     return this;
   }
 
@@ -55,19 +65,6 @@ public class AsyncHttpServerConfiguration {
 
   public AsyncHttpServerConfiguration port(int port) {
     this.port = port;
-    return this;
-  }
-
-  public Injector getServices() {
-    return services;
-  }
-
-  public void setServices(Injector services) {
-    this.services = services;
-  }
-
-  public AsyncHttpServerConfiguration services(Injector services) {
-    this.services = services;
     return this;
   }
 

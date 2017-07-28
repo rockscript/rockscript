@@ -15,23 +15,21 @@
  */
 package io.rockscript.rest;
 
-import com.google.inject.Inject;
 import io.rockscript.Engine;
+import io.rockscript.engine.EngineImpl;
 import io.rockscript.engine.JsonObject;
 import io.rockscript.netty.router.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Post("/scripts")
 public class ScriptsPostHandler implements RequestHandler {
 
-  @Inject
-  Engine engine;
-
   @Override
-  public void handle(Request request, Response response) {
+  public void handle(Request request, Response response, Context context) {
     String script = request.getBodyStringUtf8();
-    String scriptId = engine.deployScript(script);
+
+    String scriptId = context
+      .get(EngineImpl.class)
+      .deployScript(script);
 
     response.statusOk();
     response.bodyJson(new JsonObject().put("scriptId", scriptId));

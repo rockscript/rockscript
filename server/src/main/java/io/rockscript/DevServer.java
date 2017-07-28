@@ -15,11 +15,10 @@
  */
 package io.rockscript;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
 import io.rockscript.action.ActionOutput;
 import io.rockscript.action.http.HttpImportProvider;
 import io.rockscript.engine.*;
+import io.rockscript.netty.router.MapContext;
 
 public class DevServer extends Server {
 
@@ -31,16 +30,9 @@ public class DevServer extends Server {
     TestService testService;
     public TestServerConfiguration(TestEngine testEngine, TestService testService) {
       this.testService = testService;
-      asyncHttpServerConfiguration
-        // TODO reintroduce this in the test setup
-        // .interceptor(new ServerExceptionInterceptor())
-        .services(Guice.createInjector(new AbstractModule() {
-          @Override
-          protected void configure() {
-            bind(Engine.class).toInstance(testEngine);
-            bind(EngineImpl.class).toInstance(testEngine);
-          }
-        }));
+      this.context = new MapContext()
+        .put(Engine.class, testEngine)
+        .put(EngineImpl.class, testEngine);
     }
   }
 

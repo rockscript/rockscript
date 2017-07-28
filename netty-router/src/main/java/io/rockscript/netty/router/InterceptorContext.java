@@ -39,7 +39,7 @@ public class InterceptorContext {
     if (index<interceptors.size()) {
       interceptors.get(index).intercept(this);
     } else if (index==interceptors.size()) {
-      requestHandler.handle(request, response);
+      requestHandler.handle(request, response, asyncHttpServer.getContext());
     }
   }
 

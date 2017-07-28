@@ -15,10 +15,9 @@
  */
 package io.rockscript.command;
 
-import io.rockscript.netty.router.Request;
-import io.rockscript.netty.router.Response;
+import io.rockscript.netty.router.*;
 
 public interface Command {
 
-  void execute(Request request, Response response);
+  void execute(Request request, Response response, Context context);
 }
