@@ -27,17 +27,17 @@ public class ScriptExecution extends BlockExecution<Script> {
   int nextInternalExecutionId = 1;
   ExecutionMode executionMode;
 
-  public ScriptExecution(String scriptExecutionId, ServiceLocator serviceLocator, Script script) {
+  public ScriptExecution(String scriptExecutionId, EngineConfiguration engineConfiguration, Script script) {
     super(scriptExecutionId, script, null);
-    this.eventListener = serviceLocator.getEventListener();
+    this.eventListener = engineConfiguration.getEventListener();
     this.executionMode = ExecutionMode.EXECUTING;
-    initializeSystemVariable(serviceLocator);
+    initializeSystemVariable(engineConfiguration);
   }
 
-  private void initializeSystemVariable(ServiceLocator serviceLocator) {
+  private void initializeSystemVariable(EngineConfiguration engineConfiguration) {
     Variable systemVariable = createVariable("system");
     JsonObject systemJsonObject = new JsonObject();
-    systemJsonObject.put("import", new SystemImportAction(serviceLocator));
+    systemJsonObject.put("import", new SystemImportAction(engineConfiguration));
     systemVariable.setValue(systemJsonObject);
   }
 

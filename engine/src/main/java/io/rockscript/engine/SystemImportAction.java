@@ -20,16 +20,16 @@ import io.rockscript.action.*;
 
 public class SystemImportAction implements Action {
 
-  ServiceLocator serviceLocator;
+  EngineConfiguration engineConfiguration;
 
-  public SystemImportAction(ServiceLocator serviceLocator) {
-    this.serviceLocator = serviceLocator;
+  public SystemImportAction(EngineConfiguration engineConfiguration) {
+    this.engineConfiguration = engineConfiguration;
   }
 
   @Override
   public ActionOutput invoke(ActionInput input) {
     String url = (String) input.args.get(0);
-    JsonObject importedObject = serviceLocator.getImportResolver().get(url);
+    JsonObject importedObject = engineConfiguration.getImportResolver().get(url);
     return ActionOutput.endFunction(importedObject);
   }
 

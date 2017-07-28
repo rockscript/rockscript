@@ -40,8 +40,8 @@ public class ScriptTest {
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
   public EngineImpl createTestEngine() {
-    DevEngine engine = new DevEngine();
-    ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
+    TestEngine engine = new TestEngine();
+    ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
     JsonObject helloService = new JsonObject()
       .put("aSyncFunction", input -> {
           synchronousCapturedData.add("Execution was here");
@@ -90,15 +90,15 @@ public class ScriptTest {
     String scriptExecutionId = scriptExecution.getId();
 
     ScriptExecution reloadedScriptExecution = engine
-      .getServiceLocator()
+      .getEngineConfiguration()
       .getEventStore()
       .loadScriptExecution(scriptExecutionId);
 
     DeepComparator deepComparator = new DeepComparator()
       .ignoreField(ScriptExecution.class, "eventListener")
       .ignoreField(Script.class, "elements")
-      .ignoreField(Script.class, "serviceLocator")
-      .ignoreField(SystemImportAction.class, "serviceLocator")
+      .ignoreField(Script.class, "engineConfiguration")
+      .ignoreField(SystemImportAction.class, "engineConfiguration")
       .ignoreAnonymousField(Action.class, "val$functionHandler")
       .ignoreAnonymousField(Function.class, "arg$1");
     deepComparator.assertEquals(scriptExecution, reloadedScriptExecution);
@@ -108,7 +108,7 @@ public class ScriptTest {
     scriptExecution = engine.endWaitingActionImpl(new ScriptExecutionContext(scriptExecutionId, waitingExecutionId), null);
 
     reloadedScriptExecution = engine
-      .getServiceLocator()
+      .getEngineConfiguration()
       .getEventStore()
       .loadScriptExecution(scriptExecutionId);
 

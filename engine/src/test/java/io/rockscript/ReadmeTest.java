@@ -33,8 +33,8 @@ public class ReadmeTest {
 
   @Before
   public void createTestEngine() {
-    engine = new DevEngine();
-    ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
+    engine = new TestEngine();
+    ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
     JsonObject httpService = new JsonObject()
         .put("get", functionInput -> ActionOutput.endFunction());
     importResolver.add("core/http", httpService);

@@ -26,7 +26,7 @@ public class Script extends SourceElements {
   static Logger log = LoggerFactory.getLogger(Script.class);
 
   String id;
-  ServiceLocator serviceLocator;
+  EngineConfiguration engineConfiguration;
   List<ScriptElement> elements;
 
   public Script(Integer index, Location location) {
@@ -38,12 +38,12 @@ public class Script extends SourceElements {
     throw new RuntimeException("Use Script.start(...) instead");
   }
 
-  public ServiceLocator getServiceLocator() {
-    return serviceLocator;
+  public EngineConfiguration getEngineConfiguration() {
+    return engineConfiguration;
   }
 
-  public void setServiceLocator(ServiceLocator serviceLocator) {
-    this.serviceLocator = serviceLocator;
+  public void setEngineConfiguration(EngineConfiguration engineConfiguration) {
+    this.engineConfiguration = engineConfiguration;
   }
 
   public ScriptElement findScriptElement(int executableIndex) {

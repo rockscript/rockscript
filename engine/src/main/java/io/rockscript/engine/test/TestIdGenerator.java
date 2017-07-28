@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.engine.test;
 
-package io.rockscript;
+import io.rockscript.engine.EngineConfiguration;
+import io.rockscript.engine.IdGenerator;
 
-import java.util.List;
+public class TestIdGenerator implements IdGenerator {
 
-import io.rockscript.engine.*;
+  int nextId = 1;
+  String prefix;
 
-public interface Engine {
+  public TestIdGenerator(EngineConfiguration engineConfiguration, String prefix) {
+    this.prefix = prefix;
+  }
 
-  String deployScript(String scriptText);
+  @Override
+  public String createId() {
+    return prefix+Integer.toString(nextId++);
+  }
 
-  String startScriptExecution(String scriptId);
-
-  void endWaitingAction(ScriptExecutionContext context);
-
-  void endWaitingAction(ScriptExecutionContext context, Object result);
-
-  EngineConfiguration getEngineConfiguration();
-
-  List<ScriptExecution> recoverCrashedScriptExecutions();
 }

@@ -34,8 +34,8 @@ public class ObjectLiteralExpressionTest {
   List<Object> capturedValues = new ArrayList<>();
 
   public EngineImpl createTestEngine() {
-    DevEngine engine = new DevEngine();
-    ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
+    TestEngine engine = new TestEngine();
+    ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
     JsonObject helloService = new JsonObject()
       .put("assertLiteralValue", input -> {
           capturedValues.add(input.args.get(0));

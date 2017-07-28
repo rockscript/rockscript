@@ -28,8 +28,8 @@ public abstract class ExecutionEvent<T extends Execution> implements Event {
     return execution;
   }
 
-  public ServiceLocator getServiceLocator() {
-    return execution.getScript().getServiceLocator();
+  public EngineConfiguration getServiceLocator() {
+    return execution.getScript().getEngineConfiguration();
   }
 
   public abstract ExecutionEventJson toJson();

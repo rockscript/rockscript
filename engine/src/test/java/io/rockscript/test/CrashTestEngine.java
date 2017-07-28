@@ -17,32 +17,32 @@
 package io.rockscript.test;
 
 import com.google.inject.*;
-import io.rockscript.DevEngine;
+import io.rockscript.TestEngine;
 import io.rockscript.engine.*;
+import io.rockscript.engine.test.TestEngineConfiguration;
 
-public class CrashDevEngine extends DevEngine {
+import static jdk.nashorn.internal.objects.NativeFunction.bind;
 
-  @Override
-  protected Module createGuiceModule() {
-    return new CrashDevEngineModule();
-  }
+public class CrashTestEngine extends TestEngine {
 
-  public static class CrashDevEngineModule extends DevEngineModule {
-    @Override
-    protected void configureEventListener() {
-      bind(EventListener.class).to(CrashEventListener.class).in(Singleton.class);
-    }
+  public CrashTestEngine() {
+    super(new TestEngineConfiguration() {
+      /*constructor*/{
+        /* super() */
+        this.eventListener = new CrashEventListener(this.eventListener);
+      }
+    });
   }
 
   public static class CrashEventListener implements EventListener {
     boolean throwing = false;
     int eventsWithoutCrash;
     int eventCount;
-    @Inject
-    EventStore target;
+    EventListener target;
 
-    public CrashEventListener() {
+    public CrashEventListener(EventListener target) {
       this.eventCount = 0;
+      this.target = target;
     }
 
     public void throwAfterEventCount(int eventsWithoutCrash) {

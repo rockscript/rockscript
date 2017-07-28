@@ -35,7 +35,7 @@ public class EventsHandler implements RequestHandler {
   @Override
   public void handle(Request request, Response response) {
     List<EventJson> events = engine
-      .getServiceLocator()
+      .getEngineConfiguration()
       .getEventStore()
       .getEvents();
 

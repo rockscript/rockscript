@@ -39,18 +39,18 @@ public class ServerTest extends AbstractServerTest {
   public void setUp() {
     super.setUp();
     if (server==null) {
-      DevEngine devEngine = createTestEngine();
-      testService = new TestService(devEngine);
-      server = new DevServer(devEngine, testService);
+      TestEngine testEngine = createTestEngine();
+      testService = new TestService(testEngine);
+      server = new DevServer(testEngine, testService);
       server.startup();
     } else {
       testService.reset();
     }
   }
 
-  static DevEngine createTestEngine() {
-    DevEngine engine = new DevEngine();
-    engine.getServiceLocator()
+  static TestEngine createTestEngine() {
+    TestEngine engine = new TestEngine();
+    engine.getEngineConfiguration()
       .getImportResolver()
       .add("rockscript.io/test-service", new JsonObject()
         .put("doLongRunning", input -> {

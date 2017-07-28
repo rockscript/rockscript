@@ -23,13 +23,13 @@ import io.rockscript.engine.*;
 
 public class DevServer extends Server {
 
-  public DevServer(DevEngine devEngine, TestService testService) {
-    super(new TestServerConfiguration(devEngine, testService));
+  public DevServer(TestEngine testEngine, TestService testService) {
+    super(new TestServerConfiguration(testEngine, testService));
   }
 
   public static class TestServerConfiguration extends ServerConfiguration {
     TestService testService;
-    public TestServerConfiguration(DevEngine devEngine, TestService testService) {
+    public TestServerConfiguration(TestEngine testEngine, TestService testService) {
       this.testService = testService;
       asyncHttpServerConfiguration
         // TODO reintroduce this in the test setup
@@ -37,23 +37,23 @@ public class DevServer extends Server {
         .services(Guice.createInjector(new AbstractModule() {
           @Override
           protected void configure() {
-            bind(Engine.class).toInstance(devEngine);
-            bind(EngineImpl.class).toInstance(devEngine);
+            bind(Engine.class).toInstance(testEngine);
+            bind(EngineImpl.class).toInstance(testEngine);
           }
         }));
     }
   }
 
   public static void main(String[] args) {
-    DevEngine devEngine = new DevEngine();
-    TestService testService = new TestService(devEngine);
-    configureTestEngine(devEngine, testService);
-    DevServer server = new DevServer(devEngine, testService);
+    TestEngine testEngine = new TestEngine();
+    TestService testService = new TestService(testEngine);
+    configureTestEngine(testEngine, testService);
+    DevServer server = new DevServer(testEngine, testService);
     server.startup();
   }
 
-  private static void configureTestEngine(DevEngine devEngine, TestService testService) {
-    ImportResolver importResolver = devEngine.getServiceLocator().getImportResolver();
+  private static void configureTestEngine(TestEngine testEngine, TestService testService) {
+    ImportResolver importResolver = testEngine.getEngineConfiguration().getImportResolver();
     importResolver
       .add("rockscript.io/test-service", new JsonObject()
         .put("doLongRunning", input -> {

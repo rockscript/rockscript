@@ -5,7 +5,7 @@ import java.io.IOException;
 import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.ImportResolver;
 import io.rockscript.engine.JsonObject;
-import io.rockscript.DevEngine;
+import io.rockscript.TestEngine;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,13 +13,13 @@ import static org.junit.Assert.assertEquals;
 
 public class ResponseTest {
 
-  private DevEngine engine;
+  private TestEngine engine;
   private Object answer;
 
   @Before
   public void setup() throws Exception {
-    engine = new DevEngine();
-    ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
+    engine = new TestEngine();
+    ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
     JsonObject answersService = new JsonObject()
       .put("ask", input -> {
           String body = "{ \"answer\": 42 }";

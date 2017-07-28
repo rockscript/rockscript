@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.google.common.net.MediaType;
 import io.rockscript.engine.*;
-import io.rockscript.DevEngine;
+import io.rockscript.TestEngine;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,13 +15,13 @@ import static org.junit.Assert.*;
 public class HttpActionTest {
 
   private EventStore eventStore;
-  private DevEngine engine;
+  private TestEngine engine;
 
   @Before
   public void setup() throws Exception {
-    engine = new DevEngine();
-    eventStore = engine.getServiceLocator().getEventStore();
-    ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
+    engine = new TestEngine();
+    eventStore = engine.getEngineConfiguration().getEventStore();
+    ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
     // TODO this should move into some EngineConfiguration thorugh ServiceLoader
     new HttpImportProvider().provideImport(importResolver);
   }

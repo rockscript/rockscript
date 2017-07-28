@@ -54,13 +54,12 @@ public class EventStore implements EventListener {
       .typeName(new TypeToken<PropertyDereferencedEventJson>(){}, "propertyDereferenced");
   }
 
-  @Inject
-  ScriptStore scriptStore;
-
-  @Inject
-  ServiceLocator serviceLocator;
-
+  EngineConfiguration engineConfiguration;
   List<EventJson> events = new ArrayList<>();
+
+  public EventStore(EngineConfiguration engineConfiguration) {
+    this.engineConfiguration = engineConfiguration;
+  }
 
   @Override
   public void handle(Event event) {
@@ -139,12 +138,12 @@ public class EventStore implements EventListener {
   private ScriptExecution recreateScriptExecution(List<ExecutionEventJson> eventJsons, String scriptExecutionId) {
     String scriptId = findScriptId(eventJsons);
     ScriptException.throwIfNull(scriptId, "Script id not found for scriptExecutionId: %s", scriptExecutionId);
-    Script script = serviceLocator
+    Script script = engineConfiguration
       .getScriptStore()
       .loadScript(scriptId);
     ScriptException.throwIfNull(scriptId, "Script not found for scriptId: %s", scriptId);
 
-    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, serviceLocator, script);
+    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, engineConfiguration, script);
 
     EventListener originalEventListener = scriptExecution.getEventListener();
     LoadingWrapperEventListener loadingWrapperEventListener = new LoadingWrapperEventListener(scriptExecution, originalEventListener, eventJsons);

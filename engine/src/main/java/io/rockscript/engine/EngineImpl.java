@@ -21,38 +21,16 @@ import java.util.List;
 
 import com.google.inject.*;
 import io.rockscript.Engine;
-
-import static jdk.nashorn.internal.objects.NativeFunction.bind;
+import io.rockscript.engine.test.TestLockService;
 
 public abstract class EngineImpl implements Engine {
 
-  protected ServiceLocator serviceLocator;
+  protected EngineConfiguration engineConfiguration;
 
-  public EngineImpl() {
-    Injector serviceInjector = Guice.createInjector(createGuiceModule());
-    this.serviceLocator = serviceInjector.getInstance(ServiceLocator.class);
+  public EngineImpl(EngineConfiguration engineConfiguration) {
+    this.engineConfiguration = engineConfiguration;
+    this.engineConfiguration.throwIfNotProperlyConfigured();
   }
-
-  protected abstract Module createGuiceModule();
-
-  public static class EngineModule extends AbstractModule {
-
-    @Override
-    protected void configure() {
-      bind(ServiceLocator.class).toInstance(new ServiceLocator());
-      bind(EventStore.class).toInstance(new EventStore());
-      bind(ScriptStore.class).toInstance(new ScriptStore());
-      bind(ImportResolver.class).toInstance(new ImportResolver());
-      bind(LockService.class).to(LockServiceImpl.class).in(Singleton.class);
-
-      configureEventListener();
-    }
-
-    protected void configureEventListener() {
-      bind(EventListener.class).to(EventStore.class).in(Singleton.class);
-    }
-  }
-
 
   public String deployScript(String scriptText) {
     Script script = deployScriptImpl(scriptText);
@@ -64,11 +42,11 @@ public abstract class EngineImpl implements Engine {
   }
 
   public Script deployScriptImpl(String scriptText) {
-    String scriptId = serviceLocator.getScriptIdGenerator().createId();
+    String scriptId = engineConfiguration.getScriptIdGenerator().createId();
     Script script = parseScript(scriptText);
     script.setId(scriptId);
     storeScript(script, scriptText);
-    serviceLocator
+    engineConfiguration
       .getEventStore()
       .handle(new ScriptDeployedEvent(script, scriptText));
     return script;
@@ -76,12 +54,12 @@ public abstract class EngineImpl implements Engine {
 
   protected Script parseScript(String scriptText) {
     Script script = Parse.parse(scriptText);
-    script.setServiceLocator(serviceLocator);
+    script.setEngineConfiguration(engineConfiguration);
     return script;
   }
 
   private void storeScript(Script script, String scriptText) {
-    serviceLocator
+    engineConfiguration
       .getScriptStore()
       .saveScript(script, scriptText);
   }
@@ -92,17 +70,17 @@ public abstract class EngineImpl implements Engine {
   }
 
   public ScriptExecution startScriptExecutionImpl(String scriptId) {
-    Script script = serviceLocator
+    Script script = engineConfiguration
       .getScriptStore()
       .loadScript(scriptId);
 
-    String scriptExecutionId = serviceLocator
+    String scriptExecutionId = engineConfiguration
         .getScriptExecutionIdGenerator()
         .createId();
 
-    ScriptExecution scriptState = new ScriptExecution(scriptExecutionId, serviceLocator, script);
+    ScriptExecution scriptState = new ScriptExecution(scriptExecutionId, engineConfiguration, script);
 
-    serviceLocator
+    engineConfiguration
       .getLockService()
       .newScriptExecution(scriptState, "localhost");
 
@@ -122,7 +100,7 @@ public abstract class EngineImpl implements Engine {
   }
 
   public ScriptExecution endWaitingActionImpl(ScriptExecutionContext context, Object result) {
-    ScriptExecution scriptExecution = serviceLocator
+    ScriptExecution scriptExecution = engineConfiguration
       .getEventStore()
       .loadScriptExecution(context.scriptExecutionId);
 
@@ -135,13 +113,13 @@ public abstract class EngineImpl implements Engine {
     return scriptExecution;
   }
 
-  public ServiceLocator getServiceLocator() {
-    return serviceLocator;
+  public EngineConfiguration getEngineConfiguration() {
+    return engineConfiguration;
   }
 
   @Override
   public List<ScriptExecution> recoverCrashedScriptExecutions() {
-    return serviceLocator
+    return engineConfiguration
       .getEventStore()
       .recoverCrashedScriptExecutions();
   }

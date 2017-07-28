@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript.engine.test;
 
 import java.util.*;
 
-public class LockServiceImpl implements LockService {
+import io.rockscript.engine.*;
+
+public class TestLockService implements LockService {
 
   Map<String, Lock> locks = Collections.synchronizedMap(new HashMap<String, Lock>());
+
+  public TestLockService(TestEngineConfiguration testEngineConfiguration) {
+  }
 
   @Override
   public synchronized void newScriptExecution(ScriptExecution scriptExecution, String clientId) {

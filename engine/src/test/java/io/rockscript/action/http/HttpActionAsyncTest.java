@@ -23,7 +23,7 @@ import com.google.common.net.MediaType;
 import io.rockscript.action.ActionInput;
 import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.*;
-import io.rockscript.DevEngine;
+import io.rockscript.TestEngine;
 import org.asynchttpclient.BoundRequestBuilder;
 import org.asynchttpclient.DefaultAsyncHttpClient;
 import org.junit.*;
@@ -44,8 +44,8 @@ public class HttpActionAsyncTest {
 
   @Before
   public void createTestEngine() {
-    engine = new DevEngine();
-    ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
+    engine = new TestEngine();
+    ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
     JsonObject httpService = new JsonObject()
         .put("get", this::sendHttpGetRequest);
     importResolver.add("rockscript.io/http", httpService);
@@ -76,7 +76,7 @@ public class HttpActionAsyncTest {
     future.join();
 
     // Then the script result is stored in a variable.
-    EventStore eventStore = engine.getServiceLocator().getEventStore();
+    EventStore eventStore = engine.getEngineConfiguration().getEventStore();
     ScriptExecution scriptExecution = eventStore.loadScriptExecution(scriptExecutionId);
     assertNotNull(scriptExecution);
 

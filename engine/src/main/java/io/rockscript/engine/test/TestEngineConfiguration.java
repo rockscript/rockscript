@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript.engine.test;
 
-public class DevIdGenerator implements IdGenerator {
+import io.rockscript.engine.*;
 
-  int nextId = 1;
-  String prefix;
+public class TestEngineConfiguration extends EngineConfiguration {
 
-  public DevIdGenerator(String prefix) {
-    this.prefix = prefix;
-  }
-
-  @Override
-  public String createId() {
-    return prefix+Integer.toString(nextId++);
+  public TestEngineConfiguration() {
+    this.eventStore = new EventStore(this);
+    this.scriptStore = new ScriptStore(this);
+    this.eventListener = this.eventStore;
+    this.scriptIdGenerator = new TestIdGenerator(this, "s");
+    this.scriptExecutionIdGenerator = new TestIdGenerator(this, "e");
+    this.lockService = new TestLockService(this);
+    this.importResolver = new ImportResolver(this);
   }
 
 }

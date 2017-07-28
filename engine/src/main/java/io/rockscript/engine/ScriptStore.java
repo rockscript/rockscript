@@ -23,6 +23,9 @@ public class ScriptStore {
 
   Map<String, Script> scripts = new HashMap<>();
 
+  public ScriptStore(EngineConfiguration engineConfiguration) {
+  }
+
   public Script loadScript(String scriptId) {
     return scripts.get(scriptId);
   }

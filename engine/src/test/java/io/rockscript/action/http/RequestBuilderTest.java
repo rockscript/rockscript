@@ -4,7 +4,7 @@ import java.util.List;
 
 import io.rockscript.action.*;
 import io.rockscript.engine.*;
-import io.rockscript.DevEngine;
+import io.rockscript.TestEngine;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 public class RequestBuilderTest {
 
   private EventStore eventStore;
-  private DevEngine engine;
+  private TestEngine engine;
 
   private static class RequestBuilderAction implements Action {
 
@@ -25,9 +25,9 @@ public class RequestBuilderTest {
 
   @Before
   public void setup() throws Exception {
-    engine = new DevEngine();
-    eventStore = engine.getServiceLocator().getEventStore();
-    ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
+    engine = new TestEngine();
+    eventStore = engine.getEngineConfiguration().getEventStore();
+    ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
     JsonObject httpService = new JsonObject().put("request", new RequestBuilderAction());
     importResolver.add("rockscript.io/http", httpService);
   }

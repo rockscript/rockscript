@@ -21,7 +21,7 @@ import java.util.*;
 import io.rockscript.Engine;
 import io.rockscript.action.*;
 import io.rockscript.engine.*;
-import io.rockscript.DevEngine;
+import io.rockscript.TestEngine;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -44,9 +44,9 @@ public class HttpWorkerTest {
 
   @Test
   public void testAsyncExecution() {
-    DevEngine engine = new DevEngine();
+    TestEngine engine = new TestEngine();
     HttpActionWorker httpActionWorker = new HttpActionWorker(engine);
-    ImportResolver importResolver = engine.getServiceLocator().getImportResolver();
+    ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
     JsonObject http = new JsonObject()
       .put("get", input -> {
         httpActionWorker.addActionInput(input);

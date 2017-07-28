@@ -18,25 +18,15 @@ package io.rockscript;
 
 import com.google.inject.*;
 import io.rockscript.engine.*;
+import io.rockscript.engine.test.TestEngineConfiguration;
 
-public class DevEngine extends EngineImpl implements Engine {
+public class TestEngine extends EngineImpl implements Engine {
 
-  protected Module createGuiceModule() {
-    return new DevEngineModule();
+  public TestEngine() {
+    super(new TestEngineConfiguration());
   }
 
-  public static class DevEngineModule extends EngineModule {
-    @Override
-    protected void configure() {
-      super.configure();
-
-      bind(IdGenerator.class)
-        .annotatedWith(IdGenerator.Script.class)
-        .toInstance(new DevIdGenerator("s"));
-
-      bind(IdGenerator.class)
-        .annotatedWith(IdGenerator.ScriptExecution.class)
-        .toInstance(new DevIdGenerator("e"));
-    }
+  protected TestEngine(EngineConfiguration engineConfiguration) {
+    super(engineConfiguration);
   }
 }
