@@ -18,17 +18,7 @@ package io.rockscript.engine;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import com.google.inject.BindingAnnotation;
-
 public interface IdGenerator {
-
-  @BindingAnnotation
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface Script {}
-
-  @BindingAnnotation
-  @Retention(RetentionPolicy.RUNTIME)
-  public @interface ScriptExecution {}
 
   String createId();
 }

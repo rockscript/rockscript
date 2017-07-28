@@ -4,9 +4,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
 
-import com.google.common.net.MediaType;
-import io.rockscript.engine.*;
 import io.rockscript.TestEngine;
+import io.rockscript.engine.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -55,7 +54,7 @@ public class HttpActionTest {
 
     // Add the response contains the expected data
     assertEquals(HttpURLConnection.HTTP_OK, httpResponse.status);
-    assertEquals(MediaType.HTML_UTF_8.toString(), httpResponse.contentType());
+    assertEquals(MediaTypes.HTML_UTF_8, httpResponse.contentType());
     assertTrue(httpResponse.textBody.contains("<title>RockScript"));
   }
 
@@ -88,7 +87,7 @@ public class HttpActionTest {
 
     // Add the response contains the expected data
     assertEquals(HttpURLConnection.HTTP_OK, httpResponse.status);
-    assertEquals(MediaType.JSON_UTF_8.toString(), httpResponse.contentType());
+    assertEquals(MediaTypes.JSON_UTF_8, httpResponse.contentType());
     assertTrue(httpResponse.json().containsKey("name"));
     assertEquals("RockScript", httpResponse.json().get("name"));
   }

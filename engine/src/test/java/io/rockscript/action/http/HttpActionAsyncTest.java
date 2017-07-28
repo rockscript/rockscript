@@ -18,12 +18,10 @@ package io.rockscript.action.http;
 
 import java.util.concurrent.CompletableFuture;
 
-import com.google.common.net.HttpHeaders;
-import com.google.common.net.MediaType;
+import io.rockscript.TestEngine;
 import io.rockscript.action.ActionInput;
 import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.*;
-import io.rockscript.TestEngine;
 import org.asynchttpclient.BoundRequestBuilder;
 import org.asynchttpclient.DefaultAsyncHttpClient;
 import org.junit.*;
@@ -53,7 +51,7 @@ public class HttpActionAsyncTest {
 
   private ActionOutput sendHttpGetRequest(ActionInput input) {
     BoundRequestBuilder request = httpClient.prepareGet(input.args.get(0).toString())
-        .setHeader(HttpHeaders.ACCEPT.toString(), MediaType.JSON_UTF_8.toString());
+        .setHeader(HttpHeaders.ACCEPT.toString(), MediaTypes.JSON_UTF_8);
 
     future = request.execute()
         .toCompletableFuture()
@@ -88,7 +86,7 @@ public class HttpActionAsyncTest {
     assertEquals(200, response.statusCode);
     assertEquals("OK", response.statusText);
     assertEquals("GitHub.com", response.headers.get("Server").get(0));
-    assertEquals(MediaType.JSON_UTF_8.toString(), response.contentType);
+    assertEquals(MediaTypes.JSON_UTF_8, response.contentType);
     assertTrue(response.body.contains("\"name\":\"RockScript\""));
   }
 }

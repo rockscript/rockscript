@@ -16,7 +16,6 @@
  */
 package io.rockscript.test;
 
-import com.google.inject.*;
 import io.rockscript.TestEngine;
 import io.rockscript.engine.*;
 import io.rockscript.engine.test.TestEngineConfiguration;

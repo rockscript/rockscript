@@ -19,18 +19,14 @@ package io.rockscript.engine;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.inject.Inject;
 import io.rockscript.action.ImportJsonObject;
 import io.rockscript.engine.test.TestEngineConfiguration;
 
 public class ImportResolver {
 
-  @Inject
-  EngineConfiguration engineConfiguration;
-
   Map<String,JsonObject> importObjects = new HashMap<>();
 
-  public ImportResolver(TestEngineConfiguration testEngineConfiguration) {
+  public ImportResolver(EngineConfiguration engineConfiguration) {
   }
 
   public ImportResolver add(String url, JsonObject importObject) {

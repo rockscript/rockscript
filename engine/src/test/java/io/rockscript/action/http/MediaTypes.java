@@ -13,19 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.action.http;
 
-package io.rockscript;
+public interface MediaTypes {
 
-import io.rockscript.engine.*;
-import io.rockscript.engine.test.TestEngineConfiguration;
+  String JSON_UTF_8 = "application/json; charset=utf-8";
+  String HTML_UTF_8 = "text/html; charset=utf-8";
 
-public class TestEngine extends EngineImpl implements Engine {
-
-  public TestEngine() {
-    super(new TestEngineConfiguration());
-  }
-
-  protected TestEngine(EngineConfiguration engineConfiguration) {
-    super(engineConfiguration);
-  }
 }

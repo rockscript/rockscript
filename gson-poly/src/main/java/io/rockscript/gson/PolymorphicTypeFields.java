@@ -20,9 +20,9 @@ import java.util.*;
 
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
+import com.google.gson.internal.$Gson$Types;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.*;
-import com.google.inject.internal.MoreTypes;
 
 public class PolymorphicTypeFields {
 
@@ -102,7 +102,7 @@ public class PolymorphicTypeFields {
       }
       if (anyParameterHasGenerics) {
         Type rawType = parameterizedFieldType.getRawType();
-        return new MoreTypes.ParameterizedTypeImpl(null, rawType, actualTypeParameters);
+        return new ParameterizedTypeImpl(null, rawType, actualTypeParameters);
       }
     }
     return fieldType;

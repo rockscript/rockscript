@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import com.google.inject.Inject;
 import io.rockscript.action.Action;
 import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import org.slf4j.Logger;

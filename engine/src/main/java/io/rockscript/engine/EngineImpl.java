@@ -19,7 +19,6 @@ package io.rockscript.engine;
 import java.io.File;
 import java.util.List;
 
-import com.google.inject.*;
 import io.rockscript.Engine;
 import io.rockscript.engine.test.TestLockService;
 

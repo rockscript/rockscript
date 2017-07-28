@@ -18,8 +18,6 @@ package io.rockscript.engine;
 
 import java.lang.reflect.Field;
 
-import com.google.inject.*;
-
 public class EngineConfiguration {
 
   protected EventStore eventStore;

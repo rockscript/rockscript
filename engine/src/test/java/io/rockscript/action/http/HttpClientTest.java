@@ -19,8 +19,6 @@ package io.rockscript.action.http;
 import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
-import com.google.common.net.HttpHeaders;
-import com.google.common.net.MediaType;
 import org.asynchttpclient.*;
 import org.asynchttpclient.Response;
 import org.junit.*;
@@ -44,7 +42,7 @@ public class HttpClientTest {
   public void testGetRequest() throws Exception {
     // Given an HTTP request for the GitHub API
     BoundRequestBuilder request = httpClient.prepareGet(ORGANISATION_URL)
-        .setHeader(HttpHeaders.ACCEPT.toString(), MediaType.JSON_UTF_8.toString());
+        .setHeader(HttpHeaders.ACCEPT.toString(), MediaTypes.JSON_UTF_8);
 
     // When I execute the request
     ListenableFuture<org.asynchttpclient.Response> responseFuture = request.execute();
@@ -57,7 +55,7 @@ public class HttpClientTest {
 
     // Then the response has the expected data.
     assertEquals(HttpURLConnection.HTTP_OK, response.getStatusCode());
-    assertEquals(MediaType.JSON_UTF_8.toString(), response.getHeader(HttpHeaders.CONTENT_TYPE));
+    assertEquals(MediaTypes.JSON_UTF_8, response.getHeader(HttpHeaders.CONTENT_TYPE));
     assertTrue(response.getResponseBody().contains("\"name\":\"RockScript\""));
   }
 
@@ -68,7 +66,7 @@ public class HttpClientTest {
   public void testGetRequestWithEnd() throws Exception {
     // Given an HTTP request for the GitHub API
     BoundRequestBuilder request = httpClient.prepareGet(ORGANISATION_URL)
-        .setHeader(HttpHeaders.ACCEPT.toString(), MediaType.JSON_UTF_8.toString());
+        .setHeader(HttpHeaders.ACCEPT.toString(), MediaTypes.JSON_UTF_8);
 
     // When I execute the request
     CompletableFuture<Response> future = request.execute().toCompletableFuture()
