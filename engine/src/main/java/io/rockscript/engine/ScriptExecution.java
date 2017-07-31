@@ -35,10 +35,15 @@ public class ScriptExecution extends BlockExecution<Script> {
   }
 
   private void initializeSystemVariable(EngineConfiguration engineConfiguration) {
-    Variable systemVariable = createVariable("system");
     JsonObject systemJsonObject = new JsonObject();
     systemJsonObject.put("import", new SystemImportAction(engineConfiguration));
-    systemVariable.setValue(systemJsonObject);
+    createVariable("system")
+      .setValue(systemJsonObject);
+  }
+
+  void setInput(Object input) {
+    JsonObject systemJsonObject = (JsonObject) getVariable("system").getValue();
+    systemJsonObject.put("input", input);
   }
 
   public String createInternalExecutionId() {
@@ -47,12 +52,6 @@ public class ScriptExecution extends BlockExecution<Script> {
 
   @Override
   public void start() {
-    dispatchAndExecute(new ScriptStartedEvent(this));
-    // Executing the event will continue with this.startExecute()
-  }
-
-  // Continuation of start
-  void startExecute() {
     executeNextStatement();
   }
 

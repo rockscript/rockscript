@@ -178,7 +178,9 @@ public class DeepComparator {
     Map<Object, Object> mapA = new HashMap<Object, Object>((Map<Object, Object>) a);
     Map<Object, Object> mapB = new HashMap<Object, Object>((Map<Object, Object>) b);
     if (mapA.size()!=mapB.size()) {
-      throw new RuntimeException("Maps not same size: "+mapA.size()+"!="+mapB.size()+" <- "+path.toString());
+      throw new RuntimeException("Maps not same size: "+path.toString()+" \n"+
+                                 mapA.size()+"!="+mapB.size()+"\n"+
+                                 mapA+"!="+mapB);
     }
     for (Object key: mapA.keySet()) {
       path.push("['"+key+"']");
@@ -188,9 +190,10 @@ public class DeepComparator {
   }
 
   private void ok() {
-    String okMsg = "== "+getPathString()+"\n";
-    logs.append(okMsg);
-    log.debug(okMsg);
+    String okMsg = "== "+getPathString();
+    logs.append(okMsg+"\n");
+    // uncomment if you need to debug DeepComparator
+    // log.debug(okMsg);
   }
 
   private void fail(Object a, Object b) {

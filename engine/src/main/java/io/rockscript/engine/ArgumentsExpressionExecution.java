@@ -91,7 +91,8 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     Execution actionExecution = children.get(0);
     Action action = (Action) actionExecution.getResult();
     List<Object> args = collectArgs();
-    return action.invoke(new ActionInput(this, args));
+    ActionInput actionInput = new ActionInput(this, args);
+    return action.invoke(actionInput);
   }
 
   private List<Object> collectArgs() {

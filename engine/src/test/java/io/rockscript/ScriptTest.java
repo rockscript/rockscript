@@ -16,18 +16,20 @@
  */
 package io.rockscript;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 
 import io.rockscript.action.Action;
 import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.*;
 import io.rockscript.test.DeepComparator;
+import io.rockscript.test.ScriptExecutionComparator;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.rockscript.util.Maps.entry;
+import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -44,7 +46,6 @@ public class ScriptTest {
     ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
     JsonObject helloService = new JsonObject()
       .put("aSyncFunction", input -> {
-          synchronousCapturedData.add("Execution was here");
           synchronousCapturedData.add(input.args.get(0));
           return ActionOutput.endFunction();})
       .put("anAsyncFunction", input -> {
@@ -65,22 +66,50 @@ public class ScriptTest {
         "helloService.aSyncFunction('hello');")
       .getId();
 
+    log.debug("Starting script...");
     String scriptExecutionId = engine
       .startScriptExecution(scriptId)
       .getId();
 
-    assertEquals("Execution was here", synchronousCapturedData.get(0));
-    assertEquals(5d, synchronousCapturedData.get(1));
+    assertEquals(5d, synchronousCapturedData.get(0));
+    assertEquals(1, synchronousCapturedData.size());
+
+    log.debug("Ending action...");
+    String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
+    assertNotNull(waitingExecutionId);
+    ScriptExecutionContext actionExecutionPosition = new ScriptExecutionContext(scriptExecutionId, waitingExecutionId);
+    engine.endWaitingAction(actionExecutionPosition);
+
+    assertEquals("hello", synchronousCapturedData.get(1));
     assertEquals(2, synchronousCapturedData.size());
+  }
+
+  @Test
+  public void testScriptInput() {
+    String scriptId = engine
+      .deployScript(
+        "var helloService = system.import('example.com/hello'); \n" +
+        "helloService.aSyncFunction(system.input.greetingOne); \n"+
+        "helloService.anAsyncFunction(); \n" +
+        "helloService.aSyncFunction(system.input.greetingTwo);")
+      .getId();
+
+    String scriptExecutionId = engine
+      .startScriptExecution(scriptId, hashMap(
+          entry("greetingOne", "hello"),
+          entry("greetingTwo", "hi")
+      ))
+      .getId();
+
+    assertEquals("hello", synchronousCapturedData.get(0));
 
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
     assertNotNull(waitingExecutionId);
+    ScriptExecutionContext actionExecutionPosition = new ScriptExecutionContext(scriptExecutionId, waitingExecutionId);
+    engine.endWaitingAction(actionExecutionPosition);
 
-    engine.endWaitingAction(new ScriptExecutionContext(scriptExecutionId, waitingExecutionId));
-
-    assertEquals("Execution was here", synchronousCapturedData.get(2));
-    assertEquals("hello", synchronousCapturedData.get(3));
-    assertEquals(4, synchronousCapturedData.size());
+    // This tests that the input is still present after serialization/deserialization
+    assertEquals("hi", synchronousCapturedData.get(1));
   }
 
   @Test
@@ -100,16 +129,10 @@ public class ScriptTest {
     ScriptExecution reloadedScriptExecution = engine
       .getEngineConfiguration()
       .getEventStore()
-      .loadScriptExecution(scriptExecutionId);
+      .findScriptExecutionById(scriptExecutionId);
 
-    DeepComparator deepComparator = new DeepComparator()
-      .ignoreField(ScriptExecution.class, "eventListener")
-      .ignoreField(Script.class, "elements")
-      .ignoreField(Script.class, "engineConfiguration")
-      .ignoreField(SystemImportAction.class, "engineConfiguration")
-      .ignoreAnonymousField(Action.class, "val$functionHandler")
-      .ignoreAnonymousField(Function.class, "arg$1");
-    deepComparator.assertEquals(scriptExecution, reloadedScriptExecution);
+    new ScriptExecutionComparator()
+      .assertEquals(scriptExecution, reloadedScriptExecution);
 
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
 
@@ -119,9 +142,9 @@ public class ScriptTest {
     reloadedScriptExecution = engine
       .getEngineConfiguration()
       .getEventStore()
-      .loadScriptExecution(scriptExecutionId);
+      .findScriptExecutionById(scriptExecutionId);
 
-    deepComparator.assertEquals(scriptExecution, reloadedScriptExecution);
+    new ScriptExecutionComparator()
+      .assertEquals(scriptExecution, reloadedScriptExecution);
   }
-
 }

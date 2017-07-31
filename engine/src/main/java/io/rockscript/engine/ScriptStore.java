@@ -26,7 +26,7 @@ public class ScriptStore {
   public ScriptStore(EngineConfiguration engineConfiguration) {
   }
 
-  public Script loadScript(String scriptId) {
+  public Script findScriptById(String scriptId) {
     return scripts.get(scriptId);
   }
 

@@ -15,7 +15,7 @@
  */
 package io.rockscript.engine;
 
-public class ActionEndedEventJson extends RecoverableEventJson<ActionEndedEvent> {
+public class ActionEndedEventJson extends ExecutableEventJson<ActionEndedEvent> {
 
   // TODO Is there a better way to access this from HttpActionWorkQueueTest than public or getter access?
   public Object result;

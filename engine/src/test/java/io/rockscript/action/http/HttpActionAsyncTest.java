@@ -81,7 +81,7 @@ public class HttpActionAsyncTest {
 
     // Then the script result is stored in a variable.
     EventStore eventStore = engine.getEngineConfiguration().getEventStore();
-    ScriptExecution scriptExecution = eventStore.loadScriptExecution(scriptExecutionId);
+    ScriptExecution scriptExecution = eventStore.findScriptExecutionById(scriptExecutionId);
     assertNotNull(scriptExecution);
 
     Variable organisation = scriptExecution.getVariable("organisation");

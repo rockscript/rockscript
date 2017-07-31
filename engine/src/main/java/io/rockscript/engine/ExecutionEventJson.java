@@ -26,7 +26,7 @@ public abstract class ExecutionEventJson<T extends ExecutionEvent> extends Event
   public ExecutionEventJson() {
   }
 
-  public ExecutionEventJson(ExecutionEvent event) {
+  public ExecutionEventJson(T event) {
     Execution execution = event.getExecution();
     ScriptExecution scriptExecution = execution.getScriptExecution();
     this.scriptId = scriptExecution.getScript().getId();

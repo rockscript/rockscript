@@ -26,9 +26,13 @@ public class TestEngineConfiguration extends EngineConfiguration {
     this.scriptStore = new ScriptStore(this);
     this.eventListener = this.eventStore;
     this.scriptIdGenerator = new TestIdGenerator(this, "s");
-    this.scriptExecutionIdGenerator = new TestIdGenerator(this, "e");
+    this.scriptExecutionIdGenerator = new TestIdGenerator(this, "se");
     this.lockService = new TestLockService(this);
-    this.importResolver = new ImportResolver(this);
+    this.importResolver = createImportResolver();
+  }
+
+  protected ImportResolver createImportResolver() {
+    return new ImportResolver(this);
   }
 
   @Override

@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.test;
 
-package io.rockscript;
+import java.util.function.Function;
 
-import java.util.List;
-
+import io.rockscript.action.Action;
 import io.rockscript.engine.*;
 
-public interface Engine {
+public class ScriptExecutionComparator extends DeepComparator {
 
-  Script deployScript(String scriptText);
-
-  ScriptExecution startScriptExecution(String scriptId);
-
-  ScriptExecution startScriptExecution(String scriptId, Object input);
-
-  ScriptExecution endWaitingAction(ScriptExecutionContext context);
-
-  ScriptExecution endWaitingAction(ScriptExecutionContext context, Object result);
-
-  EngineConfiguration getEngineConfiguration();
-
-  List<ScriptExecution> recoverCrashedScriptExecutions();
+  public ScriptExecutionComparator() {
+    ignoreField(ScriptExecution.class, "eventListener");
+    ignoreField(Execution.class, "element");
+    ignoreField(Script.class, "elements");
+    ignoreField(Script.class, "engineConfiguration");
+    ignoreField(SystemImportAction.class, "engineConfiguration");
+    ignoreAnonymousField(Action.class, "val$functionHandler");
+    ignoreAnonymousField(Action.class, "arg$1");
+    ignoreAnonymousField(Function.class, "arg$1");
+  }
 }

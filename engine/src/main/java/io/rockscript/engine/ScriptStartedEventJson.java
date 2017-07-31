@@ -15,17 +15,24 @@
  */
 package io.rockscript.engine;
 
-public class ScriptStartedEventJson extends RecoverableEventJson<ScriptStartedEvent> {
+public class ScriptStartedEventJson extends ExecutionEventJson<ScriptStartedEvent> {
+
+  Object input;
 
   public ScriptStartedEventJson() {
   }
 
   public ScriptStartedEventJson(ScriptStartedEvent scriptStartedEvent) {
     super(scriptStartedEvent);
+    this.input = scriptStartedEvent.getInput();
   }
 
   @Override
   public ScriptStartedEvent toEvent(Execution execution) {
-    return new ScriptStartedEvent((ScriptExecution) execution);
+    throw new RuntimeException("ScriptStartedEventJson normally doesn't have to be deserialized");
+  }
+
+  public Object getInput() {
+    return input;
   }
 }

@@ -16,7 +16,7 @@
 
 package io.rockscript.engine;
 
-public class ActionStartedEventJson extends RecoverableEventJson<ActionStartedEvent> {
+public class ActionStartedEventJson extends ExecutableEventJson<ActionStartedEvent> {
 
   public ActionStartedEventJson() {
   }

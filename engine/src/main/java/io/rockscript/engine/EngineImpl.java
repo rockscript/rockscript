@@ -16,11 +16,9 @@
 
 package io.rockscript.engine;
 
-import java.io.File;
 import java.util.List;
 
 import io.rockscript.Engine;
-import io.rockscript.engine.test.TestLockService;
 
 public abstract class EngineImpl implements Engine {
 
@@ -55,15 +53,23 @@ public abstract class EngineImpl implements Engine {
   }
 
   public ScriptExecution startScriptExecution(String scriptId) {
+    return startScriptExecution(scriptId, null);
+  }
+
+  public ScriptExecution startScriptExecution(String scriptId, Object input) {
     Script script = engineConfiguration
       .getScriptStore()
-      .loadScript(scriptId);
+      .findScriptById(scriptId);
 
     String scriptExecutionId = engineConfiguration
         .getScriptExecutionIdGenerator()
         .createId();
 
     ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, engineConfiguration, script);
+    scriptExecution.setInput(input);
+
+    ScriptStartedEvent scriptStartedEvent = new ScriptStartedEvent(scriptExecution, input);
+    scriptExecution.dispatch(scriptStartedEvent);
 
     engineConfiguration
       .getLockService()
@@ -83,7 +89,7 @@ public abstract class EngineImpl implements Engine {
   public ScriptExecution endWaitingAction(ScriptExecutionContext context, Object result) {
     ScriptExecution scriptExecution = engineConfiguration
       .getEventStore()
-      .loadScriptExecution(context.scriptExecutionId);
+      .findScriptExecutionById(context.scriptExecutionId);
 
     String waitingExecutionId = context.executionId;
     ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) scriptExecution

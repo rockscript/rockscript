@@ -17,27 +17,17 @@ package io.rockscript.engine.dev;
 
 import io.rockscript.DevEngine;
 import io.rockscript.Engine;
-import io.rockscript.engine.*;
-import io.rockscript.engine.test.TestIdGenerator;
-import io.rockscript.engine.test.TestLockService;
+import io.rockscript.engine.ImportResolver;
+import io.rockscript.engine.test.TestEngineConfiguration;
 
-public class DevEngineConfiguration extends EngineConfiguration {
+public class DevEngineConfiguration extends TestEngineConfiguration {
 
   public DevEngineConfiguration() {
-    // Same as TestEngineConfiguration
-    // This could be extracted in common logic, but the
-    // ordering of the intializations becomes important
-    // and that could be hard to spot.  That's why I opted
-    // to have some duplication.
-    this.eventStore = new EventStore(this);
-    this.scriptStore = new ScriptStore(this);
-    this.eventListener = this.eventStore;
-    this.scriptIdGenerator = new TestIdGenerator(this, "s");
-    this.scriptExecutionIdGenerator = new TestIdGenerator(this, "e");
-    this.lockService = new TestLockService(this);
+  }
 
-    // Different from TestEngineConfiguration
-    this.importResolver = new DevImportResolver(this);
+  @Override
+  protected ImportResolver createImportResolver() {
+    return new DevImportResolver(this);
   }
 
   @Override

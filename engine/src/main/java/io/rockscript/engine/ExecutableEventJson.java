@@ -16,12 +16,12 @@
 
 package io.rockscript.engine;
 
-public abstract class RecoverableEventJson<T extends ExecutableEvent> extends ExecutionEventJson<T> {
+public abstract class ExecutableEventJson<T extends ExecutableEvent> extends ExecutionEventJson<T> {
 
-  public RecoverableEventJson() {
+  public ExecutableEventJson() {
   }
 
-  public RecoverableEventJson(T recoverableEvent) {
-    super(recoverableEvent);
+  public ExecutableEventJson(T event) {
+    super(event);
   }
 }

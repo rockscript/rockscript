@@ -70,15 +70,6 @@ public class CrashTest {
 
     ScriptExecution expectedScriptExecutionState = createExpectedScriptExecutionState(scriptText);
 
-    DeepComparator deepComparator = new DeepComparator()
-      .ignoreField(ScriptExecution.class, "eventListener")
-      .ignoreField(Execution.class, "element")
-      .ignoreField(Script.class, "elements")
-      .ignoreField(Script.class, "engineConfiguration")
-      .ignoreField(SystemImportAction.class, "engineConfiguration")
-      .ignoreAnonymousField(Action.class, "val$functionHandler")
-      .ignoreAnonymousField(Action.class, "arg$1");
-
     int eventsWithoutCrash = 1;
     boolean crashOccurred = false;
     CrashTestEngine engine = createCrashTestEngine();
@@ -93,7 +84,7 @@ public class CrashTest {
 
         eventListener.throwAfterEventCount(eventsWithoutCrash);
 
-        log.debug("----- Starting script execution and throwing after "+eventsWithoutCrash+" events ------");
+        log.debug("\n\n----- Starting script execution and throwing after "+eventsWithoutCrash+" events ------");
         ScriptExecution scriptExecution = engine
           .startScriptExecution(scriptId);
 
@@ -110,7 +101,8 @@ public class CrashTest {
         recoveredScriptExecution.setId(null);
         expectedScriptExecutionState.setId(null);
 
-        deepComparator.assertEquals(expectedScriptExecutionState, recoveredScriptExecution);
+        new ScriptExecutionComparator()
+          .assertEquals(expectedScriptExecutionState, recoveredScriptExecution);
       }
 
     } while (crashOccurred);
