@@ -15,8 +15,6 @@
  */
 package io.rockscript.action;
 
-/** The interface to plug external function into the script engine.
- * Actions typically call microservices endpoints. */
 public interface Action {
 
   ActionOutput invoke(ActionInput input);

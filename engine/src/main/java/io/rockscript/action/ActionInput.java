@@ -18,15 +18,28 @@ package io.rockscript.action;
 import java.util.List;
 
 import io.rockscript.engine.Execution;
-import io.rockscript.engine.ScriptExecutionContext;
 
 public class ActionInput {
 
-  public final ScriptExecutionContext context;
-  public final List<Object> args;
+  String scriptExecutionId;
+  String executionId;
+  List<Object> args;
 
   public ActionInput(Execution<?> execution, List<Object> args) {
-    context = new ScriptExecutionContext(execution.getScriptExecution().getId(), execution.getId());
+    this.scriptExecutionId = execution.getScriptExecution().getId();
+    this.executionId = execution.getId();
     this.args = args;
+  }
+
+  public String getScriptExecutionId() {
+    return scriptExecutionId;
+  }
+
+  public String getExecutionId() {
+    return executionId;
+  }
+
+  public List<Object> getArgs() {
+    return args;
   }
 }

@@ -16,13 +16,11 @@
  */
 package io.rockscript;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.List;
 
-import io.rockscript.action.Action;
 import io.rockscript.action.ActionOutput;
 import io.rockscript.engine.*;
-import io.rockscript.test.DeepComparator;
 import io.rockscript.test.ScriptExecutionComparator;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -46,10 +44,10 @@ public class ScriptTest {
     ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
     JsonObject helloService = new JsonObject()
       .put("aSyncFunction", input -> {
-          synchronousCapturedData.add(input.args.get(0));
+          synchronousCapturedData.add(input.getArgs().get(0));
           return ActionOutput.endFunction();})
       .put("anAsyncFunction", input -> {
-          waitingAsyncFunctionInvocationIds.add(input.context.executionId);
+          waitingAsyncFunctionInvocationIds.add(input.getExecutionId());
           return ActionOutput.waitForFunctionToCompleteAsync();});
     importResolver.add("example.com/hello", helloService);
     return engine;
@@ -77,8 +75,7 @@ public class ScriptTest {
     log.debug("Ending action...");
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
     assertNotNull(waitingExecutionId);
-    ScriptExecutionContext actionExecutionPosition = new ScriptExecutionContext(scriptExecutionId, waitingExecutionId);
-    engine.endWaitingAction(actionExecutionPosition);
+    engine.endWaitingAction(scriptExecutionId, waitingExecutionId);
 
     assertEquals("hello", synchronousCapturedData.get(1));
     assertEquals(2, synchronousCapturedData.size());
@@ -105,8 +102,7 @@ public class ScriptTest {
 
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
     assertNotNull(waitingExecutionId);
-    ScriptExecutionContext actionExecutionPosition = new ScriptExecutionContext(scriptExecutionId, waitingExecutionId);
-    engine.endWaitingAction(actionExecutionPosition);
+    engine.endWaitingAction(scriptExecutionId, waitingExecutionId);
 
     // This tests that the input is still present after serialization/deserialization
     assertEquals("hi", synchronousCapturedData.get(1));
@@ -136,8 +132,7 @@ public class ScriptTest {
 
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
 
-    ScriptExecutionContext scriptExecutionContext = new ScriptExecutionContext(scriptExecutionId, waitingExecutionId);
-    scriptExecution = engine.endWaitingAction(scriptExecutionContext, null);
+    scriptExecution = engine.endWaitingAction(scriptExecutionId, waitingExecutionId);
 
     reloadedScriptExecution = engine
       .getEngineConfiguration()

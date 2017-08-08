@@ -44,19 +44,16 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
   }
 
   public Object getFieldValue(Object target, String identifier) {
-    if (target == null) {
-      throw new NullPointerException("Cannot evaluate null." + identifier);
-    }
     Object fieldValue = null;
-    if (target instanceof JsonReadable) {
-      JsonReadable jsonObject = (JsonReadable) target;
+    if (target instanceof JsonObject) {
+      JsonObject jsonObject = (JsonObject) target;
       fieldValue = jsonObject.get(identifier);
     } else if (target instanceof Map) {
       @SuppressWarnings("unchecked")
       Map<String,Object> map = (Map) target;
       fieldValue = map.get(identifier);
     } else {
-      throw new RuntimeException("Could not read field value from type " + target.getClass());
+      throw new RuntimeException("TODO: target=" + target);
     }
     return fieldValue;
   }

@@ -13,11 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.action.http;
+package io.rockscript.rest;
 
-public interface MediaTypes {
+import io.rockscript.Engine;
+import io.rockscript.netty.router.*;
 
-  String JSON_UTF_8 = "application/json; charset=utf-8";
-  String HTML_UTF_8 = "text/html; charset=utf-8";
+@Post("/deploy")
+public class DeployScriptHandler implements RequestHandler {
 
+  @Override
+  public void handle(Request request, Response response, Context context) {
+    String script = request.getBodyStringUtf8();
+
+    String scriptId = context
+      .get(Engine.class)
+      .deployScript(script)
+      .getId();
+
+    response.statusOk();
+    response.bodyString(scriptId);
+    response.send();
+  }
 }

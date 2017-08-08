@@ -21,7 +21,7 @@ import java.util.function.Function;
 
 import io.rockscript.action.*;
 
-public class JsonObject implements JsonReadable {
+public class JsonObject {
 
   Map<String,Object> properties = new HashMap<>();
 
@@ -38,7 +38,13 @@ public class JsonObject implements JsonReadable {
   }
 
   public JsonObject put(String propertyName, Function<ActionInput, ActionOutput> actionFunction) {
-    put(propertyName, (Action) (input) -> actionFunction.apply(input));
+    Action action = new Action() {
+      @Override
+      public ActionOutput invoke(ActionInput input) {
+        return actionFunction.apply(input);
+      }
+    };
+    put(propertyName, action);
     return this;
   }
 

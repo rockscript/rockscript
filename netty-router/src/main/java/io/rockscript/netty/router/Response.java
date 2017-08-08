@@ -83,7 +83,7 @@ public class Response {
   public Response bodyJson(Object jsonBodyObject) {
     String jsonBodyString = asyncHttpServer.getJsonHandler().toJsonString(jsonBodyObject);
     bodyString(jsonBodyString);
-    contentTypeApplicationJson();
+    headerContentTypeApplicationJson();
     return this;
   }
 
@@ -104,12 +104,12 @@ public class Response {
     return this;
   }
 
-  public Response contentTypeApplicationJson() {
-    contentType("application/json");
+  public Response headerContentTypeApplicationJson() {
+    headerContentType("application/json");
     return this;
   }
 
-  public Response contentType(String contentType) {
+  public Response headerContentType(String contentType) {
     header(CONTENT_TYPE, contentType);
     return this;
   }

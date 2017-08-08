@@ -52,10 +52,10 @@ public class CrashTest {
       .add("example.com/hello", new ImportJsonObject()
         .put("aSyncFunction", input -> {
           synchronousCapturedData.add("Execution was here");
-          synchronousCapturedData.add(input.args.get(0));
+          synchronousCapturedData.add(input.getArgs().get(0));
           return ActionOutput.endFunction();})
         .put("anAsyncFunction", input -> {
-          waitingAsyncFunctionInvocationIds.add(input.context.executionId);
+          waitingAsyncFunctionInvocationIds.add(input.getExecutionId());
           return ActionOutput.waitForFunctionToCompleteAsync();}));
   }
 

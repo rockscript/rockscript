@@ -19,20 +19,21 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import io.rockscript.Engine;
-import io.rockscript.engine.ScriptExecutionContext;
 import io.rockscript.netty.router.*;
 
 public class EndActionCommand implements Command {
 
-  ScriptExecutionContext scriptExecutionContext;
+  String scriptExecutionId;
+  String executionId;
   Object result;
 
   /** constructor for json deserialization */
   public EndActionCommand() {
   }
 
-  public EndActionCommand(ScriptExecutionContext scriptExecutionContext) {
-    this.scriptExecutionContext = scriptExecutionContext;
+  public EndActionCommand(String scriptExecutionId, String executionId) {
+    this.scriptExecutionId = scriptExecutionId;
+    this.executionId = executionId;
   }
 
   public EndActionCommand result(Object result) {
@@ -57,7 +58,7 @@ public class EndActionCommand implements Command {
   public void execute(Request request, Response response, Context context) {
     context
       .get(Engine.class)
-      .endWaitingAction(scriptExecutionContext, result);
+      .endWaitingAction(scriptExecutionId, executionId, result);
 
     response.statusOk();
     response.send();

@@ -18,18 +18,15 @@ package io.rockscript;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.rockscript.engine.*;
-import io.rockscript.handlers.*;
+import io.rockscript.handlers.CommandHandler;
+import io.rockscript.handlers.EventsHandler;
 import io.rockscript.netty.router.*;
-import io.rockscript.rest.ScriptsPostHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.rockscript.rest.DeployScriptHandler;
 
 import static io.rockscript.command.Command.createCommandsTypeAdapterFactory;
 import static io.rockscript.engine.EventJson.createEventJsonTypeAdapterFactory;
 
 public class Server {
-
-  private static Logger log = LoggerFactory.getLogger(Server.class);
 
   AsyncHttpServer asyncHttpServer;
 
@@ -37,7 +34,6 @@ public class Server {
     Gson commonGson = new GsonBuilder()
       .registerTypeAdapterFactory(createCommandsTypeAdapterFactory())
       .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
-      .registerTypeAdapter(JsonObject.class, new JsonObjectSerialiser())
       .create();
 
     EngineConfiguration engineConfiguration = serverConfiguration.getEngineConfiguration();
@@ -48,7 +44,7 @@ public class Server {
       .getAsyncHttpServerConfiguration()
       .scan(CommandHandler.class)
       .scan(EventsHandler.class)
-      .scan(ScriptsPostHandler.class)
+      .scan(DeployScriptHandler.class)
       .jsonHandler(new JsonHandlerGson(commonGson))
       .context(Engine.class, engine);
 
@@ -56,15 +52,7 @@ public class Server {
   }
 
   public void startup() {
-    log.info("Starting RockScript Server\n"
-        + "    ____            _     ____            _       _   \n"
-        + "   |  _ \\ ___   ___| | __/ ___|  ___ _ __(_)_ __ | |_ \n"
-        + "   | |_) / _ \\ / __| |/ /\\___ \\ / __| '__| | '_ \\| __|\n"
-        + "   |  _ < (_) | (__|   <  ___) | (__| |  | | |_) | |_ \n"
-        + "   |_| \\_\\___/ \\___|_|\\_\\|____/ \\___|_|  |_| .__/ \\__|\n"
-        + "                                           |_|        ");
     asyncHttpServer.startup();
-    log.info("Server started");
   }
 
   public void shutdown() {

@@ -39,7 +39,7 @@ public class TestService {
 
   public void endAction(int index, Object result) {
     ActionInput actionInput = getActionInput(index);
-    engine.endWaitingAction(actionInput.context, result);
+    engine.endWaitingAction(actionInput.getScriptExecutionId(), actionInput.getExecutionId(), result);
   }
 
   public void reset() {

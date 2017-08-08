@@ -81,19 +81,18 @@ public abstract class EngineImpl implements Engine {
   }
 
   @Override
-  public ScriptExecution endWaitingAction(ScriptExecutionContext context) {
-    return endWaitingAction(context, null);
+  public ScriptExecution endWaitingAction(String scriptExecutionId, String executionId) {
+    return endWaitingAction(scriptExecutionId, executionId, null);
   }
 
   @Override
-  public ScriptExecution endWaitingAction(ScriptExecutionContext context, Object result) {
+  public ScriptExecution endWaitingAction(String scriptExecutionId, String executionId, Object result) {
     ScriptExecution scriptExecution = engineConfiguration
       .getEventStore()
-      .findScriptExecutionById(context.scriptExecutionId);
+      .findScriptExecutionById(scriptExecutionId);
 
-    String waitingExecutionId = context.executionId;
     ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) scriptExecution
-      .findExecutionRecursive(waitingExecutionId);
+      .findExecutionRecursive(executionId);
 
     execution.endAction(result);
 

@@ -28,9 +28,9 @@ public interface Engine {
 
   ScriptExecution startScriptExecution(String scriptId, Object input);
 
-  ScriptExecution endWaitingAction(ScriptExecutionContext context);
+  ScriptExecution endWaitingAction(String scriptExecutionId, String executionId);
 
-  ScriptExecution endWaitingAction(ScriptExecutionContext context, Object result);
+  ScriptExecution endWaitingAction(String scriptExecutionId, String executionId, Object result);
 
   EngineConfiguration getEngineConfiguration();
 

@@ -28,7 +28,7 @@ public class SystemImportAction implements Action {
 
   @Override
   public ActionOutput invoke(ActionInput input) {
-    String url = (String) input.args.get(0);
+    String url = (String) input.getArgs().get(0);
     JsonObject importedObject = engineConfiguration.getImportResolver().get(url);
     return ActionOutput.endFunction(importedObject);
   }

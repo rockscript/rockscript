@@ -18,12 +18,11 @@ package io.rockscript.netty.router;
 
 import java.util.List;
 
-import com.google.gson.JsonObject;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.router.RouteResult;
 import io.netty.handler.codec.http.router.Router;
 import org.slf4j.Logger;
@@ -106,10 +105,8 @@ public class AsyncHttpServer {
       } else {
         response.statusInternalServerError();
       }
-      JsonObject body = new JsonObject();
-      body.addProperty("message", e.getMessage());
-      response.bodyJson(body);
-      response.contentTypeApplicationJson();
+      response.bodyString("{ \"message\": \"oops\" }");
+      response.headerContentTypeApplicationJson();
       response.send();
       requestException(e, ctx);
     } finally {
