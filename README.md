@@ -1,12 +1,20 @@
+<center>
 ![RockScript](docs/image/logo.png)
 
-__Orchestrate microservices in an event driven style__
+__Easy microservice orchestration__  
+__Write synchronous code and get reactive execution__
+</center>
 
 ### Why
 
-RockScript is based on JavaScript.  But the cool part is the 
-runtime engine.  All side effects of imported functions are 
-executed asynchronously.  The state of script executions can 
+RockScript solves the pain of stitching microservices together. 
+
+
+is based on JavaScript but the cool part is the 
+runtime engine.  Actions are externally defined functions 
+that are executed asynchronous.  This way all side effects 
+do not consume resources while waiting. 
+executed asynchronously.  No resources are consumed if   The state of script executions can 
 be serialized and persisted with event sourcing.  This enables 
 developers to write event driven architectures without complex 
 synchronization hassles.
@@ -28,6 +36,7 @@ java -jar server/target/rockscript.jar
 You should see output like this
 
 ```
+
 ```
 
 Next create a file called `convert-quote.rs` with the following contents
@@ -39,7 +48,7 @@ var requestbin = system.import('rockscript.io/requestbin');
 var quotes = http.get({ url: 'http://api.fixer.io/latest' });
 
 requestbin.createBin({
-  content: '1 EUR is '+quotes.body.rates.USD'
+  content: '1 EUR is '+quotes.body.rates.USD
 })
 ```
 
