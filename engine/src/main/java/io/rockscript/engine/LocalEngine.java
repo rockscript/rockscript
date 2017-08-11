@@ -17,7 +17,6 @@ package io.rockscript.engine;
 
 import java.util.*;
 
-import com.sun.istack.internal.NotNull;
 
 /** A simple, fast, self contained lock service that does not
  * coordinate lock acquisition with any other system.
@@ -92,7 +91,7 @@ public class LocalEngine implements Engine {
     return lock;
   }
 
-  public synchronized Lock acquireLock(@NotNull String scriptExecutionId) {
+  public synchronized Lock acquireLock(String scriptExecutionId) {
     Lock lock = locks.get(scriptExecutionId);
     if (lock==null) {
       lock = new Lock(scriptExecutionId);
@@ -120,7 +119,7 @@ public class LocalEngine implements Engine {
     }
   }
 
-  public synchronized void addToActionEndBacklog(@NotNull ActionEndRequest actionEndRequest) {
+  public synchronized void addToActionEndBacklog(ActionEndRequest actionEndRequest) {
     String scriptExecutionId = actionEndRequest.getScriptExecutionId();
     List<ActionEndRequest> scriptExecutionLockListeners = actionEndBacklog.get(scriptExecutionId);
     if (scriptExecutionLockListeners==null) {

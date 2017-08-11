@@ -1,23 +1,32 @@
-<div style="text-align:center">
 ![RockScript](docs/image/logo.png)
 
 __Easy microservice orchestration__  
 __Write synchronous code and get reactive execution__
-</div>
 
 ### Why
 
-RockScript solves the pain of stitching microservices together. 
+RockScript removes the pain of complex synchronization as is 
+the case with reactive systems.  This really makes it easier to 
+stitch microservices together and makes the code more readable.
 
+In RockScript __Action__s are functions that can be imported and 
+when invoked, the engine executes them asynchronously.  While the 
+engine is waiting for actions to complete, the runtime script execution 
+state is persisted with event sourcing and does not block threads or memory.
+So it's not a problem if actions take days, weeks or even months.
+This capability to wait, persist and resume executions is not found 
+in any other programming language.
 
-is based on JavaScript but the cool part is the 
-runtime engine.  Actions are externally defined functions 
-that are executed asynchronous.  This way all side effects 
-do not consume resources while waiting. 
-executed asynchronously.  No resources are consumed if   The state of script executions can 
-be serialized and persisted with event sourcing.  This enables 
-developers to write event driven architectures without complex 
-synchronization hassles.
+The coding gets easier because you don't need to work with futures 
+or callbacks to get reactive execution.
+
+Because the runtime state is persisted, script executions can recover 
+from crashes and resume from the position where the script execution 
+was stopped.
+
+Persisted script executions provide extreme visibility when it comes 
+to tracking down what happened after the facts.  This is because the 
+complete execution history is captured with event sourcing.
 
 ### Usage
 
@@ -36,7 +45,13 @@ java -jar server/target/rockscript.jar
 You should see output like this
 
 ```
-
+59,868 INFO Server -  ____            _     ____            _       _    
+59,868 INFO Server - |  _ \ ___   ___| | __/ ___|  ___ _ __(_)_ __ | |_  
+59,869 INFO Server - | |_) / _ \ / __| |/ /\___ \ / __| '__| | '_ \| __| 
+59,869 INFO Server - |  _ < (_) | (__|   <  ___) | (__| |  | | |_) | |_  
+59,869 INFO Server - |_| \_\___/ \___|_|\_\|____/ \___|_|  |_| .__/ \__| 
+59,869 INFO Server -                                         |_|         
+00,021 INFO Server - Server started on 8888
 ```
 
 Next create a file called `convert-quote.rs` with the following contents
@@ -52,10 +67,9 @@ requestbin.createBin({
 })
 ```
 
-### Why
 
-Here we list the features of zooscript that you will not find in other programming 
-or script languages.
+
+### Why
 
 * **Simplifies and jump starts your event based architecture**: Write synchronous code and 
     get asynchronous execution. 

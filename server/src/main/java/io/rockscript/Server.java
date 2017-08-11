@@ -17,7 +17,7 @@ package io.rockscript;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.rockscript.engine.EngineConfiguration;
+import io.rockscript.engine.dev.DevEngineConfiguration;
 import io.rockscript.handlers.CommandHandler;
 import io.rockscript.handlers.EventsHandler;
 import io.rockscript.netty.router.*;
@@ -40,9 +40,9 @@ public class Server {
       .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
       .create();
 
-    EngineConfiguration engineConfiguration = serverConfiguration.getEngineConfiguration();
+    DevEngineConfiguration engineConfiguration = serverConfiguration.getEngineConfiguration();
     engineConfiguration.gson(commonGson);
-    ScriptService scriptService = engineConfiguration.build();
+    ScriptService scriptService = new DevScriptService(engineConfiguration);
 
     AsyncHttpServerConfiguration asyncHttpServerConfiguration = serverConfiguration
       .getAsyncHttpServerConfiguration()
@@ -56,11 +56,11 @@ public class Server {
   }
 
   public void startup() {
-    log.info(" ____            _     ____            _       _    \n");
-    log.info("|  _ \\ ___   ___| | __/ ___|  ___ _ __(_)_ __ | |_  \n");
-    log.info("| |_) / _ \\ / __| |/ /\\___ \\ / __| '__| | '_ \\| __| \n");
-    log.info("|  _ < (_) | (__|   <  ___) | (__| |  | | |_) | |_  \n");
-    log.info("|_| \\_\\___/ \\___|_|\\_\\|____/ \\___|_|  |_| .__/ \\__| \n");
+    log.info(" ____            _     ____            _       _    ");
+    log.info("|  _ \\ ___   ___| | __/ ___|  ___ _ __(_)_ __ | |_  ");
+    log.info("| |_) / _ \\ / __| |/ /\\___ \\ / __| '__| | '_ \\| __| ");
+    log.info("|  _ < (_) | (__|   <  ___) | (__| |  | | |_) | |_  ");
+    log.info("|_| \\_\\___/ \\___|_|\\_\\|____/ \\___|_|  |_| .__/ \\__| ");
     log.info("                                        |_|         ");
     asyncHttpServer.startup();
     log.info("Server started on "+asyncHttpServer.getPort());
