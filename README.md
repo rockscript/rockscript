@@ -1,9 +1,9 @@
-<center>
+<div style="text-align:center">
 ![RockScript](docs/image/logo.png)
 
 __Easy microservice orchestration__  
 __Write synchronous code and get reactive execution__
-</center>
+</div>
 
 ### Why
 
