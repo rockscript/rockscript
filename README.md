@@ -1,39 +1,51 @@
+<div style="text-align: center;">
 ![RockScript](docs/image/logo.png)
+</div>
 
-Orchestrate microservices with event driven architecture.
+<div style="text-align: center;">
+__Orchestrate microservices with event driven architecture.__
+</div>
 
 ### Why
 
 RockScript is based on JavaScript.  But the cool part is the 
-runtime engine.  It can serialize and persist the execution 
-state with event sourcing.  This enables developers to write 
-event driven architectures without complex synchronization 
-hassles.
+runtime engine.  All side effects of imported functions are 
+executed asynchronously.  The state of script executions can 
+be serialized and persisted with event sourcing.  This enables 
+developers to write event driven architectures without complex 
+synchronization hassles.
 
 ### Usage
 
-Here's an example script:
+Build the engine with 
 
-```javascript
-var http = system.import('rockscript.io/');
-
-var http.get({ url: 'http://api.fixer.io/latest' });
- 
+```
+mvn -Pizza clean install
 ```
 
-### Positioning
+Start the server with 
 
+```
+java -jar server/target/rockscript.jar
+```
 
+You should see output like this
 
-It's similar to [OpenWhisk](http://openwhisk.org/) in terms of many concepts and offering an 
-architectural basis for on reactive, event based systems.
+```
+```
 
-It's like [IFTTT](https://ifttt.com/), but for developers.  Instead of a UI, it offers a 
-scripting language to work with actions and triggers.  Actions and triggers are 
-easy configurable interactions with an external API offers.
+Next create a file called `convert-quote.rs` with the following contents
 
-The scripting language we offer has similar capabilities 
-to [AWS step functions](https://aws.amazon.com/step-functions/).
+```javascript
+var http = system.import('rockscript.io/http');
+var requestbin = system.import('rockscript.io/requestbin');
+
+var quotes = http.get({ url: 'http://api.fixer.io/latest' });
+
+requestbin.createBin({
+  content: '1 EUR is '+quotes.body.rates.USD'
+})
+```
 
 ### Why
 
@@ -67,6 +79,58 @@ or script languages.
 * **Architectural guidance**: First wrap the external service APIs that you want to use 
     as a set of actions and triggers.  Then secondly compose the script at a higher level.
     This is a great way to divide and conquer a large software project.
+
+### Project stage
+
+RockScript is very early in its development and is does not offer any stability guarantees at this point.
+  
+We are looking for feedback and use cases.  Contact us if you're in doubt if RockScript is the
+right solution for your project.
+
+### License
+
+The RockScript runtime server is Apache License V2.  
+
+We also make the commitment that there will only be one version of the runtime server: the open source 
+one.  All its capabilities will be included in open source.  The open source engine will not be cripled 
+so that you are not forced to buy a commercial version.  Our business model is based on services and tooling 
+on top of the open source runtime engine.
+
+### Commercial offerings
+
+**RockScript consulting** gets you in depth expertise help you use RockScript in your project.  We have 
+discount pricing for consulting that helps you evaluate if RockScript is a good fit.  
+
+The **RockScript Devtool** is a web based tool that provides convenience for developers.  This tool is 
+free, but not open source.  You have to register and provide us with your contact details in order 
+to get it.  (coming soon)
+
+The **RockScript Manager** is a commercial extension of the dev tool to monitor and administer 
+production RockScript servers.  (coming later)
+
+**RockScript Service** is a SaaS version of the server and includes development tool, 
+monitoring and administration.  (coming later)  
+
+### Related technologies
+
+RockScript is an alternative for 
+
+ * [AWS step functions](https://aws.amazon.com/step-functions/).
+ * Netflix conductor
+ * Microsoft logic apps
+ 
+
+It's similar to [OpenWhisk](http://openwhisk.org/) in terms of many concepts and offering an 
+architectural basis for on reactive, event based systems.
+
+It's like [IFTTT](https://ifttt.com/), but for developers.  Instead of a UI, it offers a 
+scripting language to work with actions and triggers.  Actions and triggers are 
+easy configurable interactions with an external API offers.
+
+====
+Deprecated
+====
+
 
 ### Example usage scenarios
 

@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.util;
 
-package io.rockscript.engine;
+import java.io.InputStream;
+import java.util.Scanner;
 
-public abstract class ExecutionEvent<T extends Execution> implements Event {
+public class Io {
 
-  T execution;
+  public static String toString(InputStream inputStream) {
+    Scanner scanner = new Scanner(inputStream)
+      .useDelimiter("\\A");
 
-  @Deprecated
-  public ExecutionEvent() {
+    if (scanner.hasNext()) {
+      return scanner.next();
+    } else {
+      return "";
+    }
   }
-
-  public ExecutionEvent(T execution) {
-    this.execution = execution;
-  }
-
-  public T getExecution() {
-    return execution;
-  }
-
-  public EngineConfiguration getServiceLocator() {
-    return execution.getScript().getEngineConfiguration();
-  }
-
-  public abstract ExecutionEventJson toJson();
 }

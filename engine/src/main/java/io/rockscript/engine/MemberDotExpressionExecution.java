@@ -45,9 +45,9 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
 
   public Object getFieldValue(Object target, String identifier) {
     Object fieldValue = null;
-    if (target instanceof JsonObject) {
-      JsonObject jsonObject = (JsonObject) target;
-      fieldValue = jsonObject.get(identifier);
+    if (target instanceof Dereferencable) {
+      Dereferencable dereferencable = (Dereferencable) target;
+      fieldValue = dereferencable.get(identifier);
     } else if (target instanceof Map) {
       @SuppressWarnings("unchecked")
       Map<String,Object> map = (Map) target;

@@ -15,7 +15,7 @@
  */
 package io.rockscript.rest;
 
-import io.rockscript.Engine;
+import io.rockscript.ScriptService;
 import io.rockscript.netty.router.*;
 
 @Post("/deploy")
@@ -26,7 +26,7 @@ public class DeployScriptHandler implements RequestHandler {
     String script = request.getBodyStringUtf8();
 
     String scriptId = context
-      .get(Engine.class)
+      .get(ScriptService.class)
       .deployScript(script)
       .getId();
 

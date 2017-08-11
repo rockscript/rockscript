@@ -15,9 +15,11 @@
  */
 package io.rockscript.engine.dev;
 
-import io.rockscript.DevEngine;
-import io.rockscript.Engine;
-import io.rockscript.engine.ImportResolver;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
+import io.rockscript.DevScriptService;
+import io.rockscript.ScriptService;
 import io.rockscript.engine.test.TestEngineConfiguration;
 
 public class DevEngineConfiguration extends TestEngineConfiguration {
@@ -26,12 +28,12 @@ public class DevEngineConfiguration extends TestEngineConfiguration {
   }
 
   @Override
-  protected ImportResolver createImportResolver() {
-    return new DevImportResolver(this);
+  protected Executor createExecutor() {
+    return Executors.newWorkStealingPool();
   }
 
   @Override
-  public Engine build() {
-    return new DevEngine(this);
+  public ScriptService createEngine() {
+    return new DevScriptService(this);
   }
 }

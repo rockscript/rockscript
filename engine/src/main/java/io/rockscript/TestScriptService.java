@@ -16,23 +16,16 @@
 
 package io.rockscript;
 
-import java.util.List;
-
 import io.rockscript.engine.*;
+import io.rockscript.engine.test.TestEngineConfiguration;
 
-public interface Engine {
+public class TestScriptService extends ScriptServiceImpl implements ScriptService {
 
-  Script deployScript(String scriptText);
+  public TestScriptService() {
+    super(new TestEngineConfiguration());
+  }
 
-  ScriptExecution startScriptExecution(String scriptId);
-
-  ScriptExecution startScriptExecution(String scriptId, Object input);
-
-  ScriptExecution endWaitingAction(String scriptExecutionId, String executionId);
-
-  ScriptExecution endWaitingAction(String scriptExecutionId, String executionId, Object result);
-
-  EngineConfiguration getEngineConfiguration();
-
-  List<ScriptExecution> recoverCrashedScriptExecutions();
+  public TestScriptService(TestEngineConfiguration testEngineConfiguration) {
+    super(testEngineConfiguration);
+  }
 }

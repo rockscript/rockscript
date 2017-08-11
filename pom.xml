@@ -27,7 +27,7 @@
 
     <modules>
         <module>gson-poly</module>
-        <module>engine</module>
+        <module>scriptService</module>
         <module>netty-router</module>
         <module>http-test</module>
         <module>server</module>

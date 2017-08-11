@@ -19,12 +19,19 @@ package io.rockscript.engine;
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executor;
 
 import com.google.gson.Gson;
-import io.rockscript.Engine;
+import com.google.gson.GsonBuilder;
+import io.rockscript.ScriptService;
+import io.rockscript.action.http.EngineContext;
+import io.rockscript.engine.test.TestIdGenerator;
 
-public abstract class EngineConfiguration {
+import static io.rockscript.engine.EventJson.createEventJsonTypeAdapterFactory;
 
+public abstract class EngineConfiguration implements EngineContext {
+
+  // used in throwIfNotProperlyConfigured
   private static Set<String> OPTIONAL_FIELDS = new HashSet<>();
 
   protected EventStore eventStore;
@@ -32,30 +39,37 @@ public abstract class EngineConfiguration {
   protected EventListener eventListener;
   protected IdGenerator scriptIdGenerator;
   protected IdGenerator scriptExecutionIdGenerator;
-  protected LockService lockService;
+  protected Engine engine;
   protected ImportResolver importResolver;
+  protected Executor executor;
 
-  static { OPTIONAL_FIELDS.add("eventsGson"); }
-  protected Gson eventsGson;
+  static { OPTIONAL_FIELDS.add("gson"); }
+  protected Gson gson;
+  protected ScriptService scriptService;
 
-  protected EngineConfiguration() {
+  public EngineConfiguration() {
+    this.eventStore = new EventStore(this);
+    this.scriptStore = new ScriptStore(this);
+    this.eventListener = this.eventStore;
+    this.scriptIdGenerator = new TestIdGenerator(this, "s");
+    this.scriptExecutionIdGenerator = new TestIdGenerator(this, "se");
+    this.engine = new LocalEngine(this);
   }
 
-  public EngineConfiguration(EventStore eventStore,
-                             ScriptStore scriptStore,
-                             EventListener eventListener,
-                             IdGenerator scriptIdGenerator,
-                             IdGenerator scriptExecutionIdGenerator,
-                             LockService lockService) {
-    this.eventStore = eventStore;
-    this.scriptStore = scriptStore;
-    this.eventListener = eventListener;
-    this.scriptIdGenerator = scriptIdGenerator;
-    this.scriptExecutionIdGenerator = scriptExecutionIdGenerator;
-    this.lockService = lockService;
+  void seal(ScriptService scriptService) {
+    if (gson==null) {
+      gson = createDefaultGson();
+    }
+    throwIfNotProperlyConfigured();
+    this.scriptService = scriptService;
   }
 
-  public abstract Engine build();
+  private Gson createDefaultGson() {
+    return new GsonBuilder()
+      .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
+      // .setPrettyPrinting()
+      .create();
+  }
 
   public void throwIfNotProperlyConfigured() {
     for (Field field: getClass().getDeclaredFields()) {
@@ -72,8 +86,10 @@ public abstract class EngineConfiguration {
     }
   }
 
-  public EngineConfiguration eventsGson(Gson eventsGson) {
-    this.eventsGson = eventsGson;
+  protected abstract ScriptService createEngine();
+
+  public EngineConfiguration gson(Gson gson) {
+    this.gson = gson;
     return this;
   }
 
@@ -97,16 +113,23 @@ public abstract class EngineConfiguration {
     return scriptExecutionIdGenerator;
   }
 
-  public LockService getLockService() {
-    return lockService;
+  public Engine getEngine() {
+    return engine;
   }
 
   public ImportResolver getImportResolver() {
     return importResolver;
   }
 
-  public Gson getEventsGson() {
-    return eventsGson;
+  public Gson getGson() {
+    return gson;
   }
 
+  public Executor getExecutor() {
+    return executor;
+  }
+
+  public ScriptService getScriptService() {
+    return scriptService;
+  }
 }

@@ -15,20 +15,29 @@
  */
 package io.rockscript.engine.test;
 
-import io.rockscript.Engine;
-import io.rockscript.TestEngine;
+import java.util.concurrent.Executor;
+
+import io.rockscript.ScriptService;
+import io.rockscript.TestScriptService;
 import io.rockscript.engine.*;
 
 public class TestEngineConfiguration extends EngineConfiguration {
 
   public TestEngineConfiguration() {
-    this.eventStore = new EventStore(this);
-    this.scriptStore = new ScriptStore(this);
-    this.eventListener = this.eventStore;
-    this.scriptIdGenerator = new TestIdGenerator(this, "s");
-    this.scriptExecutionIdGenerator = new TestIdGenerator(this, "se");
-    this.lockService = new TestLockService(this);
     this.importResolver = createImportResolver();
+    this.executor = createExecutor();
+  }
+
+  protected Executor createExecutor() {
+    // In test, commands are executed in the thread of the caller
+    // when they commands are being added to the executor.
+    // This makes testing predictable and hence easier.
+    return new Executor() {
+      @Override
+      public void execute(Runnable command) {
+        command.run();
+      }
+    };
   }
 
   protected ImportResolver createImportResolver() {
@@ -36,7 +45,7 @@ public class TestEngineConfiguration extends EngineConfiguration {
   }
 
   @Override
-  public Engine build() {
-    return new TestEngine(this);
+  public ScriptService createEngine() {
+    return new TestScriptService(this);
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,27 +14,18 @@
  * limitations under the License.
  */
 
-package io.rockscript.engine;
+package io.rockscript.action.http;
 
-public abstract class ExecutionEvent<T extends Execution> implements Event {
+import java.util.concurrent.Executor;
 
-  T execution;
+import com.google.gson.Gson;
+import io.rockscript.ScriptService;
 
-  @Deprecated
-  public ExecutionEvent() {
-  }
+public interface EngineContext {
 
-  public ExecutionEvent(T execution) {
-    this.execution = execution;
-  }
+  Executor getExecutor();
 
-  public T getExecution() {
-    return execution;
-  }
+  Gson getGson();
 
-  public EngineConfiguration getServiceLocator() {
-    return execution.getScript().getEngineConfiguration();
-  }
-
-  public abstract ExecutionEventJson toJson();
+  ScriptService getScriptService();
 }

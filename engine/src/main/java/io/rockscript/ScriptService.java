@@ -13,22 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine.dev;
 
-import java.util.ServiceLoader;
+package io.rockscript;
 
-import io.rockscript.action.ImportProvider;
-import io.rockscript.engine.ImportResolver;
+import java.util.List;
 
+import io.rockscript.engine.*;
 
-public class DevImportResolver extends ImportResolver {
+public interface ScriptService {
 
-  public DevImportResolver(DevEngineConfiguration devEngineConfiguration) {
-    super(devEngineConfiguration);
+  Script deployScript(String scriptText);
 
-    ServiceLoader<ImportProvider> importProviderLoader = ServiceLoader.load(ImportProvider.class);
-    for (ImportProvider importProvider: importProviderLoader) {
-      importProvider.provideImport(this);
-    }
-  }
+  ScriptExecution startScriptExecution(String scriptId);
+
+  ScriptExecution startScriptExecution(String scriptId, Object input);
+
+  ScriptExecution endWaitingAction(String scriptExecutionId, String executionId);
+
+  ScriptExecution endWaitingAction(String scriptExecutionId, String executionId, Object result);
+
+  EngineConfiguration getEngineConfiguration();
+
+  List<ScriptExecution> recoverCrashedScriptExecutions();
 }

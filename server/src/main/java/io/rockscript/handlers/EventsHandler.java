@@ -17,7 +17,7 @@ package io.rockscript.handlers;
 
 import java.util.List;
 
-import io.rockscript.Engine;
+import io.rockscript.ScriptService;
 import io.rockscript.engine.EventJson;
 import io.rockscript.netty.router.*;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public class EventsHandler implements RequestHandler {
   @Override
   public void handle(Request request, Response response, Context context) {
     List<EventJson> events = context
-      .get(Engine.class)
+      .get(ScriptService.class)
       .getEngineConfiguration()
       .getEventStore()
       .getEvents();

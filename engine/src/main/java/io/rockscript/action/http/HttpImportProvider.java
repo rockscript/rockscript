@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.action.http;
 
-package io.rockscript;
+import io.rockscript.action.ImportProvider;
+import io.rockscript.engine.ImportResolver;
+import io.rockscript.engine.JsonObject;
 
-import io.rockscript.engine.EngineConfiguration;
-import io.rockscript.engine.EngineImpl;
-import io.rockscript.engine.dev.DevEngineConfiguration;
+public class HttpImportProvider implements ImportProvider {
 
-public class DevEngine extends EngineImpl implements Engine {
-
-  public DevEngine() {
-    super(new DevEngineConfiguration());
-  }
-
-  public DevEngine(DevEngineConfiguration engineConfiguration) {
-    super(engineConfiguration);
+  @Override
+  public void provideImport(ImportResolver importResolver) {
+    importResolver.add("rockscript.io/http", new JsonObject()
+      .put("get", HttpAction.GET));
   }
 }

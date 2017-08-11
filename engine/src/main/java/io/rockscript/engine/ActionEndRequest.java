@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.rockscript.engine;
 
-public abstract class ExecutionEvent<T extends Execution> implements Event {
+public class ActionEndRequest {
 
-  T execution;
+  String scriptExecutionId;
+  String executionId;
+  Object result;
 
-  @Deprecated
-  public ExecutionEvent() {
+  public ActionEndRequest(String scriptExecutionId, String executionId, Object result) {
+    this.scriptExecutionId = scriptExecutionId;
+    this.executionId = executionId;
+    this.result = result;
   }
 
-  public ExecutionEvent(T execution) {
-    this.execution = execution;
+  public String getScriptExecutionId() {
+    return scriptExecutionId;
   }
 
-  public T getExecution() {
-    return execution;
+  public String getExecutionId() {
+    return executionId;
   }
 
-  public EngineConfiguration getServiceLocator() {
-    return execution.getScript().getEngineConfiguration();
+  public Object getResult() {
+    return result;
   }
-
-  public abstract ExecutionEventJson toJson();
 }

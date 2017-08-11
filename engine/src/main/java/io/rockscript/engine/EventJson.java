@@ -22,16 +22,17 @@ public class EventJson {
 
   public static PolymorphicTypeAdapterFactory createEventJsonTypeAdapterFactory() {
     return new PolymorphicTypeAdapterFactory()
-      .typeName(new TypeToken<EventJson>(){}, "event")
-      .typeName(new TypeToken<ScriptDeployedEventJson>(){}, "scriptDeployed")
-      .typeName(new TypeToken<ActionStartedEventJson>(){}, "actionStarted")
-      .typeName(new TypeToken<ActionWaitingEventJson>(){}, "actionWaiting")
-      .typeName(new TypeToken<ActionEndedEventJson>(){}, "actionEnd")
-      .typeName(new TypeToken<ScriptStartedEventJson>(){}, "scriptStarted")
-      .typeName(new TypeToken<ScriptEndedEventJson>(){}, "scriptEnded")
-      .typeName(new TypeToken<VariableCreatedEventJson>(){}, "variableCreated")
-      .typeName(new TypeToken<ObjectImportedEventJson>(){}, "objectImported")
-      .typeName(new TypeToken<IdentifierResolvedEventJson>(){}, "identifierResolved")
-      .typeName(new TypeToken<PropertyDereferencedEventJson>(){}, "propertyDereferenced");
+      .typeName(new TypeToken<EventJson>(){},                     "event") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
+      .typeName(new TypeToken<ActionEndedEventJson>(){},          "actionEnd")
+      .typeName(new TypeToken<ActionStartedEventJson>(){},        "actionStarted")
+      .typeName(new TypeToken<ActionWaitingEventJson>(){},        "actionWaiting")
+      .typeName(new TypeToken<IdentifierResolvedEventJson>(){},   "identifierResolved")
+      .typeName(new TypeToken<ObjectImportedEventJson>(){},       "objectImported")
+      .typeName(new TypeToken<PropertyDereferencedEventJson>(){}, "propertyDereferenced")
+      .typeName(new TypeToken<ScriptDeployedEventJson>(){},       "scriptDeployed")
+      .typeName(new TypeToken<ScriptEndedEventJson>(){},          "scriptEnded")
+      .typeName(new TypeToken<ScriptStartedEventJson>(){},        "scriptStarted")
+      .typeName(new TypeToken<VariableCreatedEventJson>(){},      "variableCreated")
+      ;
   }
 }

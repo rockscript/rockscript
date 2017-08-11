@@ -20,7 +20,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>rockscript-engine</artifactId>
+    <artifactId>rockscript-scriptService</artifactId>
 
     <parent>
         <groupId>io.rockscript</groupId>

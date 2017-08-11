@@ -18,7 +18,7 @@ package io.rockscript.command;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import io.rockscript.Engine;
+import io.rockscript.ScriptService;
 import io.rockscript.netty.router.*;
 
 public class StartScriptCommand implements Command {
@@ -63,7 +63,7 @@ public class StartScriptCommand implements Command {
   @Override
   public void execute(Request request, Response response, Context context) {
     String scriptExecutionId = context
-      .get(Engine.class)
+      .get(ScriptService.class)
       .startScriptExecution(scriptId)
       .getId();
 

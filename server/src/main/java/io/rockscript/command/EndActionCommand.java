@@ -18,7 +18,7 @@ package io.rockscript.command;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import io.rockscript.Engine;
+import io.rockscript.ScriptService;
 import io.rockscript.netty.router.*;
 
 public class EndActionCommand implements Command {
@@ -57,7 +57,7 @@ public class EndActionCommand implements Command {
   @Override
   public void execute(Request request, Response response, Context context) {
     context
-      .get(Engine.class)
+      .get(ScriptService.class)
       .endWaitingAction(scriptExecutionId, executionId, result);
 
     response.statusOk();

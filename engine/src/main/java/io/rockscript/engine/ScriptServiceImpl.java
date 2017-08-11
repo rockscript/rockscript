@@ -18,15 +18,15 @@ package io.rockscript.engine;
 
 import java.util.List;
 
-import io.rockscript.Engine;
+import io.rockscript.ScriptService;
 
-public abstract class EngineImpl implements Engine {
+public abstract class ScriptServiceImpl implements ScriptService {
 
   protected EngineConfiguration engineConfiguration;
 
-  public EngineImpl(EngineConfiguration engineConfiguration) {
+  public ScriptServiceImpl(EngineConfiguration engineConfiguration) {
+    engineConfiguration.seal(this);
     this.engineConfiguration = engineConfiguration;
-    this.engineConfiguration.throwIfNotProperlyConfigured();
   }
 
   public Script deployScript(String scriptText) {
@@ -57,27 +57,9 @@ public abstract class EngineImpl implements Engine {
   }
 
   public ScriptExecution startScriptExecution(String scriptId, Object input) {
-    Script script = engineConfiguration
-      .getScriptStore()
-      .findScriptById(scriptId);
-
-    String scriptExecutionId = engineConfiguration
-        .getScriptExecutionIdGenerator()
-        .createId();
-
-    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, engineConfiguration, script);
-    scriptExecution.setInput(input);
-
-    ScriptStartedEvent scriptStartedEvent = new ScriptStartedEvent(scriptExecution, input);
-    scriptExecution.dispatch(scriptStartedEvent);
-
-    engineConfiguration
-      .getLockService()
-      .newScriptExecution(scriptExecution, "localhost");
-
-    scriptExecution.start();
-
-    return scriptExecution;
+    return engineConfiguration
+      .getEngine()
+      .startScriptExecution(scriptId, input);
   }
 
   @Override
@@ -87,16 +69,9 @@ public abstract class EngineImpl implements Engine {
 
   @Override
   public ScriptExecution endWaitingAction(String scriptExecutionId, String executionId, Object result) {
-    ScriptExecution scriptExecution = engineConfiguration
-      .getEventStore()
-      .findScriptExecutionById(scriptExecutionId);
-
-    ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) scriptExecution
-      .findExecutionRecursive(executionId);
-
-    execution.endAction(result);
-
-    return scriptExecution;
+    return engineConfiguration
+      .getEngine()
+      .endWaitingAction(scriptExecutionId, executionId, result);
   }
 
   public EngineConfiguration getEngineConfiguration() {

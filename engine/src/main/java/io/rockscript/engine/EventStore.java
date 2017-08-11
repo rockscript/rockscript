@@ -19,37 +19,20 @@ package io.rockscript.engine;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import io.rockscript.action.Action;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static io.rockscript.engine.EventJson.createEventJsonTypeAdapterFactory;
 
 public class EventStore implements EventListener {
 
   static final Logger log = LoggerFactory.getLogger(EventStore.class);
   static final Logger eventLog = LoggerFactory.getLogger(EventStore.class.getName()+".events");
 
-  Gson eventsGson;
   EngineConfiguration engineConfiguration;
   List<EventJson> events = new ArrayList<>();
 
   public EventStore(EngineConfiguration engineConfiguration) {
     this.engineConfiguration = engineConfiguration;
-
-    this.eventsGson = engineConfiguration.getEventsGson();
-    if (eventsGson==null) {
-      eventsGson = createDefaultEventsGson();
-    }
-  }
-
-  private Gson createDefaultEventsGson() {
-    return new GsonBuilder()
-      .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
-      // .setPrettyPrinting()
-      .create();
   }
 
   @Override
@@ -233,7 +216,7 @@ public class EventStore implements EventListener {
   }
 
   public String eventJsonToJsonString(EventJson eventJson) {
-    return eventJson!=null ? eventsGson.toJson(eventJson) : "null";
+    return eventJson!=null ? engineConfiguration.getGson().toJson(eventJson) : "null";
   }
 
   public Object valueToJson(Object value) {

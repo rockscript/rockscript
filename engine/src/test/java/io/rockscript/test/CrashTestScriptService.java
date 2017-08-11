@@ -16,15 +16,13 @@
  */
 package io.rockscript.test;
 
-import io.rockscript.TestEngine;
+import io.rockscript.TestScriptService;
 import io.rockscript.engine.*;
 import io.rockscript.engine.test.TestEngineConfiguration;
 
-import static jdk.nashorn.internal.objects.NativeFunction.bind;
+public class CrashTestScriptService extends TestScriptService {
 
-public class CrashTestEngine extends TestEngine {
-
-  public CrashTestEngine() {
+  public CrashTestScriptService() {
     super(new TestEngineConfiguration() {
       /*constructor*/{
         /* super() */

@@ -35,12 +35,12 @@ public class ScriptTest {
 
   protected static Logger log = LoggerFactory.getLogger(ScriptTest.class);
 
-  Engine engine = createTestEngine();
+  ScriptService scriptService = createTestEngine();
   List<Object> synchronousCapturedData = new ArrayList<>();
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
-  public Engine createTestEngine() {
-    TestEngine engine = new TestEngine();
+  public ScriptService createTestEngine() {
+    TestScriptService engine = new TestScriptService();
     ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
     JsonObject helloService = new JsonObject()
       .put("aSyncFunction", input -> {
@@ -55,7 +55,7 @@ public class ScriptTest {
 
   @Test
   public void testAsyncExecution() {
-    String scriptId = engine
+    String scriptId = scriptService
       .deployScript(
         "var helloService = system.import('example.com/hello'); \n" +
         "var message = 5; \n" +
@@ -65,7 +65,7 @@ public class ScriptTest {
       .getId();
 
     log.debug("Starting script...");
-    String scriptExecutionId = engine
+    String scriptExecutionId = scriptService
       .startScriptExecution(scriptId)
       .getId();
 
@@ -75,7 +75,7 @@ public class ScriptTest {
     log.debug("Ending action...");
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
     assertNotNull(waitingExecutionId);
-    engine.endWaitingAction(scriptExecutionId, waitingExecutionId);
+    scriptService.endWaitingAction(scriptExecutionId, waitingExecutionId);
 
     assertEquals("hello", synchronousCapturedData.get(1));
     assertEquals(2, synchronousCapturedData.size());
@@ -83,7 +83,7 @@ public class ScriptTest {
 
   @Test
   public void testScriptInput() {
-    String scriptId = engine
+    String scriptId = scriptService
       .deployScript(
         "var helloService = system.import('example.com/hello'); \n" +
         "helloService.aSyncFunction(system.input.greetingOne); \n"+
@@ -91,7 +91,7 @@ public class ScriptTest {
         "helloService.aSyncFunction(system.input.greetingTwo);")
       .getId();
 
-    String scriptExecutionId = engine
+    String scriptExecutionId = scriptService
       .startScriptExecution(scriptId, hashMap(
           entry("greetingOne", "hello"),
           entry("greetingTwo", "hi")
@@ -102,7 +102,7 @@ public class ScriptTest {
 
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
     assertNotNull(waitingExecutionId);
-    engine.endWaitingAction(scriptExecutionId, waitingExecutionId);
+    scriptService.endWaitingAction(scriptExecutionId, waitingExecutionId);
 
     // This tests that the input is still present after serialization/deserialization
     assertEquals("hi", synchronousCapturedData.get(1));
@@ -110,19 +110,19 @@ public class ScriptTest {
 
   @Test
   public void testSerialization() {
-    String scriptId = engine
+    String scriptId = scriptService
       .deployScript(
         "var helloService = system.import('example.com/hello'); \n" +
         "helloService.anAsyncFunction(); \n" +
         "helloService.aSyncFunction('hello');")
       .getId();
 
-    ScriptExecution scriptExecution = engine
+    ScriptExecution scriptExecution = scriptService
       .startScriptExecution(scriptId);
 
     String scriptExecutionId = scriptExecution.getId();
 
-    ScriptExecution reloadedScriptExecution = engine
+    ScriptExecution reloadedScriptExecution = scriptService
       .getEngineConfiguration()
       .getEventStore()
       .findScriptExecutionById(scriptExecutionId);
@@ -132,9 +132,9 @@ public class ScriptTest {
 
     String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
 
-    scriptExecution = engine.endWaitingAction(scriptExecutionId, waitingExecutionId);
+    scriptExecution = scriptService.endWaitingAction(scriptExecutionId, waitingExecutionId);
 
-    reloadedScriptExecution = engine
+    reloadedScriptExecution = scriptService
       .getEngineConfiguration()
       .getEventStore()
       .findScriptExecutionById(scriptExecutionId);

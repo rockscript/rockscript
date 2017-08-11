@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package io.rockscript.engine;
+package io.rockscript;
 
-import java.util.List;
+import io.rockscript.engine.ScriptServiceImpl;
+import io.rockscript.engine.dev.DevEngineConfiguration;
 
-public interface LockService {
+public class DevScriptService extends ScriptServiceImpl implements ScriptService {
 
-  void newScriptExecution(ScriptExecution scriptExecution, String clientId);
+  public DevScriptService() {
+    super(new DevEngineConfiguration());
+  }
 
-  Lock lockScriptExecution(String scriptExecutionId, String clientId);
-
-  void releaseScriptExecution(ScriptExecution scriptExecution);
-
-  List<Lock> getLocks();
-
+  public DevScriptService(DevEngineConfiguration engineConfiguration) {
+    super(engineConfiguration);
+  }
 }

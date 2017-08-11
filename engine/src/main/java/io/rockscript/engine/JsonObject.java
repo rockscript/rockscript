@@ -21,7 +21,7 @@ import java.util.function.Function;
 
 import io.rockscript.action.*;
 
-public class JsonObject {
+public class JsonObject implements Dereferencable {
 
   Map<String,Object> properties = new HashMap<>();
 

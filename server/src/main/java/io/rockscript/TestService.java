@@ -22,11 +22,11 @@ import io.rockscript.action.ActionInput;
 
 public class TestService {
 
-  Engine engine;
+  ScriptService scriptService;
   List<ActionInput> inputs = new ArrayList<>();
 
-  public TestService(Engine engine) {
-    this.engine = engine;
+  public TestService(ScriptService scriptService) {
+    this.scriptService = scriptService;
   }
 
   public void add(ActionInput input) {
@@ -39,7 +39,7 @@ public class TestService {
 
   public void endAction(int index, Object result) {
     ActionInput actionInput = getActionInput(index);
-    engine.endWaitingAction(actionInput.getScriptExecutionId(), actionInput.getExecutionId(), result);
+    scriptService.endWaitingAction(actionInput.getScriptExecutionId(), actionInput.getExecutionId(), result);
   }
 
   public void reset() {

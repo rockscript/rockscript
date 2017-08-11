@@ -81,7 +81,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     // Continues at this.endActionExecute()
   }
 
-  // Continuation from startActionExecute -> ActionEndedEvent
+  // Continuation from endAction -> ActionEndedEvent
   void endActionExecute(Object result) {
     setResult(result);
     end();

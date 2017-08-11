@@ -30,11 +30,6 @@ public class ScriptStartedEvent extends ExecutionEvent<ScriptExecution> {
     return new ScriptStartedEventJson(this);
   }
 
-  public void execute() {
-    execution.setInput(input);
-    execution.start();
-  }
-
   public String getScriptId() {
     return scriptId;
   }

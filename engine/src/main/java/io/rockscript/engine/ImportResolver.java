@@ -16,17 +16,17 @@
 
 package io.rockscript.engine;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import io.rockscript.action.ImportJsonObject;
-import io.rockscript.engine.test.TestEngineConfiguration;
+import io.rockscript.action.ImportProvider;
 
 public class ImportResolver {
 
   Map<String,JsonObject> importObjects = new HashMap<>();
 
   public ImportResolver(EngineConfiguration engineConfiguration) {
+    loadAllAvailableOnClassPath();
   }
 
   public ImportResolver add(String url, JsonObject importObject) {
@@ -34,6 +34,14 @@ public class ImportResolver {
       ((ImportJsonObject)importObject).resolveActionNames(url);
     }
     importObjects.put(url, importObject);
+    return this;
+  }
+
+  public ImportResolver loadAllAvailableOnClassPath() {
+    ServiceLoader<ImportProvider> importProviderLoader = ServiceLoader.load(ImportProvider.class);
+    for (ImportProvider importProvider: importProviderLoader) {
+      importProvider.provideImport(this);
+    }
     return this;
   }
 

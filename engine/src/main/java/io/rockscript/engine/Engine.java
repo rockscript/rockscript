@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package io.rockscript;
+package io.rockscript.engine;
 
-import io.rockscript.engine.*;
-import io.rockscript.engine.test.TestEngineConfiguration;
+/** Ensures that only 1 scriptService is executing a ScriptExecution
+ * at any given time.  The goal is to also have an in-memory
+ * implementation for single-node deployments and a distributed
+ * implementations based on Consul. */
+public interface Engine {
 
-public class TestEngine extends EngineImpl implements Engine {
+  ScriptExecution startScriptExecution(String scriptId, Object input);
 
-  public TestEngine() {
-    super(new TestEngineConfiguration());
-  }
-
-  public TestEngine(TestEngineConfiguration testEngineConfiguration) {
-    super(testEngineConfiguration);
-  }
+  ScriptExecution endWaitingAction(String scriptExecutionId, String executionId, Object result);
 }

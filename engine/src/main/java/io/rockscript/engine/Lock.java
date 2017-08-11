@@ -18,43 +18,18 @@ package io.rockscript.engine;
 
 import java.time.Instant;
 
-import static io.rockscript.engine.ScriptException.throwIfNull;
-
 public class Lock {
 
   Instant createTime;
   String scriptExecutionId;
-  String clientId;
-  ScriptExecution scriptExecution;
 
-  public Lock(ScriptExecution scriptExecution, String clientId) {
-    this(scriptExecution.getId(), clientId);
-    this.scriptExecution = scriptExecution;
-    this.createTime = Instant.now();
-  }
-
-  public Lock(String scriptExecutionId, String clientId) {
+  public Lock(String scriptExecutionId) {
     this.scriptExecutionId = ScriptException.throwIfNull(scriptExecutionId);
-    this.clientId = ScriptException.throwIfNull(clientId);
+    this.createTime = Instant.now();
   }
 
   public String getScriptExecutionId() {
     return scriptExecutionId;
-  }
-
-  public String getClientId() {
-    return clientId;
-  }
-
-  public ScriptExecution getScriptExecution() {
-    return scriptExecution;
-  }
-
-  public void setScriptExecution(ScriptExecution scriptExecution) {
-    if (!scriptExecutionId.equals(scriptExecution.getId())) {
-      throw new ScriptException("The lock's script execution id ("+scriptExecutionId+") differs from the given scriptExecution.getId() ("+scriptExecution.getId()+")");
-    }
-    this.scriptExecution = scriptExecution;
   }
 }
 

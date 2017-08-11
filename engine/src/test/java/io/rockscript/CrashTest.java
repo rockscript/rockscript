@@ -22,7 +22,7 @@ import java.util.List;
 import io.rockscript.action.*;
 import io.rockscript.engine.*;
 import io.rockscript.test.*;
-import io.rockscript.test.CrashTestEngine.CrashEventListener;
+import io.rockscript.test.CrashTestScriptService.CrashEventListener;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,19 +34,19 @@ public class CrashTest {
   List<Object> synchronousCapturedData = new ArrayList<>();
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
-  public CrashTestEngine createCrashTestEngine() {
-    CrashTestEngine engine = new CrashTestEngine();
+  public CrashTestScriptService createCrashTestEngine() {
+    CrashTestScriptService engine = new CrashTestScriptService();
     addHelloService(engine);
     return engine;
   }
 
-  public TestEngine createNormalTestEngine() {
-    TestEngine engine = new TestEngine();
+  public TestScriptService createNormalTestEngine() {
+    TestScriptService engine = new TestScriptService();
     addHelloService(engine);
     return engine;
   }
 
-  private void addHelloService(TestEngine engine) {
+  private void addHelloService(TestScriptService engine) {
     engine.getEngineConfiguration()
       .getImportResolver()
       .add("example.com/hello", new ImportJsonObject()
@@ -72,7 +72,7 @@ public class CrashTest {
 
     int eventsWithoutCrash = 1;
     boolean crashOccurred = false;
-    CrashTestEngine engine = createCrashTestEngine();
+    CrashTestScriptService engine = createCrashTestEngine();
     CrashEventListener eventListener = (CrashEventListener) engine.getEngineConfiguration().getEventListener();
 
     String scriptId = engine
@@ -109,7 +109,7 @@ public class CrashTest {
   }
 
   private ScriptExecution createExpectedScriptExecutionState(String scriptText) {
-    TestEngine engine = createNormalTestEngine();
+    TestScriptService engine = createNormalTestEngine();
     String scriptId = engine
       .deployScript(scriptText)
       .getId();
