@@ -1,10 +1,6 @@
-<div style="text-align: center;">
 ![RockScript](docs/image/logo.png)
-</div>
 
-<div style="text-align: center;">
-__Orchestrate microservices with event driven architecture.__
-</div>
+__Orchestrate microservices in an event driven style__
 
 ### Why
 
