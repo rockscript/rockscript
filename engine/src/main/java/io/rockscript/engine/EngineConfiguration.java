@@ -67,6 +67,7 @@ public abstract class EngineConfiguration implements EngineContext {
   private Gson createDefaultGson() {
     return new GsonBuilder()
       .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
+      .disableHtmlEscaping()
       // .setPrettyPrinting()
       .create();
   }

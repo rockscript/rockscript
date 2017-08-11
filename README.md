@@ -5,11 +5,12 @@ __Write synchronous code and get reactive execution__
 
 ### Why
 
-RockScript removes the pain of complex synchronization as is 
-the case with reactive systems.  This really makes it easier to 
-stitch microservices together and makes the code more readable.
+RockScript makes it easy to stitch microservices together.
+It fits perfect within an event driven architecture.
+RockScript removes the complexity from reactive programming 
+models and makes the code easier to read.
 
-In RockScript __Action__s are functions that can be imported and 
+In RockScript **Action**s are functions that can be imported and 
 when invoked, the engine executes them asynchronously.  While the 
 engine is waiting for actions to complete, the runtime script execution 
 state is persisted with event sourcing and does not block threads or memory.
@@ -17,8 +18,9 @@ So it's not a problem if actions take days, weeks or even months.
 This capability to wait, persist and resume executions is not found 
 in any other programming language.
 
-The coding gets easier because you don't need to work with futures 
-or callbacks to get reactive execution.
+The coding is easier because you just invoke actions the same way as 
+functions.  You don't need to work with futures or callbacks to get 
+reactive execution.
 
 Because the runtime state is persisted, script executions can recover 
 from crashes and resume from the position where the script execution 
@@ -64,8 +66,47 @@ var quotes = http.get({ url: 'http://api.fixer.io/latest' });
 
 requestbin.createBin({
   content: '1 EUR is '+quotes.body.rates.USD
-})
+});
 ```
+
+### Project stage
+
+RockScript is very early in its development and is does not offer any stability guarantees at this point.
+  
+We are looking for feedback and use cases.  Contact us if you're in doubt if RockScript is the
+right solution for your project.
+
+### License
+
+The RockScript runtime server is Apache License V2.  
+
+### Commercial offerings
+
+**RockScript consulting** gets you in depth expertise help you use RockScript in your project.  We have 
+discount pricing for consulting that helps you evaluate if RockScript is a good fit.  
+
+The **RockScript Devtool** is a web based tool that provides convenience for developers.  This tool is 
+free, but not open source.  You have to register and provide us with your contact details in order 
+to get it.  (coming soon)
+
+The **RockScript Manager** is a commercial extension of the dev tool to monitor and administer 
+production RockScript servers.  (coming later)
+
+**RockScript Service** is a SaaS version of the server and includes development tool, 
+monitoring and administration.  (coming later)  
+
+### Alternatives
+
+RockScript is an alternative for 
+
+ * [AWS step functions](https://aws.amazon.com/step-functions/).
+ * Netflix conductor
+ * Microsoft logic apps
+ 
+====
+Deprecated
+====
+
 
 
 
@@ -98,58 +139,6 @@ requestbin.createBin({
 * **Architectural guidance**: First wrap the external service APIs that you want to use 
     as a set of actions and triggers.  Then secondly compose the script at a higher level.
     This is a great way to divide and conquer a large software project.
-
-### Project stage
-
-RockScript is very early in its development and is does not offer any stability guarantees at this point.
-  
-We are looking for feedback and use cases.  Contact us if you're in doubt if RockScript is the
-right solution for your project.
-
-### License
-
-The RockScript runtime server is Apache License V2.  
-
-We also make the commitment that there will only be one version of the runtime server: the open source 
-one.  All its capabilities will be included in open source.  The open source engine will not be cripled 
-so that you are not forced to buy a commercial version.  Our business model is based on services and tooling 
-on top of the open source runtime engine.
-
-### Commercial offerings
-
-**RockScript consulting** gets you in depth expertise help you use RockScript in your project.  We have 
-discount pricing for consulting that helps you evaluate if RockScript is a good fit.  
-
-The **RockScript Devtool** is a web based tool that provides convenience for developers.  This tool is 
-free, but not open source.  You have to register and provide us with your contact details in order 
-to get it.  (coming soon)
-
-The **RockScript Manager** is a commercial extension of the dev tool to monitor and administer 
-production RockScript servers.  (coming later)
-
-**RockScript Service** is a SaaS version of the server and includes development tool, 
-monitoring and administration.  (coming later)  
-
-### Related technologies
-
-RockScript is an alternative for 
-
- * [AWS step functions](https://aws.amazon.com/step-functions/).
- * Netflix conductor
- * Microsoft logic apps
- 
-
-It's similar to [OpenWhisk](http://openwhisk.org/) in terms of many concepts and offering an 
-architectural basis for on reactive, event based systems.
-
-It's like [IFTTT](https://ifttt.com/), but for developers.  Instead of a UI, it offers a 
-scripting language to work with actions and triggers.  Actions and triggers are 
-easy configurable interactions with an external API offers.
-
-====
-Deprecated
-====
-
 
 ### Example usage scenarios
 

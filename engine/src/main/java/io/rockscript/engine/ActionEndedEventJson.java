@@ -22,9 +22,9 @@ public class ActionEndedEventJson extends ExecutableEventJson<ActionEndedEvent> 
   public ActionEndedEventJson() {
   }
 
-  public ActionEndedEventJson(ActionEndedEvent externalFunctionEndedEvent) {
-    super(externalFunctionEndedEvent);
-    result = externalFunctionEndedEvent.result;
+  public ActionEndedEventJson(ActionEndedEvent actionEndedEvent) {
+    super(actionEndedEvent);
+    result = actionEndedEvent.result;
   }
 
   @Override

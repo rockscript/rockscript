@@ -65,10 +65,11 @@ public class HttpRequestRunnable implements Runnable {
         String stringBody = Io.toString(inputStream);
         httpResponse.setBody(stringBody);
       }
+      return httpResponse;
 
     } catch (IOException e) {
       e.printStackTrace();
+      return null;
     }
-    return null;
   }
 }
