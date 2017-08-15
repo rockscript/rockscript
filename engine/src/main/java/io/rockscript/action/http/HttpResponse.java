@@ -15,10 +15,12 @@
  */
 package io.rockscript.action.http;
 
+import io.rockscript.action.http.Http.ContentTypes;
+import io.rockscript.action.http.Http.Headers;
+import io.rockscript.engine.Dereferencable;
+
 import java.util.List;
 import java.util.Map;
-
-import io.rockscript.engine.Dereferencable;
 
 public class HttpResponse implements Dereferencable {
 
@@ -51,7 +53,7 @@ public class HttpResponse implements Dereferencable {
   }
 
   public boolean isContentTypeApplicationJson() {
-    return headerContains(Http.CONTENT_TYPE, Http.APPLICATION_JSON);
+    return headerContains(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
   }
 
   public boolean headerContains(String headerName, String headerValue) {

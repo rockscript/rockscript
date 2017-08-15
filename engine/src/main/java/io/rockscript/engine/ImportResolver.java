@@ -16,10 +16,12 @@
 
 package io.rockscript.engine;
 
-import java.util.*;
-
 import io.rockscript.action.ImportJsonObject;
 import io.rockscript.action.ImportProvider;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ServiceLoader;
 
 public class ImportResolver {
 
@@ -46,6 +48,11 @@ public class ImportResolver {
   }
 
   public JsonObject get(String url) {
-    return importObjects.get(url);
+    JsonObject jsonObject = importObjects.get(url);
+    if (jsonObject==null) {
+      jsonObject = new RemoteActionsJsonObject(url);
+      importObjects.put(url, jsonObject);
+    }
+    return jsonObject;
   }
 }

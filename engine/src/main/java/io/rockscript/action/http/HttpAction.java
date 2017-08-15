@@ -19,11 +19,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import io.rockscript.ScriptService;
 import io.rockscript.action.*;
+import io.rockscript.action.http.Http.Methods;
 
 public class HttpAction implements Action {
 
-  public static final HttpAction GET = new HttpAction(HttpRequest.METHOD_GET);
-  public static final HttpAction POST = new HttpAction(HttpRequest.METHOD_POST);
+  public static final HttpAction GET = new HttpAction(Methods.GET);
+  public static final HttpAction POST = new HttpAction(Methods.POST);
 
   String method;
 

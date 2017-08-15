@@ -15,12 +15,12 @@
  */
 package io.rockscript;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HttpTest {
 
@@ -39,9 +39,9 @@ public class HttpTest {
     String scriptId = scriptService
       .deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
-        "var requestbin = system.import('rockscript.io/requestbin'); \n" +
-        "var rates = http.get({url:'http://api.fixer.io/latest'}); \n" +
-        "requestbin.postToBin({ message: '1 EUR is ... USD' }); ")
+        "var jokes = system.import('localhost:3000'); \n" +
+        "var chuckResponse = http.get({url:'http://api.icndb.com/jokes/random'}); \n" +
+        "jokes.addJoke(chuckResponse.body.value.joke); ")
       .getId();
 
     log.debug("Starting script...");

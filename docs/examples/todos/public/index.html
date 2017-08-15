@@ -1,65 +1,78 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <title>Todos</title>
+  <title>Jokes</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
-<body onload="refreshTodos()">
+<body onload="refreshJokes()">
 
-<h1>Todos</h1>
-<button onclick="refreshTodos()">Refresh</button>
-<ul id="todos"></ul>
-<input id="newTodo" type="text" />
+<h1>Joke Service</h1>
+<button onclick="refreshJokes()">Refresh</button> <button onclick="refreshInASecond()">Refresh automatic every second</button>
+<div id="jokes"></div>
+<input id="newJoke" type="text" placeholder="Type a joke" /> Enter to add
 
 <script>
 
-function refreshTodos() {
-  $.get('todos', function(todos) {
-    $('#todos').html(todosHtml(todos));
+function refreshJokes() {
+  $.get('jokes', function(jokes) {
+    $('#jokes').html(jokesHtml(jokes));
   });
+  $('#newJoke').focus();
 }
 
-function todosHtml(todos) {
-  return todos.map(todo=>todoHtml(todo));
+function refreshInASecond() {
+  window.setTimeout(function(){
+   refreshJokes();
+   refreshInASecond();
+  }, 1000);
 }
 
-function todoHtml(todo) {
-  return '<li>'+todo.title+' '+deleteHtml(todo)+'</li>';
+function jokesHtml(jokes) {
+  if (jokes.length===0) {
+    return 'No jokes yet, please <a href="#TODO">run the chuck-joke.rs</a> to add jokes,  This page will refresh itself every second.';
+  } else {
+    return '<ul>' +
+             jokes.map(joke=>jokeHtml(joke)).join('') +
+           '</ul>';
+  }
 }
 
-function deleteHtml(todo) {
-  return '<button onclick="deleteTodo('+todo.id+')">X</button>'
+function jokeHtml(joke) {
+  return '<li>'+joke.title+' '+deleteHtml(joke)+'</li>';
 }
 
-function deleteTodo(todoId) {
+function deleteHtml(joke) {
+  return '<button onclick="deleteJoke(\''+joke.id+'\')">Hehe</button>'
+}
+
+function deleteJoke(jokeId) {
   $.ajax({
     method: 'DELETE',
-    url: 'todos/'+todoId,
+    url: 'jokes/'+jokeId,
     success: function() {
-      refreshTodos();
+      refreshJokes();
     }
   });
 }
 
-$('#newTodo').keyup(function (event) {
+$('#newJoke').keyup(function (event) {
   if (event.keyCode == 13) {
     $.ajax({
       method: 'POST',
-      url: 'todos',
+      url: 'jokes',
       contentType: 'application/json',
-      data: JSON.stringify({title:$("#newTodo").val()}),
+      data: JSON.stringify({title:$("#newJoke").val()}),
       dataType: 'json',
       success: function() {
-        refreshTodos();
+        refreshJokes();
       }
     });
-    $("#newTodo").val('');
+    $("#newJoke").val('');
     return false;
   }
 });
 
 </script>
-
 
 </body>
 </html>

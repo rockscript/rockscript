@@ -20,7 +20,7 @@ import java.util.Map;
 import io.rockscript.ScriptService;
 import io.rockscript.action.http.HttpResponse;
 
-import static io.rockscript.action.http.HttpRequest.POST;
+import static io.rockscript.action.http.HttpRequest.createPost;
 
 public class PostToBinCommand implements Runnable {
 
@@ -38,14 +38,14 @@ public class PostToBinCommand implements Runnable {
 
   @Override
   public void run() {
-    HttpResponse createBinResponse = POST("https://requestb.in/api/v1/bins")
+    HttpResponse createBinResponse = createPost("https://requestb.in/api/v1/bins")
       .header("User-Agent", "curl/7.54.0")
       .execute();
 
     Map<String,Object> createBinResponseBody = (Map<String, Object>) createBinResponse.getBody();
     String binName = (String) createBinResponseBody.get("name");
 
-    HttpResponse postResponse = POST("https://requestb.in/"+binName)
+    HttpResponse postResponse = createPost("https://requestb.in/"+binName)
       .header("User-Agent", "curl/7.54.0")
       .body(message)
       .execute();

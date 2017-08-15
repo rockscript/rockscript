@@ -16,22 +16,20 @@
 
 package io.rockscript.action.http;
 
+import com.google.gson.Gson;
+import io.rockscript.action.http.Http.Methods;
+import io.rockscript.util.Io;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.gson.Gson;
-import io.rockscript.util.Io;
-
 public class HttpRequest {
-
-  public static final String METHOD_GET = "GET";
-  public static final String METHOD_PUT = "PUT";
-  public static final String METHOD_POST = "POST";
-  public static final String METHOD_DELETE = "DELETE";
-
   String method;
   String url;
   Map<String,List<String>> headers;
@@ -45,12 +43,12 @@ public class HttpRequest {
     this.url = url;
   }
 
-  public static HttpRequest GET(String url) {
-    return new HttpRequest(METHOD_GET, url);
+  public static HttpRequest createGet(String url) {
+    return new HttpRequest(Methods.GET, url);
   }
 
-  public static HttpRequest POST(String url) {
-    return new HttpRequest(METHOD_POST, url);
+  public static HttpRequest createPost(String url) {
+    return new HttpRequest(Methods.POST, url);
   }
 
   public HttpResponse execute() {

@@ -13,22 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.action.http;
+package io.rockscript.engine;
 
-public interface Http {
+public class RemoteActionsJsonObject extends JsonObject {
 
-  interface Methods {
-    String GET = "GET";
-    String PUT = "PUT";
-    String POST = "POST";
-    String DELETE = "DELETE";
+  String url;
+
+  public RemoteActionsJsonObject(String url) {
+    if (!url.startsWith("http")) {
+      url = "http://"+url;
+    }
+    this.url = url;
   }
 
-  interface Headers {
-    String CONTENT_TYPE = "Content-Type";
+  @Override
+  public Object get(String propertyName) {
+    Object action = super.get(propertyName);
+    if (action==null) {
+      action = new RemoteAction(url, propertyName);
+    }
+    return action;
   }
 
-  interface ContentTypes {
-    String APPLICATION_JSON = "application/json";
-  }
 }
