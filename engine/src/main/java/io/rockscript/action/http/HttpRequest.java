@@ -16,7 +16,14 @@
 
 package io.rockscript.action.http;
 
-import java.util.Map;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import com.google.gson.Gson;
+import io.rockscript.util.Io;
 
 public class HttpRequest {
 
@@ -27,8 +34,68 @@ public class HttpRequest {
 
   String method;
   String url;
-  Map<String,String> headers;
+  Map<String,List<String>> headers;
   String body;
+
+  public HttpRequest() {
+  }
+
+  public HttpRequest(String method, String url) {
+    this.method = method;
+    this.url = url;
+  }
+
+  public static HttpRequest GET(String url) {
+    return new HttpRequest(METHOD_GET, url);
+  }
+
+  public static HttpRequest POST(String url) {
+    return new HttpRequest(METHOD_POST, url);
+  }
+
+  public HttpResponse execute() {
+    try {
+      URL url = new URL(this.url);
+      HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+      urlConnection.setRequestMethod(method);
+
+      if (headers!=null) {
+        for (String headerName: headers.keySet()) {
+          List<String> headerListValue = headers.get(headerName);
+          String headerValue = headerListValue
+            .stream()
+            .collect(Collectors.joining(";"));
+          urlConnection.setRequestProperty(headerName, headerValue);
+        }
+      }
+
+      if (body!=null) {
+        urlConnection.setDoOutput(true);
+        OutputStream outputStream = urlConnection.getOutputStream();
+        outputStream.write(body.getBytes("UTF-8"));
+        outputStream.flush();
+      }
+
+      int responseCode = urlConnection.getResponseCode();
+      HttpResponse httpResponse = new HttpResponse(responseCode);
+      httpResponse.setHeaders(urlConnection.getHeaderFields());
+      InputStream inputStream = urlConnection.getInputStream();
+
+      if (httpResponse.isContentTypeApplicationJson()) {
+        Reader bodyReader = new InputStreamReader(inputStream, "UTF-8");
+        Object parsedJsonBody = new Gson().fromJson(bodyReader, Object.class);
+        httpResponse.setBody(parsedJsonBody);
+      } else {
+        String stringBody = Io.toString(inputStream);
+        httpResponse.setBody(stringBody);
+      }
+      return httpResponse;
+
+    } catch (IOException e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
 
   public String getUrl() {
     return url;
@@ -38,12 +105,25 @@ public class HttpRequest {
     this.url = url;
   }
 
-  public Map<String, String> getHeaders() {
+  public Map<String, List<String>> getHeaders() {
     return headers;
   }
 
-  public void setHeaders(Map<String, String> headers) {
+  public void setHeaders(Map<String, List<String>> headers) {
     this.headers = headers;
+  }
+
+  public HttpRequest header(String name, String value) {
+    if (headers==null) {
+      headers = new HashMap<>();
+    }
+    List<String> values = headers.get(name);
+    if (values==null) {
+      values = new ArrayList<>();
+      headers.put(name, values);
+    }
+    values.add(value);
+    return this;
   }
 
   public String getBody() {
@@ -52,5 +132,10 @@ public class HttpRequest {
 
   public void setBody(String body) {
     this.body = body;
+  }
+
+  public HttpRequest body(String body) {
+    this.body = body;
+    return this;
   }
 }

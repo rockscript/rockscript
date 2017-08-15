@@ -69,6 +69,12 @@ requestbin.createBin({
 });
 ```
 
+
+
+```
+curl -X POST --data-binary @docs/examples/usd-to-requestbin.rs localhost:8888/scripts
+```
+
 ### Project stage
 
 RockScript is very early in its development and is does not offer any stability guarantees at this point.

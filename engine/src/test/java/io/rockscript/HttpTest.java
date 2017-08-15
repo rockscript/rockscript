@@ -39,8 +39,9 @@ public class HttpTest {
     String scriptId = scriptService
       .deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
-        "var rates = http.get({url:'http://api.fixer.io/latest'});" +
-        "")
+        "var requestbin = system.import('rockscript.io/requestbin'); \n" +
+        "var rates = http.get({url:'http://api.fixer.io/latest'}); \n" +
+        "requestbin.postToBin({ message: '1 EUR is ... USD' }); ")
       .getId();
 
     log.debug("Starting script...");

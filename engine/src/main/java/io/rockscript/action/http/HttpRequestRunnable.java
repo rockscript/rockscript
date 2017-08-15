@@ -16,13 +16,7 @@
 
 package io.rockscript.action.http;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import com.google.gson.Gson;
 import io.rockscript.ScriptService;
-import io.rockscript.util.Io;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,32 +38,8 @@ public class HttpRequestRunnable implements Runnable {
 
   @Override
   public void run() {
-    HttpResponse response = execute(request);
+    HttpResponse response = request.execute();
     scriptService.endWaitingAction(scriptExecutionId, executionId, response);
   }
 
-  private HttpResponse execute(HttpRequest request) {
-    try {
-      URL url = new URL(request.getUrl());
-      HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-      int responseCode = urlConnection.getResponseCode();
-      HttpResponse httpResponse = new HttpResponse(responseCode);
-      httpResponse.setHeaders(urlConnection.getHeaderFields());
-      InputStream inputStream = urlConnection.getInputStream();
-
-      if (httpResponse.isContentTypeApplicationJson()) {
-        Reader bodyReader = new InputStreamReader(inputStream, "UTF-8");
-        Object parsedJsonBody = new Gson().fromJson(bodyReader, Object.class);
-        httpResponse.setBody(parsedJsonBody);
-      } else {
-        String stringBody = Io.toString(inputStream);
-        httpResponse.setBody(stringBody);
-      }
-      return httpResponse;
-
-    } catch (IOException e) {
-      e.printStackTrace();
-      return null;
-    }
-  }
 }

@@ -80,9 +80,10 @@ public class EventStore implements EventListener {
         incrementEventCount();
         if (scriptExecution.getExecutionMode()==ExecutionMode.EXECUTING) {
           originalEventListener.handle(event);
-        } else {
-          log.debug("Swallowing ("+scriptExecution.getExecutionMode()+"): "+ EventStore.this.eventToJsonString(executionEvent));
         }
+//        else {
+//          log.debug("Swallowing ("+scriptExecution.getExecutionMode()+"): "+ EventStore.this.eventToJsonString(executionEvent));
+//        }
       }
     }
 
@@ -144,7 +145,7 @@ public class EventStore implements EventListener {
       // LoadingWrapperEventListener doesn't receive them, yet it also must keep
       // track of those to get the counting right
       loadingWrapperEventListener.eventExecuting(event);
-      log.debug("Executing ("+scriptExecution.getExecutionMode()+"): "+eventJsonToJsonString(eventJson));
+      // log.debug("Executing ("+scriptExecution.getExecutionMode()+"): "+eventJsonToJsonString(eventJson));
       event.execute();
     }
 

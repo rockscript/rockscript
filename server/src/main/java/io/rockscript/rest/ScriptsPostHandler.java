@@ -18,8 +18,11 @@ package io.rockscript.rest;
 import io.rockscript.ScriptService;
 import io.rockscript.netty.router.*;
 
-@Post("/deploy")
-public class DeployScriptHandler implements RequestHandler {
+import static io.rockscript.util.Maps.entry;
+import static io.rockscript.util.Maps.hashMap;
+
+@Post("/scripts")
+public class ScriptsPostHandler implements RequestHandler {
 
   @Override
   public void handle(Request request, Response response, Context context) {
@@ -31,7 +34,9 @@ public class DeployScriptHandler implements RequestHandler {
       .getId();
 
     response.statusOk();
-    response.bodyString(scriptId);
+    response.bodyJson(hashMap(
+      entry("id", scriptId)
+    ));
     response.send();
   }
 }

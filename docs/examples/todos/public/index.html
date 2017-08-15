@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Todos</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body onload="refreshTodos()">
+
+<h1>Todos</h1>
+<button onclick="refreshTodos()">Refresh</button>
+<ul id="todos"></ul>
+<input id="newTodo" type="text" />
+
+<script>
+
+function refreshTodos() {
+  $.get('todos', function(todos) {
+    $('#todos').html(todosHtml(todos));
+  });
+}
+
+function todosHtml(todos) {
+  return todos.map(todo=>todoHtml(todo));
+}
+
+function todoHtml(todo) {
+  return '<li>'+todo.title+' '+deleteHtml(todo)+'</li>';
+}
+
+function deleteHtml(todo) {
+  return '<button onclick="deleteTodo('+todo.id+')">X</button>'
+}
+
+function deleteTodo(todoId) {
+  $.ajax({
+    method: 'DELETE',
+    url: 'todos/'+todoId,
+    success: function() {
+      refreshTodos();
+    }
+  });
+}
+
+$('#newTodo').keyup(function (event) {
+  if (event.keyCode == 13) {
+    $.ajax({
+      method: 'POST',
+      url: 'todos',
+      contentType: 'application/json',
+      data: JSON.stringify({title:$("#newTodo").val()}),
+      dataType: 'json',
+      success: function() {
+        refreshTodos();
+      }
+    });
+    $("#newTodo").val('');
+    return false;
+  }
+});
+
+</script>
+
+
+</body>
+</html>

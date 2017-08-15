@@ -15,8 +15,6 @@
  */
 package io.rockscript.action.http;
 
-import java.util.concurrent.Executor;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import io.rockscript.ScriptService;
@@ -47,8 +45,10 @@ public class HttpAction implements Action {
     HttpRequestRunnable command = new HttpRequestRunnable(input.getScriptExecutionId(), input.getExecutionId(), httpRequest, scriptService);
 
     // Schedule the HttpRequestRunnable command for execution asynchronously
-    Executor executor = input.getEngineContext().getExecutor();
-    executor.execute(command);
+    input
+      .getEngineContext()
+      .getExecutor()
+      .execute(command);
 
     return ActionOutput.waitForFunctionToCompleteAsync();
   }

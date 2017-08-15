@@ -1,6 +1,7 @@
 target/
 bin/
 tmp/
+node_modules/
 .idea/
 .settings/
 .plugins/

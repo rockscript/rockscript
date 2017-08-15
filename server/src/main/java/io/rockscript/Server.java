@@ -21,7 +21,7 @@ import io.rockscript.engine.dev.DevEngineConfiguration;
 import io.rockscript.handlers.CommandHandler;
 import io.rockscript.handlers.EventsHandler;
 import io.rockscript.netty.router.*;
-import io.rockscript.rest.DeployScriptHandler;
+import io.rockscript.rest.ScriptsPostHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public class Server {
       .getAsyncHttpServerConfiguration()
       .scan(CommandHandler.class)
       .scan(EventsHandler.class)
-      .scan(DeployScriptHandler.class)
+      .scan(ScriptsPostHandler.class)
       .jsonHandler(new JsonHandlerGson(commonGson))
       .context(ScriptService.class, scriptService);
 
