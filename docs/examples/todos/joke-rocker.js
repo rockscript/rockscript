@@ -6,24 +6,30 @@ const app = express();
 app.use(bodyParser.json());
 
 app.post('/addJoke', function (req, res) {
-  postJokeToServer(req.body.args[0], function() {
-    res.send({ ended: false });
-  });
+  postJokeToServer(req.body.args[0], res);
 });
 
-function postJokeToServer(title, success) {
+function postJokeToServer(title, res) {
   var postRequest = http.request({
-    host: 'localhost',
-    port: 4000,
-    path: '/jokes',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
+      method: 'POST',
+      hostname: 'localhost',
+      port: 4000,
+      path: '/jokes',
+      headers: {
+        'Content-Type': 'application/json'
+      }
     },
-    function(postResponse) {
-      postResponse.on('end', success);
+    (res) => {
+      console.log(`STATUS: ${res.statusCode}`);
+      console.log(`HEADERS: ${JSON.stringify(res.headers)}`);
+      res.setEncoding('utf8');
+      res.on('data', (chunk) => {});
+      res.on('end', function() {
+        console.log('Post success');
+        res.send({ ended: false });
+      });
     }
-  });
+  );
   postRequest.write(JSON.stringify({title: title}));
   postRequest.end();
 }

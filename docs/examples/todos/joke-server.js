@@ -16,6 +16,7 @@ app.post('/jokes', function (req, res) {
   var joke = req.body;
   joke.id = shortid.generate();
   jokes.push(joke);
+  console.log('Added joke '+JSON.stringify(joke));
   res.send(joke);
 });
 
