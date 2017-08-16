@@ -17,12 +17,24 @@
 package io.rockscript.engine;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
 
+import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.muoncore.MultiTransportMuon;
+import io.muoncore.Muon;
+import io.muoncore.MuonBuilder;
+import io.muoncore.codec.json.JsonOnlyCodecs;
+import io.muoncore.config.AutoConfiguration;
+import io.muoncore.config.MuonConfigBuilder;
+import io.muoncore.eventstore.TestEventStore;
+import io.muoncore.memory.discovery.InMemDiscovery;
+import io.muoncore.memory.transport.InMemTransport;
 import io.rockscript.ScriptService;
 import io.rockscript.action.http.EngineContext;
 import io.rockscript.engine.test.TestIdGenerator;
@@ -42,18 +54,42 @@ public abstract class EngineConfiguration implements EngineContext {
   protected Engine engine;
   protected ImportResolver importResolver;
   protected Executor executor;
+  private Muon muon;
+
+  private TestEventStore testEventStore;
 
   static { OPTIONAL_FIELDS.add("gson"); }
   protected Gson gson;
   protected ScriptService scriptService;
 
   public EngineConfiguration() {
-    this.eventStore = new EventStore(this);
+    setupLocalMuon();
+    this.eventStore = new EventStore(this, muon);
     this.scriptStore = new ScriptStore(this);
     this.eventListener = this.eventStore;
     this.scriptIdGenerator = new TestIdGenerator(this, "s");
     this.scriptExecutionIdGenerator = new TestIdGenerator(this, "se");
     this.engine = new LocalEngine(this);
+  }
+
+  private void setupLocalMuon() {
+    AutoConfiguration config = MuonConfigBuilder.withServiceIdentifier("rockscript")
+            .build();
+    //if using standard transports (eg AMQP), and an externally managed event store this works fine
+//    this.muon = MuonBuilder.withConfig(config).build();
+
+    //For example setup, use an in mem event store and a muon configured to be in memory only.
+
+    InMemDiscovery inMemDiscovery = new InMemDiscovery();
+    EventBus eventBus = new EventBus();
+
+    this.muon = new MultiTransportMuon(config, inMemDiscovery, Collections.singletonList(new InMemTransport(config, eventBus)), new JsonOnlyCodecs());
+
+    AutoConfiguration configEvStore = MuonConfigBuilder.withServiceIdentifier("eventstore").withTags("eventstore")
+            .build();
+    Muon evStore = new MultiTransportMuon(configEvStore, inMemDiscovery, Collections.singletonList(new InMemTransport(configEvStore, eventBus)), new JsonOnlyCodecs());
+
+    this.testEventStore = new TestEventStore(evStore);
   }
 
   void seal(ScriptService scriptService) {

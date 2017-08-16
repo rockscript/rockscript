@@ -17,38 +17,79 @@
 package io.rockscript.engine;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import io.muoncore.Muon;
+import io.muoncore.protocol.event.ClientEvent;
+import io.muoncore.protocol.event.client.DefaultEventClient;
+import io.muoncore.protocol.event.client.EventClient;
+import io.muoncore.protocol.event.client.EventReplayMode;
 import io.rockscript.action.Action;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+//DD, with the Muon addition, this becomes an event facade on top of a Muon event stack based event store somewhere.
 public class EventStore implements EventListener {
 
   static final Logger log = LoggerFactory.getLogger(EventStore.class);
   static final Logger eventLog = LoggerFactory.getLogger(EventStore.class.getName()+".events");
 
   EngineConfiguration engineConfiguration;
-  List<EventJson> events = new ArrayList<>();
+  private Muon muon;
+  private EventClient evClient;
 
-  public EventStore(EngineConfiguration engineConfiguration) {
+  public EventStore(EngineConfiguration engineConfiguration, Muon muon) {
     this.engineConfiguration = engineConfiguration;
+    this.muon = muon;
+    evClient = new DefaultEventClient(muon);
   }
 
   @Override
   public void handle(Event event) {
     EventJson gsonnable = event.toJson();
-    events.add(gsonnable);
     String jsonString = eventJsonToJsonString(gsonnable);
     eventLog.debug(jsonString);
+
+    emitCentralStreamEvent(gsonnable);
+    emitEventSourceEvent(gsonnable);
+  }
+
+  private void emitCentralStreamEvent(EventJson gsonnable) {
+    evClient.event(
+            ClientEvent
+                    .ofType(gsonnable.getClass().getCanonicalName())
+                    .stream(getRockscriptStream())
+                    .payload(gsonnable).build());
+  }
+
+  private String getRockscriptStream() {
+    return "rockscript";
+  }
+
+  private void emitEventSourceEvent(EventJson gsonnable) {
+    if (ExecutionEventJson.class.isAssignableFrom(gsonnable.getClass())) {
+      String executionId = ((ExecutionEventJson) gsonnable).getScriptExecutionId();
+
+      evClient.event(
+              ClientEvent
+                      .ofType(gsonnable.getClass().getCanonicalName())
+                      .stream(getExecutionStreamName(executionId))
+                      .payload(gsonnable).build());
+    }
+  }
+
+  private String getExecutionStreamName(String executionId) {
+    return "rockscript_execution/" + executionId;
   }
 
   public List<ExecutionEventJson> findEventsByScriptExecutionId(String scriptExecutionId) {
-    return events.stream()
-      .filter(event-> event instanceof ExecutionEventJson)
-      .map(event->((ExecutionEventJson)event))
-      .filter(executionEvent->scriptExecutionId.equals(executionEvent.getScriptExecutionId()))
-      .collect(Collectors.toList());
+
+    return coldReplayEvents(getExecutionStreamName(scriptExecutionId),
+            ExecutionEventJson.class);
   }
 
   public ScriptExecution findScriptExecutionById(String scriptExecutionId) {
@@ -57,7 +98,7 @@ public class EventStore implements EventListener {
   }
 
   public List<EventJson> getEvents() {
-    return events;
+    return coldReplayEvents(getRockscriptStream(), EventJson.class);
   }
 
   private class LoadingWrapperEventListener implements EventListener {
@@ -176,7 +217,7 @@ public class EventStore implements EventListener {
   /** @return a list of events grouped by script execution. */
   public Map<String,List<ExecutionEventJson>> findCrashedScriptExecutionEvents() {
     Map<String,List<ExecutionEventJson>> groupedEvents = new HashMap<>();
-    for (EventJson event: events) {
+    for (EventJson event: getEvents()) {
       if (event instanceof ExecutionEventJson) {
         ExecutionEventJson executableEvent = (ExecutionEventJson) event;
         String scriptExecutionId = executableEvent.getScriptExecutionId();
@@ -245,5 +286,53 @@ public class EventStore implements EventListener {
       convertedMap.put(key, convertedValue);
     }
     return convertedMap;
+  }
+
+
+
+  private <T extends EventJson> List<T> coldReplayEvents(String stream, Class<T> eventType) {
+    List<T> events = new ArrayList<>();
+
+    CompletableFuture<List<T>> future = new CompletableFuture<>();
+
+    evClient.replay(stream, EventReplayMode.REPLAY_ONLY, new Subscriber<io.muoncore.protocol.event.Event>() {
+      @Override
+      public void onSubscribe(Subscription subscription) {
+        //todo, can smooth the replay flow here if wanted. use some higher level subscriber to do that.
+        subscription.request(Long.MAX_VALUE);
+      }
+
+      @Override
+      public void onNext(io.muoncore.protocol.event.Event event) {
+
+        try {
+          @SuppressWarnings("unchecked")
+          Class<T> type = (Class<T>) Class.forName(event.getEventType());
+          T payload = event.getPayload(type);
+          events.add(payload);
+          log.info("Replayed {}", payload);
+        } catch (ClassNotFoundException e) {
+          e.printStackTrace();
+        }
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+        log.warn("Failed replay of {}", stream);
+        future.completeExceptionally(throwable);
+      }
+
+      @Override
+      public void onComplete() {
+        log.info("Completed replay of {}", stream);
+        future.complete(events);
+      }
+    });
+
+    try {
+      return future.get();
+    } catch (InterruptedException | ExecutionException e) {
+      throw new IllegalStateException("Failed loading event stream " + stream, e);
+    }
   }
 }

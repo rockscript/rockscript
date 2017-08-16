@@ -57,7 +57,61 @@
             <scope>test</scope>
         </dependency>
 
+
+        <!-- muon config -->
+        <dependency>
+            <groupId>io.muoncore</groupId>
+            <artifactId>muon-core</artifactId>
+            <version>7.3.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.muoncore</groupId>
+            <artifactId>test-event-store</artifactId>
+            <version>0.0.8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.muoncore.transport</groupId>
+            <artifactId>muon-amqp</artifactId>
+            <version>0.0.8</version>
+        </dependency>
+        <dependency>
+            <groupId>io.muoncore.protocol</groupId>
+            <artifactId>stack-event</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.muoncore.protocol</groupId>
+            <artifactId>stack-rpc</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.muoncore.protocol</groupId>
+            <artifactId>stack-reactive-streams</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>21.0</version>
+        </dependency>
+
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>muon</id>
+            <name>muoncore-releases</name>
+            <url>https://simplicityitself.jfrog.io/simplicityitself/muon</url>
+        </repository>
+        <repository>
+            <id>muonsnap</id>
+            <name>muoncore-releases</name>
+            <url>https://simplicityitself.jfrog.io/simplicityitself/muon-snapshot</url>
+            <snapshots></snapshots>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
