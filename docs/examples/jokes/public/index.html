@@ -4,27 +4,19 @@
   <title>Jokes</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
-<body onload="refreshJokes()">
+<body onload="toggleRefreshing()">
 
 <h1>Joke Service</h1>
-<button onclick="refreshJokes()">Refresh</button> <button onclick="refreshInASecond()">Refresh automatic every second</button>
+<button id="refreshButton" onclick="toggleRefreshing()"></button>
 <div id="jokes"></div>
-<input id="newJoke" type="text" placeholder="Type a joke" /> Enter to add
 
 <script>
+var refreshing = false;
 
 function refreshJokes() {
   $.get('jokes', function(jokes) {
     $('#jokes').html(jokesHtml(jokes));
   });
-  $('#newJoke').focus();
-}
-
-function refreshInASecond() {
-  window.setTimeout(function(){
-   refreshJokes();
-   refreshInASecond();
-  }, 1000);
 }
 
 function jokesHtml(jokes) {
@@ -55,22 +47,26 @@ function deleteJoke(jokeId) {
   });
 }
 
-$('#newJoke').keyup(function (event) {
-  if (event.keyCode == 13) {
-    $.ajax({
-      method: 'POST',
-      url: 'jokes',
-      contentType: 'application/json',
-      data: JSON.stringify({title:$("#newJoke").val()}),
-      dataType: 'json',
-      success: function() {
-        refreshJokes();
-      }
-    });
-    $("#newJoke").val('');
-    return false;
+function toggleRefreshing() {
+  if (refreshing) {
+    refreshing = false;
+    $('#refreshButton').html('Start polling jokes');
+  } else {
+    refreshing = true;
+    $('#refreshButton').html('Stop polling jokes');
+    refreshJokes();
+    refreshInASecond();
   }
-});
+}
+
+function refreshInASecond() {
+  window.setTimeout(function(){
+    refreshJokes();
+    if (refreshing) {
+      refreshInASecond();
+    }
+  }, 1000);
+}
 
 </script>
 
