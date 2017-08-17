@@ -77,51 +77,83 @@ You should see output like this
 00,021 INFO Server - Server started on 8888
 ```
 
-Open a new console and look at the contents of the `joke.rs` script
+_**Limitation**: Bear in mind that for now, this only has an in-memory event store.
+So each time you reboot the server, it looses all it's scripts and script executions._
 
+In the directory `docs/examples/jokes`, look at the contents of the `joke.rs` script
+
+```javascript
+01 var http = system.import('rockscript.io/http');
+02 var jokes = system.import('localhost:3000');
+03 
+04 var chuckResponse = http.get({url:'http://api.icndb.com/jokes/random'});
+05 
+06 jokes.joke(chuckResponse.body.value.joke);
 ```
-> cd docs/examples/jokes
-> more joke.rs 
-var http = system.import('rockscript.io/http');
-var jokes = system.import('localhost:3000');
 
-var chuckResponse = http.get({url:'http://api.icndb.com/jokes/random'});
+The `http` activity worker is built into the engine itself.  In this 
+`jokes.rs`, `http.get(...);` in line 4 will perform a HTTP request and makes 
+a HTTP response object available in the script that looks like this:
 
-jokes.joke(chuckResponse.body.value.joke);
+```json
+{ status:200,
+  headers:{ 
+    Transfer-Encoding: ["chunked"],
+    ...other headers...
+  },
+  body: {
+    type:"success",
+    value:{
+      joke:"When God said, &quot;let there be light&quot;, Chuck Norris said, &quot;say 'please'.&quot;",
+      ...some other irrelevant properties...
+    }
+  }
+}
 ```
 
-The `http` activity worker is built into the engine itself.  
+The example `jokes` activity worker is implemented as an external service and 
+gets laughs for jokes.  It shows:  
 
-The `jokes` activity worker is an example service for getting a laugh from jokes.  
-It shows 2 aspects: 1) That you can make activity worker available over http, and
-2) That activities can take a long time to complete.
+  1) That you can make activity worker available over http
+  2) That activities can take a long time to complete
 
 The idea is that you can add a joke to the service.  And a joke ends when someone 
 has laughed with the joke.
 
-Start the `joke-server.js` with the command
-
-```
-> node joke-server.js 
-Joke Server listening on port 3000!
-```
-
-Now point your browser to `http://localhost:3000`  
-
-To add the first jokes, we run the  
 Deploy the `joke.rs` script to the RockScript server with the following command
 
 ```
-> curl -X POST --data-binary @joke.rs localhost:8888/scripts
+curl -X POST --data-binary @joke.rs localhost:8888/scripts
+```
+
+The output on the console shows the script id.  It looks something like this:  
+```
 {"id":"s1"}
 ```
 
-The response is the script id.
+Start the jokes activity worker with the command `node joke-server.js`.  You should see
+
+```
+Joke Server listening on port 3000!
+```
+
+The jokes activity worker has a minimal web UI to give jokes a laugh.  Point your 
+browser to [http://localhost:3000](http://localhost:3000)  That page refreshes itself every 
+second and shows all the jokes that didn't have a laugh yet.  
+
+To add jokes to the list, you can start the `joke.rs` script like this:
 
 ```
 > curl -X POST -H "Content-Type: application/json" -d {startScript:{scriptId:"s1"}} localhost:8888/command
 ```
 
+You will see in the logs of the server that the script will be executed up till the joke 
+action is started.  The last line will show that the joke action is waiting.
+
+In the [jokes activity worker web page](http://localhost:3000), you can give a joke a laugh by 
+clicking on the 'Hehe' button next to it.  Then the joke gets removed from the list and 
+the RockScript server will be notified that the joke action has ended.  You will see in the 
+server that the script execution related to that joke continues and ends.
 
 ### Project stage
 
