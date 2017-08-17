@@ -13,7 +13,7 @@ app.get('/jokes', function (req, res) {
   res.send(jokes);
 });
 
-app.post('/addJoke', function (req, res) {
+app.post('/joke', function (req, res) {
   var actionInput = req.body;
   console.log('New joke started with actionInput: '+JSON.stringify(actionInput, null, 2));
   var joke = {
@@ -55,7 +55,7 @@ app.delete('/jokes/:jokeId', function (req, res) {
       method: 'POST',
       hostname: 'localhost',
       port: 8888,
-      path: '/endAction',
+      path: '/command',
       headers: {
         'Content-Type': 'application/json'
       }

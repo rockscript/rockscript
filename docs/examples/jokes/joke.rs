@@ -3,4 +3,4 @@ var jokes = system.import('localhost:3000');
 
 var chuckResponse = http.get({url:'http://api.icndb.com/jokes/random'});
 
-jokes.addJoke(chuckResponse.body.value.joke);
+jokes.joke(chuckResponse.body.value.joke);

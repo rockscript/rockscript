@@ -21,7 +21,7 @@ function refreshJokes() {
 
 function jokesHtml(jokes) {
   if (jokes.length===0) {
-    return 'No jokes yet, please <a href="#TODO">run the chuck-joke.rs</a> to add jokes,  This page will refresh itself every second.';
+    return '<p>No jokes yet, please <a href="#TODO">run the chuck-joke.rs</a> to add jokes,  This page will refresh itself every second.</p>';
   } else {
     return '<ul>' +
              jokes.map(joke=>jokeHtml(joke)).join('') +
