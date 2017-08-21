@@ -133,7 +133,7 @@ public abstract class Execution<T extends ScriptElement> {
 
   protected void dispatchAndExecute(ExecutableEvent event) {
     dispatch(event);
-    event.execute();
+    event.execute(this);
   }
 
   public String getId() {

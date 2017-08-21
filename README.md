@@ -52,12 +52,14 @@ starts, the engine notifies the activity worker that a new activity has to be st
 After that notification, the RockScript engine will wait for a callback from the activity 
 worker.  During this time, the RockScript engine will not block a thread or memory.
 
-An **activity worker** executes activities.  Activity workers can expose their activities 
-through a Java API as well as over an HTTP API.  It's really easy to add activity workers 
-to an engine.
+An **activity worker** is the component responsible for executing activities.  
+It's really easy to add activity workers to an engine via an activity script object.
 
-An **activity script object** is a script object that is imported in the script and exposes 
-one or more activities in the script.
+An **activity script object** is a script object that is imported into the script and 
+exposes one or more activities in the script.  The activity script object will 
+get a notification when an activity has to be started.  The activity script object 
+passes the activity start message on to the activity worker.  The activity worker 
+is then responsible for invoking the callback to indicate when an activity ends.  
 
 ![Activity worker sequence](docs/image/activity-worker-sequence.png)
 

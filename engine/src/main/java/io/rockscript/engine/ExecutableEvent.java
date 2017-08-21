@@ -22,5 +22,5 @@ public abstract class ExecutableEvent<T extends Execution> extends ExecutionEven
     super(execution);
   }
 
-  public abstract void execute();
+  public abstract void execute(T execution);
 }

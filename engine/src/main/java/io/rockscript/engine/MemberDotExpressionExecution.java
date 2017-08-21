@@ -32,7 +32,7 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
   @Override
   public void childEnded(Execution child) {
     Object propertyValue = getPropertyValue();
-    dispatch(new PropertyDereferencedEvent(this, propertyValue));
+    // dispatch(new PropertyDereferencedEvent(this, propertyValue));
     setResult(propertyValue);
     end();
   }

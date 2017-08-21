@@ -16,7 +16,21 @@
 package io.rockscript.engine;
 
 
+import com.google.gson.reflect.TypeToken;
+import io.rockscript.gson.PolymorphicTypeAdapterFactory;
+
 public interface Event {
 
-  EventJson toJson();
+  static PolymorphicTypeAdapterFactory createEventJsonTypeAdapterFactory() {
+    return new PolymorphicTypeAdapterFactory()
+      .typeName(new TypeToken<Event>(){},                     "event") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
+      .typeName(new TypeToken<ActionEndedEvent>(){},          "actionEnd")
+      .typeName(new TypeToken<ActionStartedEvent>(){},        "actionStarted")
+      .typeName(new TypeToken<ActionWaitingEvent>(){},        "actionWaiting")
+      .typeName(new TypeToken<ScriptEndedEvent>(){},          "scriptEnded")
+      .typeName(new TypeToken<ScriptStartedEvent>(){},        "scriptStarted")
+      .typeName(new TypeToken<VariableCreatedEvent>(){},      "variableCreated")
+      ;
+  }
+
 }

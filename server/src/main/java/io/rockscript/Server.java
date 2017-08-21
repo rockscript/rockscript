@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static io.rockscript.command.Command.createCommandsTypeAdapterFactory;
-import static io.rockscript.engine.EventJson.createEventJsonTypeAdapterFactory;
+import static io.rockscript.engine.Event.createEventJsonTypeAdapterFactory;
 
 public class Server {
 

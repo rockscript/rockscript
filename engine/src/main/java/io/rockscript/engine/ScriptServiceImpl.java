@@ -16,9 +16,9 @@
 
 package io.rockscript.engine;
 
-import java.util.List;
-
 import io.rockscript.ScriptService;
+
+import java.util.List;
 
 public abstract class ScriptServiceImpl implements ScriptService {
 
@@ -34,9 +34,6 @@ public abstract class ScriptServiceImpl implements ScriptService {
     Script script = parseScript(scriptText);
     script.setId(scriptId);
     storeScript(script, scriptText);
-    engineConfiguration
-      .getEventStore()
-      .handle(new ScriptDeployedEvent(script, scriptText));
     return script;
   }
 

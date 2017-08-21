@@ -18,23 +18,31 @@ package io.rockscript.engine;
 
 public abstract class ExecutionEvent<T extends Execution> implements Event {
 
-  T execution;
+  protected String scriptExecutionId;
+  protected String executionId;
+  protected Integer elementIndex;
 
   @Deprecated
   public ExecutionEvent() {
   }
 
   public ExecutionEvent(T execution) {
-    this.execution = execution;
+    this.scriptExecutionId = execution.getScriptExecution().getId();
+    this.elementIndex = execution.getElement().getIndex();
+    if (! (execution instanceof ScriptExecution)) {
+      this.executionId = execution.getId();
+    }
   }
 
-  public T getExecution() {
-    return execution;
+  public String getScriptExecutionId() {
+    return scriptExecutionId;
   }
 
-  public EngineConfiguration getServiceLocator() {
-    return execution.getScript().getEngineConfiguration();
+  public String getExecutionId() {
+    return executionId;
   }
 
-  public abstract ExecutionEventJson toJson();
+  public Integer getElementIndex() {
+    return elementIndex;
+  }
 }

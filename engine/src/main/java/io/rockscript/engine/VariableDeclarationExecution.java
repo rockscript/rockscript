@@ -38,7 +38,14 @@ public class VariableDeclarationExecution extends Execution<VariableDeclaration>
 
   public void done() {
     Variable variable = createVariable();
-    dispatch(new VariableCreatedEvent(this, variable.getValue()));
+
+    Object value = variable.getValue();
+    Object valueJson = getScript()
+        .getEngineConfiguration()
+        .getEventStore()
+        .valueToJson(value);
+
+    dispatch(new VariableCreatedEvent(this, valueJson));
     parent.childEnded(this);
   }
 

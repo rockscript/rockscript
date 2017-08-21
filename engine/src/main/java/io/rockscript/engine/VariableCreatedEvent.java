@@ -20,15 +20,9 @@ public class VariableCreatedEvent extends ExecutionEvent<VariableDeclarationExec
 
   Object valueJson;
 
-  public VariableCreatedEvent(VariableDeclarationExecution execution, Object value) {
+  public VariableCreatedEvent(VariableDeclarationExecution execution, Object valueJson) {
     super(execution);
-    this.valueJson = getServiceLocator()
-      .getEventStore()
-      .valueToJson(value);
+    this.valueJson = valueJson;
   }
 
-  @Override
-  public ExecutionEventJson toJson() {
-    return new VariableCreatedEventJson(this, valueJson);
-  }
 }

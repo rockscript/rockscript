@@ -21,8 +21,4 @@ public class ScriptEndedEvent extends ExecutionEvent<ScriptExecution> {
     super(scriptExecution);
   }
 
-  public ExecutionEventJson toJson() {
-    return new ScriptEndedEventJson(this);
-  }
-
 }

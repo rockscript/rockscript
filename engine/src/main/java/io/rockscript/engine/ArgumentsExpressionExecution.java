@@ -15,10 +15,12 @@
  */
 package io.rockscript.engine;
 
+import io.rockscript.action.Action;
+import io.rockscript.action.ActionInput;
+import io.rockscript.action.ActionOutput;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import io.rockscript.action.*;
 
 public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression> {
 
@@ -58,7 +60,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     // are applied because they can return functions
     ActionOutput output = startActionInvoke();
     Object importedObject = output.getResult();
-    dispatch(new ObjectImportedEvent(this, importedObject));
+    // dispatch(new ObjectImportedEvent(this, importedObject));
     endActionExecute(importedObject);
   }
 

@@ -18,14 +18,8 @@ package io.rockscript.engine;
 
 public class ActionWaitingEvent extends ExecutionEvent<ArgumentsExpressionExecution> {
 
-  ArgumentsExpressionExecution argumentsExpressionExecution;
-
   public ActionWaitingEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
     super(argumentsExpressionExecution);
   }
 
-  @Override
-  public ExecutionEventJson toJson() {
-    return new ActionWaitingEventJson(this);
-  }
 }

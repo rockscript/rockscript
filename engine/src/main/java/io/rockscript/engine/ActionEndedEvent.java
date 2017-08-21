@@ -26,12 +26,8 @@ public class ActionEndedEvent extends ExecutableEvent<ArgumentsExpressionExecuti
   }
 
   @Override
-  public void execute() {
+  public void execute(ArgumentsExpressionExecution execution) {
     execution.endActionExecute(result);
   }
 
-  @Override
-  public ExecutionEventJson toJson() {
-    return new ActionEndedEventJson(this);
-  }
 }

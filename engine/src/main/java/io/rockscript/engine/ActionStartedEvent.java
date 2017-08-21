@@ -23,12 +23,7 @@ public class ActionStartedEvent extends ExecutableEvent<ArgumentsExpressionExecu
   }
 
   @Override
-  public ExecutionEventJson toJson() {
-    return new ActionStartedEventJson(this);
-  }
-
-  @Override
-  public void execute() {
+  public void execute(ArgumentsExpressionExecution execution) {
     ExecutionMode executionMode = execution.getScriptExecution().getExecutionMode();
     if (executionMode!=ExecutionMode.REBUILDING) {
       execution.startActionExecute();

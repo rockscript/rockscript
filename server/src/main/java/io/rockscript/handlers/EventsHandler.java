@@ -15,13 +15,13 @@
  */
 package io.rockscript.handlers;
 
-import java.util.List;
-
 import io.rockscript.ScriptService;
-import io.rockscript.engine.EventJson;
+import io.rockscript.engine.Event;
 import io.rockscript.netty.router.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 @Get("/events")
 public class EventsHandler implements RequestHandler {
@@ -30,7 +30,7 @@ public class EventsHandler implements RequestHandler {
 
   @Override
   public void handle(Request request, Response response, Context context) {
-    List<EventJson> events = context
+    List<Event> events = context
       .get(ScriptService.class)
       .getEngineConfiguration()
       .getEventStore()

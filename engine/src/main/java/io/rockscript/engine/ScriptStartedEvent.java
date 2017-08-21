@@ -18,16 +18,13 @@ package io.rockscript.engine;
 public class ScriptStartedEvent extends ExecutionEvent<ScriptExecution> {
 
   String scriptId;
-  String scriptExecutionId;
   Object input;
 
   public ScriptStartedEvent(ScriptExecution scriptExecution, Object input) {
     super(scriptExecution);
-    this.input = input;
-  }
 
-  public ScriptStartedEventJson toJson() {
-    return new ScriptStartedEventJson(this);
+    this.scriptId = scriptExecution.getScript().getId();
+    this.input = input;
   }
 
   public String getScriptId() {

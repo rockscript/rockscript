@@ -27,7 +27,7 @@ import io.rockscript.ScriptService;
 import io.rockscript.action.http.EngineContext;
 import io.rockscript.engine.test.TestIdGenerator;
 
-import static io.rockscript.engine.EventJson.createEventJsonTypeAdapterFactory;
+import static io.rockscript.engine.Event.createEventJsonTypeAdapterFactory;
 
 public abstract class EngineConfiguration implements EngineContext {
 

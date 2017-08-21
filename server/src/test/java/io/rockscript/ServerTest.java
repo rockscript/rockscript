@@ -15,15 +15,18 @@
  */
 package io.rockscript;
 
-import java.util.List;
-
 import com.google.gson.reflect.TypeToken;
 import io.rockscript.command.DeployScriptCommand;
 import io.rockscript.command.StartScriptCommand;
-import io.rockscript.engine.EventJson;
+import io.rockscript.engine.Event;
 import io.rockscript.http.test.AbstractServerTest;
 import io.rockscript.netty.router.AsyncHttpServer;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -88,10 +91,10 @@ public class ServerTest extends AbstractServerTest {
       .assertStatusOk()
       .body(StartScriptCommand.ResponseJson.class);
 
-    List<EventJson> eventJsons = GET("events")
+    List<Event> eventJsons = GET("events")
       .execute()
       .assertStatusOk()
-      .body(new TypeToken<List<EventJson>>(){}.getType());
+      .body(new TypeToken<List<Event>>(){}.getType());
 
     assertEquals(11, eventJsons.size());
   }
