@@ -16,15 +16,15 @@
 
 package io.rockscript.netty.router;
 
+import io.netty.handler.codec.http.router.Router;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import io.netty.handler.codec.http.router.Router;
 
 public class AsyncHttpServerConfiguration {
 
   protected Router<Class<?>> router = new Router<>();
-  protected int port = 8888;
+  protected int port = 3652;  // The default RockScript port number
   protected List<Interceptor> interceptors;
   protected MapContext context = new MapContext();
   protected JsonHandler jsonHandler;

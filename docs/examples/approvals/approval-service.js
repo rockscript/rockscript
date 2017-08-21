@@ -1,22 +1,20 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const http = require("http");
-const app = express();
 const shortid = require('shortid');
 
-app.use(express.static('public'));
+const app = express();
 app.use(bodyParser.json());
 
-var jokes = [];
+var approvals = [];
 
-app.get('/jokes', function (req, res) {
-  res.send(jokes);
+app.get('/approvals', function (req, res) {
+  res.send(approvals);
 });
 
-app.post('/joke', function (req, res) {
+app.post('/approve', function (req, res) {
   var actionInput = req.body;
-  console.log('New joke started with actionInput: '+JSON.stringify(actionInput, null, 2));
-  var joke = {
+  var approval = {
     id: shortid.generate(),
     title: actionInput.args[0],
     actionPosition: {
@@ -24,15 +22,21 @@ app.post('/joke', function (req, res) {
       executionId: actionInput.executionId
     }
   }
-  jokes.push(joke);
+  approvals.push(approval);
+
+  console.log('New approval created with incoming request: ');
+  console.log('  POST http://localhost:3000/approval');
+  console.log('  Content-Type: application/json');
+  console.log('  '+JSON.stringify(actionInput, null, 2));
+
   res.send({ ended: false });
 });
 
-app.delete('/jokes/:jokeId', function (req, res) {
-  var deleteJokeId = req.params.jokeId;
-  var joke = jokes.find((joke,i,jokes)=>{
-    if (joke.id === deleteJokeId) {
-      jokes.splice(i, 1);
+app.delete('/approvals/:approvalId', function (req, res) {
+  var deleteApprovalId = req.params.approvalId;
+  var approval = approvals.find((approval,i,approvals)=>{
+    if (approval.id === deleteApprovalId) {
+      approvals.splice(i, 1);
       return true;
     }
     return false;
@@ -41,20 +45,20 @@ app.delete('/jokes/:jokeId', function (req, res) {
 
   var endActionCommand = {
     endAction: {
-      scriptExecutionId: joke.actionPosition.scriptExecutionId,
-      executionId: joke.actionPosition.executionId
+      scriptExecutionId: approval.actionPosition.scriptExecutionId,
+      executionId: approval.actionPosition.executionId
     }
   };
 
-  console.log('Ending joke action by posting the end action command:');
-  console.log('  POST http://loclahost:8888/endAction');
+  console.log('Approval received and notifying rockscript server with outgoing request: ');
+  console.log('  POST http://localhost:3652/endAction');
   console.log('  Content-Type: application/json');
   console.log('  '+JSON.stringify(endActionCommand, null, 2));
 
   var endActionRequest = http.request({
       method: 'POST',
       hostname: 'localhost',
-      port: 8888,
+      port: 3652,
       path: '/command',
       headers: {
         'Content-Type': 'application/json'
@@ -63,7 +67,7 @@ app.delete('/jokes/:jokeId', function (req, res) {
     (res) => {
       res.on('data', (chunk) => {});
       res.on('end', function() {
-        console.log('RockScript server was notified of joke end: '+deleteJokeId);
+        console.log('RockScript server was notified of approval: '+deleteApprovalId);
       });
     }
   );
@@ -76,9 +80,9 @@ app.delete('/jokes/:jokeId', function (req, res) {
 });
 
 app.get('/', function (req, res) {
-  res.sendFile(__dirname+'/public/index.html');
+ res.sendFile(__dirname+'/public/index.html');
 });
 
 app.listen(3000, function () {
-  console.log('Joke Server listening on port 3000!');
+  console.log('Approval service listening on port 3000.  Point your browser to http://localhost:3000');
 });

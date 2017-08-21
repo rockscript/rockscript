@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <title>Approval Service</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body onload="toggleRefreshing()">
+
+<h1>Approval Service</h1>
+<button id="refreshButton" onclick="toggleRefreshing()"></button>
+<div id="approvals"></div>
+
+<script>
+var refreshing = false;
+
+function refreshApprovals() {
+  $.get('approvals', function(approvals) {
+    $('#approvals').html(approvalsHtml(approvals));
+  });
+}
+
+function approvalsHtml(approvals) {
+  if (approvals.length===0) {
+    return  '<p>No approvals yet</p>' +
+      '<p>To create approvals follow instructions on '+
+      '<a target="_blank" href="https://github.com/rockscript/server#usage-by-example">RockScript Server README</a>' +
+      '</p>';
+  } else {
+    return '<ul>' +
+             approvals.map(approval=>approvalHtml(approval)).join('') +
+           '</ul>';
+  }
+}
+
+function approvalHtml(approval) {
+  return '<li>'+deleteHtml(approval)+' '+approval.title+'</li>';
+}
+
+function deleteHtml(approval) {
+  return '<button onclick="deleteApproval(\''+approval.id+'\')">Approve</button>'
+}
+
+function deleteApproval(approvalId) {
+  $.ajax({
+    method: 'DELETE',
+    url: 'approvals/'+approvalId,
+    success: function() {
+      refreshApprovals();
+    }
+  });
+}
+
+function toggleRefreshing() {
+  if (refreshing) {
+    refreshing = false;
+    $('#refreshButton').html('Start polling approvals');
+  } else {
+    refreshing = true;
+    $('#refreshButton').html('Stop polling approvals');
+    refreshApprovals();
+    refreshInASecond();
+  }
+}
+
+function refreshInASecond() {
+  window.setTimeout(function(){
+    refreshApprovals();
+    if (refreshing) {
+      refreshInASecond();
+    }
+  }, 1000);
+}
+
+</script>
+
+</body>
+</html>

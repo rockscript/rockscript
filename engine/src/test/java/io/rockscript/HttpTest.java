@@ -15,6 +15,7 @@
  */
 package io.rockscript;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,14 +35,15 @@ public class HttpTest {
     return new TestScriptService();
   }
 
+  @Ignore
   @Test
   public void testAsyncExecution() {
     String scriptId = scriptService
       .deployScript(
         "var http = system.import('rockscript.io/http'); \n" +
-        "var jokes = system.import('localhost:3000'); \n" +
+        "var approvals = system.import('localhost:3000'); \n" +
         "var chuckResponse = http.get({url:'http://api.icndb.com/jokes/random'}); \n" +
-        "jokes.addJoke(chuckResponse.body.value.joke); ")
+        "approvals.approve(chuckResponse.body.value.joke); ")
       .getId();
 
     log.debug("Starting script...");
