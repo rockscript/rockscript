@@ -11,9 +11,9 @@
 The syntax of RockScript is based on JavaScript, so it will be very familiar 
 to you.
   
-RockScript adds the notion of an [Activity](#activitiy-workers).  In the script, 
+RockScript adds the notion of an [Activity](#activity-workers).  In the script, 
 an activity looks like a function invocation but they are executed asynchronously 
-by an [Activity Worker](#activitiy-workers) component.  Activities can be long running: 
+by an [Activity Worker](#activity-workers) component.  Activities can be long running: 
 from milliseconds, to days or even months.  The script execution will not block any thread 
 or memory resources while it is waiting for an activity completion callback.
 So you can write reactive code without the typical callback hell or other 
