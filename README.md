@@ -1,12 +1,12 @@
 ![RockScript](docs/image/logo.png)
 
+## Why use it
+
  * __Resilient script execution__
  * __Support for including long running activities__  
  * __Used for microservice orchestration__
  * __Valuable component in event driven architectures__
  * __Easier to read compared to reactive code with callbacks__
-
-## Why
 
 The syntax of RockScript is based on JavaScript, so it will be very familiar 
 to you.
@@ -24,7 +24,7 @@ each script execution is stored with event sourcing as the script executes.
 So script executions can _survive RockScript server crashes_.  It's designed 
 so that a group of RockScript servers can form a cluster. 
 
-## When
+## When to use it
 
 **Event listeners**: RockScript is ideal for implementing event listeners in 
 an event driven architecture.  That's because your server often needs to perform 
@@ -56,8 +56,8 @@ An **activity worker** executes activities.  Activity workers can expose their a
 through a Java API as well as over an HTTP API.  It's really easy to add activity workers 
 to an engine.
 
-An **activity proxy object** is a script object that is imported in the script and exposes 
-one or more activities in the script.  Activity worker proxies can be imported dynamically. 
+An **activity script object** is a script object that is imported in the script and exposes 
+one or more activities in the script.
 
 ![Activity worker sequence](docs/image/activity-worker-sequence.png)
 
@@ -65,7 +65,7 @@ one or more activities in the script.  Activity worker proxies can be imported d
 
 #### Prerequisites
 
- * Java 8
+ * Java 8 (to run the RockScript server)
  * Maven 3.3.9 (to build the engine)
  * NodeJS 7.7.1 (to run the example)
 
@@ -143,19 +143,13 @@ The script ends after the approval is given in the approval service.  Adding app
 return data and doing something with it afterwards is left as a challenge for the 
 reader :)
 
-#### The http activity worker
-
-The `http` activity worker is built into the engine itself.  It uses a separate 
-threadpool to perform the HTTP requests.  But when executing the example script, 
-it's quite fast so you might not notice it's being executed asynchronous.
-
 ### Deploying the script
 
 Before we can run the script, we have to deploy it into the RockScript server.
 Deploy `create-approval.rs` with the following command
 
 ```
-curl -X POST --data-binary @joke.rs localhost:3652/scripts
+curl -X POST --data-binary @create-approval.rs localhost:3652/scripts
 ```
 
 The output on the console shown by curl contains the script id.  It looks something 
@@ -164,6 +158,12 @@ like this:
 ```
 {"id":"s1"}
 ```
+
+#### The http activity worker
+
+The `http` activity worker is built into the engine itself.  It uses a separate 
+threadpool to perform the HTTP requests.  But when executing the example script, 
+it's quite fast so you might not notice it's being executed asynchronous.
 
 #### The approval service
 
@@ -178,7 +178,13 @@ The approval service demonstrates:
 The script adds a statement to the service for approval.  And the approval ends when 
 someone clicks on the Approve button next to the statement.
 
-Start the approval service with the command `node approval-server.js`.  You should see
+Start the approval service with the command 
+
+```
+node approval-service.js
+```  
+
+You should see
 
 ```
 Approval service listening on port 3000.  Point your browser to http://localhost:3000
