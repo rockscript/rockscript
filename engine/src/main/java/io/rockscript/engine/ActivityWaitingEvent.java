@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.action;
 
-public interface Action {
+package io.rockscript.engine;
 
-  ActionOutput invoke(ActionInput input);
+public class ActivityWaitingEvent extends ExecutionEvent<ArgumentsExpressionExecution> {
+
+  public ActivityWaitingEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
+    super(argumentsExpressionExecution);
+  }
+
 }

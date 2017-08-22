@@ -13,13 +13,13 @@ app.get('/approvals', function (req, res) {
 });
 
 app.post('/approve', function (req, res) {
-  var actionInput = req.body;
+  var activityInput = req.body;
   var approval = {
     id: shortid.generate(),
-    title: actionInput.args[0],
-    actionPosition: {
-      scriptExecutionId: actionInput.scriptExecutionId,
-      executionId: actionInput.executionId
+    title: activityInput.args[0],
+    activityPosition: {
+      scriptExecutionId: activityInput.scriptExecutionId,
+      executionId: activityInput.executionId
     }
   }
   approvals.push(approval);
@@ -27,7 +27,7 @@ app.post('/approve', function (req, res) {
   console.log('New approval created with incoming request: ');
   console.log('  POST http://localhost:3000/approval');
   console.log('  Content-Type: application/json');
-  console.log('  '+JSON.stringify(actionInput, null, 2));
+  console.log('  '+JSON.stringify(activityInput, null, 2));
 
   res.send({ ended: false });
 });
@@ -43,19 +43,19 @@ app.delete('/approvals/:approvalId', function (req, res) {
   });
   res.sendStatus(200);
 
-  var endActionCommand = {
-    endAction: {
-      scriptExecutionId: approval.actionPosition.scriptExecutionId,
-      executionId: approval.actionPosition.executionId
+  var endActivityCommand = {
+    endActivity: {
+      scriptExecutionId: approval.activityPosition.scriptExecutionId,
+      executionId: approval.activityPosition.executionId
     }
   };
 
   console.log('Approval received and notifying rockscript server with outgoing request: ');
-  console.log('  POST http://localhost:3652/endAction');
+  console.log('  POST http://localhost:3652/endActivity');
   console.log('  Content-Type: application/json');
-  console.log('  '+JSON.stringify(endActionCommand, null, 2));
+  console.log('  '+JSON.stringify(endActivityCommand, null, 2));
 
-  var endActionRequest = http.request({
+  var endActivityRequest = http.request({
       method: 'POST',
       hostname: 'localhost',
       port: 3652,
@@ -71,11 +71,11 @@ app.delete('/approvals/:approvalId', function (req, res) {
       });
     }
   );
-  endActionRequest.on('error', (e) => {
+  endActivityRequest.on('error', (e) => {
     console.error(`Got error: ${e.message}`);
   });
-  endActionRequest.write(JSON.stringify(endActionCommand));
-  endActionRequest.end();
+  endActivityRequest.write(JSON.stringify(endActivityCommand));
+  endActivityRequest.end();
 
 });
 

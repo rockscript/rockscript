@@ -206,8 +206,8 @@ curl -X POST -H Content-Type:application/json -d {startScript:{scriptId:"s1"}} l
 This assumes that the id of the deployed script was `s1`.  In case you redeploy or deploy 
 other scripts, use the script id as returned from the script deployment.
 
-You will see in the logs of the server that the script will be executed up till the joke 
-action is started.  The last line will show that the approval action is waiting.
+You will see in the logs of the server that the script will be executed up till the approval
+activity is started.  The last line will show that the approval activity is waiting.
 
 On the approval webapp, you will now see a new statement appear with an 'Approve' button 
 next to it.

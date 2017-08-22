@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rockscript.action.http;
+package io.rockscript.activity.http;
 
 import io.rockscript.ScriptService;
 import org.slf4j.Logger;
@@ -39,7 +39,7 @@ public class HttpRequestRunnable implements Runnable {
   @Override
   public void run() {
     HttpResponse response = request.execute();
-    scriptService.endWaitingAction(scriptExecutionId, executionId, response);
+    scriptService.endActivity(scriptExecutionId, executionId, response);
   }
 
 }

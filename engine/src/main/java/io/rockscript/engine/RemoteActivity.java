@@ -17,34 +17,34 @@ package io.rockscript.engine;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import io.rockscript.action.Action;
-import io.rockscript.action.ActionInput;
-import io.rockscript.action.ActionOutput;
-import io.rockscript.action.http.HttpRequest;
+import io.rockscript.activity.Activity;
+import io.rockscript.activity.ActivityInput;
+import io.rockscript.activity.ActivityOutput;
+import io.rockscript.activity.http.HttpRequest;
 
-import static io.rockscript.action.http.Http.ContentTypes.APPLICATION_JSON;
-import static io.rockscript.action.http.Http.Headers.CONTENT_TYPE;
+import static io.rockscript.activity.http.Http.ContentTypes.APPLICATION_JSON;
+import static io.rockscript.activity.http.Http.Headers.CONTENT_TYPE;
 
-public class RemoteAction implements Action {
+public class RemoteActivity implements Activity {
 
   String url;
-  String actionName;
+  String activityName;
 
-  public RemoteAction(String url, String actionName) {
+  public RemoteActivity(String url, String activityName) {
     this.url = url;
-    this.actionName = actionName;
+    this.activityName = activityName;
   }
 
   @Override
-  public ActionOutput invoke(ActionInput input) {
+  public ActivityOutput invoke(ActivityInput input) {
     Gson gson = input.getEngineContext().getGson();
-    String actionInputJson = gson.toJson(input);
-    Object actionOutputResponse = HttpRequest.createPost(url + "/" + actionName)
+    String activityInputJson = gson.toJson(input);
+    Object activityOutputResponse = HttpRequest.createPost(url + "/" + activityName)
         .header(CONTENT_TYPE, APPLICATION_JSON)
-        .body(actionInputJson)
+        .body(activityInputJson)
         .execute()
         .getBody();
-    JsonElement actionOutputJsonElement = gson.toJsonTree(actionOutputResponse);
-    return gson.fromJson(actionOutputJsonElement, ActionOutput.class);
+    JsonElement activityOutputJsonElement = gson.toJsonTree(activityOutputResponse);
+    return gson.fromJson(activityOutputJsonElement, ActivityOutput.class);
   }
 }

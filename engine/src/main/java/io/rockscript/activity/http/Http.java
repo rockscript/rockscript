@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.activity.http;
 
-package io.rockscript.engine;
+public interface Http {
 
-public class ActionStartedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
-
-  public ActionStartedEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
-    super(argumentsExpressionExecution);
+  interface Methods {
+    String GET = "GET";
+    String PUT = "PUT";
+    String POST = "POST";
+    String DELETE = "DELETE";
   }
 
-  @Override
-  public void execute(ArgumentsExpressionExecution execution) {
-    ExecutionMode executionMode = execution.getScriptExecution().getExecutionMode();
-    if (executionMode!=ExecutionMode.REBUILDING) {
-      execution.startActionExecute();
-    }
+  interface Headers {
+    String CONTENT_TYPE = "Content-Type";
+  }
+
+  interface ContentTypes {
+    String APPLICATION_JSON = "application/json";
   }
 }

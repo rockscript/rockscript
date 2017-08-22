@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.action.http;
+package io.rockscript.activity.http;
 
-import io.rockscript.action.http.Http.ContentTypes;
-import io.rockscript.action.http.Http.Headers;
+import io.rockscript.activity.http.Http.ContentTypes;
+import io.rockscript.activity.http.Http.Headers;
 import io.rockscript.engine.Dereferencable;
 
 import java.util.List;

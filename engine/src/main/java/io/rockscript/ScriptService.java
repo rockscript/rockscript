@@ -16,10 +16,13 @@
 
 package io.rockscript;
 
+import io.rockscript.engine.EngineConfiguration;
+import io.rockscript.engine.Script;
+import io.rockscript.engine.ScriptExecution;
+
 import java.util.List;
 
-import io.rockscript.engine.*;
-
+/** Access to the RockScript functionality */
 public interface ScriptService {
 
   Script deployScript(String scriptText);
@@ -28,9 +31,9 @@ public interface ScriptService {
 
   ScriptExecution startScriptExecution(String scriptId, Object input);
 
-  ScriptExecution endWaitingAction(String scriptExecutionId, String executionId);
+  ScriptExecution endActivity(String scriptExecutionId, String executionId);
 
-  ScriptExecution endWaitingAction(String scriptExecutionId, String executionId, Object result);
+  ScriptExecution endActivity(String scriptExecutionId, String executionId, Object result);
 
   EngineConfiguration getEngineConfiguration();
 

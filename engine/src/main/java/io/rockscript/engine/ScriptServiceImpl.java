@@ -60,15 +60,15 @@ public abstract class ScriptServiceImpl implements ScriptService {
   }
 
   @Override
-  public ScriptExecution endWaitingAction(String scriptExecutionId, String executionId) {
-    return endWaitingAction(scriptExecutionId, executionId, null);
+  public ScriptExecution endActivity(String scriptExecutionId, String executionId) {
+    return endActivity(scriptExecutionId, executionId, null);
   }
 
   @Override
-  public ScriptExecution endWaitingAction(String scriptExecutionId, String executionId, Object result) {
+  public ScriptExecution endActivity(String scriptExecutionId, String executionId, Object result) {
     return engineConfiguration
       .getEngine()
-      .endWaitingAction(scriptExecutionId, executionId, result);
+      .endActivity(scriptExecutionId, executionId, result);
   }
 
   public EngineConfiguration getEngineConfiguration() {

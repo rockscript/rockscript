@@ -15,27 +15,22 @@
  */
 package io.rockscript.engine;
 
-public class ActionEndRequest {
+public class ActivityEndRequestRunnable implements Runnable {
 
-  String scriptExecutionId;
-  String executionId;
-  Object result;
+  ActivityEndRequest activityEndRequest;
+  EngineConfiguration engineConfiguration;
 
-  public ActionEndRequest(String scriptExecutionId, String executionId, Object result) {
-    this.scriptExecutionId = scriptExecutionId;
-    this.executionId = executionId;
-    this.result = result;
+  public ActivityEndRequestRunnable(ActivityEndRequest activityEndRequest, EngineConfiguration engineConfiguration) {
+    this.activityEndRequest = activityEndRequest;
+    this.engineConfiguration = engineConfiguration;
   }
 
-  public String getScriptExecutionId() {
-    return scriptExecutionId;
-  }
-
-  public String getExecutionId() {
-    return executionId;
-  }
-
-  public Object getResult() {
-    return result;
+  @Override
+  public void run() {
+    engineConfiguration
+      .getScriptService()
+      .endActivity(activityEndRequest.getScriptExecutionId(),
+                        activityEndRequest.getExecutionId(),
+                        activityEndRequest.getResult());
   }
 }

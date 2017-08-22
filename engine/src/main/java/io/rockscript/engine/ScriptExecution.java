@@ -36,7 +36,7 @@ public class ScriptExecution extends BlockExecution<Script> {
 
   private void initializeSystemVariable(EngineConfiguration engineConfiguration) {
     JsonObject systemJsonObject = new JsonObject();
-    systemJsonObject.put("import", new SystemImportAction(engineConfiguration));
+    systemJsonObject.put("import", new SystemImportActivity(engineConfiguration));
     createVariable("system")
       .setValue(systemJsonObject);
   }
@@ -82,7 +82,7 @@ public class ScriptExecution extends BlockExecution<Script> {
   public void endFunctionInvocationExecution(String executionId, Object result) {
     ArgumentsExpressionExecution argumentsExpressionExecution = (ArgumentsExpressionExecution) findExecutionRecursive(executionId);
     ScriptException.throwIfNull(argumentsExpressionExecution, "Couldn't find function invocation execution %s in script execution %s", executionId, id);
-    argumentsExpressionExecution.endActionExecute(result);
+    argumentsExpressionExecution.endActivityExecute(result);
   }
 
   public EventListener getEventListener() {

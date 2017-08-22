@@ -279,7 +279,7 @@ emptyStatement
  ;
 
 /// ExpressionStatement :
-///     [lookahead ∉ {{, action}] Expression ;
+///     [lookahead ∉ {{, activity}] Expression ;
 expressionStatement
  : {(_input.LA(1) != OpenBrace) && (_input.LA(1) != Function)}? expressionSequence eos
  ;
@@ -407,7 +407,7 @@ debuggerStatement
  ;
 
 /// FunctionDeclaration :
-///     action Identifier ( FormalParameterList? ) { FunctionBody }
+///     activity Identifier ( FormalParameterList? ) { FunctionBody }
 functionDeclaration
  : Function Identifier '(' formalParameterList? ')' '{' functionBody '}'
  ;
@@ -608,7 +608,7 @@ argumentList
 ///     new MemberExpression Arguments
 ///
 /// FunctionExpression :
-///     action Identifier? ( FormalParameterList? ) { FunctionBody }
+///     activity Identifier? ( FormalParameterList? ) { FunctionBody }
 ///
 /// PrimaryExpression :
 ///     this
@@ -878,7 +878,7 @@ For        : 'for';
 Switch     : 'switch';
 While      : 'while';
 Debugger   : 'debugger';
-Function   : 'action';
+Function   : 'activity';
 This       : 'this';
 With       : 'with';
 Default    : 'default';

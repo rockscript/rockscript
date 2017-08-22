@@ -17,7 +17,7 @@ package io.rockscript.test;
 
 import java.util.function.Function;
 
-import io.rockscript.action.Action;
+import io.rockscript.activity.Activity;
 import io.rockscript.engine.*;
 
 public class ScriptExecutionComparator extends DeepComparator {
@@ -27,9 +27,9 @@ public class ScriptExecutionComparator extends DeepComparator {
     ignoreField(Execution.class, "element");
     ignoreField(Script.class, "elements");
     ignoreField(Script.class, "engineConfiguration");
-    ignoreField(SystemImportAction.class, "engineConfiguration");
-    ignoreAnonymousField(Action.class, "val$functionHandler");
-    ignoreAnonymousField(Action.class, "arg$1");
+    ignoreField(SystemImportActivity.class, "engineConfiguration");
+    ignoreAnonymousField(Activity.class, "val$functionHandler");
+    ignoreAnonymousField(Activity.class, "arg$1");
     ignoreAnonymousField(Function.class, "arg$1");
   }
 }

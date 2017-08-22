@@ -24,7 +24,7 @@ import java.util.concurrent.Executor;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.rockscript.ScriptService;
-import io.rockscript.action.http.EngineContext;
+import io.rockscript.activity.http.EngineContext;
 import io.rockscript.engine.test.TestIdGenerator;
 
 import static io.rockscript.engine.Event.createEventJsonTypeAdapterFactory;

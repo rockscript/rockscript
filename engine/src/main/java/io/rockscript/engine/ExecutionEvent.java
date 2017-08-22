@@ -20,15 +20,9 @@ public abstract class ExecutionEvent<T extends Execution> implements Event {
 
   protected String scriptExecutionId;
   protected String executionId;
-  protected Integer elementIndex;
-
-  @Deprecated
-  public ExecutionEvent() {
-  }
 
   public ExecutionEvent(T execution) {
     this.scriptExecutionId = execution.getScriptExecution().getId();
-    this.elementIndex = execution.getElement().getIndex();
     if (! (execution instanceof ScriptExecution)) {
       this.executionId = execution.getId();
     }
@@ -40,9 +34,5 @@ public abstract class ExecutionEvent<T extends Execution> implements Event {
 
   public String getExecutionId() {
     return executionId;
-  }
-
-  public Integer getElementIndex() {
-    return elementIndex;
   }
 }

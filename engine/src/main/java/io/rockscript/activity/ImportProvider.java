@@ -13,28 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.activity;
 
-package io.rockscript.engine;
+import io.rockscript.engine.ImportResolver;
 
-import io.rockscript.action.*;
+/** Interface to allow jars on the classpath to provide imports
+ * through the jdk {@link java.util.ServiceLoader} mechanism. */
+public interface ImportProvider {
 
-public class SystemImportAction implements Action {
-
-  EngineConfiguration engineConfiguration;
-
-  public SystemImportAction(EngineConfiguration engineConfiguration) {
-    this.engineConfiguration = engineConfiguration;
-  }
-
-  @Override
-  public ActionOutput invoke(ActionInput input) {
-    String url = (String) input.getArgs().get(0);
-    JsonObject importedObject = engineConfiguration.getImportResolver().get(url);
-    return ActionOutput.endFunction(importedObject);
-  }
-
-  @Override
-  public String toString() {
-    return "[system.import action]";
-  }
+  void provideImport(ImportResolver importResolver);
 }

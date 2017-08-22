@@ -13,29 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.activity;
 
-package io.rockscript.engine;
+public class ActivityOutput {
 
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
+  private final boolean ended;
+  private final Object result;
 
-public class Location {
-
-  private int start;
-  private int end;
-
-  public Location(ParserRuleContext parserRuleContext) {
-    Token start = parserRuleContext.getStart();
-    this.start = start.getStartIndex();
-    Token stop = parserRuleContext.getStop();
-    end = stop.getStopIndex();
+  protected ActivityOutput(boolean ended, Object result) {
+    this.ended = ended;
+    this.result = result;
   }
 
-  public int getStart() {
-    return start;
+  public static ActivityOutput endFunction() {
+    return endFunction(null);
   }
 
-  public int getEnd() {
-    return end;
+  public static ActivityOutput endFunction(Object result) {
+    return new ActivityOutput(true, result);
+  }
+
+  public static ActivityOutput waitForFunctionToCompleteAsync() {
+    return new ActivityOutput(false, null);
+  }
+
+  public boolean isEnded() {
+    return ended;
+  }
+
+  public Object getResult() {
+    return result;
   }
 }

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package io.rockscript.action.http;
+package io.rockscript.activity.http;
 
 import com.google.gson.Gson;
-import io.rockscript.action.http.Http.Methods;
+import io.rockscript.activity.http.Http.Methods;
 import io.rockscript.util.Io;
 
 import java.io.*;

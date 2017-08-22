@@ -13,35 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.action;
 
-public class ActionOutput {
+package io.rockscript.engine;
 
-  private final boolean ended;
-  private final Object result;
+public class ActivityStartedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
 
-  protected ActionOutput(boolean ended, Object result) {
-    this.ended = ended;
-    this.result = result;
+  public ActivityStartedEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
+    super(argumentsExpressionExecution);
   }
 
-  public static ActionOutput endFunction() {
-    return endFunction(null);
-  }
-
-  public static ActionOutput endFunction(Object result) {
-    return new ActionOutput(true, result);
-  }
-
-  public static ActionOutput waitForFunctionToCompleteAsync() {
-    return new ActionOutput(false, null);
-  }
-
-  public boolean isEnded() {
-    return ended;
-  }
-
-  public Object getResult() {
-    return result;
+  @Override
+  public void execute(ArgumentsExpressionExecution execution) {
+    ExecutionMode executionMode = execution.getScriptExecution().getExecutionMode();
+    if (executionMode!=ExecutionMode.REBUILDING) {
+      execution.startActivityExecute();
+    }
   }
 }

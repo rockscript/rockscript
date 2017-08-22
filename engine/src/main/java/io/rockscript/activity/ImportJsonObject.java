@@ -13,41 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.action;
+package io.rockscript.activity;
 
 import io.rockscript.engine.JsonObject;
 
 /** Special JsonObject used as import object that ensures automatic
- * capturing of the propertyName of Actions and wraps the actions so
- * that the toString shows the property name. */
+ * capturing of the propertyName of Activity values and wraps the
+ * activities so that the toString shows the property name. */
 public class ImportJsonObject extends JsonObject {
 
-  public void resolveActionNames(String url) {
+  public void resolveActivityNames(String url) {
     for (String propertyName: getPropertyNames()) {
       Object value = get(propertyName);
-      if (value instanceof Action) {
-        put(propertyName, new NamedActionWrapper(url+"/"+propertyName, (Action) value));
+      if (value instanceof Activity) {
+        put(propertyName, new NamedActivityWrapper(url+"/"+propertyName, (Activity) value));
       }
     }
   }
 
-  public class NamedActionWrapper implements Action {
+  public class NamedActivityWrapper implements Activity {
     String name;
-    Action action;
-    public NamedActionWrapper(String name, Action action) {
+    Activity activity;
+    public NamedActivityWrapper(String name, Activity activity) {
       this.name = name;
-      this.action = action;
+      this.activity = activity;
     }
     @Override
-    public ActionOutput invoke(ActionInput input) {
-      return action.invoke(input);
+    public ActivityOutput invoke(ActivityInput input) {
+      return activity.invoke(input);
     }
     public String getName() {
       return name;
     }
     @Override
     public String toString() {
-      return "["+name+" action]";
+      return "["+name+" activity]";
     }
   }
 }

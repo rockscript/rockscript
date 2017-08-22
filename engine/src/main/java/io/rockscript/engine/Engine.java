@@ -16,13 +16,14 @@
 
 package io.rockscript.engine;
 
-/** Ensures that only 1 scriptService is executing a ScriptExecution
- * at any given time.  The goal is to also have an in-memory
+/** Performs script execution and ensures that only 1 scriptService
+ * is executing a ScriptExecution at any given time.
+ * The goal is to also have an in-memory
  * implementation for single-node deployments and a distributed
  * implementations based on Consul. */
 public interface Engine {
 
   ScriptExecution startScriptExecution(String scriptId, Object input);
 
-  ScriptExecution endWaitingAction(String scriptExecutionId, String executionId, Object result);
+  ScriptExecution endActivity(String scriptExecutionId, String executionId, Object result);
 }

@@ -25,7 +25,7 @@ public class LocalEngine implements Engine {
 
   EngineConfiguration engineConfiguration;
   Map<String, Lock> locks = Collections.synchronizedMap(new HashMap<>());
-  Map<String, List<ActionEndRequest>> actionEndBacklog = Collections.synchronizedMap(new HashMap<>());
+  Map<String, List<ActivityEndRequest>> activityEndBacklog = Collections.synchronizedMap(new HashMap<>());
 
   public LocalEngine(EngineConfiguration engineConfiguration) {
     this.engineConfiguration = engineConfiguration;
@@ -63,16 +63,16 @@ public class LocalEngine implements Engine {
   }
 
   @Override
-  public ScriptExecution endWaitingAction(String scriptExecutionId, String executionId, Object result) {
+  public ScriptExecution endActivity(String scriptExecutionId, String executionId, Object result) {
     ScriptExecution scriptExecution =null;
-    Lock lock = acquireLockOrAddEndActionRequestToBacklog(scriptExecutionId, executionId, result);
+    Lock lock = acquireLockOrAddEndActivityRequestToBacklog(scriptExecutionId, executionId, result);
     if (lock!=null) {
       try {
         scriptExecution = engineConfiguration
           .getEventStore()
           .findScriptExecutionById(scriptExecutionId);
         ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) scriptExecution.findExecutionRecursive(executionId);
-        execution.endAction(result);
+        execution.endActivity(result);
       } finally {
         if (lock!=null) {
           releaseLock(lock);
@@ -82,11 +82,11 @@ public class LocalEngine implements Engine {
     return scriptExecution;
   }
 
-  private synchronized Lock acquireLockOrAddEndActionRequestToBacklog(String scriptExecutionId, String executionId, Object result) {
+  private synchronized Lock acquireLockOrAddEndActivityRequestToBacklog(String scriptExecutionId, String executionId, Object result) {
     Lock lock = acquireLock(scriptExecutionId);
     if (lock==null) {
       // TODO consider a timer to check that the listening didn't mismatch with releasing the lock
-      addToActionEndBacklog(new ActionEndRequest(scriptExecutionId, executionId, result));
+      addToActivityEndBacklog(new ActivityEndRequest(scriptExecutionId, executionId, result));
     }
     return lock;
   }
@@ -104,29 +104,30 @@ public class LocalEngine implements Engine {
   public synchronized void releaseLock(Lock lock) {
     String scriptExecutionId = lock.getScriptExecutionId();
     locks.remove(scriptExecutionId);
-    endActionsFromBacklog(scriptExecutionId);
+    endActivitiesFromBacklog(scriptExecutionId);
   }
 
-  private void endActionsFromBacklog(String scriptExecutionId) {List<ActionEndRequest> actionEndRequests = actionEndBacklog.get(scriptExecutionId);
-    if (actionEndRequests!=null && !actionEndRequests.isEmpty()) {
-      ActionEndRequest nextActionEndRequest = actionEndRequests.remove(0);
-      if (actionEndRequests.isEmpty()) {
-        actionEndBacklog.remove(scriptExecutionId);
+  private void endActivitiesFromBacklog(String scriptExecutionId) {List<ActivityEndRequest> activityEndRequests = activityEndBacklog
+      .get(scriptExecutionId);
+    if (activityEndRequests !=null && !activityEndRequests.isEmpty()) {
+      ActivityEndRequest nextActivityEndRequest = activityEndRequests.remove(0);
+      if (activityEndRequests.isEmpty()) {
+        activityEndBacklog.remove(scriptExecutionId);
       }
       engineConfiguration
         .getExecutor()
-        .execute(new ActionEndRequestRunnable(nextActionEndRequest, engineConfiguration));
+        .execute(new ActivityEndRequestRunnable(nextActivityEndRequest, engineConfiguration));
     }
   }
 
-  public synchronized void addToActionEndBacklog(ActionEndRequest actionEndRequest) {
-    String scriptExecutionId = actionEndRequest.getScriptExecutionId();
-    List<ActionEndRequest> scriptExecutionLockListeners = actionEndBacklog.get(scriptExecutionId);
+  public synchronized void addToActivityEndBacklog(ActivityEndRequest activityEndRequest) {
+    String scriptExecutionId = activityEndRequest.getScriptExecutionId();
+    List<ActivityEndRequest> scriptExecutionLockListeners = activityEndBacklog.get(scriptExecutionId);
     if (scriptExecutionLockListeners==null) {
       scriptExecutionLockListeners = new ArrayList<>();
-      actionEndBacklog.put(scriptExecutionId, scriptExecutionLockListeners);
+      activityEndBacklog.put(scriptExecutionId, scriptExecutionLockListeners);
     }
-    scriptExecutionLockListeners.add(actionEndRequest);
+    scriptExecutionLockListeners.add(activityEndRequest);
   }
 
   public synchronized List<Lock> getLocks() {

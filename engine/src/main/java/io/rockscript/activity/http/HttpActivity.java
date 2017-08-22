@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.action.http;
+package io.rockscript.activity.http;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import io.rockscript.ScriptService;
-import io.rockscript.action.*;
-import io.rockscript.action.http.Http.Methods;
+import io.rockscript.activity.*;
+import io.rockscript.activity.http.Http.Methods;
 
-public class HttpAction implements Action {
+public class HttpActivity implements Activity {
 
-  public static final HttpAction GET = new HttpAction(Methods.GET);
-  public static final HttpAction POST = new HttpAction(Methods.POST);
+  public static final HttpActivity GET = new HttpActivity(Methods.GET);
+  public static final HttpActivity POST = new HttpActivity(Methods.POST);
 
   String method;
 
-  public HttpAction(String method) {
+  public HttpActivity(String method) {
     this.method = method;
   }
 
   @Override
-  public ActionOutput invoke(ActionInput input) {
+  public ActivityOutput invoke(ActivityInput input) {
     // Parse the HttpRequest object
     Object requestObject = input.getArg(0);
     Gson gson = input.getEngineContext().getGson();
@@ -51,7 +51,7 @@ public class HttpAction implements Action {
       .getExecutor()
       .execute(command);
 
-    return ActionOutput.waitForFunctionToCompleteAsync();
+    return ActivityOutput.waitForFunctionToCompleteAsync();
   }
 
   @Override

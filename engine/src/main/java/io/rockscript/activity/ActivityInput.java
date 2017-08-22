@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.action;
+package io.rockscript.activity;
+
+import io.rockscript.activity.http.EngineContext;
+import io.rockscript.engine.Execution;
 
 import java.util.List;
 import java.util.Map;
 
-import io.rockscript.action.http.EngineContext;
-import io.rockscript.engine.Execution;
-
-public class ActionInput {
+public class ActivityInput {
 
   String scriptExecutionId;
   String executionId;
@@ -30,7 +30,7 @@ public class ActionInput {
   // engineContext is transient because it should not be serialized with Gson
   transient EngineContext engineContext;
 
-  public ActionInput(Execution<?> execution, List<Object> args) {
+  public ActivityInput(Execution<?> execution, List<Object> args) {
     this.scriptExecutionId = execution.getScriptExecution().getId();
     this.executionId = execution.getId();
     this.args = args;

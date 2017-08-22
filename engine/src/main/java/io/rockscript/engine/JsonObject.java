@@ -16,10 +16,14 @@
 
 package io.rockscript.engine;
 
-import java.util.*;
-import java.util.function.Function;
+import io.rockscript.activity.Activity;
+import io.rockscript.activity.ActivityInput;
+import io.rockscript.activity.ActivityOutput;
 
-import io.rockscript.action.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 
 public class JsonObject implements Dereferencable {
 
@@ -37,14 +41,14 @@ public class JsonObject implements Dereferencable {
     return this;
   }
 
-  public JsonObject put(String propertyName, Function<ActionInput, ActionOutput> actionFunction) {
-    Action action = new Action() {
+  public JsonObject put(String propertyName, Function<ActivityInput, ActivityOutput> activityOutput) {
+    Activity activity = new Activity() {
       @Override
-      public ActionOutput invoke(ActionInput input) {
-        return actionFunction.apply(input);
+      public ActivityOutput invoke(ActivityInput activityInput) {
+        return activityOutput.apply(activityInput);
       }
     };
-    put(propertyName, action);
+    put(propertyName, activity);
     return this;
   }
 

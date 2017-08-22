@@ -15,9 +15,9 @@
  */
 package io.rockscript.engine;
 
-import io.rockscript.action.Action;
-import io.rockscript.action.ActionInput;
-import io.rockscript.action.ActionOutput;
+import io.rockscript.activity.Activity;
+import io.rockscript.activity.ActivityInput;
+import io.rockscript.activity.ActivityOutput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +46,11 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
       startChild(piece);
     } else {
       Execution functionExpressionExecution = children.get(0);
-      Action action = (Action) functionExpressionExecution.getResult();
-      if (action instanceof SystemImportAction) {
+      Activity activity = (Activity) functionExpressionExecution.getResult();
+      if (activity instanceof SystemImportActivity) {
         invokeSystemImportFunction();
       } else {
-        startAction();
+        startActivity();
       }
     }
   }
@@ -58,43 +58,43 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   private void invokeSystemImportFunction() {
     // import functions have to be re-executed when the events
     // are applied because they can return functions
-    ActionOutput output = startActionInvoke();
+    ActivityOutput output = startActivityInvoke();
     Object importedObject = output.getResult();
     // dispatch(new ObjectImportedEvent(this, importedObject));
-    endActionExecute(importedObject);
+    endActivityExecute(importedObject);
   }
 
-  private void startAction() {
-    dispatchAndExecute(new ActionStartedEvent(this));
+  private void startActivity() {
+    dispatchAndExecute(new ActivityStartedEvent(this));
   }
 
-  public void startActionExecute() {
-    ActionOutput actionOutput = startActionInvoke();
-    if (actionOutput.isEnded()) {
-      endAction(actionOutput.getResult());
+  public void startActivityExecute() {
+    ActivityOutput activityOutput = startActivityInvoke();
+    if (activityOutput.isEnded()) {
+      endActivity(activityOutput.getResult());
 
     } else {
-      dispatch(new ActionWaitingEvent(this));
+      dispatch(new ActivityWaitingEvent(this));
     }
   }
 
-  public void endAction(Object result) {
-    dispatchAndExecute(new ActionEndedEvent(this, result));
-    // Continues at this.endActionExecute()
+  public void endActivity(Object result) {
+    dispatchAndExecute(new ActivityEndedEvent(this, result));
+    // Continues at this.endActivityExecute()
   }
 
-  // Continuation from endAction -> ActionEndedEvent
-  void endActionExecute(Object result) {
+  // Continuation from endActivity -> ActivityEndedEvent
+  void endActivityExecute(Object result) {
     setResult(result);
     end();
   }
 
-  public ActionOutput startActionInvoke() {
-    Execution actionExecution = children.get(0);
-    Action action = (Action) actionExecution.getResult();
+  public ActivityOutput startActivityInvoke() {
+    Execution activityExecution = children.get(0);
+    Activity activity = (Activity) activityExecution.getResult();
     List<Object> args = collectArgs();
-    ActionInput actionInput = new ActionInput(this, args);
-    return action.invoke(actionInput);
+    ActivityInput activityInput = new ActivityInput(this, args);
+    return activity.invoke(activityInput);
   }
 
   private List<Object> collectArgs() {
@@ -105,5 +105,4 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     }
     return args;
   }
-
 }

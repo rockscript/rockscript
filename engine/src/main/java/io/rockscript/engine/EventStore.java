@@ -16,7 +16,7 @@
 
 package io.rockscript.engine;
 
-import io.rockscript.action.Action;
+import io.rockscript.activity.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,7 +123,7 @@ public class EventStore implements EventListener {
     ScriptException.throwIfNull(scriptId, "Script not found for scriptId %s in script execution %s", scriptId, scriptExecutionId);
     Object inputJson = scriptStartedEvent.getInput();
     // For now, the input json is not deserialized
-    // Later we might add special deserialization to handle actions and functionsetc
+    // Later we might add special deserialization to handle activities and functions etc
     Object input = inputJson;
     ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, engineConfiguration, script);
     scriptExecution.setInput(input);
@@ -210,7 +210,7 @@ public class EventStore implements EventListener {
 
   private boolean isUnlocking(ExecutionEvent lastEvent) {
     return lastEvent!=null
-      && ( lastEvent instanceof ActionWaitingEvent
+      && ( lastEvent instanceof ActivityWaitingEvent
            || lastEvent instanceof ScriptEndedEvent);
   }
 
@@ -218,7 +218,7 @@ public class EventStore implements EventListener {
     if (value==null) {
       return "null";
     }
-    if (value instanceof Action) {
+    if (value instanceof Activity) {
       return value.toString();
     }
     if (value instanceof Map) {

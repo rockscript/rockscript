@@ -109,7 +109,7 @@ public class ECMAScriptParser extends Parser {
 		"BitXorAssign", "BitOrAssign", "NullLiteral", "BooleanLiteral", "DecimalLiteral", 
 		"HexIntegerLiteral", "OctalIntegerLiteral", "Break", "Do", "Instanceof", 
 		"Typeof", "Case", "Else", "New", "Var", "Catch", "Finally", "Return", 
-		"Void", "Continue", "For", "Switch", "While", "Debugger", "Action",
+		"Void", "Continue", "For", "Switch", "While", "Debugger", "Activity",
 		"This", "With", "Default", "If", "Throw", "Delete", "In", "Try", "Class", 
 		"Enum", "Extends", "Super", "Const", "Export", "Import", "Implements", 
 		"Let", "Private", "Public", "Interface", "Package", "Protected", "Static", 
@@ -864,7 +864,7 @@ public class ECMAScriptParser extends Parser {
 			enterOuterAlt(_localctx, 1);
 			{
 			setState(173);
-			if (!((_input.LA(1) != OpenBrace) && (_input.LA(1) != Function))) throw new FailedPredicateException(this, "(_input.LA(1) != OpenBrace) && (_input.LA(1) != Action)");
+			if (!((_input.LA(1) != OpenBrace) && (_input.LA(1) != Function))) throw new FailedPredicateException(this, "(_input.LA(1) != OpenBrace) && (_input.LA(1) != Activity)");
 			setState(174);
 			expressionSequence();
 			setState(175);

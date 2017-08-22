@@ -15,31 +15,31 @@
  */
 package io.rockscript;
 
+import io.rockscript.activity.ActivityInput;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import io.rockscript.action.ActionInput;
 
 public class TestService {
 
   ScriptService scriptService;
-  List<ActionInput> inputs = new ArrayList<>();
+  List<ActivityInput> inputs = new ArrayList<>();
 
   public TestService(ScriptService scriptService) {
     this.scriptService = scriptService;
   }
 
-  public void add(ActionInput input) {
+  public void add(ActivityInput input) {
     inputs.add(input);
   }
 
-  public ActionInput getActionInput(int index) {
+  public ActivityInput getActivityInput(int index) {
     return inputs.get(index);
   }
 
-  public void endAction(int index, Object result) {
-    ActionInput actionInput = getActionInput(index);
-    scriptService.endWaitingAction(actionInput.getScriptExecutionId(), actionInput.getExecutionId(), result);
+  public void endActivity(int index, Object result) {
+    ActivityInput activityInput = getActivityInput(index);
+    scriptService.endActivity(activityInput.getScriptExecutionId(), activityInput.getExecutionId(), result);
   }
 
   public void reset() {

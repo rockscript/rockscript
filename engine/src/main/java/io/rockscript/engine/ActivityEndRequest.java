@@ -13,17 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.action.http;
+package io.rockscript.engine;
 
-import io.rockscript.action.ImportProvider;
-import io.rockscript.engine.ImportResolver;
-import io.rockscript.engine.JsonObject;
+public class ActivityEndRequest {
 
-public class HttpImportProvider implements ImportProvider {
+  String scriptExecutionId;
+  String executionId;
+  Object result;
 
-  @Override
-  public void provideImport(ImportResolver importResolver) {
-    importResolver.add("rockscript.io/http", new JsonObject()
-      .put("get", HttpAction.GET));
+  public ActivityEndRequest(String scriptExecutionId, String executionId, Object result) {
+    this.scriptExecutionId = scriptExecutionId;
+    this.executionId = executionId;
+    this.result = result;
+  }
+
+  public String getScriptExecutionId() {
+    return scriptExecutionId;
+  }
+
+  public String getExecutionId() {
+    return executionId;
+  }
+
+  public Object getResult() {
+    return result;
   }
 }

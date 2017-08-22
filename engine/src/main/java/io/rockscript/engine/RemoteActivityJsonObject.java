@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.engine;
 
-package io.rockscript.action.http;
+public class RemoteActivityJsonObject extends JsonObject {
 
-import java.util.concurrent.Executor;
+  String url;
 
-import com.google.gson.Gson;
-import io.rockscript.ScriptService;
+  public RemoteActivityJsonObject(String url) {
+    if (!url.startsWith("http")) {
+      url = "http://"+url;
+    }
+    this.url = url;
+  }
 
-public interface EngineContext {
+  @Override
+  public Object get(String propertyName) {
+    Object activity = super.get(propertyName);
+    if (activity==null) {
+      activity = new RemoteActivity(url, propertyName);
+    }
+    return activity;
+  }
 
-  Executor getExecutor();
-
-  Gson getGson();
-
-  ScriptService getScriptService();
 }

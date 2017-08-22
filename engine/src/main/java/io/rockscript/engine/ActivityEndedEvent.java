@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.action;
 
-import io.rockscript.engine.ImportResolver;
+package io.rockscript.engine;
 
-/** Interface to allow jars on the classpath to provide imports
- * through the jdk {@link java.util.ServiceLoader} mechanism. */
-public interface ImportProvider {
+public class ActivityEndedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
 
-  void provideImport(ImportResolver importResolver);
+  Object result;
+
+  public ActivityEndedEvent(ArgumentsExpressionExecution argumentsExpressionExecution, Object result) {
+    super(argumentsExpressionExecution);
+    this.result = result;
+  }
+
+  @Override
+  public void execute(ArgumentsExpressionExecution execution) {
+    execution.endActivityExecute(result);
+  }
+
 }

@@ -13,22 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.action.http;
+package io.rockscript.activity.http;
 
-public interface Http {
+import io.rockscript.activity.ImportProvider;
+import io.rockscript.engine.ImportResolver;
+import io.rockscript.engine.JsonObject;
 
-  interface Methods {
-    String GET = "GET";
-    String PUT = "PUT";
-    String POST = "POST";
-    String DELETE = "DELETE";
-  }
+public class HttpImportProvider implements ImportProvider {
 
-  interface Headers {
-    String CONTENT_TYPE = "Content-Type";
-  }
-
-  interface ContentTypes {
-    String APPLICATION_JSON = "application/json";
+  @Override
+  public void provideImport(ImportResolver importResolver) {
+    importResolver.add("rockscript.io/http", new JsonObject()
+      .put("get", HttpActivity.GET));
   }
 }

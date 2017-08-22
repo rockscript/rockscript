@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, RockScript.io. All rights reserved.
+ * Copyright ©2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package io.rockscript.engine;
 
-public class ActionEndRequestRunnable implements Runnable {
+import io.rockscript.activity.*;
 
-  ActionEndRequest actionEndRequest;
+public class SystemImportActivity implements Activity {
+
   EngineConfiguration engineConfiguration;
 
-  public ActionEndRequestRunnable(ActionEndRequest actionEndRequest, EngineConfiguration engineConfiguration) {
-    this.actionEndRequest = actionEndRequest;
+  public SystemImportActivity(EngineConfiguration engineConfiguration) {
     this.engineConfiguration = engineConfiguration;
   }
 
   @Override
-  public void run() {
-    engineConfiguration
-      .getScriptService()
-      .endWaitingAction(actionEndRequest.getScriptExecutionId(),
-                        actionEndRequest.getExecutionId(),
-                        actionEndRequest.getResult());
+  public ActivityOutput invoke(ActivityInput input) {
+    String url = (String) input.getArgs().get(0);
+    JsonObject importedObject = engineConfiguration.getImportResolver().get(url);
+    return ActivityOutput.endFunction(importedObject);
+  }
+
+  @Override
+  public String toString() {
+    return "[system.import activity]";
   }
 }

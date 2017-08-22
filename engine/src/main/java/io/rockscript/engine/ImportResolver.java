@@ -16,8 +16,8 @@
 
 package io.rockscript.engine;
 
-import io.rockscript.action.ImportJsonObject;
-import io.rockscript.action.ImportProvider;
+import io.rockscript.activity.ImportJsonObject;
+import io.rockscript.activity.ImportProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class ImportResolver {
 
   public ImportResolver add(String url, JsonObject importObject) {
     if (importObject instanceof ImportJsonObject) {
-      ((ImportJsonObject)importObject).resolveActionNames(url);
+      ((ImportJsonObject)importObject).resolveActivityNames(url);
     }
     importObjects.put(url, importObject);
     return this;
@@ -50,7 +50,7 @@ public class ImportResolver {
   public JsonObject get(String url) {
     JsonObject jsonObject = importObjects.get(url);
     if (jsonObject==null) {
-      jsonObject = new RemoteActionsJsonObject(url);
+      jsonObject = new RemoteActivityJsonObject(url);
       importObjects.put(url, jsonObject);
     }
     return jsonObject;
