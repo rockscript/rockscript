@@ -224,7 +224,7 @@ RockScript is experimental stage and very early in its development.
 
 **RockScript does not offer any stability guarantees at this point.**
   
-We are looking for feedback and use cases.  
+We are looking for feedback and use cases:  
 
 [Create an issue](https://github.com/RockScript/server/issues/new) for 
 any question, suggestion or other feedback.  We really appreciate it.
