@@ -44,7 +44,12 @@ public class RemoteActivity implements Activity {
         .body(activityInputJson)
         .execute()
         .getBody();
-    JsonElement activityOutputJsonElement = gson.toJsonTree(activityOutputResponse);
-    return gson.fromJson(activityOutputJsonElement, ActivityOutput.class);
+    if (activityOutputResponse!=null) {
+      JsonElement activityOutputJsonElement = gson.toJsonTree(activityOutputResponse);
+      return gson.fromJson(activityOutputJsonElement, ActivityOutput.class);
+    } else {
+      // The default async activity out put is returned when the HTTP response is empty.
+      return ActivityOutput.waitForFunctionToCompleteAsync();
+    }
   }
 }

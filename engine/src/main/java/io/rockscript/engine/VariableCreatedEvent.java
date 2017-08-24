@@ -18,10 +18,12 @@ package io.rockscript.engine;
 
 public class VariableCreatedEvent extends ExecutionEvent<VariableDeclarationExecution> {
 
+  String variableName;
   Object valueJson;
 
   public VariableCreatedEvent(VariableDeclarationExecution execution, Object valueJson) {
     super(execution);
+    this.variableName = execution.getElement().getVariableName();
     this.valueJson = valueJson;
   }
 

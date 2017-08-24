@@ -53,7 +53,7 @@
 
         <dependency>
             <groupId>io.rockscript</groupId>
-            <artifactId>rockscript-scriptService</artifactId>
+            <artifactId>rockscript-engine</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 

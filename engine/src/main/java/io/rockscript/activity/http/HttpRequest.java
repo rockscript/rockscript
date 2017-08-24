@@ -76,17 +76,26 @@ public class HttpRequest {
 
       int responseCode = urlConnection.getResponseCode();
       HttpResponse httpResponse = new HttpResponse(responseCode);
-      httpResponse.setHeaders(urlConnection.getHeaderFields());
-      InputStream inputStream = urlConnection.getInputStream();
 
-      if (httpResponse.isContentTypeApplicationJson()) {
-        Reader bodyReader = new InputStreamReader(inputStream, "UTF-8");
-        Object parsedJsonBody = new Gson().fromJson(bodyReader, Object.class);
-        httpResponse.setBody(parsedJsonBody);
-      } else {
-        String stringBody = Io.toString(inputStream);
-        httpResponse.setBody(stringBody);
+      httpResponse.setHeaders(urlConnection.getHeaderFields());
+
+      InputStream inputStream = null;
+      try {
+        inputStream = urlConnection.getInputStream();
+      } catch (FileNotFoundException e) {
+        inputStream = null;
       }
+      if (inputStream!=null) {
+        if (httpResponse.isContentTypeApplicationJson()) {
+          Reader bodyReader = new InputStreamReader(inputStream, "UTF-8");
+          Object parsedJsonBody = new Gson().fromJson(bodyReader, Object.class);
+          httpResponse.setBody(parsedJsonBody);
+        } else {
+          String stringBody = Io.toString(inputStream);
+          httpResponse.setBody(stringBody);
+        }
+      }
+
       return httpResponse;
 
     } catch (IOException e) {

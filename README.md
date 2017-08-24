@@ -1,12 +1,9 @@
 ![RockScript](docs/image/logo.png)
 
-## Why use it
+## What is it?
 
- * __Resilient script execution__
- * __Support for including long running activities__  
- * __Used for microservice orchestration__
- * __Valuable component in event driven architectures__
- * __Easier to read compared to reactive code with callbacks__
+ * __Script language based on JavaScript syntax__
+ * __Adds support for long running activities__
 
 The syntax of RockScript is based on JavaScript, so it will be very familiar 
 to you.
@@ -19,12 +16,20 @@ or memory resources while it is waiting for an activity completion callback.
 So you can write reactive code without the typical callback hell or other 
 synchronization hassles as in other programming languages.   
 
+## Why use it?
+
+ * __Resilient script execution__
+ * __More readable then reactive code with callbacks__
+
 But the cool part is that executions are resilient.  The runtime state of 
 each script execution is stored with event sourcing as the script executes.
 So script executions can _survive RockScript server crashes_.  It's designed 
 so that a group of RockScript servers can form a cluster. 
 
-## When to use it
+## When to use it?
+
+ * __Used for microservice workflows__
+ * __In event driven architectures__
 
 **Event listeners**: RockScript is ideal for implementing event listeners in 
 an event driven architecture.  That's because your server often needs to perform 

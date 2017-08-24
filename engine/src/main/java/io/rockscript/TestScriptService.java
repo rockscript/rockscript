@@ -19,6 +19,7 @@ package io.rockscript;
 import io.rockscript.engine.*;
 import io.rockscript.engine.test.TestEngineConfiguration;
 
+/** RockScript service configured configured for test. */
 public class TestScriptService extends ScriptServiceImpl implements ScriptService {
 
   public TestScriptService() {

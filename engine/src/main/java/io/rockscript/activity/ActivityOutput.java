@@ -17,8 +17,11 @@ package io.rockscript.activity;
 
 public class ActivityOutput {
 
-  private final boolean ended;
-  private final Object result;
+  private boolean ended = false;
+  private Object result;
+
+  public ActivityOutput() {
+  }
 
   protected ActivityOutput(boolean ended, Object result) {
     this.ended = ended;
