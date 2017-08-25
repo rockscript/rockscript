@@ -17,21 +17,23 @@
 
 package io.rockscript.test;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class DeepComparator {
 
   static Logger log = LoggerFactory.getLogger(DeepComparator.class);
 
   public static final Set<Class<?>> VALUE_CLASSES = new HashSet<>(Arrays.asList(
-    String.class,
-    Number.class
+    String.class, Character.class,
+    Byte.class, Short.class, Integer.class, Long.class,
+    Float.class, Double.class,
+    Boolean.class
   ));
 
   Stack<String> path = new Stack<>();

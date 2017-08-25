@@ -18,6 +18,8 @@ package io.rockscript.test;
 import io.rockscript.ScriptService;
 import io.rockscript.TestConfiguration;
 import io.rockscript.engine.Script;
+import io.rockscript.engine.ScriptExecution;
+import org.junit.Before;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,13 +27,33 @@ import java.util.Map;
 public class ScriptTest {
 
   private static Map<Class<? extends ScriptServiceProvider>,ScriptService> scriptServiceCache = new HashMap<>();
-  private ScriptServiceProvider scriptServiceProvider = getScriptServiceProvider();
+
+  protected ScriptService scriptService;
+
+  @Before
+  public void setUp() {
+    scriptService = initializeScriptService();
+  }
+
+  /** Override this method if you want your ScriptService to be
+   * created for each test.
+   *
+   * Overwrite {@link #getScriptServiceProvider()} if you want to
+   * customize and cache a ScriptService in your tests. */
+  protected ScriptService initializeScriptService() {
+    ScriptServiceProvider scriptServiceProvider = getScriptServiceProvider();
+    Class<? extends ScriptServiceProvider> providerClass = scriptServiceProvider.getClass();
+    ScriptService scriptService = scriptServiceCache.get(providerClass);
+    if (scriptService==null) {
+      scriptService = scriptServiceProvider.createScriptService();
+      scriptServiceCache.put(providerClass, scriptService);
+    }
+    return scriptService;
+  }
 
   protected interface ScriptServiceProvider {
     ScriptService createScriptService();
   }
-
-  protected ScriptService scriptService = initializeScriptService();
 
   /** Override this method to customize and cache a ScriptService in your tests.
    *
@@ -46,25 +68,35 @@ public class ScriptTest {
     };
   }
 
-  /** Override this method if you want your ScriptService to be
-   * created for each test.
-   *
-   * Overwrite {@link #getScriptServiceProvider()} if you want to
-   * customize and cache a ScriptService in your tests. */
-  protected ScriptService initializeScriptService() {
-    Class<? extends ScriptServiceProvider> providerClass = scriptServiceProvider.getClass();
-    ScriptService scriptService = scriptServiceCache.get(providerClass);
-    if (scriptService==null) {
-      scriptService = scriptServiceProvider.createScriptService();
-      scriptServiceCache.put(providerClass, scriptService);
-    }
-    return scriptService;
-  }
-
-  public Script deploy(String scriptText) {
+  public Script deployScript(String scriptText) {
     return scriptService
       .newDeployScriptCommand()
       .text(scriptText)
       .execute();
   }
+
+  public ScriptExecution startScriptExecution(Script script) {
+    return startScriptExecution(script.getId(), null);
+  }
+
+  public ScriptExecution startScriptExecution(Script script, Object input) {
+    return startScriptExecution(script.getId(), input);
+  }
+
+  public ScriptExecution startScriptExecution(String scriptId) {
+    return startScriptExecution(scriptId, null);
+  }
+
+  public ScriptExecution startScriptExecution(String scriptId, Object input) {
+    return scriptService.startScriptExecution(scriptId, input);
+  }
+
+  public ScriptExecution endActivity(String scriptExecutionId, String executionId) {
+    return endActivity(scriptExecutionId, executionId, null);
+  }
+
+  public ScriptExecution endActivity(String scriptExecutionId, String executionId, Object result) {
+    return scriptService.endActivity(scriptExecutionId, executionId, result);
+  }
+
 }

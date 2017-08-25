@@ -28,6 +28,7 @@ public class ScriptExecution extends BlockExecution<ScriptAst> {
   EventListener eventListener;
   int nextInternalExecutionId = 1;
   ExecutionMode executionMode;
+  boolean isEnded;
 
   public ScriptExecution(String scriptExecutionId, Configuration configuration, ScriptAst scriptAst) {
     super(scriptExecutionId, scriptAst, null);
@@ -59,6 +60,7 @@ public class ScriptExecution extends BlockExecution<ScriptAst> {
 
   @Override
   protected void end() {
+    this.isEnded = true;
     dispatch(new ScriptEndedEvent(this));
   }
 
@@ -113,5 +115,9 @@ public class ScriptExecution extends BlockExecution<ScriptAst> {
 
   public void setExecutionMode(ExecutionMode executionMode) {
     this.executionMode = executionMode;
+  }
+
+  public boolean isEnded() {
+    return isEnded;
   }
 }

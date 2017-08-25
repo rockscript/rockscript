@@ -49,10 +49,6 @@ public class ActivityInput {
     return args;
   }
 
-  public Object getArg(int index) {
-    return args!=null ? args.get(index) : null;
-  }
-
   public ActivityContext getActivityContext() {
     return activityContext;
   }
@@ -61,9 +57,18 @@ public class ActivityInput {
     this.activityContext = activityContext;
   }
 
+
+  /** Convenience method to get the argument by index. */
+  public <T> T getArg(int index) {
+    return args!=null ? (T) args.get(index) : null;
+  }
+
   /** Convenience method to extract a json property from the first
    * json object argument. */
   public <T> T getArgProperty(String propertyName) {
+    if (args==null) {
+      return null;
+    }
     Map<String,Object> objectArg = (Map<String, Object>) args.get(0);
     return (T) objectArg.get(propertyName);
   }
