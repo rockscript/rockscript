@@ -16,31 +16,30 @@
 package io.rockscript.service;
 
 import io.rockscript.Command;
-import io.rockscript.engine.EngineConfiguration;
 
 public abstract class CommandImpl<R> implements Command<R> {
 
-  EngineConfiguration engineConfiguration;
+  Configuration configuration;
 
   /** This constructor is used for json serialization.
    * When using this constructor, make sure that
-   * {@link #setEngineConfiguration(EngineConfiguration)} is called
+   * {@link #setConfiguration(Configuration)} is called
    * before {@link #execute()} is invoked. */
   public CommandImpl() {
   }
 
-  public CommandImpl(EngineConfiguration engineConfiguration) {
-    this.engineConfiguration = engineConfiguration;
+  public CommandImpl(Configuration configuration) {
+    this.configuration = configuration;
   }
 
-  protected abstract R execute(EngineConfiguration engineConfiguration);
+  protected abstract R execute(Configuration configuration);
 
   @Override
   public R execute() {
-    return execute(engineConfiguration);
+    return execute(configuration);
   }
 
-  public void setEngineConfiguration(EngineConfiguration engineConfiguration) {
-    this.engineConfiguration = engineConfiguration;
+  public void setConfiguration(Configuration configuration) {
+    this.configuration = configuration;
   }
 }

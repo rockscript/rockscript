@@ -19,8 +19,8 @@ package io.rockscript;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.ImportJsonObject;
 import io.rockscript.engine.ScriptExecution;
-import io.rockscript.test.CrashTestScriptService;
-import io.rockscript.test.CrashTestScriptService.CrashEventListener;
+import io.rockscript.CrashConfiguration.CrashEventListener;
+import io.rockscript.service.Configuration;
 import io.rockscript.test.ScriptExecutionComparator;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -36,20 +36,20 @@ public class CrashTest {
   List<Object> synchronousCapturedData = new ArrayList<>();
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
-  public CrashTestScriptService createCrashTestEngine() {
-    CrashTestScriptService engine = new CrashTestScriptService();
-    addHelloService(engine);
-    return engine;
+  public ScriptService createCrashTestEngine() {
+    Configuration configuration = new CrashConfiguration();
+    addHelloService(configuration);
+    return configuration.build();
   }
 
-  public TestScriptService createNormalTestEngine() {
-    TestScriptService engine = new TestScriptService();
-    addHelloService(engine);
-    return engine;
+  public ScriptService createNormalTestEngine() {
+    TestConfiguration configuration = new TestConfiguration();
+    addHelloService(configuration);
+    return configuration.build();
   }
 
-  private void addHelloService(TestScriptService engine) {
-    engine.getEngineConfiguration()
+  private void addHelloService(Configuration configuration) {
+    configuration
       .getImportResolver()
       .add("example.com/hello", new ImportJsonObject()
         .put("aSyncFunction", input -> {
@@ -74,9 +74,9 @@ public class CrashTest {
 
     int eventsWithoutCrash = 1;
     boolean crashOccurred = false;
-    CrashTestScriptService scriptService = createCrashTestEngine();
+    ScriptService scriptService = createCrashTestEngine();
     CrashEventListener eventListener = (CrashEventListener) scriptService
-        .getEngineConfiguration()
+        .getConfiguration()
         .getEventListener();
 
     String scriptId = scriptService
@@ -115,7 +115,7 @@ public class CrashTest {
   }
 
   private ScriptExecution createExpectedScriptExecutionState(String scriptText) {
-    TestScriptService scriptService = createNormalTestEngine();
+    ScriptService scriptService = createNormalTestEngine();
     String scriptId = scriptService
       .newDeployScriptCommand()
         .text(scriptText)

@@ -16,6 +16,8 @@
 
 package io.rockscript.engine;
 
+import io.rockscript.service.Configuration;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,14 +25,14 @@ import java.util.Map;
 
 public class ScriptStore {
 
-  EngineConfiguration engineConfiguration;
+  Configuration configuration;
   /** maps script name to script versions */
   Map<String, List<Script>> scriptsByName = new HashMap<>();
   /** maps script ids to parsed ScriptAst's */
   Map<String, ScriptAst> scriptAstsById = new HashMap<>();
 
-  public ScriptStore(EngineConfiguration engineConfiguration) {
-    this.engineConfiguration = engineConfiguration;
+  public ScriptStore(Configuration configuration) {
+    this.configuration = configuration;
   }
 
   public ScriptAst findScriptAstById(String scriptId) {
@@ -47,7 +49,7 @@ public class ScriptStore {
 
     Parse parse = Parse.create(text);
     if (!parse.hasErrors()) {
-      String id = engineConfiguration.getScriptIdGenerator().createId();
+      String id = configuration.getScriptIdGenerator().createId();
       script.setId(id);
 
       if (name==null) {
@@ -65,7 +67,7 @@ public class ScriptStore {
 
       ScriptAst scriptAst = parse.getScriptAst();
       scriptAst.setId(id);
-      scriptAst.setEngineConfiguration(engineConfiguration);
+      scriptAst.setConfiguration(configuration);
       scriptAstsById.put(id, scriptAst);
 
     } else {

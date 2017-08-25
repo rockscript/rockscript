@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.rockscript;
 
-import io.rockscript.service.ScriptServiceImpl;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
-/** RockScript service configured configured for dev deployment. */
-public class DevScriptService extends ScriptServiceImpl implements ScriptService {
+public class DevConfiguration extends TestConfiguration {
 
-  public DevScriptService() {
-    super(new DevEngineConfiguration());
+  public DevConfiguration() {
   }
 
-  public DevScriptService(DevEngineConfiguration engineConfiguration) {
-    super(engineConfiguration);
+  @Override
+  protected Executor createExecutor() {
+    return Executors.newWorkStealingPool();
   }
+
 }

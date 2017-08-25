@@ -37,11 +37,11 @@ public class HttpSynchronousActivityTest extends HttpTest {
   protected static Logger log = LoggerFactory.getLogger(HttpSynchronousActivityTest.class);
 
   ScriptService scriptService = createTestEngine();
-  Gson gson = scriptService.getEngineConfiguration().getGson();
+  Gson gson = scriptService.getConfiguration().getGson();
   List<ActivityInput> activityInputs = new ArrayList<>();
 
   public ScriptService createTestEngine() {
-    return new TestScriptService();
+    return new TestConfiguration().build();
   }
 
   @Override

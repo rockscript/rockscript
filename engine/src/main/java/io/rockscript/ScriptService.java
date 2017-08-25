@@ -16,7 +16,7 @@
 
 package io.rockscript;
 
-import io.rockscript.engine.EngineConfiguration;
+import io.rockscript.service.Configuration;
 import io.rockscript.engine.ScriptExecution;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public interface ScriptService {
 
   ScriptExecution endActivity(String scriptExecutionId, String executionId, Object result);
 
-  EngineConfiguration getEngineConfiguration();
+  Configuration getConfiguration();
 
   List<ScriptExecution> recoverCrashedScriptExecutions();
 }

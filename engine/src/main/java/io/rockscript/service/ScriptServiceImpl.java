@@ -18,50 +18,28 @@ package io.rockscript.service;
 
 import io.rockscript.DeployScriptCommand;
 import io.rockscript.ScriptService;
-import io.rockscript.engine.EngineConfiguration;
 import io.rockscript.engine.ScriptExecution;
 
 import java.util.List;
 
-public abstract class ScriptServiceImpl implements ScriptService {
+public class ScriptServiceImpl implements ScriptService {
 
-  protected EngineConfiguration engineConfiguration;
+  protected Configuration configuration;
 
-  public ScriptServiceImpl(EngineConfiguration engineConfiguration) {
-    engineConfiguration.seal(this);
-    this.engineConfiguration = engineConfiguration;
+  public ScriptServiceImpl(Configuration configuration) {
+    this.configuration = configuration;
   }
 
   public DeployScriptCommand newDeployScriptCommand() {
-    return new DeployScriptCommandImpl(engineConfiguration);
+    return new DeployScriptCommandImpl(configuration);
   }
-
-//  public ScriptAst deployScript(String scriptText) {
-//    String scriptId = engineConfiguration.getScriptIdGenerator().createId();
-//    ScriptAst scriptAst = parseScript(scriptText);
-//    scriptAst.setId(scriptId);
-//    storeScript(scriptAst, scriptText);
-//    return scriptAst;
-//  }
-//
-//  protected ScriptAst parseScript(String scriptText) {
-//    ScriptAst scriptAst = Parse.parse(scriptText);
-//    scriptAst.setEngineConfiguration(engineConfiguration);
-//    return scriptAst;
-//  }
-//
-//  private void storeScript(ScriptAst scriptAst, String scriptText) {
-//    engineConfiguration
-//      .getScriptStore()
-//      .saveScript(scriptAst, scriptText);
-//  }
 
   public ScriptExecution startScriptExecution(String scriptId) {
     return startScriptExecution(scriptId, null);
   }
 
   public ScriptExecution startScriptExecution(String scriptId, Object input) {
-    return engineConfiguration
+    return configuration
       .getEngine()
       .startScriptExecution(scriptId, input);
   }
@@ -73,18 +51,18 @@ public abstract class ScriptServiceImpl implements ScriptService {
 
   @Override
   public ScriptExecution endActivity(String scriptExecutionId, String executionId, Object result) {
-    return engineConfiguration
+    return configuration
       .getEngine()
       .endActivity(scriptExecutionId, executionId, result);
   }
 
-  public EngineConfiguration getEngineConfiguration() {
-    return engineConfiguration;
+  public Configuration getConfiguration() {
+    return configuration;
   }
 
   @Override
   public List<ScriptExecution> recoverCrashedScriptExecutions() {
-    return engineConfiguration
+    return configuration
       .getEventStore()
       .recoverCrashedScriptExecutions();
   }

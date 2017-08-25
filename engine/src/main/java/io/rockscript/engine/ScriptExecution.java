@@ -16,6 +16,7 @@
 package io.rockscript.engine;
 
 import io.rockscript.ScriptException;
+import io.rockscript.service.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,16 +29,16 @@ public class ScriptExecution extends BlockExecution<ScriptAst> {
   int nextInternalExecutionId = 1;
   ExecutionMode executionMode;
 
-  public ScriptExecution(String scriptExecutionId, EngineConfiguration engineConfiguration, ScriptAst scriptAst) {
+  public ScriptExecution(String scriptExecutionId, Configuration configuration, ScriptAst scriptAst) {
     super(scriptExecutionId, scriptAst, null);
-    this.eventListener = engineConfiguration.getEventListener();
+    this.eventListener = configuration.getEventListener();
     this.executionMode = ExecutionMode.EXECUTING;
-    initializeSystemVariable(engineConfiguration);
+    initializeSystemVariable(configuration);
   }
 
-  private void initializeSystemVariable(EngineConfiguration engineConfiguration) {
+  private void initializeSystemVariable(Configuration configuration) {
     JsonObject systemJsonObject = new JsonObject();
-    systemJsonObject.put("import", new SystemImportActivity(engineConfiguration));
+    systemJsonObject.put("import", new SystemImportActivity(configuration));
     createVariable("system")
       .setValue(systemJsonObject);
   }

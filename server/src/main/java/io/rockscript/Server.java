@@ -19,8 +19,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.rockscript.handlers.CommandHandler;
 import io.rockscript.handlers.EventsHandler;
-import io.rockscript.netty.router.*;
+import io.rockscript.netty.router.AsyncHttpServer;
+import io.rockscript.netty.router.AsyncHttpServerConfiguration;
+import io.rockscript.netty.router.JsonHandlerGson;
 import io.rockscript.rest.ScriptsPostHandler;
+import io.rockscript.service.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,9 +42,9 @@ public class Server {
       .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
       .create();
 
-    DevEngineConfiguration engineConfiguration = serverConfiguration.getEngineConfiguration();
-    engineConfiguration.gson(commonGson);
-    ScriptService scriptService = new DevScriptService(engineConfiguration);
+    Configuration serviceConfiguration = serverConfiguration.getServiceConfiguration();
+    serviceConfiguration.gson(commonGson);
+    ScriptService scriptService = serviceConfiguration.build();
 
     AsyncHttpServerConfiguration asyncHttpServerConfiguration = serverConfiguration
       .getAsyncHttpServerConfiguration()

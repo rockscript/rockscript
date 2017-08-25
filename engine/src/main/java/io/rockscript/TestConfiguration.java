@@ -15,14 +15,14 @@
  */
 package io.rockscript;
 
-import io.rockscript.engine.EngineConfiguration;
+import io.rockscript.service.Configuration;
 import io.rockscript.engine.ImportResolver;
 
 import java.util.concurrent.Executor;
 
-public class TestEngineConfiguration extends EngineConfiguration {
+public class TestConfiguration extends Configuration {
 
-  public TestEngineConfiguration() {
+  public TestConfiguration() {
     this.importResolver = createImportResolver();
     this.executor = createExecutor();
   }
@@ -41,10 +41,5 @@ public class TestEngineConfiguration extends EngineConfiguration {
 
   protected ImportResolver createImportResolver() {
     return new ImportResolver(this);
-  }
-
-  @Override
-  public ScriptService createEngine() {
-    return new TestScriptService(this);
   }
 }

@@ -41,7 +41,7 @@ public class VariableDeclarationExecution extends Execution<VariableDeclaration>
 
     Object value = variable.getValue();
     Object valueJson = getScript()
-        .getEngineConfiguration()
+        .getConfiguration()
         .getEventStore()
         .valueToJson(value);
 

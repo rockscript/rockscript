@@ -32,7 +32,7 @@ public class EventsHandler implements RequestHandler {
   public void handle(Request request, Response response, Context context) {
     List<Event> events = context
       .get(ScriptService.class)
-      .getEngineConfiguration()
+      .getConfiguration()
       .getEventStore()
       .getEvents();
 

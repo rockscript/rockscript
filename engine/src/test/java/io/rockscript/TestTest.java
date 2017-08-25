@@ -22,7 +22,7 @@ public class TestTest {
 
   protected static Logger log = LoggerFactory.getLogger(TestTest.class);
 
-  ScriptService scriptService = new TestScriptService();
+  ScriptService scriptService = new TestConfiguration().build();
 
 //  @Test
 //  public void testTest() {

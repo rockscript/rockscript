@@ -15,6 +15,7 @@
  */
 package io.rockscript.engine;
 
+import io.rockscript.service.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public class ScriptAst extends SourceElements {
   static Logger log = LoggerFactory.getLogger(ScriptAst.class);
 
   String id;
-  EngineConfiguration engineConfiguration;
+  Configuration configuration;
   List<ScriptElement> elements;
 
   public ScriptAst(Integer index, Location location) {
@@ -39,12 +40,12 @@ public class ScriptAst extends SourceElements {
     throw new RuntimeException("Use ScriptAst.start(...) instead");
   }
 
-  public EngineConfiguration getEngineConfiguration() {
-    return engineConfiguration;
+  public Configuration getConfiguration() {
+    return configuration;
   }
 
-  public void setEngineConfiguration(EngineConfiguration engineConfiguration) {
-    this.engineConfiguration = engineConfiguration;
+  public void setConfiguration(Configuration configuration) {
+    this.configuration = configuration;
   }
 
   public ScriptElement findScriptElement(int executableIndex) {

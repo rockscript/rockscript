@@ -17,19 +17,20 @@
 package io.rockscript.engine;
 
 import io.rockscript.activity.*;
+import io.rockscript.service.Configuration;
 
 public class SystemImportActivity implements Activity {
 
-  EngineConfiguration engineConfiguration;
+  Configuration configuration;
 
-  public SystemImportActivity(EngineConfiguration engineConfiguration) {
-    this.engineConfiguration = engineConfiguration;
+  public SystemImportActivity(Configuration configuration) {
+    this.configuration = configuration;
   }
 
   @Override
   public ActivityOutput invoke(ActivityInput input) {
     String url = (String) input.getArgs().get(0);
-    JsonObject importedObject = engineConfiguration.getImportResolver().get(url);
+    JsonObject importedObject = configuration.getImportResolver().get(url);
     return ActivityOutput.endFunction(importedObject);
   }
 

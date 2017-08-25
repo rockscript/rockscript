@@ -15,7 +15,7 @@
  */
 package io.rockscript.activity;
 
-import io.rockscript.activity.http.EngineContext;
+import io.rockscript.activity.http.ActivityContext;
 import io.rockscript.engine.Execution;
 
 import java.util.List;
@@ -27,14 +27,14 @@ public class ActivityInput {
   String executionId;
   List<Object> args;
 
-  // engineContext is transient because it should not be serialized with Gson
-  transient EngineContext engineContext;
+  // activityContext is transient because it should not be serialized with Gson
+  transient ActivityContext activityContext;
 
   public ActivityInput(Execution<?> execution, List<Object> args) {
     this.scriptExecutionId = execution.getScriptExecution().getId();
     this.executionId = execution.getId();
     this.args = args;
-    this.engineContext = execution.getScript().getEngineConfiguration();
+    this.activityContext = execution.getScript().getConfiguration();
   }
 
   public String getScriptExecutionId() {
@@ -53,12 +53,12 @@ public class ActivityInput {
     return args!=null ? args.get(index) : null;
   }
 
-  public EngineContext getEngineContext() {
-    return engineContext;
+  public ActivityContext getActivityContext() {
+    return activityContext;
   }
 
-  public void setEngineContext(EngineContext engineContext) {
-    this.engineContext = engineContext;
+  public void setActivityContext(ActivityContext activityContext) {
+    this.activityContext = activityContext;
   }
 
   /** Convenience method to extract a json property from the first

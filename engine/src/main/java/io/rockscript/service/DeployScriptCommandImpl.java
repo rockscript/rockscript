@@ -27,13 +27,13 @@ public class DeployScriptCommandImpl extends CommandImpl<Script> implements Depl
   DeployScriptCommandImpl() {
   }
 
-  public DeployScriptCommandImpl(EngineConfiguration engineConfiguration) {
-    super(engineConfiguration);
+  public DeployScriptCommandImpl(Configuration configuration) {
+    super(configuration);
   }
 
   @Override
-  protected Script execute(EngineConfiguration engineConfiguration) {
-    ScriptStore scriptStore = engineConfiguration.getScriptStore();
+  protected Script execute(Configuration configuration) {
+    ScriptStore scriptStore = configuration.getScriptStore();
     return scriptStore.deployScript(name, text);
   }
 

@@ -23,7 +23,7 @@ public class DevServer extends Server {
 
   public static class DevServerConfiguration extends ServerConfiguration {
     public DevServerConfiguration() {
-      super(new DevEngineConfiguration());
+      super(new DevConfiguration());
     }
   }
 

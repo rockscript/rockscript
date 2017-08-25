@@ -42,8 +42,8 @@ public class ScriptExecutionTest {
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
   public ScriptService createTestEngine() {
-    TestScriptService engine = new TestScriptService();
-    ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
+    ScriptService engine = new TestConfiguration().build();
+    ImportResolver importResolver = engine.getConfiguration().getImportResolver();
     JsonObject helloService = new JsonObject()
       .put("aSyncFunction", input -> {
           synchronousCapturedData.add(input.getArgs().get(0));
@@ -130,7 +130,7 @@ public class ScriptExecutionTest {
     String scriptExecutionId = scriptExecution.getId();
 
     ScriptExecution reloadedScriptExecution = scriptService
-      .getEngineConfiguration()
+      .getConfiguration()
       .getEventStore()
       .findScriptExecutionById(scriptExecutionId);
 
@@ -142,7 +142,7 @@ public class ScriptExecutionTest {
     scriptExecution = scriptService.endActivity(scriptExecutionId, waitingExecutionId);
 
     reloadedScriptExecution = scriptService
-      .getEngineConfiguration()
+      .getConfiguration()
       .getEventStore()
       .findScriptExecutionById(scriptExecutionId);
 

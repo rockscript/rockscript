@@ -16,14 +16,15 @@
 package io.rockscript;
 
 import io.rockscript.netty.router.AsyncHttpServerConfiguration;
+import io.rockscript.service.Configuration;
 
 public class ServerConfiguration {
 
   protected AsyncHttpServerConfiguration asyncHttpServerConfiguration = new AsyncHttpServerConfiguration();
-  protected DevEngineConfiguration engineConfiguration;
+  protected Configuration serviceConfiguration;
 
-  public ServerConfiguration(DevEngineConfiguration engineConfiguration) {
-    this.engineConfiguration = engineConfiguration;
+  public ServerConfiguration(DevConfiguration serviceConfiguration) {
+    this.serviceConfiguration = serviceConfiguration;
   }
 
   public ServerConfiguration port(int port) {
@@ -32,6 +33,7 @@ public class ServerConfiguration {
   }
 
   public Server build() {
+    ScriptException.throwIfNull(serviceConfiguration, "serviceConfiguration must be configured.  Use .serviceConfiguration(...) before building the server.");
     return new Server(this);
   }
 
@@ -39,7 +41,12 @@ public class ServerConfiguration {
     return asyncHttpServerConfiguration;
   }
 
-  public DevEngineConfiguration getEngineConfiguration() {
-    return engineConfiguration;
+  public Configuration getServiceConfiguration() {
+    return serviceConfiguration;
+  }
+
+  public ServerConfiguration serviceConfiguration(Configuration serviceConfiguration) {
+    this.serviceConfiguration = serviceConfiguration;
+    return this;
   }
 }

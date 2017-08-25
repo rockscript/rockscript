@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package io.rockscript.engine;
+package io.rockscript.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.rockscript.ScriptException;
 import io.rockscript.ScriptService;
-import io.rockscript.activity.http.EngineContext;
+import io.rockscript.activity.http.ActivityContext;
+import io.rockscript.engine.*;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.Executor;
 
 import static io.rockscript.engine.Event.createEventJsonTypeAdapterFactory;
 
-public abstract class EngineConfiguration implements EngineContext {
+public class Configuration implements ActivityContext {
 
   protected EventStore eventStore;
   protected ScriptStore scriptStore;
@@ -40,7 +41,7 @@ public abstract class EngineConfiguration implements EngineContext {
 
   protected Gson gson;
 
-  public EngineConfiguration() {
+  public Configuration() {
     this.eventStore = new EventStore(this);
     this.scriptStore = new ScriptStore(this);
     this.eventListener = this.eventStore;
@@ -49,11 +50,12 @@ public abstract class EngineConfiguration implements EngineContext {
     this.engine = new LocalEngine(this);
   }
 
-  public void seal(ScriptService scriptService) {
+  public ScriptService build() {
     if (gson==null) {
       gson = createDefaultGson();
     }
     throwIfNotProperlyConfigured();
+    return new ScriptServiceImpl(this);
   }
 
   private Gson createDefaultGson() {
@@ -77,9 +79,7 @@ public abstract class EngineConfiguration implements EngineContext {
     }
   }
 
-  protected abstract ScriptService createEngine();
-
-  public EngineConfiguration gson(Gson gson) {
+  public Configuration gson(Gson gson) {
     this.gson = gson;
     return this;
   }

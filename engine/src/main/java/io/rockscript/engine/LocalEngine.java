@@ -15,6 +15,8 @@
  */
 package io.rockscript.engine;
 
+import io.rockscript.service.Configuration;
+
 import java.util.*;
 
 
@@ -23,25 +25,25 @@ import java.util.*;
  * This is ideal for single node deployments of the scriptService. */
 public class LocalEngine implements Engine {
 
-  EngineConfiguration engineConfiguration;
+  Configuration configuration;
   Map<String, Lock> locks = Collections.synchronizedMap(new HashMap<>());
   Map<String, List<ActivityEndRequest>> activityEndBacklog = Collections.synchronizedMap(new HashMap<>());
 
-  public LocalEngine(EngineConfiguration engineConfiguration) {
-    this.engineConfiguration = engineConfiguration;
+  public LocalEngine(Configuration configuration) {
+    this.configuration = configuration;
   }
 
   @Override
   public ScriptExecution startScriptExecution(String scriptId, Object input) {
-    ScriptAst scriptAst = engineConfiguration
+    ScriptAst scriptAst = configuration
       .getScriptStore()
       .findScriptAstById(scriptId);
 
-    String scriptExecutionId = engineConfiguration
+    String scriptExecutionId = configuration
       .getScriptExecutionIdGenerator()
       .createId();
 
-    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, engineConfiguration, scriptAst);
+    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, configuration, scriptAst);
     scriptExecution.setInput(input);
 
     Lock lock = null;
@@ -67,7 +69,7 @@ public class LocalEngine implements Engine {
     Lock lock = acquireLockOrAddEndActivityRequestToBacklog(scriptExecutionId, executionId, result);
     if (lock!=null) {
       try {
-        scriptExecution = engineConfiguration
+        scriptExecution = configuration
           .getEventStore()
           .findScriptExecutionById(scriptExecutionId);
         ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) scriptExecution.findExecutionRecursive(executionId);
@@ -113,9 +115,9 @@ public class LocalEngine implements Engine {
       if (activityEndRequests.isEmpty()) {
         activityEndBacklog.remove(scriptExecutionId);
       }
-      engineConfiguration
+      configuration
         .getExecutor()
-        .execute(new ActivityEndRequestRunnable(nextActivityEndRequest, engineConfiguration));
+        .execute(new ActivityEndRequestRunnable(nextActivityEndRequest, configuration));
     }
   }
 

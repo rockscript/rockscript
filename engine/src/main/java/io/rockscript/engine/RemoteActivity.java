@@ -37,7 +37,7 @@ public class RemoteActivity implements Activity {
 
   @Override
   public ActivityOutput invoke(ActivityInput input) {
-    Gson gson = input.getEngineContext().getGson();
+    Gson gson = input.getActivityContext().getGson();
     String activityInputJson = gson.toJson(input);
     Object activityOutputResponse = HttpRequest.createPost(url + "/" + activityName)
         .header(CONTENT_TYPE, APPLICATION_JSON)

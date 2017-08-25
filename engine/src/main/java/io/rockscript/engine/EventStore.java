@@ -18,6 +18,7 @@ package io.rockscript.engine;
 
 import io.rockscript.ScriptException;
 import io.rockscript.activity.Activity;
+import io.rockscript.service.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,11 +30,11 @@ public class EventStore implements EventListener {
   static final Logger log = LoggerFactory.getLogger(EventStore.class);
   static final Logger eventLog = LoggerFactory.getLogger(EventStore.class.getName()+".events");
 
-  EngineConfiguration engineConfiguration;
+  Configuration configuration;
   List<Event> events = new ArrayList<>();
 
-  public EventStore(EngineConfiguration engineConfiguration) {
-    this.engineConfiguration = engineConfiguration;
+  public EventStore(Configuration configuration) {
+    this.configuration = configuration;
   }
 
   @Override
@@ -44,7 +45,7 @@ public class EventStore implements EventListener {
   }
 
   public String eventJsonToJsonString(Event event) {
-    return event!=null ? engineConfiguration.getGson().toJson(event) : "null";
+    return event!=null ? configuration.getGson().toJson(event) : "null";
   }
 
   public List<ExecutionEvent> findEventsByScriptExecutionId(String scriptExecutionId) {
@@ -118,7 +119,7 @@ public class EventStore implements EventListener {
 
     String scriptId = scriptStartedEvent.getScriptId();
     ScriptException.throwIfNull(scriptId, "ScriptAst id is null in scriptStartedEvent for scriptAst execution: %s", scriptExecutionId);
-    ScriptAst scriptAst = engineConfiguration
+    ScriptAst scriptAst = configuration
       .getScriptStore()
       .findScriptAstById(scriptId);
     ScriptException.throwIfNull(scriptId, "ScriptAst not found for scriptId %s in scriptAst execution %s", scriptId, scriptExecutionId);
@@ -126,7 +127,7 @@ public class EventStore implements EventListener {
     // For now, the input json is not deserialized
     // Later we might add special deserialization to handle activities and functions etc
     Object input = inputJson;
-    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, engineConfiguration, scriptAst);
+    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, configuration, scriptAst);
     scriptExecution.setInput(input);
 
     EventListener originalEventListener = scriptExecution.getEventListener();

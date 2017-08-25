@@ -38,8 +38,8 @@ public class ObjectLiteralExpressionTest {
   List<Object> capturedValues = new ArrayList<>();
 
   public ScriptService createTestEngine() {
-    TestScriptService engine = new TestScriptService();
-    ImportResolver importResolver = engine.getEngineConfiguration().getImportResolver();
+    ScriptService engine = new TestConfiguration().build();
+    ImportResolver importResolver = engine.getConfiguration().getImportResolver();
     JsonObject helloService = new JsonObject()
       .put("assertLiteralValue", input -> {
           capturedValues.add(input.getArgs().get(0));

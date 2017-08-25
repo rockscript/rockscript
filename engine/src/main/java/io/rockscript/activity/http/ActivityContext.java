@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript;
+
+package io.rockscript.activity.http;
+
+import com.google.gson.Gson;
+import io.rockscript.engine.Engine;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
-public class DevEngineConfiguration extends TestEngineConfiguration {
+public interface ActivityContext {
 
-  public DevEngineConfiguration() {
-  }
+  Executor getExecutor();
 
-  @Override
-  protected Executor createExecutor() {
-    return Executors.newWorkStealingPool();
-  }
+  Gson getGson();
 
-  @Override
-  public ScriptService createEngine() {
-    return new DevScriptService(this);
-  }
+  Engine getEngine();
 }

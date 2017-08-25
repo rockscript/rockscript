@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.test;
 
-package io.rockscript;
-
-import io.rockscript.service.ScriptServiceImpl;
-
-/** RockScript service configured configured for test. */
-public class TestScriptService extends ScriptServiceImpl implements ScriptService {
-
-  public TestScriptService() {
-    super(new TestEngineConfiguration());
-  }
-
-  public TestScriptService(TestEngineConfiguration testEngineConfiguration) {
-    super(testEngineConfiguration);
-  }
+public class ScriptTest {
 }

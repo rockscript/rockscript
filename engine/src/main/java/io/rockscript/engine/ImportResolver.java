@@ -18,6 +18,7 @@ package io.rockscript.engine;
 
 import io.rockscript.activity.ImportJsonObject;
 import io.rockscript.activity.ImportProvider;
+import io.rockscript.service.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class ImportResolver {
 
   Map<String,JsonObject> importObjects = new HashMap<>();
 
-  public ImportResolver(EngineConfiguration engineConfiguration) {
+  public ImportResolver(Configuration configuration) {
     loadAllAvailableOnClassPath();
   }
 
