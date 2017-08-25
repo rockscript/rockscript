@@ -15,5 +15,56 @@
  */
 package io.rockscript.test;
 
+import io.rockscript.ScriptService;
+import io.rockscript.TestConfiguration;
+import io.rockscript.engine.Script;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class ScriptTest {
+
+  private static Map<Class<? extends ScriptServiceProvider>,ScriptService> scriptServiceCache = new HashMap<>();
+  private ScriptServiceProvider scriptServiceProvider = getScriptServiceProvider();
+
+  protected interface ScriptServiceProvider {
+    ScriptService createScriptService();
+  }
+
+  protected ScriptService scriptService = initializeScriptService();
+
+  /** Override this method to customize and cache a ScriptService in your tests.
+   *
+   * Overwrite {@link #initializeScriptService()} if you want your ScriptService
+   * to be created for each test. */
+  protected ScriptServiceProvider getScriptServiceProvider() {
+    return new ScriptServiceProvider() {
+      @Override
+      public ScriptService createScriptService() {
+        return new TestConfiguration().build();
+      }
+    };
+  }
+
+  /** Override this method if you want your ScriptService to be
+   * created for each test.
+   *
+   * Overwrite {@link #getScriptServiceProvider()} if you want to
+   * customize and cache a ScriptService in your tests. */
+  protected ScriptService initializeScriptService() {
+    Class<? extends ScriptServiceProvider> providerClass = scriptServiceProvider.getClass();
+    ScriptService scriptService = scriptServiceCache.get(providerClass);
+    if (scriptService==null) {
+      scriptService = scriptServiceProvider.createScriptService();
+      scriptServiceCache.put(providerClass, scriptService);
+    }
+    return scriptService;
+  }
+
+  public Script deploy(String scriptText) {
+    return scriptService
+      .newDeployScriptCommand()
+      .text(scriptText)
+      .execute();
+  }
 }

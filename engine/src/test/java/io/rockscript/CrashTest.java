@@ -18,8 +18,9 @@ package io.rockscript;
 
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.ImportJsonObject;
+import io.rockscript.engine.Event;
+import io.rockscript.engine.EventListener;
 import io.rockscript.engine.ScriptExecution;
-import io.rockscript.CrashConfiguration.CrashEventListener;
 import io.rockscript.service.Configuration;
 import io.rockscript.test.ScriptExecutionComparator;
 import org.junit.Test;
@@ -46,6 +47,45 @@ public class CrashTest {
     TestConfiguration configuration = new TestConfiguration();
     addHelloService(configuration);
     return configuration.build();
+  }
+
+  public static class CrashConfiguration extends TestConfiguration {
+    public CrashConfiguration() {
+      eventListener = new CrashEventListener(this.eventListener);
+    }
+  }
+
+  public static class CrashEventListener implements EventListener {
+    boolean throwing = false;
+    int eventsWithoutCrash;
+    int eventCount;
+    EventListener target;
+
+    public CrashEventListener(EventListener target) {
+      this.eventCount = 0;
+      this.target = target;
+    }
+
+    public void throwAfterEventCount(int eventsWithoutCrash) {
+      this.throwing = true;
+      this.eventsWithoutCrash = eventsWithoutCrash;
+      this.eventCount = 0;
+    }
+
+    public void stopThrowing() {
+      this.throwing = false;
+    }
+
+    @Override
+    public void handle(Event event) {
+      if (throwing) {
+        if (eventCount>=eventsWithoutCrash) {
+          throw new RuntimeException("Exception after the "+eventCount+"th event");
+        }
+        eventCount++;
+      }
+      target.handle(event);
+    }
   }
 
   private void addHelloService(Configuration configuration) {

@@ -21,6 +21,7 @@ import io.rockscript.engine.ImportResolver;
 import io.rockscript.engine.JsonObject;
 import io.rockscript.engine.ScriptExecution;
 import io.rockscript.test.ScriptExecutionComparator;
+import io.rockscript.test.ScriptTest;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,24 +34,24 @@ import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ScriptExecutionTest {
+public class ScriptExecutionTest extends ScriptTest {
 
   protected static Logger log = LoggerFactory.getLogger(ScriptExecutionTest.class);
 
-  ScriptService scriptService = createTestEngine();
   List<Object> synchronousCapturedData = new ArrayList<>();
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
-  public ScriptService createTestEngine() {
+  @Override
+  protected ScriptService initializeScriptService() {
     ScriptService engine = new TestConfiguration().build();
     ImportResolver importResolver = engine.getConfiguration().getImportResolver();
     JsonObject helloService = new JsonObject()
       .put("aSyncFunction", input -> {
-          synchronousCapturedData.add(input.getArgs().get(0));
-          return ActivityOutput.endFunction();})
+        synchronousCapturedData.add(input.getArgs().get(0));
+        return ActivityOutput.endFunction();})
       .put("anAsyncFunction", input -> {
-          waitingAsyncFunctionInvocationIds.add(input.getExecutionId());
-          return ActivityOutput.waitForFunctionToCompleteAsync();});
+        waitingAsyncFunctionInvocationIds.add(input.getExecutionId());
+        return ActivityOutput.waitForFunctionToCompleteAsync();});
     importResolver.add("example.com/hello", helloService);
     return engine;
   }
