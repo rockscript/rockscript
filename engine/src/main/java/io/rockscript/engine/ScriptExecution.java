@@ -15,11 +15,12 @@
  */
 package io.rockscript.engine;
 
+import io.rockscript.ScriptException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** The runtime state of a script execution. */
-public class ScriptExecution extends BlockExecution<Script> {
+/** The runtime state of a scriptAst execution. */
+public class ScriptExecution extends BlockExecution<ScriptAst> {
 
   static Logger log = LoggerFactory.getLogger(ScriptExecution.class);
 
@@ -27,8 +28,8 @@ public class ScriptExecution extends BlockExecution<Script> {
   int nextInternalExecutionId = 1;
   ExecutionMode executionMode;
 
-  public ScriptExecution(String scriptExecutionId, EngineConfiguration engineConfiguration, Script script) {
-    super(scriptExecutionId, script, null);
+  public ScriptExecution(String scriptExecutionId, EngineConfiguration engineConfiguration, ScriptAst scriptAst) {
+    super(scriptExecutionId, scriptAst, null);
     this.eventListener = engineConfiguration.getEventListener();
     this.executionMode = ExecutionMode.EXECUTING;
     initializeSystemVariable(engineConfiguration);
@@ -71,7 +72,7 @@ public class ScriptExecution extends BlockExecution<Script> {
   }
 
   @Override
-  public Script getScript() {
+  public ScriptAst getScript() {
     return element;
   }
 
@@ -81,7 +82,7 @@ public class ScriptExecution extends BlockExecution<Script> {
 
   public void endFunctionInvocationExecution(String executionId, Object result) {
     ArgumentsExpressionExecution argumentsExpressionExecution = (ArgumentsExpressionExecution) findExecutionRecursive(executionId);
-    ScriptException.throwIfNull(argumentsExpressionExecution, "Couldn't find function invocation execution %s in script execution %s", executionId, id);
+    ScriptException.throwIfNull(argumentsExpressionExecution, "Couldn't find function invocation execution %s in scriptAst execution %s", executionId, id);
     argumentsExpressionExecution.endActivityExecute(result);
   }
 
@@ -93,7 +94,7 @@ public class ScriptExecution extends BlockExecution<Script> {
     this.eventListener = eventListener;
   }
 
-  public Script getElement() {
+  public ScriptAst getElement() {
     return element;
   }
 

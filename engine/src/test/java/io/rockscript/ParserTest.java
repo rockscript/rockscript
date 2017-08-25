@@ -31,15 +31,15 @@ public class ParserTest {
 
   @Test
   public void testAsyncExecution() {
-    Script script = Parse.parse(
+    ScriptAst scriptAst = Parse.parse(
         "var otherService = system.import('example.com/hello'); \n" +
         "var message = 5; \n" +
         "helloService.aSyncFunction(message); \n"+
         "helloService.anAsyncFunction(); \n" +
         "helloService.aSyncFunction('hello');");
 
-    assertNotNull(script);
-    List<SourceElement> sourceElements = script.getSourceElements();
+    assertNotNull(scriptAst);
+    List<SourceElement> sourceElements = scriptAst.getSourceElements();
     VariableDeclaration variableDeclaration = (VariableDeclaration) sourceElements.get(0);
     assertNotNull(variableDeclaration);
 

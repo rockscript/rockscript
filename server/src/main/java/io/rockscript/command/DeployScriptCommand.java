@@ -42,7 +42,9 @@ public class DeployScriptCommand implements Command {
   public void execute(Request request, Response response, Context context) {
     String scriptId = context
       .get(ScriptService.class)
-      .deployScript(script)
+      .newDeployScriptCommand()
+        .text(script)
+        .execute()
       .getId();
 
     response.bodyJson(new ResponseJson()

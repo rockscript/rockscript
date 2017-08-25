@@ -17,7 +17,6 @@ package io.rockscript;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.rockscript.engine.dev.DevEngineConfiguration;
 import io.rockscript.handlers.CommandHandler;
 import io.rockscript.handlers.EventsHandler;
 import io.rockscript.netty.router.*;

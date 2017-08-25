@@ -16,23 +16,18 @@
 
 package io.rockscript.engine;
 
-import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.Executor;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.rockscript.ScriptException;
 import io.rockscript.ScriptService;
 import io.rockscript.activity.http.EngineContext;
-import io.rockscript.engine.test.TestIdGenerator;
+
+import java.lang.reflect.Field;
+import java.util.concurrent.Executor;
 
 import static io.rockscript.engine.Event.createEventJsonTypeAdapterFactory;
 
 public abstract class EngineConfiguration implements EngineContext {
-
-  // used in throwIfNotProperlyConfigured
-  private static Set<String> OPTIONAL_FIELDS = new HashSet<>();
 
   protected EventStore eventStore;
   protected ScriptStore scriptStore;
@@ -43,9 +38,7 @@ public abstract class EngineConfiguration implements EngineContext {
   protected ImportResolver importResolver;
   protected Executor executor;
 
-  static { OPTIONAL_FIELDS.add("gson"); }
   protected Gson gson;
-  protected ScriptService scriptService;
 
   public EngineConfiguration() {
     this.eventStore = new EventStore(this);
@@ -56,12 +49,11 @@ public abstract class EngineConfiguration implements EngineContext {
     this.engine = new LocalEngine(this);
   }
 
-  void seal(ScriptService scriptService) {
+  public void seal(ScriptService scriptService) {
     if (gson==null) {
       gson = createDefaultGson();
     }
     throwIfNotProperlyConfigured();
-    this.scriptService = scriptService;
   }
 
   private Gson createDefaultGson() {
@@ -74,16 +66,14 @@ public abstract class EngineConfiguration implements EngineContext {
 
   public void throwIfNotProperlyConfigured() {
     for (Field field: getClass().getDeclaredFields()) {
-      if (!OPTIONAL_FIELDS.contains(field.getName())) {
-        Object value = null;
-        try {
-          field.setAccessible(true);
-          value = field.get(this);
-        } catch (IllegalAccessException e) {
-          throw new ScriptException(e);
-        }
-        ScriptException.throwIfNull(value, "ServiceLocator field '%s' is null", field.getName());
+      Object value = null;
+      try {
+        field.setAccessible(true);
+        value = field.get(this);
+      } catch (IllegalAccessException e) {
+        throw new ScriptException(e);
       }
+      ScriptException.throwIfNull(value, "ServiceLocator field '%s' is null", field.getName());
     }
   }
 
@@ -128,9 +118,5 @@ public abstract class EngineConfiguration implements EngineContext {
 
   public Executor getExecutor() {
     return executor;
-  }
-
-  public ScriptService getScriptService() {
-    return scriptService;
   }
 }

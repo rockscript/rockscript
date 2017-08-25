@@ -16,8 +16,7 @@
 
 package io.rockscript;
 
-import io.rockscript.engine.ScriptServiceImpl;
-import io.rockscript.engine.dev.DevEngineConfiguration;
+import io.rockscript.service.ScriptServiceImpl;
 
 /** RockScript service configured configured for dev deployment. */
 public class DevScriptService extends ScriptServiceImpl implements ScriptService {

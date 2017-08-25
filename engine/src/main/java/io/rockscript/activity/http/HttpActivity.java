@@ -17,9 +17,11 @@ package io.rockscript.activity.http;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import io.rockscript.ScriptService;
-import io.rockscript.activity.*;
+import io.rockscript.activity.Activity;
+import io.rockscript.activity.ActivityInput;
+import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.http.Http.Methods;
+import io.rockscript.engine.Engine;
 
 public class HttpActivity implements Activity {
 
@@ -42,8 +44,8 @@ public class HttpActivity implements Activity {
     httpRequest.method = this.method;
 
     // Create the HttpRequestRunnable command
-    ScriptService scriptService = input.getEngineContext().getScriptService();
-    HttpRequestRunnable command = new HttpRequestRunnable(input.getScriptExecutionId(), input.getExecutionId(), httpRequest, scriptService);
+    Engine engine = input.getEngineContext().getEngine();
+    HttpRequestRunnable command = new HttpRequestRunnable(input.getScriptExecutionId(), input.getExecutionId(), httpRequest, engine);
 
     // Schedule the HttpRequestRunnable command for execution asynchronously
     input

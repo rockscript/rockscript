@@ -66,9 +66,11 @@ public class HttpSynchronousActivityTest extends HttpTest {
   @Test
   public void testHttpActivity() {
     String scriptId = scriptService
-      .deployScript(
+      .newDeployScriptCommand()
+        .text(
         "var approvals = system.import('localhost:"+PORT+"'); \n" +
         "var currency = approvals.approve('oo',7).currency; ")
+        .execute()
       .getId();
 
     ScriptExecution scriptExecution = scriptService

@@ -15,7 +15,6 @@
  */
 package io.rockscript;
 
-import io.rockscript.engine.dev.DevEngineConfiguration;
 import io.rockscript.netty.router.AsyncHttpServerConfiguration;
 
 public class ServerConfiguration {

@@ -18,7 +18,7 @@ package io.rockscript.test;
 
 import io.rockscript.TestScriptService;
 import io.rockscript.engine.*;
-import io.rockscript.engine.test.TestEngineConfiguration;
+import io.rockscript.TestEngineConfiguration;
 
 public class CrashTestScriptService extends TestScriptService {
 

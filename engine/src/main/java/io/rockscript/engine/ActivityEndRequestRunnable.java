@@ -28,7 +28,7 @@ public class ActivityEndRequestRunnable implements Runnable {
   @Override
   public void run() {
     engineConfiguration
-      .getScriptService()
+      .getEngine()
       .endActivity(activityEndRequest.getScriptExecutionId(),
                         activityEndRequest.getExecutionId(),
                         activityEndRequest.getResult());

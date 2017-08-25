@@ -33,19 +33,18 @@ public class LocalEngine implements Engine {
 
   @Override
   public ScriptExecution startScriptExecution(String scriptId, Object input) {
-    Script script = engineConfiguration
+    ScriptAst scriptAst = engineConfiguration
       .getScriptStore()
-      .findScriptById(scriptId);
+      .findScriptAstById(scriptId);
 
     String scriptExecutionId = engineConfiguration
       .getScriptExecutionIdGenerator()
       .createId();
 
-    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, engineConfiguration, script);
+    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, engineConfiguration, scriptAst);
     scriptExecution.setInput(input);
 
     Lock lock = null;
-    Engine engine = engineConfiguration.getEngine();
     try {
       lock = acquireLock(scriptExecutionId);
 

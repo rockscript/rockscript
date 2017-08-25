@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine.dev;
+package io.rockscript;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
-import io.rockscript.DevScriptService;
-import io.rockscript.ScriptService;
-import io.rockscript.engine.test.TestEngineConfiguration;
 
 public class DevEngineConfiguration extends TestEngineConfiguration {
 

@@ -16,6 +16,7 @@
 
 package io.rockscript.engine;
 
+import io.rockscript.ScriptException;
 import io.rockscript.activity.Activity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -116,16 +117,16 @@ public class EventStore implements EventListener {
     ScriptStartedEvent scriptStartedEvent = findScriptStartedEventJson(executionEvents);
 
     String scriptId = scriptStartedEvent.getScriptId();
-    ScriptException.throwIfNull(scriptId, "Script id is null in scriptStartedEvent for script execution: %s", scriptExecutionId);
-    Script script = engineConfiguration
+    ScriptException.throwIfNull(scriptId, "ScriptAst id is null in scriptStartedEvent for scriptAst execution: %s", scriptExecutionId);
+    ScriptAst scriptAst = engineConfiguration
       .getScriptStore()
-      .findScriptById(scriptId);
-    ScriptException.throwIfNull(scriptId, "Script not found for scriptId %s in script execution %s", scriptId, scriptExecutionId);
+      .findScriptAstById(scriptId);
+    ScriptException.throwIfNull(scriptId, "ScriptAst not found for scriptId %s in scriptAst execution %s", scriptId, scriptExecutionId);
     Object inputJson = scriptStartedEvent.getInput();
     // For now, the input json is not deserialized
     // Later we might add special deserialization to handle activities and functions etc
     Object input = inputJson;
-    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, engineConfiguration, script);
+    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, engineConfiguration, scriptAst);
     scriptExecution.setInput(input);
 
     EventListener originalEventListener = scriptExecution.getEventListener();
@@ -175,7 +176,7 @@ public class EventStore implements EventListener {
     return scriptExecutions;
   }
 
-  /** @return a list of events grouped by script execution. */
+  /** @return a list of events grouped by scriptAst execution. */
   public Map<String,List<ExecutionEvent>> findCrashedScriptExecutionEvents() {
     Map<String,List<ExecutionEvent>> groupedEvents = new HashMap<>();
     for (Event event: events) {

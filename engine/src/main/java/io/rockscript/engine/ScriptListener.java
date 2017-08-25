@@ -15,11 +15,11 @@
  */
 package io.rockscript.engine;
 
-/** To be registered added with {@link Script#addScriptListener(be.tombaeyens.script.parser.ScriptListener)}
- * to a script to receive notifications each time the script is starting. */
+/** To be registered added with {@link ScriptAst#addScriptListener(be.tombaeyens.script.parser.ScriptListener)}
+ * to a scriptAst to receive notifications each time the scriptAst is starting. */
 public interface ScriptListener {
 
-  /** Called each time a script is starting;
+  /** Called each time a scriptAst is starting;
    *  The id of the scriptExecution is already initialized when this is called,
    *  but no statements have yet been started. */
   void starting(ScriptExecution scriptExecution);

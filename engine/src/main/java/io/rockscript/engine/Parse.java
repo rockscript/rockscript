@@ -30,14 +30,14 @@ import org.slf4j.LoggerFactory;
 
 /** Use
  *
- * Script script = Parse.parse(String);
+ * ScriptAst scriptAst = Parse.parse(String);
  *
  * or
  *
  * Parse parse = Parse.create(String);
  * if (!parse.hasErrors()) {
- *   // use the script
- *   parse.getScript();
+ *   // use the scriptAst
+ *   parse.getScriptAst();
  * } else {
  *   // log
  *   parse.getErrors();
@@ -47,13 +47,13 @@ public class Parse {
 
   static Logger log = LoggerFactory.getLogger(Parse.class);
 
-  Script script;      // initialized in enterScript
+  ScriptAst scriptAst;      // initialized in enterScript
   List<String> errors;
   int nextScriptElementId = 1;
 
-  /** The parsed script */
-  public Script getScript() {
-    return script;
+  /** The parsed scriptAst */
+  public ScriptAst getScriptAst() {
+    return scriptAst;
   }
 
   public List<String> getErrors() {
@@ -85,17 +85,17 @@ public class Parse {
   }
 
   /** Convenience method that creates the Parse, parses
-   * the given scriptText and returns the script.
+   * the given scriptText and returns the scriptAst.
    * @throws RuntimeException if there was an error parsing the scriptText */
-  public static Script parse(String scriptText) {
+  public static ScriptAst parse(String scriptText) {
     Parse scriptBuilder = create(scriptText);
     scriptBuilder.throwIfError();
-    return scriptBuilder.script;
+    return scriptBuilder.scriptAst;
   }
 
   /** Creates a Parse and parses the given scriptText.
    * From the returned Parse you can check the
-   * {@link #getErrors()} and and get {@link #getScript()}. */
+   * {@link #getErrors()} and and get {@link #getScriptAst()}. */
   public static Parse create(String scriptText) {
     ECMAScriptLexer l = new ECMAScriptLexer(new ANTLRInputStream(scriptText));
     ECMAScriptParser p = new ECMAScriptParser(new CommonTokenStream(l));
@@ -106,11 +106,11 @@ public class Parse {
   }
 
   private void parseScript(ProgramContext programContext, String scriptText) {
-    this.script = new Script(null, createLocation(programContext));
+    this.scriptAst = new ScriptAst(null, createLocation(programContext));
     SourceElementsContext sourceElementsContext = programContext.sourceElements();
     List<SourceElement> sourceElements = parseSourceElements(sourceElementsContext);
-    this.script.setSourceElements(sourceElements);
-    this.script.initializeScriptElements(scriptText);
+    this.scriptAst.setSourceElements(sourceElements);
+    this.scriptAst.initializeScriptElements(scriptText);
   }
 
   private List<SourceElement> parseSourceElements(SourceElementsContext sourceElementsContext) {

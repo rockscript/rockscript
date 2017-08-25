@@ -16,7 +16,7 @@
 
 package io.rockscript.activity.http;
 
-import io.rockscript.ScriptService;
+import io.rockscript.engine.Engine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,19 +27,19 @@ public class HttpRequestRunnable implements Runnable {
   String scriptExecutionId;
   String executionId;
   HttpRequest request;
-  ScriptService scriptService;
+  Engine engine;
 
-  public HttpRequestRunnable(String scriptExecutionId, String executionId, HttpRequest request, ScriptService scriptService) {
+  public HttpRequestRunnable(String scriptExecutionId, String executionId, HttpRequest request, Engine engine) {
     this.scriptExecutionId = scriptExecutionId;
     this.executionId = executionId;
     this.request = request;
-    this.scriptService = scriptService;
+    this.engine = engine;
   }
 
   @Override
   public void run() {
     HttpResponse response = request.execute();
-    scriptService.endActivity(scriptExecutionId, executionId, response);
+    engine.endActivity(scriptExecutionId, executionId, response);
   }
 
 }

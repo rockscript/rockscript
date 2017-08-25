@@ -16,6 +16,8 @@
 
 package io.rockscript.engine;
 
+import io.rockscript.ScriptException;
+
 import java.util.*;
 
 /** Base class for the runtime state of operations. */
@@ -42,7 +44,7 @@ public abstract class Execution<T extends ScriptElement> {
     return parent.getScriptExecution();
   }
 
-  public Script getScript() {
+  public ScriptAst getScript() {
     return parent.getScript();
   }
 
@@ -53,10 +55,11 @@ public abstract class Execution<T extends ScriptElement> {
 
   protected void startChild(ScriptElement childScriptElement) {
     if (childScriptElement==null) {
-      Script script = getScript();
+      ScriptAst scriptAst = getScript();
       Integer childScriptElementId = childScriptElement.getIndex();
-      childScriptElement = script.findScriptElement(childScriptElementId);
-      ScriptException.throwIfNull(childScriptElement, "Couldn't find script element %s in script %s", childScriptElementId, script.getIndex());
+      childScriptElement = scriptAst.findScriptElement(childScriptElementId);
+      ScriptException.throwIfNull(childScriptElement, "Couldn't find scriptAst element %s in scriptAst %s", childScriptElementId, scriptAst
+          .getIndex());
     }
     Execution child = createChild(childScriptElement);
     child.start();

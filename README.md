@@ -23,8 +23,12 @@ synchronization hassles as in other programming languages.
 
 But the cool part is that executions are resilient.  The runtime state of 
 each script execution is stored with event sourcing as the script executes.
-So script executions can _survive RockScript server crashes_.  It's designed 
-so that a group of RockScript servers can form a cluster. 
+So script executions don't consume resources like threads and memory when 
+they are waiting for asynchronous activities to complete.  Also because 
+the script executions are stored, you can fully inspect what happened when 
+something goes wrong like a server crash and even recover from the last 
+saved execution position.  It's designed so that a group of RockScript 
+servers can form a cluster. 
 
 ## When to use it?
 

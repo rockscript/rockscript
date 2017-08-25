@@ -30,7 +30,9 @@ public class ScriptsPostHandler implements RequestHandler {
 
     String scriptId = context
       .get(ScriptService.class)
-      .deployScript(script)
+      .newDeployScriptCommand()
+        .text(script)
+        .execute()
       .getId();
 
     response.statusOk();

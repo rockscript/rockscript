@@ -15,18 +15,21 @@
  */
 package io.rockscript.test;
 
-import java.util.function.Function;
-
 import io.rockscript.activity.Activity;
-import io.rockscript.engine.*;
+import io.rockscript.engine.Execution;
+import io.rockscript.engine.ScriptAst;
+import io.rockscript.engine.ScriptExecution;
+import io.rockscript.engine.SystemImportActivity;
+
+import java.util.function.Function;
 
 public class ScriptExecutionComparator extends DeepComparator {
 
   public ScriptExecutionComparator() {
     ignoreField(ScriptExecution.class, "eventListener");
     ignoreField(Execution.class, "element");
-    ignoreField(Script.class, "elements");
-    ignoreField(Script.class, "engineConfiguration");
+    ignoreField(ScriptAst.class, "elements");
+    ignoreField(ScriptAst.class, "engineConfiguration");
     ignoreField(SystemImportActivity.class, "engineConfiguration");
     ignoreAnonymousField(Activity.class, "val$functionHandler");
     ignoreAnonymousField(Activity.class, "arg$1");

@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package io.rockscript.engine;
+package io.rockscript.service;
 
+import io.rockscript.DeployScriptCommand;
 import io.rockscript.ScriptService;
+import io.rockscript.engine.EngineConfiguration;
+import io.rockscript.engine.ScriptExecution;
 
 import java.util.List;
 
@@ -29,25 +32,29 @@ public abstract class ScriptServiceImpl implements ScriptService {
     this.engineConfiguration = engineConfiguration;
   }
 
-  public Script deployScript(String scriptText) {
-    String scriptId = engineConfiguration.getScriptIdGenerator().createId();
-    Script script = parseScript(scriptText);
-    script.setId(scriptId);
-    storeScript(script, scriptText);
-    return script;
+  public DeployScriptCommand newDeployScriptCommand() {
+    return new DeployScriptCommandImpl(engineConfiguration);
   }
 
-  protected Script parseScript(String scriptText) {
-    Script script = Parse.parse(scriptText);
-    script.setEngineConfiguration(engineConfiguration);
-    return script;
-  }
-
-  private void storeScript(Script script, String scriptText) {
-    engineConfiguration
-      .getScriptStore()
-      .saveScript(script, scriptText);
-  }
+//  public ScriptAst deployScript(String scriptText) {
+//    String scriptId = engineConfiguration.getScriptIdGenerator().createId();
+//    ScriptAst scriptAst = parseScript(scriptText);
+//    scriptAst.setId(scriptId);
+//    storeScript(scriptAst, scriptText);
+//    return scriptAst;
+//  }
+//
+//  protected ScriptAst parseScript(String scriptText) {
+//    ScriptAst scriptAst = Parse.parse(scriptText);
+//    scriptAst.setEngineConfiguration(engineConfiguration);
+//    return scriptAst;
+//  }
+//
+//  private void storeScript(ScriptAst scriptAst, String scriptText) {
+//    engineConfiguration
+//      .getScriptStore()
+//      .saveScript(scriptAst, scriptText);
+//  }
 
   public ScriptExecution startScriptExecution(String scriptId) {
     return startScriptExecution(scriptId, null);

@@ -19,7 +19,7 @@ package io.rockscript.engine;
 import java.util.List;
 
 
-/** Base class for a node in the abstract syntax tree of a {@link Script} */
+/** Base class for a node in the abstract syntax tree of a {@link ScriptAst} */
 public abstract class ScriptElement {
 
   protected Integer index;

@@ -16,7 +16,7 @@
 
 package io.rockscript.engine;
 
-/** Performs script execution and ensures that only 1 scriptService
+/** Performs scriptAst execution and ensures that only 1 scriptService
  * is executing a ScriptExecution at any given time.
  * The goal is to also have an in-memory
  * implementation for single-node deployments and a distributed

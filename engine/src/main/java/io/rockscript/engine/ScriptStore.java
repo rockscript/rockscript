@@ -16,21 +16,61 @@
 
 package io.rockscript.engine;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ScriptStore {
 
-  Map<String, Script> scripts = new HashMap<>();
+  EngineConfiguration engineConfiguration;
+  /** maps script name to script versions */
+  Map<String, List<Script>> scriptsByName = new HashMap<>();
+  /** maps script ids to parsed ScriptAst's */
+  Map<String, ScriptAst> scriptAstsById = new HashMap<>();
 
   public ScriptStore(EngineConfiguration engineConfiguration) {
+    this.engineConfiguration = engineConfiguration;
   }
 
-  public Script findScriptById(String scriptId) {
-    return scripts.get(scriptId);
+  public ScriptAst findScriptAstById(String scriptId) {
+    ScriptAst scriptAst = scriptAstsById.get(scriptId);
+    if (scriptAst==null) {
+      throw new RuntimeException("TODO finish this");
+    }
+    return scriptAst;
   }
 
-  public void saveScript(Script script, String scriptText) {
-    scripts.put(script.getId(), script);
+  public Script deployScript(String name, String text) {
+    Script script = new Script();
+    script.setText(text);
+
+    Parse parse = Parse.create(text);
+    if (!parse.hasErrors()) {
+      String id = engineConfiguration.getScriptIdGenerator().createId();
+      script.setId(id);
+
+      if (name==null) {
+        name = "Unnamed script";
+      }
+      script.setName(name);
+
+      List<Script> scriptVersions = scriptsByName.get(name);
+      if (scriptVersions==null) {
+        scriptVersions = new ArrayList<>();
+        scriptsByName.put(name, scriptVersions);
+      }
+      script.setVersion(scriptVersions.size());
+      scriptVersions.add(script);
+
+      ScriptAst scriptAst = parse.getScriptAst();
+      scriptAst.setId(id);
+      scriptAst.setEngineConfiguration(engineConfiguration);
+      scriptAstsById.put(id, scriptAst);
+
+    } else {
+      script.setErrors(parse.getErrors());
+    }
+    return script;
   }
 }

@@ -16,10 +16,10 @@
 
 package io.rockscript.activity.http;
 
-import java.util.concurrent.Executor;
-
 import com.google.gson.Gson;
-import io.rockscript.ScriptService;
+import io.rockscript.engine.Engine;
+
+import java.util.concurrent.Executor;
 
 public interface EngineContext {
 
@@ -27,5 +27,5 @@ public interface EngineContext {
 
   Gson getGson();
 
-  ScriptService getScriptService();
+  Engine getEngine();
 }

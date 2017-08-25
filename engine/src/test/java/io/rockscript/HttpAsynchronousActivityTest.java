@@ -78,9 +78,10 @@ public class HttpAsynchronousActivityTest extends HttpTest {
 
   private void executeApprovalScript() {
     String scriptId = scriptService
-        .deployScript(
-            "var approvals = system.import('localhost:"+PORT+"'); \n" +
+        .newDeployScriptCommand()
+          .text("var approvals = system.import('localhost:"+PORT+"'); \n" +
                 "approvals.approve('oo',7); ")
+          .execute()
         .getId();
 
     String scriptExecutionId = scriptService

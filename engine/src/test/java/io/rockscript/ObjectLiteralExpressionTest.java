@@ -16,13 +16,17 @@
  */
 package io.rockscript;
 
-import java.util.*;
-
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.engine.*;
+import io.rockscript.engine.ImportResolver;
+import io.rockscript.engine.JsonObject;
+import io.rockscript.engine.ScriptExecution;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -47,7 +51,9 @@ public class ObjectLiteralExpressionTest {
   @Test
   public void testSimpleStaticObjectLiteralExpressionWithIdentifier() {
     String scriptId = scriptService
-      .deployScript("var o = {msg: 'hello'};")
+      .newDeployScriptCommand()
+        .text("var o = {msg: 'hello'};")
+        .execute()
       .getId();
 
     ScriptExecution scriptExecution = scriptService.startScriptExecution(scriptId);
@@ -59,7 +65,9 @@ public class ObjectLiteralExpressionTest {
   @Test
   public void testSimpleStaticObjectLiteralExpressionWithPropertyString() {
     String scriptId = scriptService
-      .deployScript("var o = {'m s g': 'hello'};")
+      .newDeployScriptCommand()
+        .text("var o = {'m s g': 'hello'};")
+        .execute()
       .getId();
 
     ScriptExecution scriptExecution = scriptService.startScriptExecution(scriptId);
@@ -71,9 +79,10 @@ public class ObjectLiteralExpressionTest {
   @Test
   public void testDynamicObjectLiteralExpression() {
     String scriptId = scriptService
-      .deployScript(
-        "var greeting = 'hello'; \n"+
-        "var o = {msg: greeting}; ")
+      .newDeployScriptCommand()
+        .text("var greeting = 'hello'; \n"+
+              "var o = {msg: greeting}; ")
+        .execute()
       .getId();
 
     ScriptExecution scriptExecution = scriptService.startScriptExecution(scriptId);

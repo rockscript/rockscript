@@ -33,9 +33,9 @@ import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class ScriptTest {
+public class ScriptExecutionTest {
 
-  protected static Logger log = LoggerFactory.getLogger(ScriptTest.class);
+  protected static Logger log = LoggerFactory.getLogger(ScriptExecutionTest.class);
 
   ScriptService scriptService = createTestEngine();
   List<Object> synchronousCapturedData = new ArrayList<>();
@@ -58,12 +58,13 @@ public class ScriptTest {
   @Test
   public void testAsyncExecution() {
     String scriptId = scriptService
-      .deployScript(
-        "var helloService = system.import('example.com/hello'); \n" +
+      .newDeployScriptCommand()
+        .text("var helloService = system.import('example.com/hello'); \n" +
         "var message = 5; \n" +
         "helloService.aSyncFunction(message); \n"+
         "helloService.anAsyncFunction(); \n" +
         "helloService.aSyncFunction('hello');")
+        .execute()
       .getId();
 
     log.debug("Starting script...");
@@ -86,11 +87,13 @@ public class ScriptTest {
   @Test
   public void testScriptInput() {
     String scriptId = scriptService
-      .deployScript(
+      .newDeployScriptCommand()
+        .text(
         "var helloService = system.import('example.com/hello'); \n" +
         "helloService.aSyncFunction(system.input.greetingOne); \n"+
         "helloService.anAsyncFunction(); \n" +
         "helloService.aSyncFunction(system.input.greetingTwo);")
+        .execute()
       .getId();
 
     String scriptExecutionId = scriptService
@@ -113,10 +116,12 @@ public class ScriptTest {
   @Test
   public void testSerialization() {
     String scriptId = scriptService
-      .deployScript(
+      .newDeployScriptCommand()
+        .text(
         "var helloService = system.import('example.com/hello'); \n" +
         "helloService.anAsyncFunction(); \n" +
         "helloService.aSyncFunction('hello');")
+        .execute()
       .getId();
 
     ScriptExecution scriptExecution = scriptService

@@ -16,6 +16,8 @@
 
 package io.rockscript.engine;
 
+import io.rockscript.ScriptException;
+
 import java.time.Instant;
 
 public class Lock {

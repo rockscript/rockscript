@@ -16,16 +16,18 @@
  */
 package io.rockscript;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import io.rockscript.activity.*;
-import io.rockscript.engine.*;
-import io.rockscript.test.*;
+import io.rockscript.activity.ActivityOutput;
+import io.rockscript.activity.ImportJsonObject;
+import io.rockscript.engine.ScriptExecution;
+import io.rockscript.test.CrashTestScriptService;
 import io.rockscript.test.CrashTestScriptService.CrashEventListener;
+import io.rockscript.test.ScriptExecutionComparator;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CrashTest {
 
@@ -72,11 +74,15 @@ public class CrashTest {
 
     int eventsWithoutCrash = 1;
     boolean crashOccurred = false;
-    CrashTestScriptService engine = createCrashTestEngine();
-    CrashEventListener eventListener = (CrashEventListener) engine.getEngineConfiguration().getEventListener();
+    CrashTestScriptService scriptService = createCrashTestEngine();
+    CrashEventListener eventListener = (CrashEventListener) scriptService
+        .getEngineConfiguration()
+        .getEventListener();
 
-    String scriptId = engine
-      .deployScript(scriptText)
+    String scriptId = scriptService
+      .newDeployScriptCommand()
+        .text(scriptText)
+        .execute()
       .getId();
     do {
       try  {
@@ -85,7 +91,7 @@ public class CrashTest {
         eventListener.throwAfterEventCount(eventsWithoutCrash);
 
         log.debug("\n\n----- Starting script execution and throwing after "+eventsWithoutCrash+" events ------");
-        ScriptExecution scriptExecution = engine
+        ScriptExecution scriptExecution = scriptService
           .startScriptExecution(scriptId);
 
       } catch (RuntimeException e) {
@@ -94,7 +100,7 @@ public class CrashTest {
         eventsWithoutCrash++;
 
         eventListener.stopThrowing();
-        List<ScriptExecution> recoverCrashedScriptExecutions = engine.recoverCrashedScriptExecutions();
+        List<ScriptExecution> recoverCrashedScriptExecutions = scriptService.recoverCrashedScriptExecutions();
         ScriptExecution recoveredScriptExecution = recoverCrashedScriptExecutions.get(0);
 
         // We don't want to compare the id's
@@ -109,10 +115,12 @@ public class CrashTest {
   }
 
   private ScriptExecution createExpectedScriptExecutionState(String scriptText) {
-    TestScriptService engine = createNormalTestEngine();
-    String scriptId = engine
-      .deployScript(scriptText)
+    TestScriptService scriptService = createNormalTestEngine();
+    String scriptId = scriptService
+      .newDeployScriptCommand()
+        .text(scriptText)
+        .execute()
       .getId();
-    return engine.startScriptExecution(scriptId);
+    return scriptService.startScriptExecution(scriptId);
   }
 }

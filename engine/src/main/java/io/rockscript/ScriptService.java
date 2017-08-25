@@ -17,15 +17,23 @@
 package io.rockscript;
 
 import io.rockscript.engine.EngineConfiguration;
-import io.rockscript.engine.Script;
 import io.rockscript.engine.ScriptExecution;
 
 import java.util.List;
 
-/** Access to the RockScript functionality */
+/** Access to the RockScript functionality
+ * eg:
+ *
+ * <code>
+ *   DeployScriptResponse response = scriptService.newDeployScriptCommand()
+ *     .name("Approval")
+ *     .scriptText("...the script text...")
+ *     .execute();
+ * </code>
+ */
 public interface ScriptService {
 
-  Script deployScript(String scriptText);
+  DeployScriptCommand newDeployScriptCommand();
 
   ScriptExecution startScriptExecution(String scriptId);
 
