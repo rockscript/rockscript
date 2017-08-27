@@ -35,7 +35,7 @@ public class ActivityTest extends ScriptTest {
 
   protected static Logger log = LoggerFactory.getLogger(ActivityTest.class);
 
-  List<ActivityInput> continuationReferences = new ArrayList<>();
+  List<ActivityInput> activityInputs = new ArrayList<>();
 
   @Override
   protected ScriptService initializeScriptService() {
@@ -50,7 +50,7 @@ public class ActivityTest extends ScriptTest {
     scriptService.getConfiguration().getImportResolver().add(
       "approvalService", new JsonObject()
         .put("approve", input -> {
-          continuationReferences.add(input);
+          activityInputs.add(input);
           return ActivityOutput.waitForFunctionToCompleteAsync();
         }));
 
@@ -60,16 +60,16 @@ public class ActivityTest extends ScriptTest {
 
     ScriptExecution scriptExecution = startScriptExecution(script);
 
-    ActivityInput continuationReference = continuationReferences.get(0);
-    assertEquals("primus", continuationReference.getArgs().get(0));
-    assertEquals(1, continuationReferences.size());
+    ActivityInput activityInput = activityInputs.get(0);
+    assertEquals("primus", activityInput.getArgs().get(0));
+    assertEquals(1, activityInputs.size());
     assertFalse(scriptExecution.isEnded());
 
     String scriptExecutionId = scriptExecution.getId();
-    String executionId = continuationReference.getExecutionId();
+    String executionId = activityInput.getExecutionId();
     assertNotNull(executionId);
 
-    scriptExecution = endActivity(scriptExecutionId, executionId);
+    scriptExecution = endActivity(activityInput.getContinuationReference());
     assertTrue(scriptExecution.isEnded());
   }
 
@@ -87,7 +87,7 @@ public class ActivityTest extends ScriptTest {
 
     ScriptExecution scriptExecution = startScriptExecution(script);
 
-    assertEquals(0, continuationReferences.size());
+    assertEquals(0, activityInputs.size());
     assertTrue(scriptExecution.isEnded());
   }
 

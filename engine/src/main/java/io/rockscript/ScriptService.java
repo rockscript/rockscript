@@ -16,8 +16,9 @@
 
 package io.rockscript;
 
-import io.rockscript.service.Configuration;
+import io.rockscript.engine.ContinuationReference;
 import io.rockscript.engine.ScriptExecution;
+import io.rockscript.service.Configuration;
 
 import java.util.List;
 
@@ -39,9 +40,9 @@ public interface ScriptService {
 
   ScriptExecution startScriptExecution(String scriptId, Object input);
 
-  ScriptExecution endActivity(String scriptExecutionId, String executionId);
+  ScriptExecution endActivity(ContinuationReference continuationReference);
 
-  ScriptExecution endActivity(String scriptExecutionId, String executionId, Object result);
+  ScriptExecution endActivity(ContinuationReference continuationReference, Object result);
 
   Configuration getConfiguration();
 

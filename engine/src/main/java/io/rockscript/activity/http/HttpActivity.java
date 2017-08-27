@@ -45,7 +45,7 @@ public class HttpActivity implements Activity {
 
     // Create the HttpRequestRunnable command
     Engine engine = input.getActivityContext().getEngine();
-    HttpRequestRunnable command = new HttpRequestRunnable(input.getScriptExecutionId(), input.getExecutionId(), httpRequest, engine);
+    HttpRequestRunnable command = new HttpRequestRunnable(input.getContinuationReference(), httpRequest, engine);
 
     // Schedule the HttpRequestRunnable command for execution asynchronously
     input

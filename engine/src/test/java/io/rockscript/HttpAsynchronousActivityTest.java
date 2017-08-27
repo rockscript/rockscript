@@ -89,6 +89,6 @@ public class HttpAsynchronousActivityTest extends HttpTest {
         .getId();
 
     ActivityInput activityInput = activityInputs.get(0);
-    ScriptExecution scriptExecution = scriptService.endActivity(activityInput.getScriptExecutionId(), activityInput.getExecutionId());
+    ScriptExecution scriptExecution = scriptService.endActivity(activityInput.getContinuationReference());
   }
 }

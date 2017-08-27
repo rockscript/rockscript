@@ -16,6 +16,7 @@
 
 package io.rockscript.activity.http;
 
+import io.rockscript.engine.ContinuationReference;
 import io.rockscript.engine.Engine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,14 +25,12 @@ public class HttpRequestRunnable implements Runnable {
 
   static Logger log = LoggerFactory.getLogger(HttpRequestRunnable.class);
 
-  String scriptExecutionId;
-  String executionId;
+  ContinuationReference continuationReference;
   HttpRequest request;
   Engine engine;
 
-  public HttpRequestRunnable(String scriptExecutionId, String executionId, HttpRequest request, Engine engine) {
-    this.scriptExecutionId = scriptExecutionId;
-    this.executionId = executionId;
+  public HttpRequestRunnable(ContinuationReference continuationReference, HttpRequest request, Engine engine) {
+    this.continuationReference = continuationReference;
     this.request = request;
     this.engine = engine;
   }
@@ -39,7 +38,7 @@ public class HttpRequestRunnable implements Runnable {
   @Override
   public void run() {
     HttpResponse response = request.execute();
-    engine.endActivity(scriptExecutionId, executionId, response);
+    engine.endActivity(continuationReference, response);
   }
 
 }

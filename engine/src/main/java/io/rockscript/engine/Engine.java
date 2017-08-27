@@ -25,5 +25,5 @@ public interface Engine {
 
   ScriptExecution startScriptExecution(String scriptId, Object input);
 
-  ScriptExecution endActivity(String scriptExecutionId, String executionId, Object result);
+  ScriptExecution endActivity(ContinuationReference continuationReference, Object result);
 }

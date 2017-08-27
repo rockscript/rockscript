@@ -18,6 +18,7 @@ package io.rockscript.service;
 
 import io.rockscript.DeployScriptCommand;
 import io.rockscript.ScriptService;
+import io.rockscript.engine.ContinuationReference;
 import io.rockscript.engine.ScriptExecution;
 
 import java.util.List;
@@ -45,15 +46,15 @@ public class ScriptServiceImpl implements ScriptService {
   }
 
   @Override
-  public ScriptExecution endActivity(String scriptExecutionId, String executionId) {
-    return endActivity(scriptExecutionId, executionId, null);
+  public ScriptExecution endActivity(ContinuationReference continuationReference) {
+    return endActivity(continuationReference, null);
   }
 
   @Override
-  public ScriptExecution endActivity(String scriptExecutionId, String executionId, Object result) {
+  public ScriptExecution endActivity(ContinuationReference continuationReference, Object result) {
     return configuration
       .getEngine()
-      .endActivity(scriptExecutionId, executionId, result);
+      .endActivity(continuationReference, result);
   }
 
   public Configuration getConfiguration() {

@@ -16,6 +16,7 @@
 package io.rockscript.command;
 
 import io.rockscript.ScriptService;
+import io.rockscript.engine.ContinuationReference;
 import io.rockscript.netty.router.Context;
 import io.rockscript.netty.router.Request;
 import io.rockscript.netty.router.Response;
@@ -25,17 +26,15 @@ import java.util.Map;
 
 public class EndActivityCommand implements Command {
 
-  String scriptExecutionId;
-  String executionId;
+  ContinuationReference continuationReference;
   Object result;
 
   /** constructor for json deserialization */
   public EndActivityCommand() {
   }
 
-  public EndActivityCommand(String scriptExecutionId, String executionId) {
-    this.scriptExecutionId = scriptExecutionId;
-    this.executionId = executionId;
+  public EndActivityCommand(ContinuationReference continuationReference) {
+    this.continuationReference = continuationReference;
   }
 
   public EndActivityCommand result(Object result) {
@@ -60,7 +59,7 @@ public class EndActivityCommand implements Command {
   public void execute(Request request, Response response, Context context) {
     context
       .get(ScriptService.class)
-      .endActivity(scriptExecutionId, executionId, result);
+      .endActivity(continuationReference, result);
 
     response.statusOk();
     response.send();

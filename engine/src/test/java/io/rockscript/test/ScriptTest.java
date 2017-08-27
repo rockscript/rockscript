@@ -17,6 +17,7 @@ package io.rockscript.test;
 
 import io.rockscript.ScriptService;
 import io.rockscript.TestConfiguration;
+import io.rockscript.engine.ContinuationReference;
 import io.rockscript.engine.Script;
 import io.rockscript.engine.ScriptExecution;
 import org.junit.Before;
@@ -91,12 +92,12 @@ public class ScriptTest {
     return scriptService.startScriptExecution(scriptId, input);
   }
 
-  public ScriptExecution endActivity(String scriptExecutionId, String executionId) {
-    return endActivity(scriptExecutionId, executionId, null);
+  public ScriptExecution endActivity(ContinuationReference continuationReference) {
+    return endActivity(continuationReference, null);
   }
 
-  public ScriptExecution endActivity(String scriptExecutionId, String executionId, Object result) {
-    return scriptService.endActivity(scriptExecutionId, executionId, result);
+  public ScriptExecution endActivity(ContinuationReference continuationReference, Object result) {
+    return scriptService.endActivity(continuationReference, result);
   }
 
 }

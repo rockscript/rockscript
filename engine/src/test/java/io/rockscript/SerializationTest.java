@@ -37,7 +37,7 @@ public class SerializationTest extends ScriptTest {
 
   protected static Logger log = LoggerFactory.getLogger(SerializationTest.class);
 
-  List<ActivityInput> continuationReferences = new ArrayList<>();
+  List<ActivityInput> activityInputs = new ArrayList<>();
 
   @Override
   protected ScriptService initializeScriptService() {
@@ -55,7 +55,7 @@ public class SerializationTest extends ScriptTest {
               return ActivityOutput.endFunction(input.getArg(0)+" world");
             })
             .put("world", input -> {
-              continuationReferences.add(input);
+              activityInputs.add(input);
               return ActivityOutput.waitForFunctionToCompleteAsync();
             }));
 
@@ -73,12 +73,11 @@ public class SerializationTest extends ScriptTest {
     new ScriptExecutionComparator()
       .assertEquals(scriptExecution, reloadScriptExecution(scriptExecutionId));
 
-    ActivityInput continuationReference = continuationReferences.get(0);
+    ActivityInput activityInput = activityInputs.get(0);
 
-    assertEquals("hello world", continuationReference.getArg(0));
+    assertEquals("hello world", activityInput.getArg(0));
 
-    String executionId = continuationReference.getExecutionId();
-    scriptExecution = scriptService.endActivity(scriptExecutionId, executionId);
+    scriptExecution = scriptService.endActivity(activityInput.getContinuationReference());
 
     new ScriptExecutionComparator()
       .assertEquals(scriptExecution, reloadScriptExecution(scriptExecutionId));

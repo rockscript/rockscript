@@ -17,22 +17,16 @@ package io.rockscript.engine;
 
 public class ActivityEndRequest {
 
-  String scriptExecutionId;
-  String executionId;
+  ContinuationReference continuationReference;
   Object result;
 
-  public ActivityEndRequest(String scriptExecutionId, String executionId, Object result) {
-    this.scriptExecutionId = scriptExecutionId;
-    this.executionId = executionId;
+  public ActivityEndRequest(ContinuationReference continuationReference, Object result) {
+    this.continuationReference = continuationReference;
     this.result = result;
   }
 
-  public String getScriptExecutionId() {
-    return scriptExecutionId;
-  }
-
-  public String getExecutionId() {
-    return executionId;
+  public ContinuationReference getContinuationReference() {
+    return continuationReference;
   }
 
   public Object getResult() {

@@ -31,8 +31,7 @@ public class ActivityEndRequestRunnable implements Runnable {
   public void run() {
     configuration
       .getEngine()
-      .endActivity(activityEndRequest.getScriptExecutionId(),
-                        activityEndRequest.getExecutionId(),
-                        activityEndRequest.getResult());
+      .endActivity(activityEndRequest.getContinuationReference(),
+                   activityEndRequest.getResult());
   }
 }

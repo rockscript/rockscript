@@ -64,15 +64,17 @@ public class LocalEngine implements Engine {
   }
 
   @Override
-  public ScriptExecution endActivity(String scriptExecutionId, String executionId, Object result) {
+  public ScriptExecution endActivity(ContinuationReference continuationReference, Object result) {
     ScriptExecution scriptExecution =null;
-    Lock lock = acquireLockOrAddEndActivityRequestToBacklog(scriptExecutionId, executionId, result);
+    Lock lock = acquireLockOrAddEndActivityRequestToBacklog(continuationReference, result);
     if (lock!=null) {
       try {
         scriptExecution = configuration
           .getEventStore()
-          .findScriptExecutionById(scriptExecutionId);
-        ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) scriptExecution.findExecutionRecursive(executionId);
+          .findScriptExecutionById(continuationReference.getScriptExecutionId());
+        String executionId = continuationReference.getExecutionId();
+        ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) scriptExecution
+            .findExecutionRecursive(executionId);
         execution.endActivity(result);
       } finally {
         if (lock!=null) {
@@ -83,11 +85,11 @@ public class LocalEngine implements Engine {
     return scriptExecution;
   }
 
-  private synchronized Lock acquireLockOrAddEndActivityRequestToBacklog(String scriptExecutionId, String executionId, Object result) {
-    Lock lock = acquireLock(scriptExecutionId);
+  private synchronized Lock acquireLockOrAddEndActivityRequestToBacklog(ContinuationReference continuationReference, Object result) {
+    Lock lock = acquireLock(continuationReference.getScriptExecutionId());
     if (lock==null) {
       // TODO consider a timer to check that the listening didn't mismatch with releasing the lock
-      addToActivityEndBacklog(new ActivityEndRequest(scriptExecutionId, executionId, result));
+      addToActivityEndBacklog(new ActivityEndRequest(continuationReference, result));
     }
     return lock;
   }
@@ -122,7 +124,7 @@ public class LocalEngine implements Engine {
   }
 
   public synchronized void addToActivityEndBacklog(ActivityEndRequest activityEndRequest) {
-    String scriptExecutionId = activityEndRequest.getScriptExecutionId();
+    String scriptExecutionId = activityEndRequest.getContinuationReference().getScriptExecutionId();
     List<ActivityEndRequest> scriptExecutionLockListeners = activityEndBacklog.get(scriptExecutionId);
     if (scriptExecutionLockListeners==null) {
       scriptExecutionLockListeners = new ArrayList<>();

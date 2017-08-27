@@ -16,6 +16,7 @@
 package io.rockscript.activity;
 
 import io.rockscript.activity.http.ActivityContext;
+import io.rockscript.engine.ContinuationReference;
 import io.rockscript.engine.Execution;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 public class ActivityInput {
 
+  ContinuationReference continuationReference;
   String scriptExecutionId;
   String executionId;
   List<Object> args;
@@ -33,6 +35,10 @@ public class ActivityInput {
   public ActivityInput(Execution<?> execution, List<Object> args) {
     this.scriptExecutionId = execution.getScriptExecution().getId();
     this.executionId = execution.getId();
+    this.continuationReference = new ContinuationReference(
+        execution.getScriptExecution().getId(),
+        execution.getId()
+    );
     this.args = args;
     this.activityContext = execution.getScript().getConfiguration();
   }
@@ -43,6 +49,10 @@ public class ActivityInput {
 
   public String getExecutionId() {
     return executionId;
+  }
+
+  public ContinuationReference getContinuationReference() {
+    return continuationReference;
   }
 
   public List<Object> getArgs() {
