@@ -15,10 +15,13 @@
  */
 package io.rockscript.gson;
 
-import java.util.*;
-
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Constructor;
+import java.util.*;
 
 public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
 
@@ -27,6 +30,7 @@ public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
 
   Set<TypeToken<?>> matchingTypes = new HashSet<>();
   PolymorphicTypeAdapter<?> typeAdapter = null;
+  Map<Class,Constructor<?>> accessibleConstructors = Collections.synchronizedMap(new HashMap<>());
 
   public PolymorphicTypeAdapterFactory typeName(Class<?> clazz, String name) {
     return typeName(TypeToken.get(clazz), name);
@@ -69,5 +73,20 @@ public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
     }
 
     return null;
+  }
+
+  public <T> Constructor<T> getAccessibleConstructor(Class<T> clazz) {
+    Constructor<?> constructor = accessibleConstructors.get(clazz);
+    if (constructor!=null) {
+      return (Constructor<T>) constructor;
+    }
+    try {
+      constructor = clazz.getDeclaredConstructor((Class<?>[]) null);
+      constructor.setAccessible(true);
+      accessibleConstructors.put(clazz, constructor);
+      return (Constructor<T>) constructor;
+    } catch (NoSuchMethodException e) {
+      throw new RuntimeException("Couldn't get constructor for "+clazz, e);
+    }
   }
 }

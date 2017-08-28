@@ -31,7 +31,7 @@ public class ScriptsPostHandler implements RequestHandler {
     String scriptId = context
       .get(ScriptService.class)
       .newDeployScriptCommand()
-        .text(script)
+        .scriptText(script)
         .execute()
       .getId();
 

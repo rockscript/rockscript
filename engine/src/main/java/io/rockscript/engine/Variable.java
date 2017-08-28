@@ -31,4 +31,8 @@ public class Variable {
   public void setValue(Object value) {
     this.value = value;
   }
+
+  public String getVariableName() {
+    return variableName;
+  }
 }

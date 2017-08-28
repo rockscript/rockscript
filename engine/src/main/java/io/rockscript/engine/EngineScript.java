@@ -15,6 +15,7 @@
  */
 package io.rockscript.engine;
 
+import io.rockscript.Script;
 import io.rockscript.service.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,21 +24,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** The Abstract Syntax Tree (AST) of a script. */
-public class ScriptAst extends SourceElements {
+public class EngineScript extends SourceElements {
 
-  static Logger log = LoggerFactory.getLogger(ScriptAst.class);
+  static Logger log = LoggerFactory.getLogger(EngineScript.class);
 
-  String id;
+  Script script;
   Configuration configuration;
   List<ScriptElement> elements;
 
-  public ScriptAst(Integer index, Location location) {
+  public EngineScript(Integer index, Location location) {
     super(index, location);
   }
 
   @Override
   public Execution createExecution(Execution parent) {
-    throw new RuntimeException("Use ScriptAst.start(...) instead");
+    throw new RuntimeException("Use EngineScript.start(...) instead");
   }
 
   public Configuration getConfiguration() {
@@ -84,11 +85,11 @@ public class ScriptAst extends SourceElements {
     return elements;
   }
 
-  public String getId() {
-    return id;
+  public Script getScript() {
+    return script;
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public void setScript(Script script) {
+    this.script = script;
   }
 }

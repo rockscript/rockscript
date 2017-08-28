@@ -39,7 +39,10 @@ public class TestService {
 
   public void endActivity(int index, Object result) {
     ActivityInput activityInput = getActivityInput(index);
-    scriptService.endActivity(activityInput.getContinuationReference(), result);
+    scriptService.newEndActivityCommand()
+      .continuationReference(activityInput.getContinuationReference())
+      .result(result)
+      .execute();
   }
 
   public void reset() {

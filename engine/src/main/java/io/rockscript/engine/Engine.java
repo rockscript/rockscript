@@ -16,14 +16,14 @@
 
 package io.rockscript.engine;
 
-/** Performs scriptAst execution and ensures that only 1 scriptService
- * is executing a ScriptExecution at any given time.
+/** Performs engineScript execution and ensures that only 1 scriptService
+ * is executing a EngineScriptExecution at any given time.
  * The goal is to also have an in-memory
  * implementation for single-node deployments and a distributed
  * implementations based on Consul. */
 public interface Engine {
 
-  ScriptExecution startScriptExecution(String scriptId, Object input);
+  EngineScriptExecution startScriptExecution(String scriptName, String scriptId, Object input);
 
-  ScriptExecution endActivity(ContinuationReference continuationReference, Object result);
+  EngineScriptExecution endActivity(ContinuationReference continuationReference, Object result);
 }

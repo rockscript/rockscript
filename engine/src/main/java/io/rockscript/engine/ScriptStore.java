@@ -16,6 +16,7 @@
 
 package io.rockscript.engine;
 
+import io.rockscript.Script;
 import io.rockscript.service.Configuration;
 
 import java.util.ArrayList;
@@ -28,51 +29,36 @@ public class ScriptStore {
   Configuration configuration;
   /** maps script name to script versions */
   Map<String, List<Script>> scriptsByName = new HashMap<>();
-  /** maps script ids to parsed ScriptAst's */
-  Map<String, ScriptAst> scriptAstsById = new HashMap<>();
+  /** maps script ids to parsed EngineScript's */
+  Map<String, EngineScript> scriptAstsById = new HashMap<>();
 
   public ScriptStore(Configuration configuration) {
     this.configuration = configuration;
   }
 
-  public ScriptAst findScriptAstById(String scriptId) {
-    ScriptAst scriptAst = scriptAstsById.get(scriptId);
-    if (scriptAst==null) {
+  public EngineScript findScriptAstById(String scriptId) {
+    EngineScript engineScript = scriptAstsById.get(scriptId);
+    if (engineScript ==null) {
       throw new RuntimeException("TODO finish this");
     }
-    return scriptAst;
+    return engineScript;
   }
 
-  public Script deployScript(String name, String text) {
-    Script script = new Script();
-    script.setText(text);
-
-    Parse parse = Parse.create(text);
-    if (!parse.hasErrors()) {
-      String id = configuration.getScriptIdGenerator().createId();
-      script.setId(id);
-
-      if (name==null) {
-        name = "Unnamed script";
-      }
-      script.setName(name);
-
-      List<Script> scriptVersions = scriptsByName.get(name);
-      if (scriptVersions==null) {
-        scriptVersions = new ArrayList<>();
-        scriptsByName.put(name, scriptVersions);
-      }
-      script.setVersion(scriptVersions.size());
-      scriptVersions.add(script);
-
-      ScriptAst scriptAst = parse.getScriptAst();
-      scriptAst.setId(id);
-      scriptAst.setConfiguration(configuration);
-      scriptAstsById.put(id, scriptAst);
-
-    } else {
-      script.setErrors(parse.getErrors());
+  /** Stores the script, caches the engineScript and
+   * assigns the next version to script.version */
+  public void deploy(Script script, EngineScript engineScript) {
+    String id = script.getId();
+    String name = script.getName();
+    List<Script> scriptVersions = scriptsByName.get(name);
+    if (scriptVersions==null) {
+      scriptVersions = new ArrayList<>();
+      scriptsByName.put(name, scriptVersions);
     }
-    return script;
+    script.setVersion(scriptVersions.size());
+    scriptVersions.add(script);
+
+    engineScript.setScript(script);
+    engineScript.setConfiguration(configuration);
+    scriptAstsById.put(id, engineScript);
   }
 }

@@ -15,29 +15,31 @@
  */
 package io.rockscript.engine;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import io.rockscript.parser.ECMAScriptLexer;
 import io.rockscript.parser.ECMAScriptParser;
 import io.rockscript.parser.ECMAScriptParser.*;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /** Use
  *
- * ScriptAst scriptAst = Parse.parse(String);
+ * EngineScript engineScript = Parse.parse(String);
  *
  * or
  *
  * Parse parse = Parse.create(String);
  * if (!parse.hasErrors()) {
- *   // use the scriptAst
- *   parse.getScriptAst();
+ *   // use the engineScript
+ *   parse.getEngineScript();
  * } else {
  *   // log
  *   parse.getErrors();
@@ -47,13 +49,13 @@ public class Parse {
 
   static Logger log = LoggerFactory.getLogger(Parse.class);
 
-  ScriptAst scriptAst;      // initialized in enterScript
+  EngineScript engineScript;      // initialized in enterScript
   List<String> errors;
   int nextScriptElementId = 1;
 
-  /** The parsed scriptAst */
-  public ScriptAst getScriptAst() {
-    return scriptAst;
+  /** The parsed engineScript */
+  public EngineScript getEngineScript() {
+    return engineScript;
   }
 
   public List<String> getErrors() {
@@ -85,17 +87,17 @@ public class Parse {
   }
 
   /** Convenience method that creates the Parse, parses
-   * the given scriptText and returns the scriptAst.
+   * the given scriptText and returns the engineScript.
    * @throws RuntimeException if there was an error parsing the scriptText */
-  public static ScriptAst parse(String scriptText) {
+  public static EngineScript parse(String scriptText) {
     Parse scriptBuilder = create(scriptText);
     scriptBuilder.throwIfError();
-    return scriptBuilder.scriptAst;
+    return scriptBuilder.engineScript;
   }
 
   /** Creates a Parse and parses the given scriptText.
    * From the returned Parse you can check the
-   * {@link #getErrors()} and and get {@link #getScriptAst()}. */
+   * {@link #getErrors()} and and get {@link #getEngineScript()}. */
   public static Parse create(String scriptText) {
     ECMAScriptLexer l = new ECMAScriptLexer(new ANTLRInputStream(scriptText));
     ECMAScriptParser p = new ECMAScriptParser(new CommonTokenStream(l));
@@ -106,19 +108,21 @@ public class Parse {
   }
 
   private void parseScript(ProgramContext programContext, String scriptText) {
-    this.scriptAst = new ScriptAst(null, createLocation(programContext));
+    this.engineScript = new EngineScript(null, createLocation(programContext));
     SourceElementsContext sourceElementsContext = programContext.sourceElements();
     List<SourceElement> sourceElements = parseSourceElements(sourceElementsContext);
-    this.scriptAst.setSourceElements(sourceElements);
-    this.scriptAst.initializeScriptElements(scriptText);
+    this.engineScript.setSourceElements(sourceElements);
+    this.engineScript.initializeScriptElements(scriptText);
   }
 
   private List<SourceElement> parseSourceElements(SourceElementsContext sourceElementsContext) {
     List<SourceElement> sourceElements = new ArrayList<>();
-    List<SourceElementContext> sourceElementContexts = sourceElementsContext.sourceElement();
-    for (SourceElementContext sourceElementContext: sourceElementContexts) {
-      SourceElement sourceElement = parseSourceElement(sourceElementContext);
-      sourceElements.add(sourceElement);
+    if (sourceElementsContext!=null) {
+      List<SourceElementContext> sourceElementContexts = sourceElementsContext.sourceElement();
+      for (SourceElementContext sourceElementContext: sourceElementContexts) {
+        SourceElement sourceElement = parseSourceElement(sourceElementContext);
+        sourceElements.add(sourceElement);
+      }
     }
     return sourceElements;
   }

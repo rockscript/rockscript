@@ -16,7 +16,7 @@
 
 package io.rockscript.engine;
 
-import io.rockscript.ScriptException;
+import io.rockscript.EngineException;
 import io.rockscript.activity.Activity;
 import io.rockscript.service.Configuration;
 import org.slf4j.Logger;
@@ -56,7 +56,7 @@ public class EventStore implements EventListener {
       .collect(Collectors.toList());
   }
 
-  public ScriptExecution findScriptExecutionById(String scriptExecutionId) {
+  public EngineScriptExecution findScriptExecutionById(String scriptExecutionId) {
     List<ExecutionEvent> executionEvents = findEventsByScriptExecutionId(scriptExecutionId);
     return recreateScriptExecution(executionEvents, scriptExecutionId);
   }
@@ -66,12 +66,12 @@ public class EventStore implements EventListener {
   }
 
   private class LoadingWrapperEventListener implements EventListener {
-    ScriptExecution scriptExecution;
+    EngineScriptExecution scriptExecution;
     EventListener originalEventListener;
     int previouslyExecutedEvents;
     int replayedEvents;
 
-    public LoadingWrapperEventListener(ScriptExecution scriptExecution, EventListener originalEventListener, List<ExecutionEvent> executionEvents) {
+    public LoadingWrapperEventListener(EngineScriptExecution scriptExecution, EventListener originalEventListener, List<ExecutionEvent> executionEvents) {
       this.scriptExecution = scriptExecution;
       this.originalEventListener = originalEventListener;
       this.previouslyExecutedEvents = executionEvents.size()+1;
@@ -114,20 +114,20 @@ public class EventStore implements EventListener {
     }
   }
 
-  private ScriptExecution recreateScriptExecution(List<ExecutionEvent> executionEvents, String scriptExecutionId) {
+  private EngineScriptExecution recreateScriptExecution(List<ExecutionEvent> executionEvents, String scriptExecutionId) {
     ScriptStartedEvent scriptStartedEvent = findScriptStartedEventJson(executionEvents);
 
     String scriptId = scriptStartedEvent.getScriptId();
-    ScriptException.throwIfNull(scriptId, "ScriptAst id is null in scriptStartedEvent for scriptAst execution: %s", scriptExecutionId);
-    ScriptAst scriptAst = configuration
+    EngineException.throwIfNull(scriptId, "EngineScript id is null in scriptStartedEvent for engineScript execution: %s", scriptExecutionId);
+    EngineScript engineScript = configuration
       .getScriptStore()
       .findScriptAstById(scriptId);
-    ScriptException.throwIfNull(scriptId, "ScriptAst not found for scriptId %s in scriptAst execution %s", scriptId, scriptExecutionId);
+    EngineException.throwIfNull(scriptId, "EngineScript not found for scriptId %s in engineScript execution %s", scriptId, scriptExecutionId);
     Object inputJson = scriptStartedEvent.getInput();
     // For now, the input json is not deserialized
     // Later we might add special deserialization to handle activities and functions etc
     Object input = inputJson;
-    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, configuration, scriptAst);
+    EngineScriptExecution scriptExecution = new EngineScriptExecution(scriptExecutionId, configuration, engineScript);
     scriptExecution.setInput(input);
 
     EventListener originalEventListener = scriptExecution.getEventListener();
@@ -166,18 +166,18 @@ public class EventStore implements EventListener {
       .get();
   }
 
-  public List<ScriptExecution> recoverCrashedScriptExecutions() {
-    List<ScriptExecution> scriptExecutions = new ArrayList<>();
+  public List<EngineScriptExecution> recoverCrashedScriptExecutions() {
+    List<EngineScriptExecution> scriptExecutions = new ArrayList<>();
     Map<String,List<ExecutionEvent>> groupedEvents = findCrashedScriptExecutionEvents();
     for (String scriptExecutionId: groupedEvents.keySet()) {
       List<ExecutionEvent> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
-      ScriptExecution scriptExecution = recreateScriptExecution(scriptExecutionEvents, scriptExecutionId);
+      EngineScriptExecution scriptExecution = recreateScriptExecution(scriptExecutionEvents, scriptExecutionId);
       scriptExecutions.add(scriptExecution);
     }
     return scriptExecutions;
   }
 
-  /** @return a list of events grouped by scriptAst execution. */
+  /** @return a list of events grouped by engineScript execution. */
   public Map<String,List<ExecutionEvent>> findCrashedScriptExecutionEvents() {
     Map<String,List<ExecutionEvent>> groupedEvents = new HashMap<>();
     for (Event event: events) {

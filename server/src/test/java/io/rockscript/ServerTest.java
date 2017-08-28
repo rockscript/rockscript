@@ -16,8 +16,6 @@
 package io.rockscript;
 
 import com.google.gson.reflect.TypeToken;
-import io.rockscript.command.DeployScriptCommand;
-import io.rockscript.command.StartScriptCommand;
 import io.rockscript.engine.Event;
 import io.rockscript.http.test.AbstractServerTest;
 import io.rockscript.netty.router.AsyncHttpServer;
@@ -49,47 +47,47 @@ public class ServerTest extends AbstractServerTest {
     server.waitForShutdown();
   }
 
-  @Ignore
   @Test
   public void testServer() {
-    DeployScriptCommand.ResponseJson deployScriptResponse = POST("command")
-      .bodyJson(new DeployScriptCommand(
-           "# TODO"))
+    DeployScriptResponse deployScriptResponse = POST("command")
+      .bodyJson(new DeployScriptCommand()
+          .scriptText(""))
       .execute()
       .assertStatusOk()
-      .body(DeployScriptCommand.ResponseJson.class);
+      .body(DeployScriptResponse.class);
 
-    String scriptId = deployScriptResponse.scriptId;
+    String scriptId = deployScriptResponse.getId();
 
     assertNotNull(scriptId);
 
-    StartScriptCommand.ResponseJson startScriptResponse = POST("command")
-      .bodyJson(new StartScriptCommand(scriptId))
+    StartScriptExecutionResponse startScriptResponse = POST("command")
+      .bodyJson(new StartScriptExecutionCommand()
+          .scriptId(scriptId))
       .execute()
       .assertStatusOk()
-      .body(StartScriptCommand.ResponseJson.class);
+      .body(StartScriptExecutionResponse.class);
 
-    String scriptExecutionId = startScriptResponse.scriptExecutionId;
-
+    String scriptExecutionId = startScriptResponse.getScriptExecutionId();
   }
 
   @Ignore
   @Test
   public void testEvents() {
-    DeployScriptCommand.ResponseJson deployScriptResponse = POST("command")
-      .bodyJson(new DeployScriptCommand(
-        "# TODO"))
+    DeployScriptResponse deployScriptResponse = POST("command")
+      .bodyJson(new DeployScriptCommand()
+        .scriptText("# TODO"))
       .execute()
       .assertStatusOk()
-      .body(DeployScriptCommand.ResponseJson.class);
+      .body(DeployScriptResponse.class);
 
-    String scriptId = deployScriptResponse.scriptId;
+    String scriptId = deployScriptResponse.getId();
 
-    StartScriptCommand.ResponseJson startScriptResponse = POST("command")
-      .bodyJson(new StartScriptCommand(scriptId))
+    StartScriptExecutionResponse startScriptResponse = POST("command")
+      .bodyJson(new StartScriptExecutionCommand()
+        .scriptId(scriptId))
       .execute()
       .assertStatusOk()
-      .body(StartScriptCommand.ResponseJson.class);
+      .body(StartScriptExecutionResponse.class);
 
     List<Event> eventJsons = GET("events")
       .execute()

@@ -15,23 +15,23 @@
  */
 package io.rockscript.engine;
 
-import io.rockscript.ScriptException;
+import io.rockscript.EngineException;
 import io.rockscript.service.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** The runtime state of a scriptAst execution. */
-public class ScriptExecution extends BlockExecution<ScriptAst> {
+/** The runtime state of a engineScript execution. */
+public class EngineScriptExecution extends BlockExecution<EngineScript> {
 
-  static Logger log = LoggerFactory.getLogger(ScriptExecution.class);
+  static Logger log = LoggerFactory.getLogger(EngineScriptExecution.class);
 
   EventListener eventListener;
   int nextInternalExecutionId = 1;
   ExecutionMode executionMode;
   boolean isEnded;
 
-  public ScriptExecution(String scriptExecutionId, Configuration configuration, ScriptAst scriptAst) {
-    super(scriptExecutionId, scriptAst, null);
+  public EngineScriptExecution(String scriptExecutionId, Configuration configuration, EngineScript engineScript) {
+    super(scriptExecutionId, engineScript, null);
     this.eventListener = configuration.getEventListener();
     this.executionMode = ExecutionMode.EXECUTING;
     initializeSystemVariable(configuration);
@@ -70,12 +70,12 @@ public class ScriptExecution extends BlockExecution<ScriptAst> {
   }
 
   @Override
-  public ScriptExecution getScriptExecution() {
+  public EngineScriptExecution getScriptExecution() {
     return this;
   }
 
   @Override
-  public ScriptAst getScript() {
+  public EngineScript getEngineScript() {
     return element;
   }
 
@@ -85,7 +85,7 @@ public class ScriptExecution extends BlockExecution<ScriptAst> {
 
   public void endFunctionInvocationExecution(String executionId, Object result) {
     ArgumentsExpressionExecution argumentsExpressionExecution = (ArgumentsExpressionExecution) findExecutionRecursive(executionId);
-    ScriptException.throwIfNull(argumentsExpressionExecution, "Couldn't find function invocation execution %s in scriptAst execution %s", executionId, id);
+    EngineException.throwIfNull(argumentsExpressionExecution, "Couldn't find function invocation execution %s in engineScript execution %s", executionId, id);
     argumentsExpressionExecution.endActivityExecute(result);
   }
 
@@ -97,7 +97,7 @@ public class ScriptExecution extends BlockExecution<ScriptAst> {
     this.eventListener = eventListener;
   }
 
-  public ScriptAst getElement() {
+  public EngineScript getElement() {
     return element;
   }
 

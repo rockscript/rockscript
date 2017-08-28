@@ -16,22 +16,21 @@
 package io.rockscript;
 
 import io.rockscript.activity.ActivityInput;
-import io.rockscript.activity.ActivityOutput;
-import io.rockscript.engine.JsonObject;
-import io.rockscript.engine.Script;
-import io.rockscript.engine.ScriptExecution;
-import io.rockscript.test.ScriptExecutionComparator;
-import io.rockscript.test.ScriptTest;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+    import io.rockscript.activity.ActivityOutput;
+    import io.rockscript.engine.JsonObject;
+    import io.rockscript.engine.EngineScriptExecution;
+    import io.rockscript.test.ScriptExecutionComparator;
+    import io.rockscript.test.ScriptTest;
+    import org.junit.Test;
+    import org.slf4j.Logger;
+    import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+    import java.util.ArrayList;
+    import java.util.List;
 
-import static io.rockscript.util.Maps.entry;
-import static io.rockscript.util.Maps.hashMap;
-import static org.junit.Assert.assertEquals;
+    import static io.rockscript.util.Maps.entry;
+    import static io.rockscript.util.Maps.hashMap;
+    import static org.junit.Assert.assertEquals;
 
 public class SerializationTest extends ScriptTest {
 
@@ -49,7 +48,7 @@ public class SerializationTest extends ScriptTest {
 
   @Test
   public void testSerialization() {
-    scriptService.getConfiguration().getImportResolver().add(
+    getConfiguration().getImportResolver().add(
         "helloService", new JsonObject()
             .put("hi", input -> {
               return ActivityOutput.endFunction(input.getArg(0)+" world");
@@ -61,32 +60,39 @@ public class SerializationTest extends ScriptTest {
 
     Script script = deployScript(
         "var helloService = system.import('helloService'); \n" +
-        "var response = helloService.hi(system.input.message); \n" +
-        "helloService.world(response);");
+            "var response = helloService.hi(system.input.message); \n" +
+            "helloService.world(response);");
 
-    ScriptExecution scriptExecution = startScriptExecution(script, hashMap(
-        entry("message", "hello")
-    ));
+    EngineScriptExecution engineScriptExecution = scriptService.newStartScriptExecutionCommand()
+        .scriptId(script.getId())
+        .input(hashMap(
+            entry("message", "hello")
+        ))
+        .execute()
+        .getEngineScriptExecution();
 
-    String scriptExecutionId = scriptExecution.getId();
+    String scriptExecutionId = engineScriptExecution.getId();
 
     new ScriptExecutionComparator()
-      .assertEquals(scriptExecution, reloadScriptExecution(scriptExecutionId));
+        .assertEquals(engineScriptExecution, reloadScriptExecution(scriptExecutionId));
 
     ActivityInput activityInput = activityInputs.get(0);
 
     assertEquals("hello world", activityInput.getArg(0));
 
-    scriptExecution = scriptService.endActivity(activityInput.getContinuationReference());
+    engineScriptExecution = scriptService.newEndActivityCommand()
+        .continuationReference(activityInput.getContinuationReference())
+        .result(null)
+        .execute()
+        .getEngineScriptExecution();
 
     new ScriptExecutionComparator()
-      .assertEquals(scriptExecution, reloadScriptExecution(scriptExecutionId));
+        .assertEquals(engineScriptExecution, reloadScriptExecution(scriptExecutionId));
   }
 
-  private ScriptExecution reloadScriptExecution(String scriptExecutionId) {
-    return scriptService
-      .getConfiguration()
-      .getEventStore()
-      .findScriptExecutionById(scriptExecutionId);
+  private EngineScriptExecution reloadScriptExecution(String scriptExecutionId) {
+    return getConfiguration()
+        .getEventStore()
+        .findScriptExecutionById(scriptExecutionId);
   }
 }

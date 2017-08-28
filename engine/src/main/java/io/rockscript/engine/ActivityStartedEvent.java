@@ -24,9 +24,6 @@ public class ActivityStartedEvent extends ExecutableEvent<ArgumentsExpressionExe
 
   @Override
   public void execute(ArgumentsExpressionExecution execution) {
-    ExecutionMode executionMode = execution.getScriptExecution().getExecutionMode();
-    if (executionMode!=ExecutionMode.REBUILDING) {
-      execution.startActivityExecute();
-    }
+    execution.startActivityExecute();
   }
 }

@@ -15,10 +15,10 @@
  */
 package io.rockscript;
 
-/** Abstract base class for all commands.
- * All commands should be serializable with Gson. */
+/** Abstract base class for all commands and queries.
+ * All commands are serializable with Gson. */
 public interface Command<R> {
 
-  /** @throws ScriptException */
+  /** @throws EngineException */
   R execute();
 }

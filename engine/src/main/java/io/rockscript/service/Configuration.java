@@ -18,7 +18,7 @@ package io.rockscript.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.rockscript.ScriptException;
+import io.rockscript.EngineException;
 import io.rockscript.ScriptService;
 import io.rockscript.activity.http.ActivityContext;
 import io.rockscript.engine.*;
@@ -48,6 +48,7 @@ public class Configuration implements ActivityContext {
     this.scriptIdGenerator = new TestIdGenerator(this, "s");
     this.scriptExecutionIdGenerator = new TestIdGenerator(this, "se");
     this.engine = new LocalEngine(this);
+    this.importResolver = new ImportResolver(this);
   }
 
   public ScriptService build() {
@@ -73,9 +74,9 @@ public class Configuration implements ActivityContext {
         field.setAccessible(true);
         value = field.get(this);
       } catch (IllegalAccessException e) {
-        throw new ScriptException(e);
+        throw new EngineException(e);
       }
-      ScriptException.throwIfNull(value, "ServiceLocator field '%s' is null", field.getName());
+      EngineException.throwIfNull(value, "ServiceLocator field '%s' is null", field.getName());
     }
   }
 

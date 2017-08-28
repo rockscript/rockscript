@@ -17,9 +17,8 @@
 package io.rockscript;
 
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.engine.ImportResolver;
 import io.rockscript.engine.JsonObject;
-import io.rockscript.engine.ScriptExecution;
+import io.rockscript.test.ScriptTest;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,64 +29,54 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class ObjectLiteralExpressionTest {
+public class ObjectLiteralExpressionTest extends ScriptTest {
 
   protected static Logger log = LoggerFactory.getLogger(ObjectLiteralExpressionTest.class);
 
-  ScriptService scriptService = createTestEngine();
   List<Object> capturedValues = new ArrayList<>();
 
-  public ScriptService createTestEngine() {
-    ScriptService engine = new TestConfiguration().build();
-    ImportResolver importResolver = engine.getConfiguration().getImportResolver();
-    JsonObject helloService = new JsonObject()
-      .put("assertLiteralValue", input -> {
-          capturedValues.add(input.getArgs().get(0));
-          return ActivityOutput.endFunction();});
-    importResolver.add("example.com/assert", helloService);
-    return engine;
+  @Override
+  protected ScriptService initializeScriptService() {
+    TestConfiguration configuration = new TestConfiguration();
+    configuration.getImportResolver()
+        .add("example.com/assert", new JsonObject()
+            .put("assertLiteralValue", input -> {
+              capturedValues.add(input.getArgs().get(0));
+              return ActivityOutput.endFunction();}));
+    return configuration.build();
   }
 
   @Test
   public void testSimpleStaticObjectLiteralExpressionWithIdentifier() {
-    String scriptId = scriptService
-      .newDeployScriptCommand()
-        .text("var o = {msg: 'hello'};")
-        .execute()
-      .getId();
+    Script script = deployScript(
+        "var o = {msg: 'hello'};");
 
-    ScriptExecution scriptExecution = scriptService.startScriptExecution(scriptId);
+    ScriptExecution scriptExecution = startScriptExecution(script);
     @SuppressWarnings("unchecked")
-    Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariable("o").getValue();
+    Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariableValue("o");
     assertEquals("hello", o.get("msg"));
   }
 
   @Test
   public void testSimpleStaticObjectLiteralExpressionWithPropertyString() {
-    String scriptId = scriptService
-      .newDeployScriptCommand()
-        .text("var o = {'m s g': 'hello'};")
-        .execute()
-      .getId();
+    Script script = deployScript(
+        "var o = {'m s g': 'hello'};");
 
-    ScriptExecution scriptExecution = scriptService.startScriptExecution(scriptId);
+    ScriptExecution scriptExecution = startScriptExecution(script);
     @SuppressWarnings("unchecked")
-    Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariable("o").getValue();
+    Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariableValue("o");
     assertEquals("hello", o.get("m s g"));
   }
 
   @Test
   public void testDynamicObjectLiteralExpression() {
-    String scriptId = scriptService
-      .newDeployScriptCommand()
-        .text("var greeting = 'hello'; \n"+
-              "var o = {msg: greeting}; ")
-        .execute()
-      .getId();
+    Script script = deployScript(
+        "var greeting = 'hello'; \n"+
+        "var o = {msg: greeting}; ");
 
-    ScriptExecution scriptExecution = scriptService.startScriptExecution(scriptId);
+    ScriptExecution scriptExecution = startScriptExecution(script);
     @SuppressWarnings("unchecked")
-    Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariable("o").getValue();
+    Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariableValue("o");
     assertEquals("hello", o.get("msg"));
   }
 

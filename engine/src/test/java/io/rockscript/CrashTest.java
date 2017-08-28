@@ -18,9 +18,9 @@ package io.rockscript;
 
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.ImportJsonObject;
+import io.rockscript.engine.EngineScriptExecution;
 import io.rockscript.engine.Event;
 import io.rockscript.engine.EventListener;
-import io.rockscript.engine.ScriptExecution;
 import io.rockscript.service.Configuration;
 import io.rockscript.test.ScriptExecutionComparator;
 import org.junit.Test;
@@ -37,10 +37,10 @@ public class CrashTest {
   List<Object> synchronousCapturedData = new ArrayList<>();
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
-  public ScriptService createCrashTestEngine() {
+  public Configuration createCrashTestConfiguration() {
     Configuration configuration = new CrashConfiguration();
     addHelloService(configuration);
-    return configuration.build();
+    return configuration;
   }
 
   public ScriptService createNormalTestEngine() {
@@ -110,18 +110,18 @@ public class CrashTest {
       "helloService.anAsyncFunction(); \n" +
       "helloService.aSyncFunction('hello');";
 
-    ScriptExecution expectedScriptExecutionState = createExpectedScriptExecutionState(scriptText);
+    EngineScriptExecution expectedScriptExecutionState = createExpectedScriptExecutionState(scriptText);
 
     int eventsWithoutCrash = 1;
     boolean crashOccurred = false;
-    ScriptService scriptService = createCrashTestEngine();
-    CrashEventListener eventListener = (CrashEventListener) scriptService
-        .getConfiguration()
+    Configuration configuration = createCrashTestConfiguration();
+    ScriptService scriptService = configuration.build();
+    CrashEventListener eventListener = (CrashEventListener) configuration
         .getEventListener();
 
     String scriptId = scriptService
       .newDeployScriptCommand()
-        .text(scriptText)
+        .scriptText(scriptText)
         .execute()
       .getId();
     do {
@@ -131,8 +131,9 @@ public class CrashTest {
         eventListener.throwAfterEventCount(eventsWithoutCrash);
 
         log.debug("\n\n----- Starting script execution and throwing after "+eventsWithoutCrash+" events ------");
-        ScriptExecution scriptExecution = scriptService
-          .startScriptExecution(scriptId);
+        scriptService.newStartScriptExecutionCommand()
+          .scriptId(scriptId)
+          .execute();
 
       } catch (RuntimeException e) {
         log.debug("----- Recovering script execution and throwing after "+eventsWithoutCrash+" events ------");
@@ -140,8 +141,8 @@ public class CrashTest {
         eventsWithoutCrash++;
 
         eventListener.stopThrowing();
-        List<ScriptExecution> recoverCrashedScriptExecutions = scriptService.recoverCrashedScriptExecutions();
-        ScriptExecution recoveredScriptExecution = recoverCrashedScriptExecutions.get(0);
+        List<EngineScriptExecution> recoverCrashedScriptExecutions = scriptService.recoverCrashedScriptExecutions();
+        EngineScriptExecution recoveredScriptExecution = recoverCrashedScriptExecutions.get(0);
 
         // We don't want to compare the id's
         recoveredScriptExecution.setId(null);
@@ -154,13 +155,16 @@ public class CrashTest {
     } while (crashOccurred);
   }
 
-  private ScriptExecution createExpectedScriptExecutionState(String scriptText) {
+  private EngineScriptExecution createExpectedScriptExecutionState(String scriptText) {
     ScriptService scriptService = createNormalTestEngine();
     String scriptId = scriptService
       .newDeployScriptCommand()
-        .text(scriptText)
+        .scriptText(scriptText)
         .execute()
       .getId();
-    return scriptService.startScriptExecution(scriptId);
+    return scriptService.newStartScriptExecutionCommand()
+      .scriptId(scriptId)
+      .execute()
+      .getEngineScriptExecution();
   }
 }

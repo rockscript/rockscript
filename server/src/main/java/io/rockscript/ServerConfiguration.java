@@ -33,7 +33,7 @@ public class ServerConfiguration {
   }
 
   public Server build() {
-    ScriptException.throwIfNull(serviceConfiguration, "serviceConfiguration must be configured.  Use .serviceConfiguration(...) before building the server.");
+    EngineException.throwIfNull(serviceConfiguration, "serviceConfiguration must be configured.  Use .serviceConfiguration(...) before building the server.");
     return new Server(this);
   }
 

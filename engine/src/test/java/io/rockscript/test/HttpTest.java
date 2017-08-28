@@ -16,29 +16,27 @@
 package io.rockscript.test;
 
 import com.google.gson.Gson;
-import io.rockscript.ScriptService;
-import io.rockscript.TestConfiguration;
 import org.junit.After;
-import org.junit.Before;
 
-public abstract class HttpTest {
+public abstract class HttpTest extends ScriptTest {
 
   protected final int PORT = 4000;
   protected HttpTestServer httpTestServer = new HttpTestServer(PORT);
-  protected ScriptService scriptService = new TestConfiguration().build();
-  protected Gson gson = scriptService.getConfiguration().getGson();
+  protected Gson gson;
 
-  @Before
-  public void setUpApprovalActivityWorker() {
+  @Override
+  public void setUp() {
+    super.setUp();
+    gson = getConfiguration().getGson();
     configure(httpTestServer);
     httpTestServer.start();
   }
 
-  protected abstract void configure(HttpTestServer httpTestServer);
-
   @After
-  public void tearDownApprovalActivityWorker() {
+  public void tearDown() {
     httpTestServer.stop();
   }
+
+  protected abstract void configure(HttpTestServer httpTestServer);
 
 }

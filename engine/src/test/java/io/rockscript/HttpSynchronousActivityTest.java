@@ -15,10 +15,8 @@
  */
 package io.rockscript;
 
-import com.google.gson.Gson;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.engine.ScriptExecution;
 import io.rockscript.test.HttpTest;
 import io.rockscript.test.HttpTestServer;
 import org.junit.Test;
@@ -31,18 +29,13 @@ import java.util.List;
 import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class HttpSynchronousActivityTest extends HttpTest {
 
   protected static Logger log = LoggerFactory.getLogger(HttpSynchronousActivityTest.class);
 
-  ScriptService scriptService = createTestEngine();
-  Gson gson = scriptService.getConfiguration().getGson();
   List<ActivityInput> activityInputs = new ArrayList<>();
-
-  public ScriptService createTestEngine() {
-    return new TestConfiguration().build();
-  }
 
   @Override
   protected void configure(HttpTestServer httpTestServer) {
@@ -65,17 +58,14 @@ public class HttpSynchronousActivityTest extends HttpTest {
 
   @Test
   public void testHttpActivity() {
-    String scriptId = scriptService
-      .newDeployScriptCommand()
-        .text(
+    Script script = deployScript(
         "var approvals = system.import('localhost:"+PORT+"'); \n" +
-        "var currency = approvals.approve('oo',7).currency; ")
-        .execute()
-      .getId();
+            "var currency = approvals.approve('oo',7).currency; ");
 
-    ScriptExecution scriptExecution = scriptService
-      .startScriptExecution(scriptId);
+    ScriptExecution scriptExecution = startScriptExecution(script);
 
-    assertEquals("EUR", scriptExecution.getVariable("currency").getValue());
+    ActivityInput activityInput = activityInputs.get(0);
+    assertEquals("EUR", scriptExecution.getVariableValue("currency"));
+    assertTrue(scriptExecution.isEnded());
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript;
 
-public class ScriptEndedEvent extends ExecutionEvent<EngineScriptExecution> {
+import java.util.List; /**
+ * ActivityContinuation's are serializable with Gson.
+ */
+public class ActivityContinuation {
 
-  public ScriptEndedEvent(EngineScriptExecution scriptExecution) {
-    super(scriptExecution);
+  String id;
+  String activityName;
+  List<Object> args;
+
+  /** constructor for Gson serialization */
+  ActivityContinuation() {
   }
+
+  public ActivityContinuation(String id, String activityName, List<Object> args) {
+    this.id = id;
+    this.activityName = activityName;
+    this.args = args;
+  }
+
 
 }

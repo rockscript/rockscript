@@ -16,7 +16,6 @@
 package io.rockscript;
 
 import io.rockscript.activity.ActivityInput;
-import io.rockscript.engine.ScriptExecution;
 import io.rockscript.test.HttpTest;
 import io.rockscript.test.HttpTestServer;
 import org.junit.Test;
@@ -25,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 public class HttpAsynchronousActivityTest extends HttpTest {
 
@@ -77,18 +78,14 @@ public class HttpAsynchronousActivityTest extends HttpTest {
   }
 
   private void executeApprovalScript() {
-    String scriptId = scriptService
-        .newDeployScriptCommand()
-          .text("var approvals = system.import('localhost:"+PORT+"'); \n" +
-                "approvals.approve('oo',7); ")
-          .execute()
-        .getId();
+    Script script = deployScript(
+        "var approvals = system.import('localhost:"+PORT+"'); \n" +
+        "approvals.approve('oo',7); ");
 
-    String scriptExecutionId = scriptService
-        .startScriptExecution(scriptId)
-        .getId();
+    startScriptExecution(script);
 
     ActivityInput activityInput = activityInputs.get(0);
-    ScriptExecution scriptExecution = scriptService.endActivity(activityInput.getContinuationReference());
+    ScriptExecution scriptExecution = endActivity(activityInput.getContinuationReference());
+    assertTrue(scriptExecution.isEnded());
   }
 }

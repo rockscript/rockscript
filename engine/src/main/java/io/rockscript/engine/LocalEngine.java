@@ -34,8 +34,8 @@ public class LocalEngine implements Engine {
   }
 
   @Override
-  public ScriptExecution startScriptExecution(String scriptId, Object input) {
-    ScriptAst scriptAst = configuration
+  public EngineScriptExecution startScriptExecution(String scriptName, String scriptId, Object input) {
+    EngineScript engineScript = configuration
       .getScriptStore()
       .findScriptAstById(scriptId);
 
@@ -43,7 +43,7 @@ public class LocalEngine implements Engine {
       .getScriptExecutionIdGenerator()
       .createId();
 
-    ScriptExecution scriptExecution = new ScriptExecution(scriptExecutionId, configuration, scriptAst);
+    EngineScriptExecution scriptExecution = new EngineScriptExecution(scriptExecutionId, configuration, engineScript);
     scriptExecution.setInput(input);
 
     Lock lock = null;
@@ -64,8 +64,8 @@ public class LocalEngine implements Engine {
   }
 
   @Override
-  public ScriptExecution endActivity(ContinuationReference continuationReference, Object result) {
-    ScriptExecution scriptExecution =null;
+  public EngineScriptExecution endActivity(ContinuationReference continuationReference, Object result) {
+    EngineScriptExecution scriptExecution =null;
     Lock lock = acquireLockOrAddEndActivityRequestToBacklog(continuationReference, result);
     if (lock!=null) {
       try {

@@ -17,9 +17,11 @@
 package io.rockscript.service;
 
 import io.rockscript.DeployScriptCommand;
+import io.rockscript.EndActivityCommand;
 import io.rockscript.ScriptService;
+import io.rockscript.StartScriptExecutionCommand;
 import io.rockscript.engine.ContinuationReference;
-import io.rockscript.engine.ScriptExecution;
+import io.rockscript.engine.EngineScriptExecution;
 
 import java.util.List;
 
@@ -32,29 +34,16 @@ public class ScriptServiceImpl implements ScriptService {
   }
 
   public DeployScriptCommand newDeployScriptCommand() {
-    return new DeployScriptCommandImpl(configuration);
+    return new DeployScriptCommand(configuration);
   }
 
-  public ScriptExecution startScriptExecution(String scriptId) {
-    return startScriptExecution(scriptId, null);
-  }
-
-  public ScriptExecution startScriptExecution(String scriptId, Object input) {
-    return configuration
-      .getEngine()
-      .startScriptExecution(scriptId, input);
+  public StartScriptExecutionCommand newStartScriptExecutionCommand() {
+    return new StartScriptExecutionCommand(configuration);
   }
 
   @Override
-  public ScriptExecution endActivity(ContinuationReference continuationReference) {
-    return endActivity(continuationReference, null);
-  }
-
-  @Override
-  public ScriptExecution endActivity(ContinuationReference continuationReference, Object result) {
-    return configuration
-      .getEngine()
-      .endActivity(continuationReference, result);
+  public EndActivityCommand newEndActivityCommand() {
+    return new EndActivityCommand(configuration);
   }
 
   public Configuration getConfiguration() {
@@ -62,7 +51,7 @@ public class ScriptServiceImpl implements ScriptService {
   }
 
   @Override
-  public List<ScriptExecution> recoverCrashedScriptExecutions() {
+  public List<EngineScriptExecution> recoverCrashedScriptExecutions() {
     return configuration
       .getEventStore()
       .recoverCrashedScriptExecutions();

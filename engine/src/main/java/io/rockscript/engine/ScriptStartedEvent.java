@@ -15,15 +15,18 @@
  */
 package io.rockscript.engine;
 
-public class ScriptStartedEvent extends ExecutionEvent<ScriptExecution> {
+public class ScriptStartedEvent extends ExecutionEvent<EngineScriptExecution> {
 
   String scriptId;
   Object input;
 
-  public ScriptStartedEvent(ScriptExecution scriptExecution, Object input) {
+  public ScriptStartedEvent(EngineScriptExecution scriptExecution, Object input) {
     super(scriptExecution);
 
-    this.scriptId = scriptExecution.getScript().getId();
+    this.scriptId = scriptExecution
+        .getEngineScript()
+        .getScript()
+        .getId();
     this.input = input;
   }
 

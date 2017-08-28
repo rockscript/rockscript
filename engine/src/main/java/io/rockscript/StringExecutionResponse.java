@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript;
 
-public class ScriptEndedEvent extends ExecutionEvent<EngineScriptExecution> {
-
-  public ScriptEndedEvent(EngineScriptExecution scriptExecution) {
-    super(scriptExecution);
-  }
-
+public class StringExecutionResponse extends ScriptExecution {
 }

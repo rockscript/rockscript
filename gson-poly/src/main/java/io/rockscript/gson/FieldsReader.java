@@ -35,7 +35,10 @@ public class FieldsReader {
     }
     polymorphicTypeFields = typeAdapter.polymorphicTypesByName.get(typeName);
     try {
-      return concreteType.newInstance();
+      return typeAdapter
+          .getFactory()
+          .getAccessibleConstructor(concreteType)
+          .newInstance();
     } catch (Exception e) {
       throw new RuntimeException("Couldn't instantiate new "+concreteType+": "+e.getMessage(), e);
     }

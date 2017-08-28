@@ -15,6 +15,7 @@
  */
 package io.rockscript.engine;
 
+import io.rockscript.ActivityContinuation;
 import io.rockscript.activity.Activity;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
@@ -23,6 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression> {
+
+  Activity activity = null;
+  List<Object> args = null;
+  boolean ended = false;
 
   public ArgumentsExpressionExecution(ArgumentsExpression element, Execution parent) {
     super(parent.createInternalExecutionId(), element, parent);
@@ -58,6 +63,8 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   private void invokeSystemImportFunction() {
     // import functions have to be re-executed when the events
     // are applied because they can return functions
+    initializeActivity();
+    initializeArgs();
     ActivityOutput output = startActivityInvoke();
     Object importedObject = output.getResult();
     // dispatch(new ObjectImportedEvent(this, importedObject));
@@ -69,12 +76,17 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   }
 
   public void startActivityExecute() {
-    ActivityOutput activityOutput = startActivityInvoke();
-    if (activityOutput.isEnded()) {
-      endActivity(activityOutput.getResult());
+    initializeActivity();
+    initializeArgs();
+    ExecutionMode executionMode = getScriptExecution().getExecutionMode();
+    if (executionMode!=ExecutionMode.REBUILDING) {
+      ActivityOutput activityOutput = startActivityInvoke();
+      if (activityOutput.isEnded()) {
+        endActivity(activityOutput.getResult());
 
-    } else {
-      dispatch(new ActivityWaitingEvent(this));
+      } else {
+        dispatch(new ActivityWaitingEvent(this));
+      }
     }
   }
 
@@ -86,23 +98,29 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   // Continuation from endActivity -> ActivityEndedEvent
   void endActivityExecute(Object result) {
     setResult(result);
+    ended = true;
     end();
   }
 
   public ActivityOutput startActivityInvoke() {
-    Execution activityExecution = children.get(0);
-    Activity activity = (Activity) activityExecution.getResult();
-    List<Object> args = collectArgs();
     ActivityInput activityInput = new ActivityInput(this, args);
     return activity.invoke(activityInput);
   }
 
-  private List<Object> collectArgs() {
-    List<Object> args = new ArrayList<>();
+  private void initializeActivity() {
+    Execution activityExecution = children.get(0);
+    activity = (Activity) activityExecution.getResult();
+  }
+
+  private void initializeArgs() {
+    args = new ArrayList<>();
     List<Execution> argExecutions = children.subList(1, children.size());
     for (Execution argExecution: argExecutions) {
       args.add(argExecution.getResult());
     }
-    return args;
+  }
+
+  public ActivityContinuation getActivityContinuation() {
+    return !ended ? new ActivityContinuation(id, activity.toString(), args) : null;
   }
 }

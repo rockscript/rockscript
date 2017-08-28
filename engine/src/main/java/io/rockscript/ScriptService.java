@@ -16,15 +16,20 @@
 
 package io.rockscript;
 
-import io.rockscript.engine.ContinuationReference;
-import io.rockscript.engine.ScriptExecution;
-import io.rockscript.service.Configuration;
+import io.rockscript.engine.EngineScriptExecution;
 
 import java.util.List;
 
 /** Access to the RockScript functionality
- * eg:
  *
+ * Obtain a ScriptService like this:
+ * <code>
+ *   ScriptService scriptService = new TestConfiguration()
+ *     // potentially apply fluent configuration tweaks
+ *     .build();
+ * </code>
+ *
+ * Use it like this:
  * <code>
  *   DeployScriptResponse response = scriptService.newDeployScriptCommand()
  *     .name("Approval")
@@ -35,16 +40,8 @@ import java.util.List;
 public interface ScriptService {
 
   DeployScriptCommand newDeployScriptCommand();
+  StartScriptExecutionCommand newStartScriptExecutionCommand();
+  EndActivityCommand newEndActivityCommand();
 
-  ScriptExecution startScriptExecution(String scriptId);
-
-  ScriptExecution startScriptExecution(String scriptId, Object input);
-
-  ScriptExecution endActivity(ContinuationReference continuationReference);
-
-  ScriptExecution endActivity(ContinuationReference continuationReference, Object result);
-
-  Configuration getConfiguration();
-
-  List<ScriptExecution> recoverCrashedScriptExecutions();
+  List<EngineScriptExecution> recoverCrashedScriptExecutions();
 }

@@ -53,7 +53,7 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
       Map<String,Object> map = (Map) target;
       fieldValue = map.get(identifier);
     } else {
-      throw new RuntimeException("TODO: target=" + target);
+      throw new RuntimeException("Can't dereference '"+identifier+"': target=" + target);
     }
     return fieldValue;
   }

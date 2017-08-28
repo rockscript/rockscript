@@ -16,7 +16,7 @@
 
 package io.rockscript.engine;
 
-import io.rockscript.ScriptException;
+import io.rockscript.EngineException;
 
 import java.time.Instant;
 
@@ -26,7 +26,7 @@ public class Lock {
   String scriptExecutionId;
 
   public Lock(String scriptExecutionId) {
-    this.scriptExecutionId = ScriptException.throwIfNull(scriptExecutionId);
+    this.scriptExecutionId = EngineException.throwIfNull(scriptExecutionId);
     this.createTime = Instant.now();
   }
 

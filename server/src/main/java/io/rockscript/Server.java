@@ -17,6 +17,8 @@ package io.rockscript;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.handlers.CommandHandler;
 import io.rockscript.handlers.EventsHandler;
 import io.rockscript.netty.router.AsyncHttpServer;
@@ -27,7 +29,6 @@ import io.rockscript.service.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.rockscript.command.Command.createCommandsTypeAdapterFactory;
 import static io.rockscript.engine.Event.createEventJsonTypeAdapterFactory;
 
 public class Server {
@@ -52,9 +53,18 @@ public class Server {
       .scan(EventsHandler.class)
       .scan(ScriptsPostHandler.class)
       .jsonHandler(new JsonHandlerGson(commonGson))
-      .context(ScriptService.class, scriptService);
+      .context(ScriptService.class, scriptService)
+      .context(Configuration.class, serviceConfiguration);
 
     this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
+  }
+
+  public static PolymorphicTypeAdapterFactory createCommandsTypeAdapterFactory() {
+    return new PolymorphicTypeAdapterFactory()
+      .typeName(new TypeToken<Command>(){}, "command")
+      .typeName(new TypeToken<DeployScriptCommand>(){}, "deployScript")
+      .typeName(new TypeToken<StartScriptExecutionCommand>(){}, "startScript")
+      .typeName(new TypeToken<EndActivityCommand>(){}, "endActivity");
   }
 
   public void startup() {

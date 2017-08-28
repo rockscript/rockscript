@@ -40,7 +40,7 @@ public class ActivityInput {
         execution.getId()
     );
     this.args = args;
-    this.activityContext = execution.getScript().getConfiguration();
+    this.activityContext = execution.getEngineScript().getConfiguration();
   }
 
   public String getScriptExecutionId() {

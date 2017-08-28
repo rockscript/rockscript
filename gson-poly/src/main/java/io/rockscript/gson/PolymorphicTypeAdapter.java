@@ -15,33 +15,41 @@
  */
 package io.rockscript.gson;
 
-import java.io.IOException;
-import java.lang.reflect.*;
-import java.util.*;
-
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.*;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
+
+import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class PolymorphicTypeAdapter<T> extends TypeAdapter<T> {
 
+  PolymorphicTypeAdapterFactory factory;
   Map<String,PolymorphicTypeFields> polymorphicTypesByName = new HashMap<>();
   Map<Class<?>, PolymorphicTypeFields> polymorphicTypesByRawClass = new HashMap<>();
   Map<String,Class<?>> typesByName = new HashMap<>();
   PolymorphicTypeNameStrategy typeNameStrategy;
 
   public PolymorphicTypeAdapter(TypeToken<T> declaredBaseType, PolymorphicTypeAdapterFactory factory, Gson gson) {
-    typeNameStrategy = factory.typeNameStrategy;
+    this.factory = factory;
+    this.typeNameStrategy = factory.typeNameStrategy;
     Set<TypeToken<?>> types = factory.typeNames.keySet();
     PolymorphicTypeResolver typeResolver = new PolymorphicTypeResolver(types);
     for (TypeToken<?> type: types) {
       String typeName = factory.typeNames.get(type);
       PolymorphicTypeFields polymorphicTypeFields = new PolymorphicTypeFields(typeName, type, typeResolver, gson);
-      polymorphicTypesByName.put(typeName, polymorphicTypeFields);
+      this.polymorphicTypesByName.put(typeName, polymorphicTypeFields);
       Class<?> rawClass = type.getRawType();
-      polymorphicTypesByRawClass.put(rawClass, polymorphicTypeFields);
-      typesByName.put(typeName, rawClass);
+      this.polymorphicTypesByRawClass.put(rawClass, polymorphicTypeFields);
+      this.typesByName.put(typeName, rawClass);
     }
   }
 
@@ -102,4 +110,7 @@ public class PolymorphicTypeAdapter<T> extends TypeAdapter<T> {
     }
   }
 
+  public PolymorphicTypeAdapterFactory getFactory() {
+    return factory;
+  }
 }

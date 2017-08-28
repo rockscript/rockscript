@@ -13,33 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.rockscript;
 
+import io.rockscript.engine.EngineScriptExecution;
 
-public class ScriptException extends RuntimeException {
+public class EndActivityResponse extends ScriptExecution {
 
-  public ScriptException(String message) {
-    super(message);
+  /** transient because it must not be serialized with Gson */
+  transient EngineScriptExecution engineScriptExecution;
+
+  /** constructor for Gson serialization */
+  EndActivityResponse() {
   }
 
-  public ScriptException(Throwable cause) {
-    super(cause);
+  public EndActivityResponse(EngineScriptExecution engineScriptExecution) {
+    super(engineScriptExecution);
+    this.engineScriptExecution = engineScriptExecution;
   }
 
-  public static <T> T throwIfNull(T value) {
-    return throwIfNull(value, null);
+  public ScriptExecution getScriptExecution() {
+    return new ScriptExecution(engineScriptExecution);
   }
 
-  public static <T> T throwIfNull(T value, String message, Object... messageArguments) {
-    if (value==null) {
-      if (message==null) {
-        message = "null value is invalid here";
-      } else if (messageArguments!=null) {
-        message = String.format(message, (Object[])messageArguments);
-      }
-      throw new ScriptException(message);
-    }
-    return value;
+  public EngineScriptExecution getEngineScriptExecution() {
+    return engineScriptExecution;
   }
 }

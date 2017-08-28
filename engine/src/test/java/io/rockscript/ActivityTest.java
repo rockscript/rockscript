@@ -19,8 +19,6 @@ package io.rockscript;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.engine.JsonObject;
-import io.rockscript.engine.Script;
-import io.rockscript.engine.ScriptExecution;
 import io.rockscript.test.ScriptTest;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -47,7 +45,7 @@ public class ActivityTest extends ScriptTest {
 
   @Test
   public void testAsynchronousActivity() {
-    scriptService.getConfiguration().getImportResolver().add(
+    getConfiguration().getImportResolver().add(
       "approvalService", new JsonObject()
         .put("approve", input -> {
           activityInputs.add(input);
@@ -75,7 +73,7 @@ public class ActivityTest extends ScriptTest {
 
   @Test
   public void testSynchronousActivityWithoutResult() {
-    scriptService.getConfiguration().getImportResolver().add(
+    getConfiguration().getImportResolver().add(
       "approvalService", new JsonObject()
         .put("approve", input -> {
           return ActivityOutput.endFunction();
@@ -93,7 +91,7 @@ public class ActivityTest extends ScriptTest {
 
   @Test
   public void testSynchronousActivityWithResult() {
-    scriptService.getConfiguration().getImportResolver().add(
+    getConfiguration().getImportResolver().add(
         "approvalService", new JsonObject()
             .put("approve", input -> {
               return ActivityOutput.endFunction("approved");
@@ -105,46 +103,8 @@ public class ActivityTest extends ScriptTest {
 
     ScriptExecution scriptExecution = startScriptExecution(script);
 
-    Object approveResult = scriptExecution.getVariable("approveResult").getValue();
+    Object approveResult = scriptExecution.getVariableValue("approveResult");
     assertEquals("approved", approveResult);
     assertTrue(scriptExecution.isEnded());
   }
-
-//
-//  @Test
-//  public void testSerialization() {
-//    String scriptId = scriptService
-//      .newDeployScriptCommand()
-//        .text(
-//        "var helloService = system.import('example.com/hello'); \n" +
-//        "helloService.anAsyncFunction(); \n" +
-//        "helloService.aSyncFunction('hello');")
-//        .execute()
-//      .getId();
-//
-//    ScriptExecution scriptExecution = scriptService
-//      .startScriptExecution(scriptId);
-//
-//    String scriptExecutionId = scriptExecution.getId();
-//
-//    ScriptExecution reloadedScriptExecution = scriptService
-//      .getConfiguration()
-//      .getEventStore()
-//      .findScriptExecutionById(scriptExecutionId);
-//
-//    new ScriptExecutionComparator()
-//      .assertEquals(scriptExecution, reloadedScriptExecution);
-//
-//    String waitingExecutionId = waitingAsyncFunctionInvocationIds.get(0);
-//
-//    scriptExecution = scriptService.endActivity(scriptExecutionId, waitingExecutionId);
-//
-//    reloadedScriptExecution = scriptService
-//      .getConfiguration()
-//      .getEventStore()
-//      .findScriptExecutionById(scriptExecutionId);
-//
-//    new ScriptExecutionComparator()
-//      .assertEquals(scriptExecution, reloadedScriptExecution);
-//  }
 }

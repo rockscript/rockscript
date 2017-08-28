@@ -13,54 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript;
 
 import java.util.List;
 
-/** The script data.
- * Script's are Gson-nable. */
-public class Script {
+/** Response from the DeployScriptCommand.
+ *
+ * DeployScriptResponse are serializable with Gson. */
+public class DeployScriptResponse extends Script {
 
-  protected String id;
-  protected String name;
-  protected String text;
-  protected Integer version;
   protected List<String> errors;
-
-  public String getId() {
-    return id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getText() {
-    return text;
-  }
-
-  public Integer getVersion() {
-    return version;
-  }
 
   public List<String> getErrors() {
     return errors;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public void setText(String text) {
-    this.text = text;
-  }
-
-  public void setVersion(Integer version) {
-    this.version = version;
   }
 
   public void setErrors(List<String> errors) {

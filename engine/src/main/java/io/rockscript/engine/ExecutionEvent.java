@@ -23,7 +23,7 @@ public abstract class ExecutionEvent<T extends Execution> implements Event {
 
   public ExecutionEvent(T execution) {
     this.scriptExecutionId = execution.getScriptExecution().getId();
-    if (! (execution instanceof ScriptExecution)) {
+    if (! (execution instanceof EngineScriptExecution)) {
       this.executionId = execution.getId();
     }
   }

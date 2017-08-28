@@ -15,11 +15,10 @@
  */
 package io.rockscript.test;
 
-import io.rockscript.ScriptService;
-import io.rockscript.TestConfiguration;
+import io.rockscript.*;
 import io.rockscript.engine.ContinuationReference;
-import io.rockscript.engine.Script;
-import io.rockscript.engine.ScriptExecution;
+import io.rockscript.service.Configuration;
+import io.rockscript.service.ScriptServiceImpl;
 import org.junit.Before;
 
 import java.util.HashMap;
@@ -72,7 +71,7 @@ public class ScriptTest {
   public Script deployScript(String scriptText) {
     return scriptService
       .newDeployScriptCommand()
-      .text(scriptText)
+      .scriptText(scriptText)
       .execute();
   }
 
@@ -89,7 +88,11 @@ public class ScriptTest {
   }
 
   public ScriptExecution startScriptExecution(String scriptId, Object input) {
-    return scriptService.startScriptExecution(scriptId, input);
+    StartScriptExecutionResponse response = scriptService.newStartScriptExecutionCommand()
+        .scriptId(scriptId)
+        .input(input)
+        .execute();
+    return response.getScriptExecution();
   }
 
   public ScriptExecution endActivity(ContinuationReference continuationReference) {
@@ -97,7 +100,14 @@ public class ScriptTest {
   }
 
   public ScriptExecution endActivity(ContinuationReference continuationReference, Object result) {
-    return scriptService.endActivity(continuationReference, result);
+    return scriptService.newEndActivityCommand()
+      .continuationReference(continuationReference)
+      .result(result)
+      .execute()
+      .getScriptExecution();
   }
 
+  protected Configuration getConfiguration() {
+    return ((ScriptServiceImpl)scriptService).getConfiguration();
+  }
 }

@@ -16,14 +16,17 @@
 package io.rockscript;
 
 import io.rockscript.service.Configuration;
-import io.rockscript.engine.ImportResolver;
 
 import java.util.concurrent.Executor;
 
+/** Configuration used to build a ScriptEngine
+ * for testing.
+ *
+ * No asynchronous execution of activities. *
+ */
 public class TestConfiguration extends Configuration {
 
   public TestConfiguration() {
-    this.importResolver = createImportResolver();
     this.executor = createExecutor();
   }
 
@@ -37,9 +40,5 @@ public class TestConfiguration extends Configuration {
         command.run();
       }
     };
-  }
-
-  protected ImportResolver createImportResolver() {
-    return new ImportResolver(this);
   }
 }

@@ -40,7 +40,7 @@ public class VariableDeclarationExecution extends Execution<VariableDeclaration>
     Variable variable = createVariable();
 
     Object value = variable.getValue();
-    Object valueJson = getScript()
+    Object valueJson = getEngineScript()
         .getConfiguration()
         .getEventStore()
         .valueToJson(value);

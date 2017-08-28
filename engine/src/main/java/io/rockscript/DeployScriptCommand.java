@@ -15,13 +15,86 @@
  */
 package io.rockscript;
 
-import io.rockscript.engine.Script;
+import io.rockscript.engine.EngineScript;
+import io.rockscript.engine.Parse;
+import io.rockscript.engine.ScriptStore;
+import io.rockscript.service.CommandImpl;
+import io.rockscript.service.Configuration;
 
-public interface DeployScriptCommand extends Command<Script> {
+/** Deploys a new script version to the script service.
+ *
+ * Required fields: {@link #scriptText(String)}
+ *
+ * Example usage:
+ * Use it like this:
+ * <code>
+ *   DeployScriptResponse response = scriptService.newDeployScriptCommand()
+ *     .name("Approval")
+ *     .text("...the script text...")
+ *     .execute();
+ * </code>
+ *
+ * DeployScriptCommand's are serializable with Gson.
+ */
+public class DeployScriptCommand extends CommandImpl<DeployScriptResponse> {
 
-  /** (Required) the script text */
-  DeployScriptCommand text(String script);
+  protected String scriptName;
+  protected String scriptText;
 
+  /** used by gson deserialization */
+  public DeployScriptCommand() {
+  }
+
+  public DeployScriptCommand(Configuration configuration) {
+    super(configuration);
+  }
+
+  @Override
+  protected DeployScriptResponse execute(Configuration configuration) {
+    ScriptStore scriptStore = configuration.getScriptStore();
+    DeployScriptResponse response = new DeployScriptResponse();
+    response.setText(scriptText);
+
+    Parse parse = Parse.create(scriptText);
+    if (!parse.hasErrors()) {
+      String id = configuration.getScriptIdGenerator().createId();
+      response.setId(id);
+
+      if (scriptName ==null) {
+        scriptName = "Unnamed response";
+      }
+      response.setName(scriptName);
+
+      EngineScript engineScript = parse.getEngineScript();
+      scriptStore.deploy(response, engineScript);
+
+    } else {
+      response.setErrors(parse.getErrors());
+    }
+    return response;
+  }
+
+  public String getScriptName() {
+    return this.scriptName;
+  }
+  public void setScriptName(String scriptName) {
+    this.scriptName = scriptName;
+  }
   /** (Optional) the script name */
-  DeployScriptCommand name(String name);
+  public DeployScriptCommand scriptName(String scriptName) {
+    this.scriptName = scriptName;
+    return this;
+  }
+
+  public String getScriptText() {
+    return this.scriptText;
+  }
+  public void setScriptText(String scriptText) {
+    this.scriptText = scriptText;
+  }
+  /** (Required) the script text */
+  public DeployScriptCommand scriptText(String scriptText) {
+    this.scriptText = scriptText;
+    return this;
+  }
 }
