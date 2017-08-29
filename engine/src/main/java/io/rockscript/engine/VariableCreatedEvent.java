@@ -27,4 +27,10 @@ public class VariableCreatedEvent extends ExecutionEvent<VariableDeclarationExec
     this.valueJson = valueJson;
   }
 
+  @Override
+  public String toString() {
+    return "[" + scriptExecutionId + "] " +
+        "Created variable '" + variableName + "' = " +
+        (valueJson!=null ? valueJson : "undefined");
+  }
 }

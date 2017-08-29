@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class EventStore implements EventListener {
 
   static final Logger log = LoggerFactory.getLogger(EventStore.class);
-  static final Logger eventLog = LoggerFactory.getLogger(EventStore.class.getName()+".events");
 
   Configuration configuration;
   List<Event> events = new ArrayList<>();
@@ -40,12 +39,6 @@ public class EventStore implements EventListener {
   @Override
   public void handle(Event event) {
     events.add(event);
-    String jsonString = eventJsonToJsonString(event);
-    eventLog.debug(jsonString);
-  }
-
-  public String eventJsonToJsonString(Event event) {
-    return event!=null ? configuration.getGson().toJson(event) : "null";
   }
 
   public List<ExecutionEvent> findEventsByScriptExecutionId(String scriptExecutionId) {

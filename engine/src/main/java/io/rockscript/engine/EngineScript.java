@@ -77,7 +77,7 @@ public class EngineScript extends SourceElements {
     int start = location.getStart();
     int end = location.getEnd()+1;
     String scriptPiece = scriptText.substring(start, end).replaceAll("\\s", " ");
-    log.debug(scriptElement.getIndex()+" - "+scriptElement.getClass().getSimpleName()+" - "+scriptPiece);
+    // log.debug(scriptElement.getIndex()+" - "+scriptElement.getClass().getSimpleName()+" - "+scriptPiece);
     scriptElement.setText(scriptPiece);
   }
 

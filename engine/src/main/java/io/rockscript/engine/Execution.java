@@ -93,7 +93,7 @@ public abstract class Execution<T extends ScriptElement> {
   public Variable createVariable(String variableName) {
     Variable variable = new Variable(variableName);
     if (variables==null) {
-      variables = new HashMap<>();
+      variables = new LinkedHashMap<>();
     }
     variables.put(variableName, variable);
     return variable;

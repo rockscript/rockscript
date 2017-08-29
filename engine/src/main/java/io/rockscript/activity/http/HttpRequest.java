@@ -19,6 +19,8 @@ package io.rockscript.activity.http;
 import com.google.gson.Gson;
 import io.rockscript.activity.http.Http.Methods;
 import io.rockscript.util.Io;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -30,6 +32,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class HttpRequest {
+
+  static Logger log = LoggerFactory.getLogger(HttpRequest.class);
+
   String method;
   String url;
   Map<String,List<String>> headers;
@@ -41,6 +46,24 @@ public class HttpRequest {
   public HttpRequest(String method, String url) {
     this.method = method;
     this.url = url;
+  }
+
+
+  public HttpRequest log() {
+    Http.log.debug("> "+method+" "+url);
+    if (headers!=null) {
+      for (String headerName: headers.keySet()) {
+        List<String> headerListValue = headers.get(headerName);
+        String headerValue = headerListValue
+            .stream()
+            .collect(Collectors.joining(";"));
+        Http.log.debug("    ["+headerName+"] "+ headerValue);
+      }
+    }
+    if (body!=null) {
+      Http.log.debug("    "+body);
+    }
+    return this;
   }
 
   public static HttpRequest createGet(String url) {

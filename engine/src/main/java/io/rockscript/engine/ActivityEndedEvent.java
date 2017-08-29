@@ -16,12 +16,16 @@
 
 package io.rockscript.engine;
 
+import static io.rockscript.engine.ActivityStartedEvent.getActivityName;
+
 public class ActivityEndedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
 
+  String activityName;
   Object result;
 
   public ActivityEndedEvent(ArgumentsExpressionExecution argumentsExpressionExecution, Object result) {
     super(argumentsExpressionExecution);
+    this.activityName = getActivityName(argumentsExpressionExecution);
     this.result = result;
   }
 
@@ -30,4 +34,10 @@ public class ActivityEndedEvent extends ExecutableEvent<ArgumentsExpressionExecu
     execution.endActivityExecute(result);
   }
 
+  @Override
+  public String toString() {
+    return "[" + scriptExecutionId + "|" + executionId + "] " +
+        "Received callback" +
+        (result!=null ? " with result "+result : " without result");
+  }
 }

@@ -44,7 +44,7 @@ public class Configuration implements ActivityContext {
   public Configuration() {
     this.eventStore = new EventStore(this);
     this.scriptStore = new ScriptStore(this);
-    this.eventListener = this.eventStore;
+    this.eventListener = new EventLogger(this, eventStore);
     this.scriptIdGenerator = new TestIdGenerator(this, "s");
     this.scriptExecutionIdGenerator = new TestIdGenerator(this, "se");
     this.engine = new LocalEngine(this);

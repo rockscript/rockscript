@@ -18,6 +18,7 @@ package io.rockscript;
 
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
+import io.rockscript.activity.ImportJsonObject;
 import io.rockscript.engine.JsonObject;
 import io.rockscript.test.ScriptTest;
 import org.junit.Test;
@@ -46,7 +47,7 @@ public class ActivityTest extends ScriptTest {
   @Test
   public void testAsynchronousActivity() {
     getConfiguration().getImportResolver().add(
-      "approvalService", new JsonObject()
+      "approvalService", new ImportJsonObject()
         .put("approve", input -> {
           activityInputs.add(input);
           return ActivityOutput.waitForFunctionToCompleteAsync();

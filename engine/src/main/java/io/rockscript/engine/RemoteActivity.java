@@ -27,6 +27,8 @@ import static io.rockscript.activity.http.Http.Headers.CONTENT_TYPE;
 
 public class RemoteActivity implements Activity {
 
+
+
   String url;
   String activityName;
 
@@ -42,7 +44,9 @@ public class RemoteActivity implements Activity {
     Object activityOutputResponse = HttpRequest.createPost(url + "/" + activityName)
         .header(CONTENT_TYPE, APPLICATION_JSON)
         .body(activityInputJson)
+        .log()
         .execute()
+        .log()
         .getBody();
     if (activityOutputResponse!=null) {
       JsonElement activityOutputJsonElement = gson.toJsonTree(activityOutputResponse);

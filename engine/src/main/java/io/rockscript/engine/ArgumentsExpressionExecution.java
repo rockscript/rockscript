@@ -51,7 +51,9 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
       startChild(piece);
     } else {
       Execution functionExpressionExecution = children.get(0);
-      Activity activity = (Activity) functionExpressionExecution.getResult();
+      this.activity = (Activity) functionExpressionExecution.getResult();
+      this.args = collectArgsFromChildren();
+
       if (activity instanceof SystemImportActivity) {
         invokeSystemImportFunction();
       } else {
@@ -60,11 +62,18 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     }
   }
 
+  private List<Object> collectArgsFromChildren() {
+    List<Object> args = new ArrayList<>();
+    List<Execution> argExecutions = children.subList(1, children.size());
+    for (Execution argExecution: argExecutions) {
+      args.add(argExecution.getResult());
+    }
+    return args;
+  }
+
   private void invokeSystemImportFunction() {
     // import functions have to be re-executed when the events
     // are applied because they can return functions
-    initializeActivity();
-    initializeArgs();
     ActivityOutput output = startActivityInvoke();
     Object importedObject = output.getResult();
     // dispatch(new ObjectImportedEvent(this, importedObject));
@@ -76,8 +85,6 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   }
 
   public void startActivityExecute() {
-    initializeActivity();
-    initializeArgs();
     ExecutionMode executionMode = getScriptExecution().getExecutionMode();
     if (executionMode!=ExecutionMode.REBUILDING) {
       ActivityOutput activityOutput = startActivityInvoke();
@@ -105,19 +112,6 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   public ActivityOutput startActivityInvoke() {
     ActivityInput activityInput = new ActivityInput(this, args);
     return activity.invoke(activityInput);
-  }
-
-  private void initializeActivity() {
-    Execution activityExecution = children.get(0);
-    activity = (Activity) activityExecution.getResult();
-  }
-
-  private void initializeArgs() {
-    args = new ArrayList<>();
-    List<Execution> argExecutions = children.subList(1, children.size());
-    for (Execution argExecution: argExecutions) {
-      args.add(argExecution.getResult());
-    }
   }
 
   public ActivityContinuation getActivityContinuation() {

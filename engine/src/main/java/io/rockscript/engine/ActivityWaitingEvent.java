@@ -22,4 +22,10 @@ public class ActivityWaitingEvent extends ExecutionEvent<ArgumentsExpressionExec
     super(argumentsExpressionExecution);
   }
 
+  @Override
+  public String toString() {
+    return "[" + scriptExecutionId + "|" + executionId + "] " +
+        "Waiting for completion callback";
+  }
+
 }

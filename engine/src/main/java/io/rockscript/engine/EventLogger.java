@@ -13,27 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.activity.http;
+package io.rockscript.engine;
 
+import io.rockscript.service.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public interface Http {
+public class EventLogger implements EventListener {
 
-  public static Logger log = LoggerFactory.getLogger(Http.class);
+  static final Logger eventLog = LoggerFactory.getLogger(EventLogger.class.getName());
 
-  interface Methods {
-    String GET = "GET";
-    String PUT = "PUT";
-    String POST = "POST";
-    String DELETE = "DELETE";
+  EventListener next;
+
+  public EventLogger(Configuration configuration, EventListener next) {
+    this.next = next;
   }
 
-  interface Headers {
-    String CONTENT_TYPE = "Content-Type";
+  @Override
+  public void handle(Event event) {
+    String jsonString = eventJsonToJsonString(event);
+    eventLog.debug(jsonString);
+    next.handle(event);
   }
 
-  interface ContentTypes {
-    String APPLICATION_JSON = "application/json";
+  public String eventJsonToJsonString(Event event) {
+    return event!=null ? event.toString() : "null";
   }
+
 }

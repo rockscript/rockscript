@@ -22,7 +22,10 @@ import io.rockscript.engine.JsonObject;
  * activities so that the toString shows the property name. */
 public class ImportJsonObject extends JsonObject {
 
+  String url;
+
   public void resolveActivityNames(String url) {
+    this.url = url;
     for (String propertyName: getPropertyNames()) {
       Object value = get(propertyName);
       if (value instanceof Activity) {
@@ -47,7 +50,12 @@ public class ImportJsonObject extends JsonObject {
     }
     @Override
     public String toString() {
-      return "["+name+" activity]";
+      return name;
     }
+  }
+
+  @Override
+  public String toString() {
+    return url;
   }
 }

@@ -21,6 +21,7 @@ import io.rockscript.engine.Dereferencable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HttpResponse implements Dereferencable {
 
@@ -30,6 +31,31 @@ public class HttpResponse implements Dereferencable {
 
   public HttpResponse(int status) {
     this.status = status;
+  }
+
+  public HttpResponse log() {
+    if (headers!=null) {
+      Http.log.debug("< "+headerListToString(headers.get(null)));
+      for (String headerName: headers.keySet()) {
+        if (headerName!=null) {
+          List<String> headerListValue = headers.get(headerName);
+          String headerValue = headerListToString(headerListValue);
+          Http.log.debug("    ["+headerName+"] "+ headerValue);
+        }
+      }
+    } else {
+      Http.log.debug("< "+status);
+    }
+    if (body!=null) {
+      Http.log.debug("    "+body);
+    }
+    return this;
+  }
+
+  public static String headerListToString(List<String> headerListValue) {
+    return headerListValue
+        .stream()
+        .collect(Collectors.joining(";"));
   }
 
   public int getStatus() {

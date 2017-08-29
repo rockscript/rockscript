@@ -15,18 +15,23 @@
  */
 package io.rockscript.engine;
 
+import io.rockscript.Script;
+
 public class ScriptStartedEvent extends ExecutionEvent<EngineScriptExecution> {
 
   String scriptId;
+  String scriptName;
   Object input;
 
   public ScriptStartedEvent(EngineScriptExecution scriptExecution, Object input) {
     super(scriptExecution);
 
-    this.scriptId = scriptExecution
+    Script script = scriptExecution
         .getEngineScript()
-        .getScript()
-        .getId();
+        .getScript();
+
+    this.scriptId = script.getId();
+    this.scriptName = script.getName();
     this.input = input;
   }
 
@@ -40,5 +45,14 @@ public class ScriptStartedEvent extends ExecutionEvent<EngineScriptExecution> {
 
   public Object getInput() {
     return input;
+  }
+
+  @Override
+  public String toString() {
+    return "[" + scriptExecutionId + "] " +
+        "Started script [" +
+        scriptId + "|" +
+        scriptName + "]" +
+        (input!=null ? " with input "+input.toString() : " without input");
   }
 }

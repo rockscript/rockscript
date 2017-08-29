@@ -61,7 +61,7 @@ public class DeployScriptCommand extends CommandImpl<DeployScriptResponse> {
       response.setId(id);
 
       if (scriptName ==null) {
-        scriptName = "Unnamed response";
+        scriptName = "Unnamed script";
       }
       response.setName(scriptName);
 

@@ -21,6 +21,10 @@ public abstract class ExecutionEvent<T extends Execution> implements Event {
   protected String scriptExecutionId;
   protected String executionId;
 
+  /** for Gson serialzation */
+  ExecutionEvent() {
+  }
+
   public ExecutionEvent(T execution) {
     this.scriptExecutionId = execution.getScriptExecution().getId();
     if (! (execution instanceof EngineScriptExecution)) {

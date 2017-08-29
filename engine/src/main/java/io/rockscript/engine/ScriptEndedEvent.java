@@ -21,4 +21,10 @@ public class ScriptEndedEvent extends ExecutionEvent<EngineScriptExecution> {
     super(scriptExecution);
   }
 
+  @Override
+  public String toString() {
+    return "[" + scriptExecutionId + "] " +
+        "Script execution ended";
+  }
+
 }

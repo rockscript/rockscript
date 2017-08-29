@@ -16,14 +16,34 @@
 
 package io.rockscript.engine;
 
+import java.util.List;
+
 public class ActivityStartedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
+
+  String activityName;
+  List<Object> args;
 
   public ActivityStartedEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
     super(argumentsExpressionExecution);
+    this.activityName = getActivityName(argumentsExpressionExecution);
+    this.args = argumentsExpressionExecution.args;
   }
 
   @Override
   public void execute(ArgumentsExpressionExecution execution) {
     execution.startActivityExecute();
+  }
+
+  static String getActivityName(ArgumentsExpressionExecution argumentsExpressionExecution) {
+    return argumentsExpressionExecution.activity.toString();
+  }
+
+  @Override
+  public String toString() {
+    return "[" + scriptExecutionId + "|" + executionId + "] " +
+        "Started [" +
+        activityName +
+        "]"+
+        (args!=null ? " with args "+args.toString() : " without args");
   }
 }
