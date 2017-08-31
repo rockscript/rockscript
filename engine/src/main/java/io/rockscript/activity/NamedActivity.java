@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.activity;
 
-package io.rockscript.engine;
+public class NamedActivity implements Activity {
 
-import io.rockscript.activity.*;
-import io.rockscript.service.Configuration;
+  String name;
+  Activity activity;
 
-public class SystemImportActivity implements Activity {
-
-  Configuration configuration;
-
-  public SystemImportActivity(Configuration configuration) {
-    this.configuration = configuration;
+  public NamedActivity(String name, Activity activity) {
+    this.name = name;
+    this.activity = activity;
   }
 
   @Override
   public ActivityOutput invoke(ActivityInput input) {
-    String url = (String) input.getArgs().get(0);
-    Object importedObject = configuration.getImportResolver().get(url);
-    return ActivityOutput.endFunction(importedObject);
+    return activity.invoke(input);
+  }
+
+  public String getName() {
+    return name;
   }
 
   @Override
   public String toString() {
-    return "[system.import activity]";
+    return name;
   }
 }

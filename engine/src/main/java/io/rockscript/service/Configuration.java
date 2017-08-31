@@ -20,6 +20,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.rockscript.EngineException;
 import io.rockscript.ScriptService;
+import io.rockscript.activity.Activity;
+import io.rockscript.activity.ImportResolver;
 import io.rockscript.activity.http.ActivityContext;
 import io.rockscript.engine.*;
 
@@ -28,7 +30,7 @@ import java.util.concurrent.Executor;
 
 import static io.rockscript.engine.Event.createEventJsonTypeAdapterFactory;
 
-public class Configuration implements ActivityContext {
+public abstract class Configuration implements ActivityContext {
 
   protected EventStore eventStore;
   protected ScriptStore scriptStore;
@@ -38,7 +40,6 @@ public class Configuration implements ActivityContext {
   protected Engine engine;
   protected ImportResolver importResolver;
   protected Executor executor;
-
   protected Gson gson;
 
   public Configuration() {
@@ -62,6 +63,7 @@ public class Configuration implements ActivityContext {
   private Gson createDefaultGson() {
     return new GsonBuilder()
       .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
+      .registerTypeHierarchyAdapter(Activity.class, new ActivitySerializer())
       .disableHtmlEscaping()
       // .setPrettyPrinting()
       .create();

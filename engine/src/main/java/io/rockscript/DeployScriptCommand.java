@@ -52,26 +52,7 @@ public class DeployScriptCommand extends CommandImpl<DeployScriptResponse> {
   @Override
   protected DeployScriptResponse execute(Configuration configuration) {
     ScriptStore scriptStore = configuration.getScriptStore();
-    DeployScriptResponse response = new DeployScriptResponse();
-    response.setText(scriptText);
-
-    Parse parse = Parse.create(scriptText);
-    if (!parse.hasErrors()) {
-      String id = configuration.getScriptIdGenerator().createId();
-      response.setId(id);
-
-      if (scriptName ==null) {
-        scriptName = "Unnamed script";
-      }
-      response.setName(scriptName);
-
-      EngineScript engineScript = parse.getEngineScript();
-      scriptStore.deploy(response, engineScript);
-
-    } else {
-      response.setErrors(parse.getErrors());
-    }
-    return response;
+    return scriptStore.deploy(scriptName, scriptText);
   }
 
   public String getScriptName() {

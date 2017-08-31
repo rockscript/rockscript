@@ -195,8 +195,14 @@ public class HttpTestServer {
 
   public static class HttpTestResponse {
     HttpServletResponse response;
+    ServletOutputStream outputStream;
     public HttpTestResponse(HttpServletResponse response) {
       this.response = response;
+      try {
+        this.outputStream = response.getOutputStream();
+      } catch (IOException e) {
+        throw new RuntimeException("Couldn't get response output stream", e);
+      }
     }
     public HttpTestResponse status(int status) {
       response.setStatus(status);
@@ -216,14 +222,19 @@ public class HttpTestServer {
     }
     public HttpTestResponse body(String body) {
       try {
-        ServletOutputStream outputStream = response.getOutputStream();
         outputStream.write(body.getBytes(Charset.forName("UTF-8")));
-        outputStream.flush();
-        outputStream.close();
       } catch (IOException e) {
         throw new RuntimeException("Couldn't write to response output stream", e);
       }
       return this;
+    }
+
+    public void send() {
+      try {
+        outputStream.flush();
+      } catch (IOException e) {
+        throw new RuntimeException("Couldn't flush response output stream", e);
+      }
     }
   }
 }

@@ -222,7 +222,6 @@ public class Parse {
     PropertyNameAndValueListContext propertyNameAndValueListContext = objectLiteralContext.propertyNameAndValueList();
     List<PropertyAssignmentContext> propertyAssignmentContexts = propertyNameAndValueListContext.propertyAssignment();
     for (PropertyAssignmentContext propertyAssignmentContext: propertyAssignmentContexts) {
-      log.debug(propertyAssignmentContext.getText());
       PropertyNameContext propertyNameContext = (PropertyNameContext) propertyAssignmentContext.getChild(0);
       String propertyName = parsePropertyName(propertyNameContext);
       SingleExpressionContext valueContext = (SingleExpressionContext) propertyAssignmentContext.getChild(2);

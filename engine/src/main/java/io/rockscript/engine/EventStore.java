@@ -221,9 +221,6 @@ public class EventStore implements EventListener {
       Map<String,Object> map = (Map<String,Object>) value;
       return valueMapToJson(map);
     }
-    if (value instanceof JsonObject) {
-      return valueMapToJson(((JsonObject)value).properties);
-    }
     return value;
   }
 

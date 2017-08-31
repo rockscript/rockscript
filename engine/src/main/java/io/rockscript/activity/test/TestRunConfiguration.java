@@ -13,20 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.activity.http;
+package io.rockscript.activity.test;
 
-import io.rockscript.activity.ImportObject;
-import io.rockscript.activity.ImportProvider;
+import io.rockscript.TestConfiguration;
+import io.rockscript.engine.ScriptStore;
+import io.rockscript.service.Configuration;
 
-public class HttpImportProvider extends ImportObject implements ImportProvider {
-
-  public HttpImportProvider() {
-    super("rockscript.io/http");
-    put("get", HttpActivity.GET);
-  }
-
-  @Override
-  public ImportObject getImportObject() {
-    return this;
+public class TestRunConfiguration extends TestConfiguration {
+  public TestRunConfiguration(Configuration engineConfiguration, TestImportObject testImportObject, TestResult testResult) {
+    getImportResolver().add(testImportObject);
+    this.scriptStore = new ScriptStore(this, engineConfiguration.getScriptStore());
+    this.eventListener = new TestLogger(testResult, eventStore);
   }
 }

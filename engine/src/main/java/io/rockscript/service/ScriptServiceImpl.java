@@ -16,11 +16,7 @@
 
 package io.rockscript.service;
 
-import io.rockscript.DeployScriptCommand;
-import io.rockscript.EndActivityCommand;
-import io.rockscript.ScriptService;
-import io.rockscript.StartScriptExecutionCommand;
-import io.rockscript.engine.ContinuationReference;
+import io.rockscript.*;
 import io.rockscript.engine.EngineScriptExecution;
 
 import java.util.List;
@@ -55,5 +51,10 @@ public class ScriptServiceImpl implements ScriptService {
     return configuration
       .getEventStore()
       .recoverCrashedScriptExecutions();
+  }
+
+  @Override
+  public RunTestsCommand newRunTestsCommand() {
+    return new RunTestsCommand(configuration);
   }
 }

@@ -17,7 +17,6 @@
 package io.rockscript;
 
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.engine.JsonObject;
 import io.rockscript.test.ScriptTest;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -38,11 +37,10 @@ public class ObjectLiteralExpressionTest extends ScriptTest {
   @Override
   protected ScriptService initializeScriptService() {
     TestConfiguration configuration = new TestConfiguration();
-    configuration.getImportResolver()
-        .add("example.com/assert", new JsonObject()
-            .put("assertLiteralValue", input -> {
-              capturedValues.add(input.getArgs().get(0));
-              return ActivityOutput.endFunction();}));
+    configuration.getImportResolver().createImport("example.com/assert")
+      .put("assertLiteralValue", input -> {
+        capturedValues.add(input.getArgs().get(0));
+        return ActivityOutput.endFunction();});
     return configuration.build();
   }
 

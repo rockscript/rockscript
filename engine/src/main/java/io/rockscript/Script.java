@@ -24,6 +24,16 @@ public class Script {
   protected String text;
   protected Integer version;
 
+  public Script() {
+  }
+
+  public Script(Script other) {
+    this.id = other.id;
+    this.name = other.name;
+    this.text = other.text;
+    this.version = other.version;
+  }
+
   public String getId() {
     return id;
   }

@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript;
+package io.rockscript.activity.test;
 
-public class StringExecutionResponse extends ScriptExecution {
+import java.util.ArrayList;
+
+public class TestResults extends ArrayList<TestResult> {
 }

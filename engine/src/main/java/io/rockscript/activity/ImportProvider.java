@@ -15,11 +15,9 @@
  */
 package io.rockscript.activity;
 
-import io.rockscript.engine.ImportResolver;
-
 /** Interface to allow jars on the classpath to provide imports
  * through the jdk {@link java.util.ServiceLoader} mechanism. */
 public interface ImportProvider {
 
-  void provideImport(ImportResolver importResolver);
+  ImportObject getImportObject();
 }

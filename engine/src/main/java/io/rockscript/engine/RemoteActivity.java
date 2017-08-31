@@ -17,17 +17,17 @@ package io.rockscript.engine;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import io.rockscript.EngineException;
 import io.rockscript.activity.Activity;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.http.HttpRequest;
+import io.rockscript.activity.http.HttpResponse;
 
 import static io.rockscript.activity.http.Http.ContentTypes.APPLICATION_JSON;
 import static io.rockscript.activity.http.Http.Headers.CONTENT_TYPE;
 
 public class RemoteActivity implements Activity {
-
-
 
   String url;
   String activityName;
@@ -41,19 +41,54 @@ public class RemoteActivity implements Activity {
   public ActivityOutput invoke(ActivityInput input) {
     Gson gson = input.getActivityContext().getGson();
     String activityInputJson = gson.toJson(input);
-    Object activityOutputResponse = HttpRequest.createPost(url + "/" + activityName)
+
+    ContinuationReference continuationReference = input.getContinuationReference();
+    String logPrefix = "["+continuationReference.getScriptExecutionId()+"|"+continuationReference.getExecutionId()+"]";
+
+    HttpResponse httpResponse = HttpRequest.createPost(url + "/" + activityName)
         .header(CONTENT_TYPE, APPLICATION_JSON)
         .body(activityInputJson)
-        .log()
+        .log(logPrefix)
         .execute()
-        .log()
-        .getBody();
-    if (activityOutputResponse!=null) {
-      JsonElement activityOutputJsonElement = gson.toJsonTree(activityOutputResponse);
-      return gson.fromJson(activityOutputJsonElement, ActivityOutput.class);
+        .log(logPrefix);
+
+    int status = httpResponse.getStatus();
+    if (status<200 || 300<status) {
+      throw new EngineException("Remote HTTP activity did not return a status in the 200 range: "+status);
+    }
+
+    ActivityOutput activityOutput = null;
+    Object body = trim(httpResponse.getBody());
+    if (body!=null) {
+      try {
+        JsonElement activityOutputJsonElement = gson.toJsonTree(body);
+        activityOutput = gson.fromJson(activityOutputJsonElement, ActivityOutput.class);
+      } catch (Exception e) {
+        throw new EngineException("Couldn't parse remote HTTP activity response as ActivityOutput: " + e.getMessage(), e);
+      }
+    }
+
+    if (activityOutput!=null) {
+      return activityOutput;
     } else {
-      // The default async activity out put is returned when the HTTP response is empty.
+      // The default async activity output is returned when the HTTP response is empty.
       return ActivityOutput.waitForFunctionToCompleteAsync();
     }
+  }
+
+  private Object trim(Object body) {
+    if (!(body instanceof String)) {
+      return body;
+    }
+    String trimmed = ((String)body).trim();
+    if ("".equals(trimmed)) {
+      return null;
+    }
+    return trimmed;
+  }
+
+  @Override
+  public String toString() {
+    return url+"/"+activityName;
   }
 }

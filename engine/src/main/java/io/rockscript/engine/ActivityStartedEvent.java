@@ -16,6 +16,8 @@
 
 package io.rockscript.engine;
 
+import io.rockscript.EngineException;
+
 import java.util.List;
 
 public class ActivityStartedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
@@ -25,6 +27,9 @@ public class ActivityStartedEvent extends ExecutableEvent<ArgumentsExpressionExe
 
   public ActivityStartedEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
     super(argumentsExpressionExecution);
+    if (argumentsExpressionExecution.activity==null) {
+      throw new EngineException("Activity doesn't exist: "+argumentsExpressionExecution.element.getText());
+    }
     this.activityName = getActivityName(argumentsExpressionExecution);
     this.args = argumentsExpressionExecution.args;
   }

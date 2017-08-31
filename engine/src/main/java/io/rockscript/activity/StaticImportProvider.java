@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.activity;
 
-package io.rockscript.engine;
 
-import java.util.HashMap;
-import java.util.Map;
+public class StaticImportProvider implements ImportProvider {
 
-public class JsonObject extends HashMap<String, Object> implements Dereferencable {
+  ImportObject importObject;
 
-  public JsonObject() {
-  }
-
-  public JsonObject(Map<String,Object> properties) {
-    super(properties);
+  public StaticImportProvider(ImportObject importObject) {
+    this.importObject = importObject;
   }
 
   @Override
-  public Object get(String propertyName) {
-    return super.get(propertyName);
+  public ImportObject getImportObject() {
+    return importObject;
   }
 }

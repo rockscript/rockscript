@@ -28,6 +28,10 @@ public class EngineException extends RuntimeException {
     super(cause);
   }
 
+  public EngineException(String message, Throwable cause) {
+    super(message, cause);
+  }
+
   public static <T> T throwIfNull(T value) {
     return throwIfNull(value, null);
   }

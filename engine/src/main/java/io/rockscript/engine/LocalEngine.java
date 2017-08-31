@@ -15,14 +15,13 @@
  */
 package io.rockscript.engine;
 
+import io.rockscript.EngineException;
 import io.rockscript.service.Configuration;
 
 import java.util.*;
 
 
-/** A simple, fast, self contained lock service that does not
- * coordinate lock acquisition with any other system.
- * This is ideal for single node deployments of the scriptService. */
+/** A simple, fast, single-node engine. */
 public class LocalEngine implements Engine {
 
   Configuration configuration;
@@ -35,9 +34,20 @@ public class LocalEngine implements Engine {
 
   @Override
   public EngineScriptExecution startScriptExecution(String scriptName, String scriptId, Object input) {
-    EngineScript engineScript = configuration
-      .getScriptStore()
-      .findScriptAstById(scriptId);
+    EngineScript engineScript = null;
+    if (scriptId!=null) {
+      engineScript = configuration
+          .getScriptStore()
+          .findScriptAstById(scriptId);
+    } else if (scriptName!=null) {
+      engineScript = configuration
+          .getScriptStore()
+          .findLatestScriptAstByName(scriptName);
+    } else {
+      throw new EngineException("Either scriptName or scriptId are mandatory");
+    }
+
+    EngineException.throwIfNull(engineScript, "Script %s not found", (scriptId!=null?scriptId:scriptName));
 
     String scriptExecutionId = configuration
       .getScriptExecutionIdGenerator()

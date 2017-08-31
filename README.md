@@ -244,18 +244,22 @@ The RockScript runtime server is Apache License V2.
 
 ### Commercial offerings
 
-**RockScript consulting** gets you in depth expertise help you use RockScript in your project.  We have 
-discount pricing for consulting that helps you evaluate if RockScript is a good fit.  
+**RockScript Consulting** gets you in depth expertise to help you use RockScript 
+in the best way for your project.  
 
-The **RockScript Devtool** is a web based tool that provides convenience for developers.  This tool is 
-free, but not open source.  You have to register and provide us with your contact details in order 
-to get it.  (planned)
+**RockScript Service** is a SaaS version of the server with the UI to deploy, test, 
+continuously integrate, monitor and administer the server. (planned)  
 
-The **RockScript Manager** is a commercial extension of the dev tool to monitor and administer 
-production RockScript servers.  (later)
+**RockScript On-Premise** is an on-premise version of the SaaS product that can be installed
+on your own systems. (later)  
 
-**RockScript Service** is a SaaS version of the server and includes development tool, 
-monitoring and administration.  (later)  
+### Thanks
+
+Thanks to [GitHub](https://github.com) for hosting the code, community and website.
+
+Thanks to JetBrains for their support to open source and the free [Intellij IDEA Ultimate](https://www.jetbrains.com/idea/) license.
+
+Thanks to [Travis CI](https://travis-ci.org/) for their continuous integration
 
 ### Alternatives
 

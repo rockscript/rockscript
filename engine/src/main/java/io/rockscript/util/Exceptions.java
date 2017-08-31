@@ -13,20 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.activity.http;
+package io.rockscript.util;
 
-import io.rockscript.activity.ImportObject;
-import io.rockscript.activity.ImportProvider;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
-public class HttpImportProvider extends ImportObject implements ImportProvider {
+public class Exceptions {
 
-  public HttpImportProvider() {
-    super("rockscript.io/http");
-    put("get", HttpActivity.GET);
+  public static String getRecursiveMessage(Throwable t) {
+    List<Throwable> exceptionStack = new ArrayList<>();
+    addRecursive(t, exceptionStack);
+    return exceptionStack.stream()
+      .map(e -> e.getMessage())
+      .collect(Collectors.joining("\n -> "));
   }
 
-  @Override
-  public ImportObject getImportObject() {
-    return this;
+  private static void addRecursive(Throwable t, List<Throwable> exceptionStack) {
+    if (t!=null) {
+      exceptionStack.add(t);
+      addRecursive(t.getCause(), exceptionStack);
+    }
   }
 }

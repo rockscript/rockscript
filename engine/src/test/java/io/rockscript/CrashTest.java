@@ -17,7 +17,6 @@
 package io.rockscript;
 
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.activity.ImportJsonObject;
 import io.rockscript.engine.EngineScriptExecution;
 import io.rockscript.engine.Event;
 import io.rockscript.engine.EventListener;
@@ -89,16 +88,14 @@ public class CrashTest {
   }
 
   private void addHelloService(Configuration configuration) {
-    configuration
-      .getImportResolver()
-      .add("example.com/hello", new ImportJsonObject()
-        .put("aSyncFunction", input -> {
-          synchronousCapturedData.add("Execution was here");
-          synchronousCapturedData.add(input.getArgs().get(0));
-          return ActivityOutput.endFunction();})
-        .put("anAsyncFunction", input -> {
-          waitingAsyncFunctionInvocationIds.add(input.getExecutionId());
-          return ActivityOutput.waitForFunctionToCompleteAsync();}));
+    configuration.getImportResolver().createImport("example.com/hello")
+      .put("aSyncFunction", input -> {
+        synchronousCapturedData.add("Execution was here");
+        synchronousCapturedData.add(input.getArgs().get(0));
+        return ActivityOutput.endFunction();})
+      .put("anAsyncFunction", input -> {
+        waitingAsyncFunctionInvocationIds.add(input.getExecutionId());
+        return ActivityOutput.waitForFunctionToCompleteAsync();});
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package io.rockscript.engine;
+package io.rockscript.activity;
 
-import io.rockscript.activity.ImportJsonObject;
-import io.rockscript.activity.ImportProvider;
+import io.rockscript.engine.RemoteActivityJsonObject;
 import io.rockscript.service.Configuration;
 
 import java.util.HashMap;
@@ -26,34 +25,41 @@ import java.util.ServiceLoader;
 
 public class ImportResolver {
 
-  Map<String,JsonObject> importObjects = new HashMap<>();
+  /** importProviders by name */
+  Map<String,ImportProvider> importProviders = new HashMap<>();
 
   public ImportResolver(Configuration configuration) {
     loadAllAvailableOnClassPath();
   }
 
-  public ImportResolver add(String url, JsonObject importObject) {
-    if (importObject instanceof ImportJsonObject) {
-      ((ImportJsonObject)importObject).resolveActivityNames(url);
-    }
-    importObjects.put(url, importObject);
+  public ImportResolver add(ImportProvider importProvider) {
+    importProviders.put(importProvider.getImportObject().getUrl(), importProvider);
     return this;
   }
 
   public ImportResolver loadAllAvailableOnClassPath() {
     ServiceLoader<ImportProvider> importProviderLoader = ServiceLoader.load(ImportProvider.class);
     for (ImportProvider importProvider: importProviderLoader) {
-      importProvider.provideImport(this);
+      add(importProvider);
     }
     return this;
   }
 
-  public JsonObject get(String url) {
-    JsonObject jsonObject = importObjects.get(url);
-    if (jsonObject==null) {
-      jsonObject = new RemoteActivityJsonObject(url);
-      importObjects.put(url, jsonObject);
+  public Object get(String url) {
+    Object importObject = null;
+    ImportProvider importProvider = importProviders.get(url);
+    if (importProvider!=null) {
+      importObject = importProvider.getImportObject();
+    } else {
+      importObject = new RemoteActivityJsonObject(url);
     }
-    return jsonObject;
+    return importObject;
   }
+
+  public ImportObject createImport(String url) {
+    ImportObject importObject = new ImportObject(url);
+    add(new StaticImportProvider(importObject));
+    return importObject;
+  }
+
 }

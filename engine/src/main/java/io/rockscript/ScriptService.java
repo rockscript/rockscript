@@ -44,4 +44,6 @@ public interface ScriptService {
   EndActivityCommand newEndActivityCommand();
 
   List<EngineScriptExecution> recoverCrashedScriptExecutions();
+
+  RunTestsCommand newRunTestsCommand();
 }

@@ -44,7 +44,9 @@ public class HttpAsynchronousActivityTest extends HttpTest {
         .post("/approve", (request,response)-> {
           ActivityInput activityInput = gson.fromJson(request.body(), ActivityInput.class);
           activityInputs.add(activityInput);
-          response.status(200); });
+          response
+              .status(200)
+              .send(); });
 
     executeApprovalScript();
   }
@@ -58,7 +60,8 @@ public class HttpAsynchronousActivityTest extends HttpTest {
           response
               .status(200)
               .headerContentTypeApplicationJson()
-              .body("{ \"ended\": \"false\" }"); });
+              .body("{ \"ended\": \"false\" }")
+              .send(); });
 
     executeApprovalScript();
   }
@@ -72,7 +75,8 @@ public class HttpAsynchronousActivityTest extends HttpTest {
           response
               .status(200)
               .headerContentTypeApplicationJson()
-              .body("{}"); });
+              .body("{}")
+              .send(); });
 
     executeApprovalScript();
   }

@@ -16,21 +16,20 @@
 package io.rockscript;
 
 import io.rockscript.activity.ActivityInput;
-    import io.rockscript.activity.ActivityOutput;
-    import io.rockscript.engine.JsonObject;
-    import io.rockscript.engine.EngineScriptExecution;
-    import io.rockscript.test.ScriptExecutionComparator;
-    import io.rockscript.test.ScriptTest;
-    import org.junit.Test;
-    import org.slf4j.Logger;
-    import org.slf4j.LoggerFactory;
+import io.rockscript.activity.ActivityOutput;
+import io.rockscript.engine.EngineScriptExecution;
+import io.rockscript.test.ScriptExecutionComparator;
+import io.rockscript.test.ScriptTest;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    import java.util.ArrayList;
-    import java.util.List;
+import java.util.ArrayList;
+import java.util.List;
 
-    import static io.rockscript.util.Maps.entry;
-    import static io.rockscript.util.Maps.hashMap;
-    import static org.junit.Assert.assertEquals;
+import static io.rockscript.util.Maps.entry;
+import static io.rockscript.util.Maps.hashMap;
+import static org.junit.Assert.assertEquals;
 
 public class SerializationTest extends ScriptTest {
 
@@ -48,15 +47,14 @@ public class SerializationTest extends ScriptTest {
 
   @Test
   public void testSerialization() {
-    getConfiguration().getImportResolver().add(
-        "helloService", new JsonObject()
-            .put("hi", input -> {
-              return ActivityOutput.endFunction(input.getArg(0)+" world");
-            })
-            .put("world", input -> {
-              activityInputs.add(input);
-              return ActivityOutput.waitForFunctionToCompleteAsync();
-            }));
+    getConfiguration().getImportResolver().createImport("helloService")
+      .put("hi", input -> {
+        return ActivityOutput.endFunction(input.getArg(0) + " world");
+      })
+      .put("world", input -> {
+        activityInputs.add(input);
+        return ActivityOutput.waitForFunctionToCompleteAsync();
+      });
 
     Script script = deployScript(
         "var helloService = system.import('helloService'); \n" +
@@ -74,7 +72,7 @@ public class SerializationTest extends ScriptTest {
     String scriptExecutionId = engineScriptExecution.getId();
 
     new ScriptExecutionComparator()
-        .assertEquals(engineScriptExecution, reloadScriptExecution(scriptExecutionId));
+      .assertEquals(engineScriptExecution, reloadScriptExecution(scriptExecutionId));
 
     ActivityInput activityInput = activityInputs.get(0);
 

@@ -20,11 +20,15 @@ import io.rockscript.engine.ContinuationReference;
 import io.rockscript.service.Configuration;
 import io.rockscript.service.ScriptServiceImpl;
 import org.junit.Before;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ScriptTest {
+
+  protected static Logger log = LoggerFactory.getLogger(ScriptTest.class);
 
   private static Map<Class<? extends ScriptServiceProvider>,ScriptService> scriptServiceCache = new HashMap<>();
 

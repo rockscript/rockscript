@@ -17,41 +17,43 @@ package io.rockscript.activity;
 
 import io.rockscript.engine.JsonObject;
 
+import java.util.function.Function;
+
 /** Special JsonObject used as import object that ensures automatic
  * capturing of the propertyName of Activity values and wraps the
  * activities so that the toString shows the property name. */
-public class ImportJsonObject extends JsonObject {
+public class ImportObject extends JsonObject {
 
   String url;
 
-  public void resolveActivityNames(String url) {
+  public ImportObject(String url) {
     this.url = url;
-    for (String propertyName: getPropertyNames()) {
-      Object value = get(propertyName);
-      if (value instanceof Activity) {
-        put(propertyName, new NamedActivityWrapper(url+"/"+propertyName, (Activity) value));
-      }
-    }
   }
 
-  public class NamedActivityWrapper implements Activity {
-    String name;
-    Activity activity;
-    public NamedActivityWrapper(String name, Activity activity) {
-      this.name = name;
-      this.activity = activity;
+  @Override
+  public ImportObject put(String propertyName, Object value) {
+    if (value instanceof Activity
+        && ! (value instanceof NamedActivity)) {
+      put(propertyName, new NamedActivity(url+"/"+propertyName, (Activity) value));
+    } else {
+      super.put(propertyName, value);
     }
-    @Override
-    public ActivityOutput invoke(ActivityInput input) {
-      return activity.invoke(input);
-    }
-    public String getName() {
-      return name;
-    }
-    @Override
-    public String toString() {
-      return name;
-    }
+    return this;
+  }
+
+  public ImportObject put(String propertyName, Function<ActivityInput, ActivityOutput> activityOutput) {
+    Activity activity = new Activity() {
+      @Override
+      public ActivityOutput invoke(ActivityInput activityInput) {
+        return activityOutput.apply(activityInput);
+      }
+    };
+    put(propertyName, activity);
+    return this;
+  }
+
+  public String getUrl() {
+    return url;
   }
 
   @Override

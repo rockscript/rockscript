@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class EventLogger implements EventListener {
 
-  static final Logger eventLog = LoggerFactory.getLogger(EventLogger.class.getName());
+  static final Logger log = LoggerFactory.getLogger(EventLogger.class.getName());
 
   EventListener next;
 
@@ -31,13 +31,7 @@ public class EventLogger implements EventListener {
 
   @Override
   public void handle(Event event) {
-    String jsonString = eventJsonToJsonString(event);
-    eventLog.debug(jsonString);
+    log.debug(event.toString());
     next.handle(event);
   }
-
-  public String eventJsonToJsonString(Event event) {
-    return event!=null ? event.toString() : "null";
-  }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.activity.test;
 
-package io.rockscript.engine;
+import io.rockscript.engine.Event;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
-public class JsonObject extends HashMap<String, Object> implements Dereferencable {
+public class TestResult {
 
-  public JsonObject() {
+  List<Event> events = new ArrayList<>();
+  String error;
+
+  public void addError(String error) {
+    this.error = error;
   }
 
-  public JsonObject(Map<String,Object> properties) {
-    super(properties);
-  }
-
-  @Override
-  public Object get(String propertyName) {
-    return super.get(propertyName);
+  public void addEvent(Event event) {
+    events.add(event);
   }
 }

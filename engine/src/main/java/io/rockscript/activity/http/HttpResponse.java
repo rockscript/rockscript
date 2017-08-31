@@ -33,21 +33,21 @@ public class HttpResponse implements Dereferencable {
     this.status = status;
   }
 
-  public HttpResponse log() {
+  public HttpResponse log(String prefix) {
     if (headers!=null) {
-      Http.log.debug("< "+headerListToString(headers.get(null)));
+      Http.log.debug(prefix+" < "+headerListToString(headers.get(null)));
       for (String headerName: headers.keySet()) {
         if (headerName!=null) {
           List<String> headerListValue = headers.get(headerName);
           String headerValue = headerListToString(headerListValue);
-          Http.log.debug("    ["+headerName+"] "+ headerValue);
+          Http.log.debug(prefix+"     ["+headerName+"] "+ headerValue);
         }
       }
     } else {
-      Http.log.debug("< "+status);
+      Http.log.debug(prefix+" < "+status);
     }
     if (body!=null) {
-      Http.log.debug("    "+body);
+      Http.log.debug(prefix+"     "+body);
     }
     return this;
   }

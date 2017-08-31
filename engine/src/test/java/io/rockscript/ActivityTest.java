@@ -18,8 +18,6 @@ package io.rockscript;
 
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.activity.ImportJsonObject;
-import io.rockscript.engine.JsonObject;
 import io.rockscript.test.ScriptTest;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -46,12 +44,11 @@ public class ActivityTest extends ScriptTest {
 
   @Test
   public void testAsynchronousActivity() {
-    getConfiguration().getImportResolver().add(
-      "approvalService", new ImportJsonObject()
-        .put("approve", input -> {
-          activityInputs.add(input);
-          return ActivityOutput.waitForFunctionToCompleteAsync();
-        }));
+    getConfiguration().getImportResolver().createImport("approvalService")
+      .put("approve", input -> {
+        activityInputs.add(input);
+        return ActivityOutput.waitForFunctionToCompleteAsync();
+      });
 
     Script script = deployScript(
       "var approvalService = system.import('approvalService'); \n" +
@@ -74,11 +71,10 @@ public class ActivityTest extends ScriptTest {
 
   @Test
   public void testSynchronousActivityWithoutResult() {
-    getConfiguration().getImportResolver().add(
-      "approvalService", new JsonObject()
-        .put("approve", input -> {
-          return ActivityOutput.endFunction();
-        }));
+    getConfiguration().getImportResolver().createImport("approvalService")
+      .put("approve", input -> {
+        return ActivityOutput.endFunction();
+      });
 
     Script script = deployScript(
       "var approvalService = system.import('approvalService'); \n" +
@@ -92,11 +88,10 @@ public class ActivityTest extends ScriptTest {
 
   @Test
   public void testSynchronousActivityWithResult() {
-    getConfiguration().getImportResolver().add(
-        "approvalService", new JsonObject()
-            .put("approve", input -> {
-              return ActivityOutput.endFunction("approved");
-            }));
+    getConfiguration().getImportResolver().createImport("approvalService")
+      .put("approve", input -> {
+        return ActivityOutput.endFunction("approved");
+      });
 
     Script script = deployScript(
         "var approvalService = system.import('approvalService'); \n" +

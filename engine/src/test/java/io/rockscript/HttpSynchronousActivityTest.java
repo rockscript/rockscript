@@ -52,7 +52,8 @@ public class HttpSynchronousActivityTest extends HttpTest {
         response
             .status(200)
             .headerContentTypeApplicationJson()
-            .body(gson.toJson(activityOutput));
+            .body(gson.toJson(activityOutput))
+            .send();
       });
   }
 

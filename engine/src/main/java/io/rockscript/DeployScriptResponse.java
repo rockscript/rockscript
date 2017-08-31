@@ -24,6 +24,15 @@ public class DeployScriptResponse extends Script {
 
   protected List<String> errors;
 
+  /** for gson serialization */
+  DeployScriptResponse() {
+  }
+
+  public DeployScriptResponse(Script script, List<String> errors) {
+    super(script);
+    this.errors = errors;
+  }
+
   public List<String> getErrors() {
     return errors;
   }

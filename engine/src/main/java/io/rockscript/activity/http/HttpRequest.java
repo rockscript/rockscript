@@ -48,20 +48,19 @@ public class HttpRequest {
     this.url = url;
   }
 
-
-  public HttpRequest log() {
-    Http.log.debug("> "+method+" "+url);
+  public HttpRequest log(String prefix) {
+    Http.log.debug(prefix+" > "+method+" "+url);
     if (headers!=null) {
       for (String headerName: headers.keySet()) {
         List<String> headerListValue = headers.get(headerName);
         String headerValue = headerListValue
             .stream()
             .collect(Collectors.joining(";"));
-        Http.log.debug("    ["+headerName+"] "+ headerValue);
+        Http.log.debug(prefix+"     ["+headerName+"] "+ headerValue);
       }
     }
     if (body!=null) {
-      Http.log.debug("    "+body);
+      Http.log.debug(prefix+"     "+body);
     }
     return this;
   }
