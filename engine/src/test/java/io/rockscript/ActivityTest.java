@@ -99,7 +99,7 @@ public class ActivityTest extends ScriptTest {
 
     ScriptExecution scriptExecution = startScriptExecution(script);
 
-    Object approveResult = scriptExecution.getVariableValue("approveResult");
+    Object approveResult = scriptExecution.getVariable("approveResult");
     assertEquals("approved", approveResult);
     assertTrue(scriptExecution.isEnded());
   }

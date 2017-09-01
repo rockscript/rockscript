@@ -1,14 +1,20 @@
-![RockScript](docs/image/logo.png)
+![RockScript](docs/img/logo.png)
 
 ## What is it?
 
- * __Script language based on JavaScript syntax__
- * __Adds support for long running activities__
+RockScript creates a new category of programming languages.  Most programming 
+languages differ in their syntax or style.  RockScript offers a different 
+execution engine that enables non-blocking waiting which is resilient and 
+resumable.  Read on to learn more.
+
+#### RockScript is based on JavaScript syntax
 
 The syntax of RockScript is based on JavaScript, so it will be very familiar 
 to you.
+
+#### RockScript adds support for long running activities
   
-RockScript adds the notion of an [Activity](#activity-workers).  In the script, 
+RockScript adds the notion of an [Activity](wiki/Activity-workers).  In the script, 
 an activity looks like a function invocation but they are executed asynchronously 
 by an [Activity Worker](#activity-workers) component.  Activities can be long running: 
 from milliseconds, to days or even months.  The script execution will not block any thread 
@@ -18,8 +24,7 @@ synchronization hassles as in other programming languages.
 
 ## Why use it?
 
- * __Resilient script execution__
- * __More readable then reactive code with callbacks__
+#### Resilient script execution
 
 But the cool part is that executions are resilient.  The runtime state of 
 each script execution is stored with event sourcing as the script executes.
@@ -28,14 +33,49 @@ they are waiting for asynchronous activities to complete.  Also because
 the script executions are stored, you can fully inspect what happened when 
 something goes wrong like a server crash and even recover from the last 
 saved execution position.  It's designed so that a group of RockScript 
-servers can form a cluster. 
+servers can form a cluster.
+
+#### Juggle with JSON
+
+When combining multiple microservices interactions, you often need to 
+transform the data between those interactions.  Most of the microservices 
+interactions are based on JSON. There is no better language to deal with 
+JSON manipulation than JavaScript.  That's why RockScript is based on 
+JavaScript.  So that coding your data transformations between microservice 
+interactions becomes super easy. 
+
+#### More readable then reactive code with callbacks
+
+Even though activities look like normal function calls, they are executed 
+asynchronous.  This means that with RockScript, you do not require any of 
+the complex synchronization constructs like callbacks, futures, promises
+to get asynchronous execution.
+
+#### Full stack JavaScript
+
+RockScript fits perfect in a full JavaScript stack.
 
 ## When to use it?
 
- * __Used for microservice workflows__
- * __In event driven architectures__
+#### Resilient microservice workflows
 
-**Event listeners**: RockScript is ideal for implementing event listeners in 
+Interactions with microservices are mostly done in JSON over HTTP.
+These interactions therefor can not participate in a transaction.
+At any point during an interaction, your server or the called 
+microservice may crash.  In order to keep consistency when combining 
+multiple microservice interactions you need to keep very good track of 
+which service you started calling, which already completed.  And how will 
+you recover?  That is exactly what RockScript will do for you.
+
+#### Event driven architectures
+
+RockScript is designed to be connected with messages as well as HTTP 
+API. (This is still planned, not yet implemented).
+
+TODO: Describe how RockScript has the vision of applying the Triggers and Actions 
+concepts (similar to IFTTT) to event driven microservice architectures.
+
+RockScript is ideal for implementing event listeners in 
 an event driven architecture.  That's because your server often needs to perform 
 multiple integration activities in response to an incoming event.  Often 
 these integrations happen over HTTP and cannot participate in a transaction.  
@@ -48,13 +88,9 @@ RockScript ensures that script executions recover from server crashes and from
 the stored runtime script execution state you can analyse what has happened.
 This capabilities make RockScripts a viable alternative for transactions.
 
-**Long running activities**: RockScript allows you to write scripts that 
-are include long running activities like document transformations, 
-user tasks, waiting for clicking a confirmation link, report generations, 
-big file transformations, long running map reduce jobs, etc.  Also any API 
-operation can be wrapped as a RockScript activity.
-
 ## Activity workers
+
+TODO move this to the WIKI
 
 **An activity** is a function that is executed by an activity worker. When an activity 
 starts, the engine notifies the activity worker that a new activity has to be started. 
@@ -70,9 +106,11 @@ get a notification when an activity has to be started.  The activity script obje
 passes the activity start message on to the activity worker.  The activity worker 
 is then responsible for invoking the callback to indicate when an activity ends.  
 
-![Activity worker sequence](docs/image/activity-worker-sequence.png)
+![Activity worker sequence](docs/img/activity-worker-sequence.png)
 
 ## Usage by example
+
+TODO move this to the WIKI
 
 #### Prerequisites
 
@@ -227,22 +265,19 @@ execution will lead to a statement being added.
 Each time you click on the 'Approve' button next to a statement, you will see in the 
 logs of the RockScript server that the corresponding script executions ends. 
 
-### Project stage
+### Project status
 
-RockScript is experimental stage and very early in its development.
+RockScript is experimental stage and quite early in its development.  
 
 **RockScript does not offer any stability guarantees at this point.**
-  
-We are looking for feedback and use cases:  
 
-[Create an issue](https://github.com/RockScript/server/issues/new) for 
+You can help us with your feedback.  [Create an issue](https://github.com/RockScript/server/issues/new) for 
 any question, suggestion or other feedback.  We really appreciate it.
-
-### License
-
-The RockScript runtime server is Apache License V2.  
-
-### Commercial offerings
+ 
+I'm planning to build a business model on top of RockScript.  I'm interested to find 
+a cofounder.  If you think you have what it takes (don't be shy) email me.  
+ 
+The current business plan is based on:
 
 **RockScript Consulting** gets you in depth expertise to help you use RockScript 
 in the best way for your project.  
@@ -252,6 +287,12 @@ continuously integrate, monitor and administer the server. (planned)
 
 **RockScript On-Premise** is an on-premise version of the SaaS product that can be installed
 on your own systems. (later)  
+
+### License
+
+The full RockScript runtime server is Apache License V2.  
+
+The commercial tooling will not be open source.
 
 ### Thanks
 

@@ -16,6 +16,8 @@
 
 package io.rockscript.engine;
 
+import io.rockscript.EngineException;
+
 public class IdentifierExpressionExecution extends Execution<IdentifierExpression> {
 
   public IdentifierExpressionExecution(IdentifierExpression element, Execution parent) {
@@ -33,6 +35,9 @@ public class IdentifierExpressionExecution extends Execution<IdentifierExpressio
   public Object getIdentifierValue() {
     String variableName = element.getIdentifier();
     Variable variable = parent.getVariable(variableName);
-    return variable!=null ? variable.getValue() : null;
+    if (variable==null) {
+      throw new EngineException("ReferenceError: "+variableName+" is not defined", this);
+    }
+    return variable.getValue();
   }
 }

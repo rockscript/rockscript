@@ -16,13 +16,13 @@
 package io.rockscript;
 
 import io.rockscript.activity.test.TestImportObject;
-import io.rockscript.engine.ScriptStore;
-import io.rockscript.service.CommandImpl;
-import io.rockscript.service.Configuration;
 import io.rockscript.activity.test.TestResult;
 import io.rockscript.activity.test.TestResults;
 import io.rockscript.activity.test.TestRunConfiguration;
-import io.rockscript.util.Exceptions;
+import io.rockscript.engine.ErrorMessage;
+import io.rockscript.engine.ScriptStore;
+import io.rockscript.service.CommandImpl;
+import io.rockscript.service.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +70,7 @@ public class RunTestsCommand extends CommandImpl<TestResults> {
           .scriptId(scriptId)
           .execute();
     } catch (Throwable t) {
-      t.printStackTrace();
-      testResult.addError(Exceptions.getRecursiveMessage(t));
+      testResult.setError(new ErrorMessage(t));
     }
     return testResult;
   }

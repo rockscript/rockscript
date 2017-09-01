@@ -17,8 +17,15 @@
 package io.rockscript;
 
 
+import io.rockscript.activity.ActivityInput;
+import io.rockscript.engine.Execution;
+import io.rockscript.engine.Location;
+
 /** Base class for all RockScript exceptions. */
 public class EngineException extends RuntimeException {
+
+  String scriptId;
+  Location location;
 
   public EngineException(String message) {
     super(message);
@@ -30,6 +37,18 @@ public class EngineException extends RuntimeException {
 
   public EngineException(String message, Throwable cause) {
     super(message, cause);
+  }
+
+  public EngineException(String message, ActivityInput activityInput) {
+    super(message);
+    this.location = activityInput.getElementLocation();
+    this.scriptId = activityInput.getExecution().getEngineScript().getScript().getId();
+  }
+
+  public EngineException(String message, Execution execution) {
+    super(message);
+    this.location = execution.getElement().getLocation();
+    this.scriptId = execution.getEngineScript().getScript().getId();
   }
 
   public static <T> T throwIfNull(T value) {
@@ -46,5 +65,13 @@ public class EngineException extends RuntimeException {
       throw new EngineException(message);
     }
     return value;
+  }
+
+  public Location getLocation() {
+    return location;
+  }
+
+  public String getScriptId() {
+    return scriptId;
   }
 }

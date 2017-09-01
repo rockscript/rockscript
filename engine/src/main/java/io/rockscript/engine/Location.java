@@ -21,6 +21,7 @@ import org.antlr.v4.runtime.Token;
 
 public class Location {
 
+  private int line;
   private int start;
   private int end;
 
@@ -29,6 +30,7 @@ public class Location {
     this.start = start.getStartIndex();
     Token stop = parserRuleContext.getStop();
     end = stop.getStopIndex();
+    line = start.getLine();
   }
 
   public int getStart() {
@@ -37,5 +39,9 @@ public class Location {
 
   public int getEnd() {
     return end;
+  }
+
+  public int getLine() {
+    return line;
   }
 }

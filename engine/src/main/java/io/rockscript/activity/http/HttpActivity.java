@@ -38,18 +38,17 @@ public class HttpActivity implements Activity {
   public ActivityOutput invoke(ActivityInput input) {
     // Parse the HttpRequest object
     Object requestObject = input.getArg(0);
-    Gson gson = input.getActivityContext().getGson();
+    Gson gson = input.getGson();
     JsonElement requestElement = gson.toJsonTree(requestObject);
     HttpRequest httpRequest = gson.fromJson(requestElement, HttpRequest.class);
     httpRequest.method = this.method;
 
     // Create the HttpRequestRunnable command
-    Engine engine = input.getActivityContext().getEngine();
+    Engine engine = input.getEngine();
     HttpRequestRunnable command = new HttpRequestRunnable(input.getContinuationReference(), httpRequest, engine);
 
     // Schedule the HttpRequestRunnable command for execution asynchronously
     input
-      .getActivityContext()
       .getExecutor()
       .execute(command);
 

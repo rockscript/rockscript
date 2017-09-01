@@ -66,7 +66,7 @@ public class HttpSynchronousActivityTest extends HttpTest {
     ScriptExecution scriptExecution = startScriptExecution(script);
 
     ActivityInput activityInput = activityInputs.get(0);
-    assertEquals("EUR", scriptExecution.getVariableValue("currency"));
+    assertEquals("EUR", scriptExecution.getVariable("currency"));
     assertTrue(scriptExecution.isEnded());
   }
 }

@@ -51,7 +51,7 @@ public class ObjectLiteralExpressionTest extends ScriptTest {
 
     ScriptExecution scriptExecution = startScriptExecution(script);
     @SuppressWarnings("unchecked")
-    Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariableValue("o");
+    Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariable("o");
     assertEquals("hello", o.get("msg"));
   }
 
@@ -62,7 +62,7 @@ public class ObjectLiteralExpressionTest extends ScriptTest {
 
     ScriptExecution scriptExecution = startScriptExecution(script);
     @SuppressWarnings("unchecked")
-    Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariableValue("o");
+    Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariable("o");
     assertEquals("hello", o.get("m s g"));
   }
 
@@ -74,7 +74,7 @@ public class ObjectLiteralExpressionTest extends ScriptTest {
 
     ScriptExecution scriptExecution = startScriptExecution(script);
     @SuppressWarnings("unchecked")
-    Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariableValue("o");
+    Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariable("o");
     assertEquals("hello", o.get("msg"));
   }
 

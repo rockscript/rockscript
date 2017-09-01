@@ -65,9 +65,7 @@ public class LocalEngine implements Engine {
       scriptExecution.start();
 
     } finally {
-      if (lock!=null) {
-        releaseLock(lock);
-      }
+      releaseLock(lock, scriptExecution);
     }
 
     return scriptExecution;
@@ -82,17 +80,20 @@ public class LocalEngine implements Engine {
         scriptExecution = configuration
           .getEventStore()
           .findScriptExecutionById(continuationReference.getScriptExecutionId());
-        String executionId = continuationReference.getExecutionId();
-        ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) scriptExecution
-            .findExecutionRecursive(executionId);
-        execution.endActivity(result);
+        endActivity(scriptExecution, continuationReference, result);
       } finally {
-        if (lock!=null) {
-          releaseLock(lock);
-        }
+        releaseLock(lock, scriptExecution);
       }
     }
     return scriptExecution;
+  }
+
+  @Override
+  public void endActivity(EngineScriptExecution lockedScriptExecution, ContinuationReference continuationReference, Object result) {
+    String executionId = continuationReference.getExecutionId();
+    ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) lockedScriptExecution
+        .findExecutionRecursive(executionId);
+    execution.endActivity(result);
   }
 
   private synchronized Lock acquireLockOrAddEndActivityRequestToBacklog(ContinuationReference continuationReference, Object result) {
@@ -114,23 +115,30 @@ public class LocalEngine implements Engine {
     return null;
   }
 
-  public synchronized void releaseLock(Lock lock) {
-    String scriptExecutionId = lock.getScriptExecutionId();
-    locks.remove(scriptExecutionId);
-    endActivitiesFromBacklog(scriptExecutionId);
+  public synchronized void releaseLock(Lock lock, EngineScriptExecution lockedScriptExecution) {
+    String scriptExecutionId = lockedScriptExecution.getId();
+    ActivityEndRequest nextActivityEndRequest = removeNextActivityEndRequest(scriptExecutionId);
+    if (nextActivityEndRequest!=null) {
+      configuration
+          .getExecutor()
+          .execute(new ActivityEndRequestRunnable(nextActivityEndRequest, lock, lockedScriptExecution, this));
+
+    } else {
+      locks.remove(scriptExecutionId);
+    }
   }
 
-  private void endActivitiesFromBacklog(String scriptExecutionId) {List<ActivityEndRequest> activityEndRequests = activityEndBacklog
+  private ActivityEndRequest removeNextActivityEndRequest(String scriptExecutionId) {
+    ActivityEndRequest nextActivityEndRequest = null;
+        List<ActivityEndRequest> activityEndRequests = activityEndBacklog
       .get(scriptExecutionId);
     if (activityEndRequests !=null && !activityEndRequests.isEmpty()) {
-      ActivityEndRequest nextActivityEndRequest = activityEndRequests.remove(0);
+      nextActivityEndRequest = activityEndRequests.remove(0);
       if (activityEndRequests.isEmpty()) {
         activityEndBacklog.remove(scriptExecutionId);
       }
-      configuration
-        .getExecutor()
-        .execute(new ActivityEndRequestRunnable(nextActivityEndRequest, configuration));
     }
+    return nextActivityEndRequest;
   }
 
   public synchronized void addToActivityEndBacklog(ActivityEndRequest activityEndRequest) {

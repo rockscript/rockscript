@@ -22,7 +22,6 @@ import io.rockscript.EngineException;
 import io.rockscript.ScriptService;
 import io.rockscript.activity.Activity;
 import io.rockscript.activity.ImportResolver;
-import io.rockscript.activity.http.ActivityContext;
 import io.rockscript.engine.*;
 
 import java.lang.reflect.Field;
@@ -30,7 +29,7 @@ import java.util.concurrent.Executor;
 
 import static io.rockscript.engine.Event.createEventJsonTypeAdapterFactory;
 
-public abstract class Configuration implements ActivityContext {
+public abstract class Configuration {
 
   protected EventStore eventStore;
   protected ScriptStore scriptStore;

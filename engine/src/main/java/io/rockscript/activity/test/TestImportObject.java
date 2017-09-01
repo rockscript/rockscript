@@ -15,6 +15,7 @@
  */
 package io.rockscript.activity.test;
 
+import io.rockscript.EngineException;
 import io.rockscript.ScriptService;
 import io.rockscript.StartScriptExecutionResponse;
 import io.rockscript.activity.ActivityOutput;
@@ -36,6 +37,24 @@ public class TestImportObject extends ImportObject implements ImportProvider {
           .execute();
       return ActivityOutput.endFunction(response.getScriptExecution());
     });
+    put("assertEquals", activityInput -> {
+      Object actual = activityInput.getArg(0);
+      Object expected = activityInput.getArg(1);
+      if (!equal(actual, expected)) {
+        throw new EngineException("Expected "+expected+", but was "+actual, activityInput);
+      }
+      return ActivityOutput.endFunction();
+    });
+  }
+
+  private boolean equal(Object a, Object b) {
+    if (a==null && b==null) {
+      return true;
+    }
+    if (a!=null) {
+      return a.equals(b);
+    }
+    return b.equals(a);
   }
 
   public TestResult getTestResult() {

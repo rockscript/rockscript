@@ -39,7 +39,7 @@ public class RemoteActivity implements Activity {
 
   @Override
   public ActivityOutput invoke(ActivityInput input) {
-    Gson gson = input.getActivityContext().getGson();
+    Gson gson = input.getGson();
     String activityInputJson = gson.toJson(input);
 
     ContinuationReference continuationReference = input.getContinuationReference();

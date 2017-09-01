@@ -29,7 +29,7 @@ public class ScriptExecution {
 
   String id;
   Script script;
-  Map<String,Object> variableValues;
+  Map<String,Object> variables;
   List<ActivityContinuation> activityContinuations;
   Boolean ended;
 
@@ -64,10 +64,10 @@ public class ScriptExecution {
   private void scanVariables(Map<String, Variable> variables) {
     if (variables!=null) {
       for (Variable variable: variables.values()) {
-        if (variableValues==null) {
-          variableValues = new HashMap<>();
+        if (this.variables ==null) {
+          this.variables = new HashMap<>();
         }
-        variableValues.put(variable.getVariableName(), variable.getValue());
+        this.variables.put(variable.getVariableName(), variable.getValue());
       }
     }
   }
@@ -88,11 +88,13 @@ public class ScriptExecution {
     return id;
   }
 
-  public Map<String, Object> getVariableValues() {
-    return variableValues;
+  /** variable values */
+  public Map<String, Object> getVariables() {
+    return variables;
   }
 
-  public Object getVariableValue(String variableName) {
-    return variableValues!=null ? variableValues.get(variableName): null;
+  /** the variable value */
+  public Object getVariable(String variableName) {
+    return variables !=null ? variables.get(variableName): null;
   }
 }

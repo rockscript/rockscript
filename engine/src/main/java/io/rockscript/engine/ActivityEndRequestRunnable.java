@@ -15,23 +15,29 @@
  */
 package io.rockscript.engine;
 
-import io.rockscript.service.Configuration;
-
 public class ActivityEndRequestRunnable implements Runnable {
 
   ActivityEndRequest activityEndRequest;
-  Configuration configuration;
+  Lock lock;
+  EngineScriptExecution lockedScriptExecution;
+  LocalEngine localEngine;
 
-  public ActivityEndRequestRunnable(ActivityEndRequest activityEndRequest, Configuration configuration) {
+  public ActivityEndRequestRunnable(ActivityEndRequest activityEndRequest, Lock lock, EngineScriptExecution lockedScriptExecution, LocalEngine localEngine) {
     this.activityEndRequest = activityEndRequest;
-    this.configuration = configuration;
+    this.lock = lock;
+    this.lockedScriptExecution = lockedScriptExecution;
+    this.localEngine = localEngine;
   }
 
   @Override
   public void run() {
-    configuration
-      .getEngine()
-      .endActivity(activityEndRequest.getContinuationReference(),
-                   activityEndRequest.getResult());
+    try {
+      localEngine.endActivity(
+          lockedScriptExecution,
+          activityEndRequest.getContinuationReference(),
+          activityEndRequest.getResult());
+    } finally {
+      localEngine.releaseLock(lock, lockedScriptExecution);
+    }
   }
 }

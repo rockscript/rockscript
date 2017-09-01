@@ -13,35 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.activity.test;
+package io.rockscript.engine;
 
 import io.rockscript.EngineException;
-import io.rockscript.engine.ErrorMessage;
-import io.rockscript.engine.Event;
-import io.rockscript.engine.Location;
 import io.rockscript.util.Exceptions;
 
-import java.util.ArrayList;
-import java.util.List;
+public class ErrorMessage {
 
-public class TestResult {
+  String message;
+  Location location;
+  String scriptId;
 
-  List<Event> events = new ArrayList<>();
-  ErrorMessage error;
-
-  public void setError(ErrorMessage error) {
-    this.error = error;
+  public ErrorMessage(String message) {
+    this.message = message;
   }
 
-  public void addEvent(Event event) {
-    events.add(event);
+  public ErrorMessage(Throwable t) {
+    this.message = Exceptions.getRecursiveMessage(t);
+    if (t instanceof EngineException) {
+      EngineException engineException = (EngineException) t;
+      this.location = engineException.getLocation();
+      this.scriptId = engineException.getScriptId();
+    }
   }
 
-  public ErrorMessage getError() {
-    return error;
+  public String getMessage() {
+    return message;
   }
 
-  public List<Event> getEvents() {
-    return events;
+  public Location getLocation() {
+    return location;
+  }
+
+  public String getScriptId() {
+    return scriptId;
   }
 }

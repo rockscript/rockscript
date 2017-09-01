@@ -35,4 +35,10 @@ public class Exceptions {
       addRecursive(t.getCause(), exceptionStack);
     }
   }
+
+  public static void assertContains(String expected, String text) {
+    if (text==null || !text.contains(expected)) {
+      throw new AssertionError("Expected '"+expected+"' to be present, but text was "+(text!=null ? "'"+text+"'" : "null"));
+    }
+  }
 }

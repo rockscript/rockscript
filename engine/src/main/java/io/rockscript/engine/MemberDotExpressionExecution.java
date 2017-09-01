@@ -16,6 +16,9 @@
 
 package io.rockscript.engine;
 
+import io.rockscript.util.Reflection;
+
+import java.lang.reflect.Field;
 import java.util.Map;
 
 public class MemberDotExpressionExecution extends Execution<MemberDotExpression> {
@@ -53,7 +56,12 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
       Map<String,Object> map = (Map) target;
       fieldValue = map.get(identifier);
     } else {
-      throw new RuntimeException("Can't dereference '"+identifier+"': target=" + target);
+      Field field = Reflection.findFieldInObject(target, identifier);
+      if (field!=null) {
+        fieldValue = Reflection.getFieldValue(field, target);
+      } else {
+        throw new RuntimeException("Can't dereference '"+identifier+"': target=" + target);
+      }
     }
     return fieldValue;
   }

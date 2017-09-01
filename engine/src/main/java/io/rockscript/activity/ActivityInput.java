@@ -15,12 +15,16 @@
  */
 package io.rockscript.activity;
 
-import io.rockscript.activity.http.ActivityContext;
+import com.google.gson.Gson;
 import io.rockscript.engine.ContinuationReference;
+import io.rockscript.engine.Engine;
 import io.rockscript.engine.Execution;
+import io.rockscript.engine.Location;
+import io.rockscript.service.Configuration;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 public class ActivityInput {
 
@@ -29,8 +33,9 @@ public class ActivityInput {
   String executionId;
   List<Object> args;
 
-  // activityContext is transient because it should not be serialized with Gson
-  transient ActivityContext activityContext;
+  // configuration is transient because it should not be serialized with Gson
+  transient Configuration configuration;
+  transient Execution<?> execution;
 
   public ActivityInput(Execution<?> execution, List<Object> args) {
     this.scriptExecutionId = execution.getScriptExecution().getId();
@@ -40,7 +45,7 @@ public class ActivityInput {
         execution.getId()
     );
     this.args = args;
-    this.activityContext = execution.getEngineScript().getConfiguration();
+    this.execution = execution;
   }
 
   public String getScriptExecutionId() {
@@ -59,14 +64,9 @@ public class ActivityInput {
     return args;
   }
 
-  public ActivityContext getActivityContext() {
-    return activityContext;
+  Configuration getConfiguration() {
+    return execution.getEngineScript().getConfiguration();
   }
-
-  public void setActivityContext(ActivityContext activityContext) {
-    this.activityContext = activityContext;
-  }
-
 
   /** Convenience method to get the argument by index. */
   public <T> T getArg(int index) {
@@ -81,5 +81,25 @@ public class ActivityInput {
     }
     Map<String,Object> objectArg = (Map<String, Object>) args.get(0);
     return (T) objectArg.get(propertyName);
+  }
+
+  public Gson getGson() {
+    return getConfiguration().getGson();
+  }
+
+  public Engine getEngine() {
+    return getConfiguration().getEngine();
+  }
+
+  public Location getElementLocation() {
+    return execution.getElement().getLocation();
+  }
+
+  public Executor getExecutor() {
+    return getConfiguration().getExecutor();
+  }
+
+  public Execution<?> getExecution() {
+    return execution;
   }
 }
