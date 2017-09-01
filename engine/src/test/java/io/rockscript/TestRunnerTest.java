@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.rockscript.util.Exceptions.assertContains;
 import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.assertEquals;
@@ -77,8 +76,7 @@ public class TestRunnerTest extends HttpTest {
     log.debug(getConfiguration().getGson().toJson(testResults));
 
     ErrorMessage error = testResults.get(0).getError();
-    assertContains("Expected 'The Netherlands'", error.getMessage());
-    assertContains("but was 'Belgium'", error.getMessage());
+    assertEquals("Expected The Netherlands, but was Belgium", error.getMessage());
 
     assertEquals(testScriptId, error.getScriptId());
     assertEquals(5, error.getLocation().getLine());

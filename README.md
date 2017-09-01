@@ -56,7 +56,12 @@ to get asynchronous execution.
 
 #### Full stack JavaScript
 
-RockScript fits perfect in a full JavaScript stack.
+There are already solutions for writing JavaScript frontend and backend.
+  
+RockScript adds a crucial integration component so that developers can deliver 
+complete applications in one language.  Because JavaScript is the most 
+common language, it will be easy to train and find developers so it's a 
+safe technology choice.
 
 ## When to use it?
 
@@ -128,7 +133,7 @@ Thanks to JetBrains for their support to open source and the free [Intellij IDEA
 
 Thanks to [Travis CI](https://travis-ci.org/) for their continuous integration
 
-### Alternatives
+## Alternatives
 
 RockScript is an alternative for 
 
