@@ -23,6 +23,10 @@ public class ActivityEndedEvent extends ExecutableEvent<ArgumentsExpressionExecu
   String activityName;
   Object result;
 
+  /** constructor for gson serialization */
+  ActivityEndedEvent() {
+  }
+
   public ActivityEndedEvent(ArgumentsExpressionExecution argumentsExpressionExecution, Object result) {
     super(argumentsExpressionExecution);
     this.activityName = getActivityName(argumentsExpressionExecution);

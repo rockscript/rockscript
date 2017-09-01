@@ -23,6 +23,10 @@ public class ScriptStartedEvent extends ExecutionEvent<EngineScriptExecution> {
   String scriptName;
   Object input;
 
+  /** constructor for gson serialization */
+  ScriptStartedEvent() {
+  }
+
   public ScriptStartedEvent(EngineScriptExecution scriptExecution, Object input) {
     super(scriptExecution);
 

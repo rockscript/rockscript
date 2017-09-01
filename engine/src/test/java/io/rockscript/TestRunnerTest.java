@@ -33,18 +33,14 @@ public class TestRunnerTest extends HttpTest {
 
   @Override
   protected void configure(HttpTestServer httpTestServer) {
-    httpTestServer
-      .get("/ole", (request,response)-> {
-        response
-          .status(200)
-          .headerContentTypeApplicationJson()
-          .body(gson.toJson(hashMap(
-              entry("country", "Belgium"),
-              entry("currency", "EUR")
-            )
-          ))
-          .send();
-      });
+    httpTestServer.get("/ole", (request, response) -> {
+      response.status(200)
+        .headerContentTypeApplicationJson()
+        .body(gson.toJson(hashMap(
+          entry("country", "Belgium"),
+          entry("currency", "EUR"))))
+        .send();
+    });
   }
 
   @Test
@@ -59,19 +55,17 @@ public class TestRunnerTest extends HttpTest {
       .execute();
 
     String testScriptId = scriptService.newDeployScriptCommand()
-        .scriptText(
-            "var test = system.import('rockscript.io/test'); \n" +
-                "var scriptExecution = test.start({ \n" +
-                "  scriptName: 'The Script.rs', \n" +
-                "  skipActivities: true}); \n" +
-                "test.assertEquals(scriptExecution.variables.country, 'The Netherlands');")
-        .scriptName("The Script Test.rst")
-        .execute()
-        .getId();
+      .scriptText(
+        "var test = system.import('rockscript.io/test'); \n" +
+        "var scriptExecution = test.start({ \n" +
+        "  scriptName: 'The Script.rs', \n" +
+        "  skipActivities: true}); \n" +
+        "test.assertEquals(scriptExecution.variables.country, 'The Netherlands');")
+      .scriptName("The Script Test.rst")
+      .execute()
+      .getId();
 
-    TestResults testResults = scriptService.newRunTestsCommand()
-        .tests("*.rst")
-        .execute();
+    TestResults testResults = scriptService.newRunTestsCommand().tests("*.rst").execute();
 
     log.debug(getConfiguration().getGson().toJson(testResults));
 
@@ -85,25 +79,23 @@ public class TestRunnerTest extends HttpTest {
   @Test
   public void testTestRunnerScriptFailure() {
     String scriptId = scriptService.newDeployScriptCommand()
-        .scriptText(
-            "var http = system.import('rockscript.io/http'); \n" +
-                "unexistingvar.unexistingmethod();")
-        .scriptName("The Script.rs")
-        .execute()
-        .getId();
+      .scriptText(
+        "var http = system.import('rockscript.io/http'); \n" +
+        "unexistingvar.unexistingmethod();")
+      .scriptName("The Script.rs")
+      .execute()
+      .getId();
 
     scriptService.newDeployScriptCommand()
-        .scriptText(
-            "var test = system.import('rockscript.io/test'); \n" +
-                "var scriptExecution = test.start({ \n" +
-                "  scriptName: 'The Script.rs', \n" +
-                "  skipActivities: true}); ")
-        .scriptName("The Script Test.rst")
-        .execute();
+      .scriptText(
+        "var test = system.import('rockscript.io/test'); \n" +
+        "var scriptExecution = test.start({ \n" +
+        "  scriptName: 'The Script.rs', \n" +
+        "  skipActivities: true}); ")
+      .scriptName("The Script Test.rst")
+      .execute();
 
-    TestResults testResults = scriptService.newRunTestsCommand()
-        .tests("*.rst")
-        .execute();
+    TestResults testResults = scriptService.newRunTestsCommand().tests("*.rst").execute();
 
     log.debug(getConfiguration().getGson().toJson(testResults));
 

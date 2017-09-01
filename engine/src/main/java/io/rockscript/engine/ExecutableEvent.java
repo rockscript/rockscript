@@ -18,7 +18,7 @@ package io.rockscript.engine;
 
 public abstract class ExecutableEvent<T extends Execution> extends ExecutionEvent<T> {
 
-  /** for Gson serialzation */
+  /** constructor for gson serialization */
   ExecutableEvent() {
   }
 

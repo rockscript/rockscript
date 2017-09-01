@@ -18,6 +18,10 @@ package io.rockscript.engine;
 
 public class ActivityWaitingEvent extends ExecutionEvent<ArgumentsExpressionExecution> {
 
+  /** constructor for gson serialization */
+  ActivityWaitingEvent() {
+  }
+
   public ActivityWaitingEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
     super(argumentsExpressionExecution);
   }

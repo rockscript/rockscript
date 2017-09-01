@@ -25,6 +25,10 @@ public class ActivityStartedEvent extends ExecutableEvent<ArgumentsExpressionExe
   String activityName;
   List<Object> args;
 
+  /** constructor for gson serialization */
+  ActivityStartedEvent() {
+  }
+
   public ActivityStartedEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
     super(argumentsExpressionExecution);
     if (argumentsExpressionExecution.activity==null) {

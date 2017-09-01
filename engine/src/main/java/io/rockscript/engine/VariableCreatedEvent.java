@@ -21,6 +21,10 @@ public class VariableCreatedEvent extends ExecutionEvent<VariableDeclarationExec
   String variableName;
   Object valueJson;
 
+  /** constructor for gson serialization */
+  VariableCreatedEvent() {
+  }
+
   public VariableCreatedEvent(VariableDeclarationExecution execution, Object valueJson) {
     super(execution);
     this.variableName = execution.getElement().getVariableName();

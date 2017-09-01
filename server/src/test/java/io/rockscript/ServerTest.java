@@ -26,8 +26,8 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ServerTest extends AbstractServerTest {
 
@@ -70,12 +70,11 @@ public class ServerTest extends AbstractServerTest {
     String scriptExecutionId = startScriptResponse.getScriptExecutionId();
   }
 
-  @Ignore
   @Test
   public void testEvents() {
     DeployScriptResponse deployScriptResponse = POST("command")
       .bodyJson(new DeployScriptCommand()
-        .scriptText("# TODO"))
+        .scriptText("var msg = {hello: 'world'};"))
       .execute()
       .assertStatusOk()
       .body(DeployScriptResponse.class);
@@ -94,7 +93,7 @@ public class ServerTest extends AbstractServerTest {
       .assertStatusOk()
       .body(new TypeToken<List<Event>>(){}.getType());
 
-    assertEquals(11, eventJsons.size());
+    assertTrue(eventJsons.size()>2);
   }
 
   @Override
