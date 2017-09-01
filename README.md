@@ -17,8 +17,8 @@ to you.
 
 #### RockScript adds support for long running activities
   
-RockScript adds the notion of an [Activity](https://github.com/RockScript/server/wiki/Activities).  
-In the script, an activity looks like a function invocation but they are executed asynchronously 
+RockScript adds the notion of an [Activity](https://github.com/RockScript/server/wiki/Activities). In 
+the script, an activity looks like a function invocation but they are executed asynchronously 
 by an _Activity worker_ component.  Activities can be long running: 
 from milliseconds, to days or even months.  The script execution will not block any thread 
 or memory resources while it is waiting for an activity completion callback.
