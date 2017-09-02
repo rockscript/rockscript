@@ -98,26 +98,38 @@ This capabilities make RockScripts a viable alternative for transactions.
 
 ## Project status
 
-RockScript is experimental stage and quite early in its development.  
-
 **RockScript does not offer any stability guarantees at this point.**
+ 
+RockScript is experimental stage and quite early in its development.
+
+At this point we have a good start on the developer experience. You -as a 
+curious, badass, rock star developer- can already try it as intended to get 
+a good idea of what RockScript can do.
+
+Persistence is still only in-memory.  We plan to build persistence to 
+a datastore (SQL or Kafka) once the developer experience is sufficiently done.
+
+Also at this stage the 
+[coverage of the JavaScript language](https://github.com/RockScript/server/wiki/RockScript-language) 
+is still super super minimal.
 
 You can help us with your feedback.  [Create an issue](https://github.com/RockScript/server/issues/new) for 
 any question, suggestion or other feedback.  We really appreciate it.
  
-I'm planning to build a business model on top of RockScript.  I'm interested to find 
-a cofounder.  If you think you have what it takes (don't be shy) email me.  
+I'm planning to build a business model on top of RockScript.  I'm looking for
+a cofounder so if you think you have what it takes email me: mail @ tombaeyens . be  
  
-The current business plan is based on:
+The business plan is to provide following commercial offerings on top of the 
+open source engine:
 
 **RockScript Consulting** gets you in depth expertise to help you use RockScript 
 in the best way for your project.  
 
 **RockScript Service** is a SaaS version of the server with the UI to deploy, test, 
-continuously integrate, monitor and administer the server. (planned)  
+continuously integrate, monitor and administer the server.
 
 **RockScript On-Premise** is an on-premise version of the SaaS product that can be installed
-on your own systems. (later)  
+on your own systems.
 
 ## License
 

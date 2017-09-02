@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.rockscript.engine;
 
-public class ActivityWaitingEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
+public class ExecuteEventOperation implements Operation {
 
-  /** constructor for gson serialization */
-  ActivityWaitingEvent() {
-  }
+  ExecutableEvent event;
+  Execution execution;
 
-  public ActivityWaitingEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
-    super(argumentsExpressionExecution);
-  }
-
-  @Override
-  public void execute(ArgumentsExpressionExecution execution) {
+  public ExecuteEventOperation(ExecutableEvent event, Execution execution) {
+    this.event = event;
+    this.execution = execution;
   }
 
   @Override
-  public String toString() {
-    return "[" + scriptExecutionId + "|" + executionId + "] " +
-        "Waiting for completion callback";
+  public void execute(EngineScriptExecution engineScriptExecution) {
+    event.execute(execution);
   }
-
 }

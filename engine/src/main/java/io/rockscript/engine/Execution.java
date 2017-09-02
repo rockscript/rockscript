@@ -18,7 +18,10 @@ package io.rockscript.engine;
 
 import io.rockscript.EngineException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /** Base class for the runtime state of operations. */
 public abstract class Execution<T extends ScriptElement> {
@@ -131,12 +134,11 @@ public abstract class Execution<T extends ScriptElement> {
   }
 
   protected void dispatch(ExecutionEvent event) {
-    parent.dispatch(event);
+    getScriptExecution().dispatch(event);
   }
 
   protected void dispatchAndExecute(ExecutableEvent event) {
-    dispatch(event);
-    event.execute(this);
+    getScriptExecution().dispatchAndExecute(event, this);
   }
 
   public String getId() {

@@ -20,6 +20,10 @@ import io.rockscript.service.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 /** The runtime state of a engineScript execution. */
 public class EngineScriptExecution extends BlockExecution<EngineScript> {
 
@@ -29,12 +33,32 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
   int nextInternalExecutionId = 1;
   ExecutionMode executionMode;
   boolean isEnded;
+  Queue<Operation> work = new LinkedList<Operation>();
+
+  LinkedList<ExecutionEvent> unreplayedEvents;
 
   public EngineScriptExecution(String scriptExecutionId, Configuration configuration, EngineScript engineScript) {
     super(scriptExecutionId, engineScript, null);
     this.eventListener = configuration.getEventListener();
     this.executionMode = ExecutionMode.EXECUTING;
     initializeSystemVariable(configuration);
+  }
+
+  public EngineScriptExecution(String scriptExecutionId, Configuration configuration, EngineScript engineScript, List<ExecutionEvent> storedEvents) {
+    this(scriptExecutionId, configuration, engineScript);
+
+    this.executionMode = ExecutionMode.REBUILDING;
+    this.unreplayedEvents = new LinkedList<>(storedEvents);
+
+    while (!this.unreplayedEvents.isEmpty()) {
+      ExecutableEvent executableEvent = (ExecutableEvent) removeNextUnreplayedEvent();
+      // Script execution events do not have an executionId in the event, only the scriptExecutionId.
+      Execution execution = executableEvent.executionId!=null ? findExecutionRecursive(executableEvent.executionId) : this;
+      executableEvent.execute(execution);
+    }
+
+    this.executionMode = ExecutionMode.EXECUTING;
+    this.unreplayedEvents = null;
   }
 
   private void initializeSystemVariable(Configuration configuration) {
@@ -49,24 +73,74 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
     systemJsonObject.put("input", input);
   }
 
+  public void doWork() {
+    while (!work.isEmpty()) {
+      Operation operation = work.poll();
+      operation.execute(this);
+    }
+  }
+
+  public void addWork(Operation operation) {
+    work.add(operation);
+  }
+
+  @Override
+  protected void dispatch(ExecutionEvent event) {
+    if (!rebuilding()) {
+      eventListener.handle(event);
+    } else {
+      if (!(event instanceof ExecutableEvent)) {
+        ExecutionEvent unreplayedEvent = removeNextUnreplayedEvent();
+        if (!event.toString().equals(unreplayedEvent.toString())) {
+          log.debug("Expected, unreplayed event: "+unreplayedEvent.toString());
+          throw new RuntimeException();
+        }
+      }
+    }
+  }
+
+  private ExecutionEvent removeNextUnreplayedEvent() {
+    ExecutionEvent nextUnreplayedEvent = unreplayedEvents.removeFirst();
+    if (unreplayedEvents.isEmpty()) {
+      executionMode = ExecutionMode.EXECUTING;
+    } else if (unreplayedEvents.size() == 1) {
+      executionMode = ExecutionMode.RECOVERING;
+    }
+    return nextUnreplayedEvent;
+  }
+
+  protected void dispatchAndExecute(ExecutableEvent event, Execution execution) {
+    dispatch(event);
+
+    if (!rebuilding()) {
+      addWork(new ExecuteEventOperation(event, execution));
+      // event.execute(execution);
+    } // when rebuilding, the loop in the constructor will re-execute the ExecutableEvent's
+  }
+
+  private boolean rebuilding() {
+    return executionMode==ExecutionMode.REBUILDING
+           || executionMode==ExecutionMode.RECOVERING;
+  }
+
   public String createInternalExecutionId() {
     return "e"+Integer.toString(nextInternalExecutionId++);
   }
 
-  @Override
-  public void start() {
-    executeNextStatement();
+  public void start(Object input) {
+    dispatchAndExecute(new ScriptStartedEvent(this, input));
+    // Continues at startExecute()
+  }
+
+  // Continuation from start(Object)
+  public void startExecute() {
+    start();
   }
 
   @Override
   protected void end() {
     this.isEnded = true;
     dispatch(new ScriptEndedEvent(this));
-  }
-
-  @Override
-  protected void dispatch(ExecutionEvent event) {
-    eventListener.handle(event);
   }
 
   @Override

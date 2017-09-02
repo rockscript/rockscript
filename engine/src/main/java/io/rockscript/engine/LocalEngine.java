@@ -59,10 +59,8 @@ public class LocalEngine implements Engine {
     Lock lock = null;
     try {
       lock = acquireLock(scriptExecutionId);
-
-      ScriptStartedEvent scriptStartedEvent = new ScriptStartedEvent(scriptExecution, input);
-      scriptExecution.dispatch(scriptStartedEvent);
-      scriptExecution.start();
+      scriptExecution.start(input);
+      scriptExecution.doWork();
 
     } finally {
       releaseLock(lock, scriptExecution);
@@ -81,6 +79,9 @@ public class LocalEngine implements Engine {
           .getEventStore()
           .findScriptExecutionById(continuationReference.getScriptExecutionId());
         endActivity(scriptExecution, continuationReference, result);
+      } catch (RuntimeException e) {
+        e.printStackTrace();
+        throw e;
       } finally {
         releaseLock(lock, scriptExecution);
       }
@@ -94,6 +95,7 @@ public class LocalEngine implements Engine {
     ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) lockedScriptExecution
         .findExecutionRecursive(executionId);
     execution.endActivity(result);
+    lockedScriptExecution.doWork();
   }
 
   private synchronized Lock acquireLockOrAddEndActivityRequestToBacklog(ContinuationReference continuationReference, Object result) {

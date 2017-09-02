@@ -58,55 +58,6 @@ public class EventStore implements EventListener {
     return events;
   }
 
-  private class LoadingWrapperEventListener implements EventListener {
-    EngineScriptExecution scriptExecution;
-    EventListener originalEventListener;
-    int previouslyExecutedEvents;
-    int replayedEvents;
-
-    public LoadingWrapperEventListener(EngineScriptExecution scriptExecution, EventListener originalEventListener, List<ExecutionEvent> executionEvents) {
-      this.scriptExecution = scriptExecution;
-      this.originalEventListener = originalEventListener;
-      this.previouslyExecutedEvents = executionEvents.size()+1;
-      this.replayedEvents = 0;
-    }
-
-    @Override
-    public void handle(Event event) {
-      if (event instanceof ExecutionEvent) {
-        ExecutionEvent executionEvent = (ExecutionEvent) event;
-        incrementEventCount();
-        if (scriptExecution.getExecutionMode()==ExecutionMode.EXECUTING) {
-          originalEventListener.handle(event);
-        }
-//        else {
-//          log.debug("Swallowing ("+scriptExecution.getExecutionMode()+"): "+ EventStore.this.eventToJsonString(executionEvent));
-//        }
-      }
-    }
-
-    private void incrementEventCount() {
-      if (replayedEvents==0) {
-        if (previouslyExecutedEvents==1) {
-          scriptExecution.setExecutionMode(ExecutionMode.RECOVERING);
-        } else {
-          scriptExecution.setExecutionMode(ExecutionMode.REBUILDING);
-        }
-      } else if (scriptExecution.getExecutionMode()==ExecutionMode.REBUILDING) {
-        if (replayedEvents==previouslyExecutedEvents-1) {
-          scriptExecution.setExecutionMode(ExecutionMode.RECOVERING);
-        }
-      } else if (scriptExecution.getExecutionMode()==ExecutionMode.RECOVERING) {
-        scriptExecution.setExecutionMode(ExecutionMode.EXECUTING);
-      }
-      replayedEvents++;
-    }
-
-    public void eventExecuting(ExecutionEvent event) {
-      incrementEventCount();
-    }
-  }
-
   private EngineScriptExecution recreateScriptExecution(List<ExecutionEvent> executionEvents, String scriptExecutionId) {
     ScriptStartedEvent scriptStartedEvent = findScriptStartedEventJson(executionEvents);
 
@@ -116,37 +67,9 @@ public class EventStore implements EventListener {
       .getScriptStore()
       .findScriptAstById(scriptId);
     EngineException.throwIfNull(scriptId, "EngineScript not found for scriptId %s in engineScript execution %s", scriptId, scriptExecutionId);
-    Object inputJson = scriptStartedEvent.getInput();
-    // For now, the input json is not deserialized
-    // Later we might add special deserialization to handle activities and functions etc
-    Object input = inputJson;
-    EngineScriptExecution scriptExecution = new EngineScriptExecution(scriptExecutionId, configuration, engineScript);
-    scriptExecution.setInput(input);
 
-    EventListener originalEventListener = scriptExecution.getEventListener();
-    LoadingWrapperEventListener loadingWrapperEventListener = new LoadingWrapperEventListener(scriptExecution, originalEventListener, executionEvents);
-    scriptExecution.setEventListener(loadingWrapperEventListener);
-    // This is for the StartScriptEvent which already has been processed
-    loadingWrapperEventListener.incrementEventCount();
-
-    scriptExecution.start();
-
-    List<ExecutableEvent> executableEvents = executionEvents.stream()
-      .filter(this::isExecutable)
-      .map(executionEvent-> (ExecutableEvent)executionEvent)
-      .collect(Collectors.toList());
-
-    for (ExecutableEvent event: executableEvents) {
-      Execution execution = scriptExecution.findExecutionRecursive(event.executionId);
-      // The events that are being executed are not dispatched and hence the
-      // LoadingWrapperEventListener doesn't receive them, yet it also must keep
-      // track of those to get the counting right
-      loadingWrapperEventListener.eventExecuting(event);
-      // log.debug("Executing ("+scriptExecution.getExecutionMode()+"): "+eventJsonToJsonString(event));
-      event.execute(execution);
-    }
-
-    scriptExecution.setExecutionMode(ExecutionMode.EXECUTING);
+    EngineScriptExecution scriptExecution = new EngineScriptExecution(scriptExecutionId, configuration, engineScript, executionEvents);
+    scriptExecution.doWork();
 
     return scriptExecution;
   }
@@ -197,10 +120,6 @@ public class EventStore implements EventListener {
       }
     }
     return groupedEvents;
-  }
-
-  private boolean isExecutable(ExecutionEvent event) {
-    return (event instanceof ExecutableEvent);
   }
 
   private boolean isUnlocking(ExecutionEvent lastEvent) {

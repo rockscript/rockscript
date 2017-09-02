@@ -17,7 +17,7 @@ package io.rockscript.engine;
 
 import io.rockscript.Script;
 
-public class ScriptStartedEvent extends ExecutionEvent<EngineScriptExecution> {
+public class ScriptStartedEvent extends ExecutableEvent<EngineScriptExecution> {
 
   String scriptId;
   String scriptName;
@@ -25,6 +25,12 @@ public class ScriptStartedEvent extends ExecutionEvent<EngineScriptExecution> {
 
   /** constructor for gson serialization */
   ScriptStartedEvent() {
+  }
+
+  @Override
+  public void execute(EngineScriptExecution execution) {
+    execution.setInput(input);
+    execution.startExecute();
   }
 
   public ScriptStartedEvent(EngineScriptExecution scriptExecution, Object input) {
