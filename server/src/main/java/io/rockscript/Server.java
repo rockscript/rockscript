@@ -64,7 +64,8 @@ public class Server {
       .typeName(new TypeToken<Command>(){}, "command")
       .typeName(new TypeToken<DeployScriptCommand>(){}, "deployScript")
       .typeName(new TypeToken<StartScriptExecutionCommand>(){}, "startScript")
-      .typeName(new TypeToken<EndActivityCommand>(){}, "endActivity");
+      .typeName(new TypeToken<EndActivityCommand>(){}, "endActivity")
+      .typeName(new TypeToken<RunTestsCommand>(){}, "runTests");
   }
 
   public void startup() {
