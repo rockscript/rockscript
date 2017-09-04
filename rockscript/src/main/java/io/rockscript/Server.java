@@ -52,7 +52,9 @@ public class Server extends Rock {
 
   @Override
   void showHelp() {
-    log("The server help");
+    log("TODO add options and document them");
+//    HelpFormatter formatter = new HelpFormatter();
+//    formatter.printHelp( "rock server [server options]", createCommandLineOptions());
   }
 
   private void configure() {
@@ -98,7 +100,7 @@ public class Server extends Rock {
     log("                                        |_|         ");
     try {
       asyncHttpServer.startup();
-      log("Server started on "+asyncHttpServer.getPort());
+      log("Server started on port "+asyncHttpServer.getPort());
 
     } catch (Throwable t) {
       if ("Address already in use".equals(t.getMessage())
