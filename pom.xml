@@ -27,10 +27,9 @@
 
     <modules>
         <module>gson-poly</module>
-        <module>engine</module>
         <module>netty-router</module>
         <module>http-test</module>
-        <module>server</module>
+        <module>rockscript</module>
     </modules>
 
     <dependencies>
