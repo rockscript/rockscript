@@ -1,3 +1,3 @@
 All documentation can be found in the   
 
-[RockScript Wiki](./wiki) 
+[RockScript Wiki](https://github.com/rockscript/rockscript/wiki) 
