@@ -31,19 +31,36 @@ import org.slf4j.LoggerFactory;
 
 import static io.rockscript.engine.Event.createEventJsonTypeAdapterFactory;
 
-public class Server {
+public class Server extends Rock {
 
   static Logger log = LoggerFactory.getLogger(Server.class);
 
   AsyncHttpServer asyncHttpServer;
 
-  public Server(ServerConfiguration serverConfiguration) {
+  boolean parse(String[] args) {
+    return true;
+  }
+
+  @Override
+  void execute() {
+    configure();
+    startup();
+  }
+
+  @Override
+  void showHelp() {
+    log("The server help");
+  }
+
+  private void configure() {
+    DevConfiguration serviceConfiguration = new DevConfiguration();
+
+    ServerConfiguration serverConfiguration = new ServerConfiguration(serviceConfiguration);
     Gson commonGson = new GsonBuilder()
       .registerTypeAdapterFactory(createCommandsTypeAdapterFactory())
       .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
       .create();
 
-    Configuration serviceConfiguration = serverConfiguration.getServiceConfiguration();
     serviceConfiguration.gson(commonGson);
     ScriptService scriptService = serviceConfiguration.build();
 

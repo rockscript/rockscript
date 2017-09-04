@@ -21,7 +21,6 @@ import io.rockscript.http.test.AbstractServerTest;
 import io.rockscript.netty.router.AsyncHttpServer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;
@@ -36,8 +35,8 @@ public class ServerTest extends AbstractServerTest {
   @BeforeClass
   public static void setUpStatic() {
     if (server==null) {
-      server = new DevServer();
-      server.startup();
+      server = new Server();
+      server.execute();
     }
   }
 

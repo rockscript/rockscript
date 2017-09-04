@@ -32,11 +32,6 @@ public class ServerConfiguration {
     return this;
   }
 
-  public Server build() {
-    EngineException.throwIfNull(serviceConfiguration, "serviceConfiguration must be configured.  Use .serviceConfiguration(...) before building the server.");
-    return new Server(this);
-  }
-
   AsyncHttpServerConfiguration getAsyncHttpServerConfiguration() {
     return asyncHttpServerConfiguration;
   }
