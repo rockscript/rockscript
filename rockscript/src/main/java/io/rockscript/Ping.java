@@ -47,7 +47,7 @@ public class Ping extends Rock {
   @Override
   void execute() throws Exception {
     try {
-      Response response = Request.Get(url)
+      Response response = Request.Get(url+"/ping")
         .execute();
       int statusCode = response.returnResponse().getStatusLine().getStatusCode();
       String body = response.returnContent().asString();

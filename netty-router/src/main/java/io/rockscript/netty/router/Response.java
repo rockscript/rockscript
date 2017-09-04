@@ -16,13 +16,13 @@
 
 package io.rockscript.netty.router;
 
-import java.nio.charset.Charset;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.*;
 import org.slf4j.Logger;
+
+import java.nio.charset.Charset;
 
 import static io.netty.buffer.Unpooled.buffer;
 import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_LENGTH;
@@ -104,19 +104,24 @@ public class Response {
     return this;
   }
 
-  public Response headerContentTypeApplicationJson() {
-    headerContentType("application/json");
-    return this;
-  }
-
   public Response headerContentType(String contentType) {
     header(CONTENT_TYPE, contentType);
     return this;
   }
 
+  public Response headerContentTypeApplicationJson() {
+    headerContentType("application/json");
+    return this;
+  }
+
+  public Response headerContentTypeTextPlain() {
+    headerContentType("text/plain");
+    return this;
+  }
+
   public HttpResponse buildHttpResponse() {
     autoAddContentLengthHeader();
-    log.debug("<<< "+status+(contentStringForLog!=null ? " "+contentStringForLog : ""));
+    log.debug("<<< ["+status+(contentStringForLog!=null ? "] "+contentStringForLog : "]"));
     DefaultFullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(httpVersion, status, byteBuf);
     fullHttpResponse.headers().add(headers);
     return fullHttpResponse;

@@ -99,6 +99,14 @@ public class ServerTest extends AbstractServerTest {
     assertTrue(eventJsons.size()>2);
   }
 
+  @Test
+  public void testPing() {
+    GET("ping")
+      .execute()
+      .assertStatusOk();
+  }
+
+
   @Override
   public AsyncHttpServer getNettyServer() {
     return server.asyncHttpServer;

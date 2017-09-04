@@ -1,3 +1,2 @@
-The rockscript server.
-
-TODO document the HTTP requests for the server here
+The rockscript codebase that includes server 
+and command line interface.

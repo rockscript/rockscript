@@ -16,10 +16,10 @@
 
 package io.rockscript.netty.router;
 
-import java.util.List;
-
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.FullHttpRequest;
@@ -27,6 +27,8 @@ import io.netty.handler.codec.http.router.RouteResult;
 import io.netty.handler.codec.http.router.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class AsyncHttpServer {
 
@@ -50,54 +52,50 @@ public class AsyncHttpServer {
     this.jsonHandler = asyncHttpServerConfiguration.getJsonHandler();
   }
 
-  public AsyncHttpServer startup() {
+  public void startup() throws Exception {
     bossGroup = new NioEventLoopGroup(1);
     workerGroup = new NioEventLoopGroup();
 
-    try {
-      ServerBootstrap serverBootstrap = new ServerBootstrap()
-        .group(bossGroup, workerGroup);
-      serverBootstrap
-        .childOption(ChannelOption.TCP_NODELAY, java.lang.Boolean.TRUE)
-        .childOption(ChannelOption.SO_KEEPALIVE, java.lang.Boolean.TRUE)
-        .channel(NioServerSocketChannel.class)
-        // .handler(new LoggingHandler(LogLevel.INFO))
-        .childHandler(createServerChannelInitializer());
+    ServerBootstrap serverBootstrap = new ServerBootstrap()
+      .group(bossGroup, workerGroup);
+    serverBootstrap
+      .childOption(ChannelOption.TCP_NODELAY, java.lang.Boolean.TRUE)
+      .childOption(ChannelOption.SO_KEEPALIVE, java.lang.Boolean.TRUE)
+      .channel(NioServerSocketChannel.class)
+      // .handler(new LoggingHandler(LogLevel.INFO))
+      .childHandler(createServerChannelInitializer());
 
-      channel = serverBootstrap
-        .bind("localhost", port)
-        .sync()
-        .channel();
-      
-      log.debug("AsyncHttpServer started: http://127.0.0.1:" + port + "/\n" + router);
-
-    } catch (Throwable t) {
-      t.printStackTrace();
-    }
-    
-    return this;
+    channel = serverBootstrap
+      .bind("localhost", port)
+      .sync()
+      .channel();
   }
 
   public void handleRequest(FullHttpRequest fullHttpRequest, ChannelHandlerContext ctx) {
     RouteResult<Class<?>> route = router.route(fullHttpRequest.getMethod(), fullHttpRequest.getUri());
-    BadRequestException.checkNotNull(route, "No route for %s %s", fullHttpRequest.getMethod(), fullHttpRequest.getUri());
-    
     Request request = new Request(this, fullHttpRequest, route);
     Response response = new Response(this, fullHttpRequest, ctx);
 
     try {
-      Request.log.debug(">>> "+fullHttpRequest.getMethod()+" "+fullHttpRequest.getUri());
-      Class<?> requestHandlerClass = route.target();
-      
-      RequestHandler requestHandler = instantiate(requestHandlerClass);
-      if (interceptors!=null) {
-        InterceptorContext intercepterContext = new InterceptorContext(interceptors, requestHandler, request, response, this);
-        intercepterContext.next();
+      if (route!=null) {
+        Request.log.debug(">>> "+fullHttpRequest.getMethod()+" "+fullHttpRequest.getUri());
+        Class<?> requestHandlerClass = route.target();
+
+        RequestHandler requestHandler = instantiate(requestHandlerClass);
+        if (interceptors!=null) {
+          InterceptorContext intercepterContext = new InterceptorContext(interceptors, requestHandler, request, response, this);
+          intercepterContext.next();
+
+        } else {
+          requestHandler.handle(request, response, context);
+        }
 
       } else {
-        requestHandler.handle(request, response, context);
+        response.statusNotFound();
+        response.bodyString("Invalid request path: "+fullHttpRequest.getUri());
+        response.headerContentTypeTextPlain();
+        response.send();
       }
-      
 
     } catch (RuntimeException e) {
       if (e instanceof BadRequestException) {
@@ -109,8 +107,6 @@ public class AsyncHttpServer {
       response.headerContentTypeApplicationJson();
       response.send();
       requestException(e, ctx);
-    } finally {
-      // ?
     }
   }
 
