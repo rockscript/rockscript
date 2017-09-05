@@ -16,11 +16,12 @@
 package io.rockscript.activity;
 
 import com.google.gson.Gson;
+import io.rockscript.engine.Configuration;
 import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.Engine;
 import io.rockscript.engine.impl.Execution;
 import io.rockscript.engine.impl.Location;
-import io.rockscript.engine.Configuration;
+import io.rockscript.http.Http;
 
 import java.util.List;
 import java.util.Map;
@@ -33,8 +34,6 @@ public class ActivityInput {
   String executionId;
   List<Object> args;
 
-  // configuration is transient because it should not be serialized with Gson
-  transient Configuration configuration;
   transient Execution<?> execution;
 
   public ActivityInput(Execution<?> execution, List<Object> args) {
@@ -101,5 +100,9 @@ public class ActivityInput {
 
   public Execution<?> getExecution() {
     return execution;
+  }
+
+  public Http getHttp() {
+    return getConfiguration().getHttp();
   }
 }

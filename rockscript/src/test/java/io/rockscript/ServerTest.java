@@ -21,10 +21,7 @@ import io.rockscript.engine.DeployScriptResponse;
 import io.rockscript.engine.StartScriptExecutionCommand;
 import io.rockscript.engine.StartScriptExecutionResponse;
 import io.rockscript.engine.impl.Event;
-import io.rockscript.http.test.AbstractServerTest;
-import io.rockscript.netty.router.AsyncHttpServer;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import io.rockscript.test.AbstractServerTest;
 import org.junit.Test;
 
 import java.util.List;
@@ -34,81 +31,59 @@ import static org.junit.Assert.assertTrue;
 
 public class ServerTest extends AbstractServerTest {
 
-  static Server server;
-
-  @BeforeClass
-  public static void setUpStatic() {
-    if (server==null) {
-      server = new Server();
-      server.execute();
-    }
-  }
-
-  @AfterClass
-  public static void tearDownStatic() {
-    server.shutdown();
-    server.waitForShutdown();
-  }
-
   @Test
   public void testServer() {
-    DeployScriptResponse deployScriptResponse = POST("command")
-      .bodyJson(new DeployScriptCommand()
+    DeployScriptResponse deployScriptResponse = newPost("command")
+      .bodyObject(new DeployScriptCommand()
           .scriptText(""))
       .execute()
       .assertStatusOk()
-      .body(DeployScriptResponse.class);
+      .getBodyAs(DeployScriptResponse.class);
 
     String scriptId = deployScriptResponse.getId();
 
     assertNotNull(scriptId);
 
-    StartScriptExecutionResponse startScriptResponse = POST("command")
-      .bodyJson(new StartScriptExecutionCommand()
+    StartScriptExecutionResponse startScriptResponse = newPost("command")
+      .bodyObject(new StartScriptExecutionCommand()
           .scriptId(scriptId))
       .execute()
       .assertStatusOk()
-      .body(StartScriptExecutionResponse.class);
+      .getBodyAs(StartScriptExecutionResponse.class);
 
     String scriptExecutionId = startScriptResponse.getScriptExecutionId();
   }
 
   @Test
   public void testEvents() {
-    DeployScriptResponse deployScriptResponse = POST("command")
-      .bodyJson(new DeployScriptCommand()
+    DeployScriptResponse deployScriptResponse = newPost("command")
+      .bodyObject(new DeployScriptCommand()
         .scriptText("var msg = {hello: 'world'};"))
       .execute()
       .assertStatusOk()
-      .body(DeployScriptResponse.class);
+      .getBodyAs(DeployScriptResponse.class);
 
     String scriptId = deployScriptResponse.getId();
 
-    StartScriptExecutionResponse startScriptResponse = POST("command")
-      .bodyJson(new StartScriptExecutionCommand()
+    StartScriptExecutionResponse startScriptResponse = newPost("command")
+      .bodyObject(new StartScriptExecutionCommand()
         .scriptId(scriptId))
       .execute()
       .assertStatusOk()
-      .body(StartScriptExecutionResponse.class);
+      .getBodyAs(StartScriptExecutionResponse.class);
 
-    List<Event> eventJsons = GET("events")
+    List<Event> eventJsons = newGet("events")
       .execute()
       .assertStatusOk()
-      .body(new TypeToken<List<Event>>(){}.getType());
+      .getBodyAs(new TypeToken<List<Event>>(){}.getType());
 
     assertTrue(eventJsons.size()>2);
   }
 
   @Test
   public void testPing() {
-    GET("ping")
+    newGet("ping")
       .execute()
       .assertStatusOk();
-  }
-
-
-  @Override
-  public AsyncHttpServer getNettyServer() {
-    return server.asyncHttpServer;
   }
 }

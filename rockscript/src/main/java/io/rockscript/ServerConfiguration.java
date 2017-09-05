@@ -33,7 +33,7 @@ public class ServerConfiguration {
     return this;
   }
 
-  AsyncHttpServerConfiguration getAsyncHttpServerConfiguration() {
+  public AsyncHttpServerConfiguration getAsyncHttpServerConfiguration() {
     return asyncHttpServerConfiguration;
   }
 

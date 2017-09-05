@@ -20,13 +20,16 @@ import com.google.gson.JsonElement;
 import io.rockscript.activity.Activity;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.activity.http.Http.Methods;
 import io.rockscript.engine.impl.Engine;
+import io.rockscript.http.Http;
+import io.rockscript.http.HttpRequest;
 
 public class HttpActivity implements Activity {
 
-  public static final HttpActivity GET = new HttpActivity(Methods.GET);
-  public static final HttpActivity POST = new HttpActivity(Methods.POST);
+  public static final HttpActivity GET = new HttpActivity(Http.Methods.GET);
+  public static final HttpActivity POST = new HttpActivity(Http.Methods.POST);
+  public static final HttpActivity PUT = new HttpActivity(Http.Methods.PUT);
+  public static final HttpActivity DELETE = new HttpActivity(Http.Methods.DELETE);
 
   String method;
 
@@ -41,7 +44,8 @@ public class HttpActivity implements Activity {
     Gson gson = input.getGson();
     JsonElement requestElement = gson.toJsonTree(requestObject);
     HttpRequest httpRequest = gson.fromJson(requestElement, HttpRequest.class);
-    httpRequest.method = this.method;
+    httpRequest.setHttp(input.getHttp());
+    httpRequest.setMethod(this.method);
 
     // Create the HttpRequestRunnable command
     Engine engine = input.getEngine();

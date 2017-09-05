@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.http.test;
+package io.rockscript.test;
 
 import org.junit.rules.TestName;
 import org.junit.runner.Description;

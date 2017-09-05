@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.http.test;
+package io.rockscript.test;
 
 import io.rockscript.netty.router.Interceptor;
 import io.rockscript.netty.router.InterceptorContext;
 
-import static io.rockscript.http.test.AbstractServerTest.serverException;
+import static io.rockscript.test.AbstractServerTest.serverException;
 
 public class ServerExceptionInterceptor implements Interceptor {
 

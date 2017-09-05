@@ -16,16 +16,14 @@
 package io.rockscript.engine.impl;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import io.rockscript.engine.EngineException;
 import io.rockscript.activity.Activity;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.activity.http.HttpRequest;
-import io.rockscript.activity.http.HttpResponse;
+import io.rockscript.engine.EngineException;
+import io.rockscript.http.HttpResponse;
 
-import static io.rockscript.activity.http.Http.ContentTypes.APPLICATION_JSON;
-import static io.rockscript.activity.http.Http.Headers.CONTENT_TYPE;
+import static io.rockscript.http.Http.ContentTypes.APPLICATION_JSON;
+import static io.rockscript.http.Http.Headers.CONTENT_TYPE;
 
 public class RemoteActivity implements Activity {
 
@@ -45,7 +43,8 @@ public class RemoteActivity implements Activity {
     ContinuationReference continuationReference = input.getContinuationReference();
     String logPrefix = "["+continuationReference.getScriptExecutionId()+"|"+continuationReference.getExecutionId()+"]";
 
-    HttpResponse httpResponse = HttpRequest.createPost(url + "/" + activityName)
+    HttpResponse httpResponse = input.getHttp()
+        .newPost(url + "/" + activityName)
         .header(CONTENT_TYPE, APPLICATION_JSON)
         .body(activityInputJson)
         .log(logPrefix)
@@ -58,14 +57,10 @@ public class RemoteActivity implements Activity {
     }
 
     ActivityOutput activityOutput = null;
-    Object body = trim(httpResponse.getBody());
-    if (body!=null) {
-      try {
-        JsonElement activityOutputJsonElement = gson.toJsonTree(body);
-        activityOutput = gson.fromJson(activityOutputJsonElement, ActivityOutput.class);
-      } catch (Exception e) {
-        throw new EngineException("Couldn't parse remote HTTP activity response as ActivityOutput: " + e.getMessage(), e);
-      }
+    try {
+      activityOutput = httpResponse.getBodyAs(ActivityOutput.class);
+    } catch (Exception e) {
+      throw new EngineException("Couldn't parse remote HTTP activity response as ActivityOutput: " + e.getMessage(), e);
     }
 
     if (activityOutput!=null) {
@@ -74,17 +69,6 @@ public class RemoteActivity implements Activity {
       // The default async activity output is returned when the HTTP response is empty.
       return ActivityOutput.waitForFunctionToCompleteAsync();
     }
-  }
-
-  private Object trim(Object body) {
-    if (!(body instanceof String)) {
-      return body;
-    }
-    String trimmed = ((String)body).trim();
-    if ("".equals(trimmed)) {
-      return null;
-    }
-    return trimmed;
   }
 
   @Override

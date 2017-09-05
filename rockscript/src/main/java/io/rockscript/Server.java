@@ -27,6 +27,8 @@ import io.rockscript.server.handlers.CommandHandler;
 import io.rockscript.server.handlers.EventsHandler;
 import io.rockscript.server.handlers.PingHandler;
 import io.rockscript.server.rest.ScriptsPostHandler;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,48 +40,58 @@ public class Server extends Rock {
 
   static Logger log = LoggerFactory.getLogger(Server.class);
 
-  AsyncHttpServer asyncHttpServer;
+  protected DevConfiguration serviceConfiguration;
+  protected ServerConfiguration serverConfiguration;
+  protected AsyncHttpServer asyncHttpServer;
 
-  boolean parse(String[] args) {
-    return true;
+  @Override
+  public String getCommandName() {
+    return "server";
   }
 
   @Override
-  void execute() {
+  protected Options createOptions() {
+    Options options = new Options();
+    return options;
+  }
+
+  @Override
+  protected void parse(CommandLine commandLine) {
+  }
+
+  @Override
+  public void execute() {
     configure();
     startup();
   }
 
-  @Override
-  void showHelp() {
-    log("TODO add options and document them");
-//    HelpFormatter formatter = new HelpFormatter();
-//    formatter.printHelp( "rock server [server options]", createCommandLineOptions());
+  private void configure() {
+    Gson commonGson = createCommonGson();
+    this.serviceConfiguration = new DevConfiguration();
+    this.serverConfiguration = new ServerConfiguration(serviceConfiguration);
+    this.serviceConfiguration.gson(commonGson);
+    ScriptService scriptService = serviceConfiguration.build();
+    AsyncHttpServerConfiguration asyncHttpServerConfiguration = createAsyncHttpServerConfiguration(commonGson, scriptService);
+    this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
   }
 
-  private void configure() {
-    DevConfiguration serviceConfiguration = new DevConfiguration();
-
-    ServerConfiguration serverConfiguration = new ServerConfiguration(serviceConfiguration);
-    Gson commonGson = new GsonBuilder()
+  protected Gson createCommonGson() {
+    return new GsonBuilder()
       .registerTypeAdapterFactory(createCommandsTypeAdapterFactory())
       .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
       .create();
+  }
 
-    serviceConfiguration.gson(commonGson);
-    ScriptService scriptService = serviceConfiguration.build();
-
-    AsyncHttpServerConfiguration asyncHttpServerConfiguration = serverConfiguration
-      .getAsyncHttpServerConfiguration()
-      .scan(CommandHandler.class)
-      .scan(EventsHandler.class)
-      .scan(PingHandler.class)
-      .scan(ScriptsPostHandler.class)
-      .jsonHandler(new JsonHandlerGson(commonGson))
-      .context(ScriptService.class, scriptService)
-      .context(Configuration.class, serviceConfiguration);
-
-    this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
+  protected AsyncHttpServerConfiguration createAsyncHttpServerConfiguration(Gson commonGson, ScriptService scriptService) {
+    return serverConfiguration
+        .getAsyncHttpServerConfiguration()
+        .scan(CommandHandler.class)
+        .scan(EventsHandler.class)
+        .scan(PingHandler.class)
+        .scan(ScriptsPostHandler.class)
+        .jsonHandler(new JsonHandlerGson(commonGson))
+        .context(ScriptService.class, scriptService)
+        .context(Configuration.class, serviceConfiguration);
   }
 
   public static PolymorphicTypeAdapterFactory createCommandsTypeAdapterFactory() {

@@ -69,6 +69,26 @@ public class HttpAsynchronousActivityTest extends HttpTest {
   }
 
   @Test
+  public void testMany() {
+    testHttpActivityEmptyBodyResponse();
+  }
+
+  @Test
+  public void testMany2() {
+    testHttpActivityEmptyBodyResponse();
+  }
+
+  @Test
+  public void testMany3() {
+    testHttpActivityEmptyBodyResponse();
+  }
+
+  @Test
+  public void testMany4() {
+    testHttpActivityEmptyBodyResponse();
+  }
+
+  @Test
   public void testHttpActivityEmptyBodyResponse() {
     httpTestServer
         .post("/approve", (request,response)-> {

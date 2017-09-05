@@ -15,19 +15,27 @@
  */
 package io.rockscript;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Options;
+
 public class Deploy extends Rock {
 
-  boolean parse(String[] args) {
-    return true;
+  @Override
+  public String getCommandName() {
+    return "deploy";
   }
 
   @Override
-  void execute() {
+  protected Options createOptions() {
+    return null;
+  }
+
+  @Override
+  protected void parse(CommandLine commandLine) {
 
   }
 
   @Override
-  void showHelp() {
-
+  public void execute() throws Exception {
   }
 }

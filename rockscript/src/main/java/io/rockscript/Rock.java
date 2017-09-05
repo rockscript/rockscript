@@ -34,7 +34,7 @@ public abstract class Rock {
     try {
       if (args==null
           || args.length==0) {
-        showCommandUsage();
+        showCommandsOverview();
       } else {
         String command = args[0];
         if ("help".equals(command)) {
@@ -42,17 +42,22 @@ public abstract class Rock {
             String helpCommand = args[1];
             Rock rock = getRock(helpCommand);
             if (rock!=null) {
-              rock.showHelp();
+              rock.showCommandUsage();
             }
           } else {
-            showCommandUsage();
+            showCommandsOverview();
           }
         } else {
           Rock rock = getRock(command);
           if (rock!=null) {
-            if (rock.parse(args)) {
-              rock.execute();
+            rock.args = args;
+            Options options = rock.createOptions();
+            if (options!=null) {
+              CommandLineParser commandLineParser = new DefaultParser();
+              CommandLine commandLine = commandLineParser.parse(options, args);
+              rock.parse(commandLine);
             }
+            rock.execute();
           }
         }
       }
@@ -61,19 +66,11 @@ public abstract class Rock {
     }
   }
 
-  abstract boolean parse(String[] args);
-  abstract void execute() throws Exception;
-  abstract void showHelp();
-
-  private static Rock parseRock(String[] args) {
-    return null;
-  }
-
-  private static Rock getRock(String command) {
+  static Rock getRock(String command) {
     try {
       Class<? extends Rock> rockClass = COMMAND_CLASSES.get(command);
       if (rockClass==null) {
-        showCommandUsage(command);
+        showCommandsOverview(command);
         return null;
       }
       return rockClass.newInstance();
@@ -82,11 +79,11 @@ public abstract class Rock {
     }
   }
 
-  static void showCommandUsage() {
-    showCommandUsage(null);
+  static void showCommandsOverview() {
+    showCommandsOverview(null);
   }
 
-  static void showCommandUsage(String invalidCommand) {
+  static void showCommandsOverview(String invalidCommand) {
     if (invalidCommand!=null) {
       log("Invalid command: " + invalidCommand);
       log();
@@ -102,20 +99,24 @@ public abstract class Rock {
     log("More details at https://github.com/RockScript/server/wiki/RockScript-API");
   }
 
+  protected String[] args;
+
+  public abstract void execute() throws Exception;
+  public abstract String getCommandName();
+
+  protected abstract Options createOptions();
+  protected abstract void parse(CommandLine commandLine);
+
+  protected void showCommandUsage() {
+    HelpFormatter formatter = new HelpFormatter();
+    formatter.printHelp("rock " + getCommandName() + " [" + getCommandName() + " options]", createOptions());
+  }
+
   public static void log() {
     System.out.println();
   }
 
   public static void log(String text) {
     System.out.println(text);
-  }
-
-  public static CommandLine parseCommandLine(Options options, String[] args) {
-    CommandLineParser commandLineParser = new DefaultParser();
-    try {
-      return commandLineParser.parse( options, args);
-    } catch (ParseException e) {
-      throw new RuntimeException(e);
-    }
   }
 }

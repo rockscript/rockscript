@@ -15,46 +15,44 @@
  */
 package io.rockscript;
 
+import io.rockscript.http.Http;
+import io.rockscript.http.HttpResponse;
 import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
 
 public class Ping extends Rock {
 
-  String url = "http://localhost:3652";
+  protected String url = "http://localhost:3652";
 
-  private static Options createCommandLineOptions() {
+  @Override
+  public String getCommandName() {
+    return "ping";
+  }
+
+  protected Options createOptions() {
     Options options = new Options();
     options.addOption("url", "The url of the server.  Default value is http://localhost:3652");
     return options;
   }
 
-  public boolean parse(String[] args) {
-    try {
-      CommandLine commandLine = parseCommandLine(createCommandLineOptions(), args);
-      if (commandLine.hasOption("url")) {
-        this.url = commandLine.getOptionValue("url");
-      }
-      return true;
-    } catch (Exception e) {
-      e.printStackTrace();
-      return false;
-    }
+  @Override
+  protected void parse(CommandLine commandLine) {
+    this.url = commandLine.getOptionValue("url", url);
   }
 
   @Override
-  void execute() throws Exception {
+  public void execute() throws Exception {
     try {
-      Response response = Request.Get(url+"/ping")
+      HttpResponse response = new Http()
+        .newGet(url + "/ping")
         .execute();
-      int statusCode = response.returnResponse().getStatusLine().getStatusCode();
-      String body = response.returnContent().asString();
-      if (statusCode==200) {
-        log("Success. The server returned:");
+
+      int status = response.getStatus();
+      String body = response.getBodyAsString();
+      if (status==200) {
+        log("200 OK");
       } else {
-        log("Server did respond, but with an error:");
+        log("Wrong status: "+status);
       }
       log(body);
     } catch (Exception e) {
@@ -62,9 +60,14 @@ public class Ping extends Rock {
     }
   }
 
-  @Override
-  void showHelp() {
-    HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp( "rock ping [ping options]", createCommandLineOptions());
+  public String getUrl() {
+    return this.url;
+  }
+  public void setUrl(String url) {
+    this.url = url;
+  }
+  public Ping url(String url) {
+    this.url = url;
+    return this;
   }
 }

@@ -18,6 +18,8 @@ package io.rockscript.activity.http;
 
 import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.Engine;
+import io.rockscript.http.HttpRequest;
+import io.rockscript.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

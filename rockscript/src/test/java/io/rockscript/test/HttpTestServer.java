@@ -19,6 +19,8 @@ import io.rockscript.util.Io;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -33,6 +35,8 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 public class HttpTestServer {
+
+  static Logger log = LoggerFactory.getLogger(HttpTestServer.class);
 
   private static final String GET = "GET";
   private static final String POST = "POST";
@@ -222,7 +226,10 @@ public class HttpTestServer {
     }
     public HttpTestResponse body(String body) {
       try {
-        outputStream.write(body.getBytes(Charset.forName("UTF-8")));
+        log.debug("Writing String to output stream: "+body);
+        byte[] bytes = body.getBytes(Charset.forName("UTF-8"));
+        log.debug("Writing "+bytes.length+" bytes to output stream "+System.identityHashCode(outputStream));
+        outputStream.write(bytes);
       } catch (IOException e) {
         throw new RuntimeException("Couldn't write to response output stream", e);
       }
@@ -231,7 +238,9 @@ public class HttpTestServer {
 
     public void send() {
       try {
+        log.debug("Flushing & closing outputstream "+System.identityHashCode(outputStream));
         outputStream.flush();
+        outputStream.close();
       } catch (IOException e) {
         throw new RuntimeException("Couldn't flush response output stream", e);
       }

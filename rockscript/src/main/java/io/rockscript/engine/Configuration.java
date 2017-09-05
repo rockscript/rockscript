@@ -21,6 +21,8 @@ import com.google.gson.GsonBuilder;
 import io.rockscript.activity.Activity;
 import io.rockscript.activity.ImportResolver;
 import io.rockscript.engine.impl.*;
+import io.rockscript.http.GsonCodec;
+import io.rockscript.http.Http;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.Executor;
@@ -38,6 +40,7 @@ public abstract class Configuration {
   protected ImportResolver importResolver;
   protected Executor executor;
   protected Gson gson;
+  protected Http http;
 
   public Configuration() {
     this.eventStore = new EventStore(this);
@@ -53,6 +56,7 @@ public abstract class Configuration {
     if (gson==null) {
       gson = createDefaultGson();
     }
+    this.http = new Http(new GsonCodec(gson));
     throwIfNotProperlyConfigured();
     return new ScriptServiceImpl(this);
   }
@@ -118,5 +122,9 @@ public abstract class Configuration {
 
   public Executor getExecutor() {
     return executor;
+  }
+
+  public Http getHttp() {
+    return http;
   }
 }
