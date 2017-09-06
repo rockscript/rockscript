@@ -26,9 +26,9 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <modules>
-        <module>gson-poly</module>
-        <module>netty-router</module>
-        <module>http-test</module>
+        <module>rockscript-gson-poly</module>
+        <module>rockscript-netty-router</module>
+        <module>rockscript-http-client</module>
         <module>rockscript</module>
     </modules>
 

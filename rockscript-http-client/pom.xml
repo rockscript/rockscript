@@ -19,7 +19,7 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>rockscript-http-test</artifactId>
+  <artifactId>rockscript-http-client</artifactId>
 
   <parent>
     <groupId>io.rockscript</groupId>
@@ -45,6 +45,7 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.11</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
