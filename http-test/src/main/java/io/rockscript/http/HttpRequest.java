@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import static io.rockscript.http.Http.Methods.*;
 
+/** Request builder */
 public class HttpRequest {
 
   private static final EntityHandler DEFAULT_ENTITY_HANDLER = new StringEntityHandler();
@@ -40,36 +41,21 @@ public class HttpRequest {
   transient Http http;
   /** transient because this field should not be serialized by gson */
   transient HttpRequestBase apacheRequest;
+  /** transient because this field should not be serialized by gson */
   transient EntityHandler entityHandler = DEFAULT_ENTITY_HANDLER;
 
-  String method;
-  String url;
-  Map<String,List<String>> headers;
-  Object body;
+  protected String method;
+  protected String url;
+  protected Map<String,List<String>> headers;
+  protected Object body;
 
-  public HttpRequest(Http http, String method, String url) {
+  protected HttpRequest(Http http, String method, String url) {
     this.http = http;
     this.method = method;
     this.url = url;
   }
 
-  public HttpRequest log(String prefix) {
-    Http.log.debug(prefix+" > "+method+" "+url);
-    if (headers!=null) {
-      for (String headerName: headers.keySet()) {
-        List<String> headerListValue = headers.get(headerName);
-        String headerValue = headerListValue
-            .stream()
-            .collect(Collectors.joining(";"));
-        Http.log.debug(prefix+"     ["+headerName+"] "+ headerValue);
-      }
-    }
-    if (body!=null) {
-      Http.log.debug(prefix+"     "+body);
-    }
-    return this;
-  }
-
+  /** Executes the request and returns the H */
   public HttpResponse execute() {
     try {
       if (GET.equals(method)) {
@@ -113,6 +99,24 @@ public class HttpRequest {
     return new HttpResponse(this);
   }
 
+  /** Logs the request in human readable form to the {@link Http} Slf4j logger */
+  public HttpRequest log(String prefix) {
+    Http.log.debug(prefix+" > "+method+" "+url);
+    if (headers!=null) {
+      for (String headerName: headers.keySet()) {
+        List<String> headerListValue = headers.get(headerName);
+        String headerValue = headerListValue
+          .stream()
+          .collect(Collectors.joining(";"));
+        Http.log.debug(prefix+"     ["+headerName+"] "+ headerValue);
+      }
+    }
+    if (body!=null) {
+      Http.log.debug(prefix+"     "+body);
+    }
+    return this;
+  }
+
   public String getUrl() {
     return url;
   }
@@ -142,24 +146,24 @@ public class HttpRequest {
     return this;
   }
 
-  public Object getBody() {
-    return body;
-  }
-
+  /** Sets a String as the body for the request */
   public void setBody(String body) {
     this.body = body;
   }
-
+  /** Sets a String as the body for the request */
   public HttpRequest body(String body) {
     setBody(body);
     return this;
   }
 
+  /** Uses the {@link Http} {@link Codec} to transform
+   * the given bodyObject to a string. */
   public HttpRequest bodyObject(Object bodyObject) {
     setBodyObject(bodyObject);
     return this;
   }
 
+  /** See {@link #bodyObject(Object)} */
   public void setBodyObject(Object bodyObject) {
     this.body = http.getCodec().serialize(bodyObject);
   }
@@ -187,9 +191,14 @@ public class HttpRequest {
   public EntityHandler getEntityHandler() {
     return this.entityHandler;
   }
+
+  /** See {@link #entityHandler(EntityHandler)} */
   public void setEntityHandler(EntityHandler entityHandler) {
     this.entityHandler = entityHandler;
   }
+
+  /** Fluent setter to overwrite the default {@link StringEntityHandler}.
+   * Check out {@link EntityHandler} for more info. */
   public HttpRequest entityHandler(EntityHandler entityHandler) {
     this.entityHandler = entityHandler;
     return this;

@@ -20,8 +20,33 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Fluent HTTP client based on Apache Http Components and for which
- * the HttpRequest and HttpResponse classes are serializable with Gson */
+/** Fluent, synchronous HTTP client based on Apache Http Components.
+ *
+ * To obtain a Http object, use the constructors {@link #Http()}
+ * or {@link #Http(Codec)}.
+ *
+ * To start building a request, use the factory methods
+ * {@link #newGet(String url)},
+ * {@link #newPost(String url)},
+ * {@link #newPut(String url)},
+ * {@link #newDelete(String url)} or
+ * {@link #newRequest(String method, String url)}
+ *
+ * To execute the request (synchronous) and get the response, use
+ * {@link HttpRequest#execute()}
+ *
+ * This is a synchronous HTTP library.  That means that the client
+ * thread will be blocked when executing the request until the response
+ * is being obtained. If you need an async or non-blocking HTTP library,
+ * go look elsewhere.
+ *
+ * The 2 motivations for writing this fluent API on top of Apache HTTP
+ * commons are:
+ * 1) HttpRequest and HttpResponse classes are serializable
+ *    with Gson.
+ * 2) Allow access to the response status line as well as the
+ *    response body.
+ */
 public class Http {
 
   protected static Logger log = LoggerFactory.getLogger(Http.class);
@@ -35,12 +60,15 @@ public class Http {
   public Http() {
   }
 
+  /** A Codec is only required when using methods
+   * {@link HttpRequest#setBodyObject(Object)} or
+   * {@link HttpResponse#getBodyAs(java.lang.reflect.Type)}.
+   * It is used to transform the request and response body
+   * to java objects. Eg the {@link GsonCodec} transforms
+   * between body strings and java objects using the Gson
+   * JSON parser / serializer. */
   public Http(Codec codec) {
     this.codec = codec;
-  }
-
-  public void resetApacheHttpClient() {
-    apacheHttpClient = HttpClients.createDefault();
   }
 
   public interface Methods {
@@ -106,6 +134,8 @@ public class Http {
   public HttpRequest newDelete(String url) {
     return new HttpRequest(this, Methods.DELETE, url);
   }
+
+  /** @param method constant can be obtained from {@link Methods} */
   public HttpRequest newRequest(String method, String url) {
     return new HttpRequest(this, method, url);
   }
@@ -119,6 +149,7 @@ public class Http {
     return codec;
   }
 
+  /** For more info on code, see {@link #Http(Codec)} */
   public void setCodec(Codec codec) {
     this.codec = codec;
   }

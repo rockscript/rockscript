@@ -29,6 +29,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
+/** Obtain a response by starting from the {@link Http} object
+ * use one of the newXxx methods to get a request and then
+ * invoke {@link HttpRequest#execute()} */
 public class HttpResponse {
 
   /** transient because this field should not be serialized by gson */
@@ -40,7 +44,7 @@ public class HttpResponse {
   protected Map<String,List<String>> headers;
   protected Object body;
 
-  public HttpResponse(HttpRequest request) throws IOException {
+  protected HttpResponse(HttpRequest request) throws IOException {
     this.request = request;
     this.apacheResponse = request.http.apacheHttpClient.execute(request.apacheRequest);
     try {
@@ -69,6 +73,7 @@ public class HttpResponse {
     return headers;
   }
 
+  /** Logs the request in human readable form to the {@link Http} Slf4j logger */
   public HttpResponse log(String prefix) {
     Http.log.debug(prefix+" < "+apacheResponse.getStatusLine());
     if (headers!=null) {
