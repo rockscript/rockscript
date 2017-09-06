@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static io.rockscript.http.HttpRequest.NEWLINE;
+
 
 /** Obtain a response by starting from the {@link Http} object
  * use one of the newXxx methods to get a request and then
@@ -73,24 +75,45 @@ public class HttpResponse {
     return headers;
   }
 
-  /** Logs the request in human readable form to the {@link Http} Slf4j logger */
-  public HttpResponse log(String prefix) {
-    Http.log.debug(prefix+" < "+apacheResponse.getStatusLine());
+  @Override
+  public String toString() {
+    return toString(null);
+  }
+
+  public String toString(String prefix) {
+    StringBuilder text = new StringBuilder();
+    if (prefix==null) {
+      prefix = "";
+    }
+    text.append(prefix);
+    text.append("< ");
+    text.append(apacheResponse.getStatusLine());
+    text.append(NEWLINE);
     if (headers!=null) {
       for (String headerName: headers.keySet()) {
         if (headerName!=null) {
           List<String> headerListValue = headers.get(headerName);
           String headerValue = headerListToString(headerListValue);
-          Http.log.debug(prefix+"     ["+headerName+"] "+ headerValue);
+          text.append(prefix);
+          text.append("  ");
+          text.append(headerName);
+          text.append(": ");
+          text.append(headerValue);
+          text.append(NEWLINE);
         }
       }
     } else {
-      Http.log.debug(prefix+" < "+status);
+      text.append(prefix);
+      text.append("< ");
+      text.append(status);
+      text.append(NEWLINE);
     }
     if (body!=null) {
-      Http.log.debug(prefix+"     "+getBodyAsString());
+      text.append(prefix);
+      text.append("  ");
+      text.append(getBodyAsString());
     }
-    return this;
+    return text.toString();
   }
 
   public static String headerListToString(List<String> headerListValue) {

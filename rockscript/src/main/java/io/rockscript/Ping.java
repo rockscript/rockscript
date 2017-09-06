@@ -17,57 +17,37 @@ package io.rockscript;
 
 import io.rockscript.http.Http;
 import io.rockscript.http.HttpResponse;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.Options;
 
-public class Ping extends Rock {
+public class Ping extends ClientCommand {
 
   protected String url = "http://localhost:3652";
 
   @Override
-  public String getCommandName() {
-    return "ping";
-  }
-
-  protected Options createOptions() {
-    Options options = new Options();
-    options.addOption("url", "The url of the server.  Default value is http://localhost:3652");
-    return options;
-  }
-
-  @Override
-  protected void parse(CommandLine commandLine) {
-    this.url = commandLine.getOptionValue("url", url);
+  protected String getCommandLineSyntax() {
+    return "rock ping [ping options]";
   }
 
   @Override
   public void execute() throws Exception {
     try {
+      String pingUrl = this.url + "/ping";
+      log("> GET "+pingUrl+" ...");
       HttpResponse response = new Http()
-        .newGet(url + "/ping")
+        .newGet(pingUrl)
         .execute();
 
       int status = response.getStatus();
       String body = response.getBodyAsString();
       if (status==200) {
-        log("200 OK");
+        log("< 200 OK");
       } else {
-        log("Wrong status: "+status);
+        log("Wrong response status: "+status);
       }
-      log(body);
+      log("< "+body);
     } catch (Exception e) {
       log("Could not connect to "+url+" : "+e.getMessage());
     }
   }
 
-  public String getUrl() {
-    return this.url;
-  }
-  public void setUrl(String url) {
-    this.url = url;
-  }
-  public Ping url(String url) {
-    this.url = url;
-    return this;
-  }
+
 }

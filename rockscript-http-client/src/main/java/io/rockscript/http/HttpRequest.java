@@ -35,6 +35,8 @@ import static io.rockscript.http.Http.Methods.*;
 /** Request builder */
 public class HttpRequest {
 
+  static final String NEWLINE = System.getProperty("line.separator");
+
   private static final EntityHandler DEFAULT_ENTITY_HANDLER = new StringEntityHandler();
 
   /** transient because this field should not be serialized by gson */
@@ -100,21 +102,43 @@ public class HttpRequest {
   }
 
   /** Logs the request in human readable form to the {@link Http} Slf4j logger */
-  public HttpRequest log(String prefix) {
-    Http.log.debug(prefix+" > "+method+" "+url);
+
+  @Override
+  public String toString() {
+    return toString(null);
+  }
+
+  public String toString(String prefix) {
+    StringBuilder text = new StringBuilder();
+    if (prefix==null) {
+      prefix = "";
+    }
+    text.append(prefix);
+    text.append("> ");
+    text.append(method);
+    text.append(" ");
+    text.append(url);
+    text.append(NEWLINE);
     if (headers!=null) {
       for (String headerName: headers.keySet()) {
         List<String> headerListValue = headers.get(headerName);
         String headerValue = headerListValue
           .stream()
-          .collect(Collectors.joining(";"));
-        Http.log.debug(prefix+"     ["+headerName+"] "+ headerValue);
+          .collect(Collectors.joining("; "));
+        text.append(prefix);
+        text.append("  ");
+        text.append(headerName);
+        text.append(": ");
+        text.append(headerValue);
+        text.append(NEWLINE);
       }
     }
     if (body!=null) {
-      Http.log.debug(prefix+"     "+body);
+      text.append(prefix);
+      text.append("  ");
+      text.append(body);
     }
-    return this;
+    return text.toString();
   }
 
   public String getUrl() {
@@ -143,6 +167,16 @@ public class HttpRequest {
       headers.put(name, values);
     }
     values.add(value);
+    return this;
+  }
+
+  public HttpRequest headerContentType(String contentType) {
+    header(Http.Headers.CONTENT_TYPE, contentType);
+    return this;
+  }
+
+  public HttpRequest headerContentTypeApplicationJson() {
+    headerContentType(Http.ContentTypes.APPLICATION_JSON);
     return this;
   }
 

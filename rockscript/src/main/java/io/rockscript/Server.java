@@ -45,11 +45,6 @@ public class Server extends Rock {
   protected AsyncHttpServer asyncHttpServer;
 
   @Override
-  public String getCommandName() {
-    return "server";
-  }
-
-  @Override
   protected Options createOptions() {
     Options options = new Options();
     return options;
@@ -57,6 +52,11 @@ public class Server extends Rock {
 
   @Override
   protected void parse(CommandLine commandLine) {
+  }
+
+  @Override
+  protected String getCommandLineSyntax() {
+    return "rock server [server options]";
   }
 
   @Override
@@ -73,13 +73,6 @@ public class Server extends Rock {
     ScriptService scriptService = serviceConfiguration.build();
     AsyncHttpServerConfiguration asyncHttpServerConfiguration = createAsyncHttpServerConfiguration(commonGson, scriptService);
     this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
-  }
-
-  protected Gson createCommonGson() {
-    return new GsonBuilder()
-      .registerTypeAdapterFactory(createCommandsTypeAdapterFactory())
-      .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
-      .create();
   }
 
   protected AsyncHttpServerConfiguration createAsyncHttpServerConfiguration(Gson commonGson, ScriptService scriptService) {

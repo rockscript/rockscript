@@ -15,10 +15,16 @@
  */
 package io.rockscript;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import io.rockscript.http.GsonCodec;
+import io.rockscript.http.Http;
 import org.apache.commons.cli.*;
 
 import java.util.Map;
 
+import static io.rockscript.Server.createCommandsTypeAdapterFactory;
+import static io.rockscript.engine.impl.Event.createEventJsonTypeAdapterFactory;
 import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
 
@@ -102,21 +108,33 @@ public abstract class Rock {
   protected String[] args;
 
   public abstract void execute() throws Exception;
-  public abstract String getCommandName();
 
   protected abstract Options createOptions();
   protected abstract void parse(CommandLine commandLine);
 
   protected void showCommandUsage() {
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp("rock " + getCommandName() + " [" + getCommandName() + " options]", createOptions());
+    formatter.printHelp(getCommandLineSyntax(), createOptions());
   }
 
-  public static void log() {
+  protected abstract String getCommandLineSyntax();
+
+  protected static void log() {
     System.out.println();
   }
 
-  public static void log(String text) {
+  protected static void log(String text) {
     System.out.println(text);
+  }
+
+  protected Gson createCommonGson() {
+    return new GsonBuilder()
+      .registerTypeAdapterFactory(createCommandsTypeAdapterFactory())
+      .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
+      .create();
+  }
+
+  protected Http createHttp() {
+    return new Http(new GsonCodec(createCommonGson()));
   }
 }
