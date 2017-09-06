@@ -19,7 +19,7 @@ import io.rockscript.http.Http.ContentTypes;
 import io.rockscript.http.Http.Headers;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.client.methods.CloseableHttpResponse;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -32,20 +32,28 @@ import java.util.stream.Collectors;
 public class HttpResponse {
 
   /** transient because this field should not be serialized by gson */
-  transient HttpRequest httpRequest;
+  transient HttpRequest request;
   /** transient because this field should not be serialized by gson */
-  transient org.apache.http.HttpResponse apacheResponse;
+  transient CloseableHttpResponse apacheResponse;
 
   protected int status;
   protected Map<String,List<String>> headers;
   protected Object body;
 
-  public HttpResponse(HttpRequest httpRequest) throws IOException {
-    this.httpRequest = httpRequest;
-    this.apacheResponse = httpRequest.http.apacheClient.execute(httpRequest.apacheRequest);
-    this.status = apacheResponse.getStatusLine().getStatusCode();
-    this.headers = extractHeaders(apacheResponse);
-    this.body = apacheResponse.getEntity();
+  public HttpResponse(HttpRequest request) throws IOException {
+    this.request = request;
+    this.apacheResponse = request.http.apacheHttpClient.execute(request.apacheRequest);
+    try {
+      this.status = apacheResponse.getStatusLine().getStatusCode();
+      this.headers = extractHeaders(apacheResponse);
+
+      HttpEntity entity = apacheResponse.getEntity();
+      if (entity != null) {
+        this.body = request.getEntityHandler().apply(entity, this);
+      }
+    } finally {
+      apacheResponse.close();
+    }
   }
 
   static Map<String, List<String>> extractHeaders(org.apache.http.HttpResponse apacheResponse) {
@@ -94,7 +102,6 @@ public class HttpResponse {
     this.status = status;
   }
 
-
   public HttpResponse assertStatusOk() {
     return assertStatus(200);
   }
@@ -115,20 +122,20 @@ public class HttpResponse {
   }
 
   public String getBodyAsString() {
-    if (body instanceof HttpEntity) {
-      try {
-        HttpEntity entity = (HttpEntity) body;
-        this.body = EntityUtils.toString(entity, "UTF-8");
-      } catch (IOException e) {
-        throw new RuntimeException("Could not get body as string: "+e.getMessage(), e);
-      }
+    if (body instanceof String) {
+      return (String) body;
     }
-    return (String) this.body;
+    return body!=null ? body.toString() : null;
   }
 
   public <T> T getBodyAs(Type type) {
-    String bodyString = getBodyAsString();
-    return httpRequest.http.getCodec().deserialize(bodyString, type);
+    if (body==null) {
+      return null;
+    }
+    if (body instanceof String) {
+      return request.http.getCodec().deserialize((String)body, type);
+    }
+    throw new RuntimeException("Don't know how to convert "+body.getClass().getName()+" to "+type);
   }
 
   public void setBody(Object body) {
@@ -157,5 +164,17 @@ public class HttpResponse {
       }
     }
     return false;
+  }
+
+  public HttpRequest getRequest() {
+    return request;
+  }
+
+  public CloseableHttpResponse getApacheResponse() {
+    return apacheResponse;
+  }
+
+  public Map<String, List<String>> getHeaders() {
+    return headers;
   }
 }

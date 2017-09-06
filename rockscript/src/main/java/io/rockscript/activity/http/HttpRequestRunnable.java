@@ -20,8 +20,11 @@ import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.Engine;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
+import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class HttpRequestRunnable implements Runnable {
 
@@ -39,8 +42,23 @@ public class HttpRequestRunnable implements Runnable {
 
   @Override
   public void run() {
-    HttpResponse response = request.execute();
+    HttpResponse response = request
+      .entityHandler((httpEntity,httpResponse)->{
+        try {
+          Object body = EntityUtils.toString(httpEntity, "UTF-8");
+          if (httpResponse.isContentTypeApplicationJson()) {
+            body = httpResponse
+              .getRequest()
+              .getHttp()
+              .getCodec()
+              .deserialize((String)body, Object.class);
+          }
+          return body;
+        } catch (IOException e) {
+          throw new RuntimeException("Couldn't ready body/entity from http request "+httpResponse.toString());
+        }
+      })
+      .execute();
     engine.endActivity(continuationReference, response);
   }
-
 }

@@ -34,10 +34,13 @@ import static io.rockscript.http.Http.Methods.*;
 
 public class HttpRequest {
 
+  private static final EntityHandler DEFAULT_ENTITY_HANDLER = new StringEntityHandler();
+
   /** transient because this field should not be serialized by gson */
   transient Http http;
   /** transient because this field should not be serialized by gson */
   transient HttpRequestBase apacheRequest;
+  transient EntityHandler entityHandler = DEFAULT_ENTITY_HANDLER;
 
   String method;
   String url;
@@ -179,5 +182,20 @@ public class HttpRequest {
 
   public void setBody(Object body) {
     this.body = body;
+  }
+
+  public EntityHandler getEntityHandler() {
+    return this.entityHandler;
+  }
+  public void setEntityHandler(EntityHandler entityHandler) {
+    this.entityHandler = entityHandler;
+  }
+  public HttpRequest entityHandler(EntityHandler entityHandler) {
+    this.entityHandler = entityHandler;
+    return this;
+  }
+
+  public HttpRequestBase getApacheRequest() {
+    return apacheRequest;
   }
 }

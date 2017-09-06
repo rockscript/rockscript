@@ -17,17 +17,20 @@ package io.rockscript.test;
 
 import com.google.gson.Gson;
 import org.junit.After;
+import org.junit.Before;
 
 public abstract class HttpTest extends ScriptTest {
 
-  protected final int PORT = 4000;
-  protected HttpTestServer httpTestServer = new HttpTestServer(PORT);
+  protected static final int PORT = 4000;
+  protected static HttpTestServer httpTestServer = new HttpTestServer(PORT);
   protected Gson gson;
 
   @Override
+  @Before
   public void setUp() {
     super.setUp();
     gson = getConfiguration().getGson();
+    httpTestServer.reset();
     configure(httpTestServer);
     httpTestServer.start();
   }
@@ -35,6 +38,7 @@ public abstract class HttpTest extends ScriptTest {
   @After
   public void tearDown() {
     httpTestServer.stop();
+    super.tearDown();
   }
 
   protected abstract void configure(HttpTestServer httpTestServer);

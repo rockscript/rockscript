@@ -15,7 +15,7 @@
  */
 package io.rockscript.http;
 
-import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class Http {
 
   protected static Logger log = LoggerFactory.getLogger(Http.class);
 
-  protected HttpClient apacheClient = HttpClients.createDefault();
+  protected CloseableHttpClient apacheHttpClient = HttpClients.createDefault();
 
   /** Used only when clients use methods {@link HttpRequest#setBodyObject(Object)} or
    * {@link HttpResponse#getBodyAs(java.lang.reflect.Type)}. */
@@ -37,6 +37,10 @@ public class Http {
 
   public Http(Codec codec) {
     this.codec = codec;
+  }
+
+  public void resetApacheHttpClient() {
+    apacheHttpClient = HttpClients.createDefault();
   }
 
   public interface Methods {
@@ -117,5 +121,9 @@ public class Http {
 
   public void setCodec(Codec codec) {
     this.codec = codec;
+  }
+
+  public CloseableHttpClient getApacheHttpClient() {
+    return apacheHttpClient;
   }
 }

@@ -19,24 +19,36 @@ import io.rockscript.engine.*;
 import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.ScriptServiceImpl;
+import org.junit.After;
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class ScriptTest {
 
   protected static Logger log = LoggerFactory.getLogger(ScriptTest.class);
 
-  private static Map<Class<? extends ScriptServiceProvider>,ScriptService> scriptServiceCache = new HashMap<>();
+  protected static Map<Class<? extends ScriptServiceProvider>,ScriptService> scriptServiceCache = new HashMap<>();
 
   protected ScriptService scriptService;
 
   @Before
   public void setUp() {
     scriptService = initializeScriptService();
+  }
+
+  @SuppressWarnings("deprecation")
+  @After
+  public void tearDown() {
+    ((ScriptServiceImpl)scriptService).getConfiguration()
+      .getHttp()
+      .getApacheHttpClient()
+      .getConnectionManager()
+      .closeIdleConnections(0, TimeUnit.NANOSECONDS);
   }
 
   /** Override this method if you want your ScriptService to be

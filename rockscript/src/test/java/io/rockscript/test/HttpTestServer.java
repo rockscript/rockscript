@@ -44,7 +44,7 @@ public class HttpTestServer {
   private static final String DELETE = "DELETE";
 
   Server server;
-  List<RequestHandler> requestHandlers = new ArrayList<>();
+  List<RequestHandler> requestHandlers;
 
   public HttpTestServer(int port) {
     this.server = new Server(port);
@@ -78,6 +78,11 @@ public class HttpTestServer {
     } catch (Exception e) {
       throw new RuntimeException("Couldn't stop server", e);
     }
+  }
+
+  /** Cleans the request handlers so that a new test can configure and use the same HttpTestServer. */
+  public void reset() {
+    requestHandlers = new ArrayList<>();
   }
 
   private class TestHandler extends AbstractHandler {
