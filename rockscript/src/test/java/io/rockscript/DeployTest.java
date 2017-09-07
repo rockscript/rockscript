@@ -18,6 +18,7 @@ package io.rockscript;
 
 import io.rockscript.engine.DeployScriptCommand;
 import io.rockscript.engine.DeployScriptResponse;
+import io.rockscript.engine.ParseError;
 import io.rockscript.test.AbstractServerTest;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -53,15 +54,38 @@ public class DeployTest extends AbstractServerTest {
   public void testDeploySyntaxError() {
     DeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
-        .scriptText("invalid script"))
+        .scriptText("\n\ninvalid script"))
       .execute()
       .assertStatusBadRequest()
       .getBodyAs(DeployScriptResponse.class);
 
     assertEquals("Unnamed script", deployScriptResponse.getName());
 
-    List<String> errors = deployScriptResponse.getErrors();
+    List<ParseError> errors = deployScriptResponse.getErrors();
     assertEquals(1, errors.size());
+    ParseError error = errors.get(0);
+    assertEquals(3, error.getLine());
+    assertEquals(8, error.getColumn());
+    assertEquals("no viable alternative at input 'script'", error.getMessage());
+  }
+
+  @Test
+  public void testDeployParseError() {
+    DeployScriptResponse deployScriptResponse = newPost("command")
+      .bodyObject(new DeployScriptCommand()
+        .scriptText("\n\nvar a = b+c;"))
+      .execute()
+      .assertStatusBadRequest()
+      .getBodyAs(DeployScriptResponse.class);
+
+    assertEquals("Unnamed script", deployScriptResponse.getName());
+
+    List<ParseError> errors = deployScriptResponse.getErrors();
+    assertEquals(1, errors.size());
+    ParseError error = errors.get(0);
+    assertEquals(3, error.getLine());
+    assertEquals(8, error.getColumn());
+    assertEquals("Unsupported singleExpression: b+c", error.getMessage());
   }
 
   @Test

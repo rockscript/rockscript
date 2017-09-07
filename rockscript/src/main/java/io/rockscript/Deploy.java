@@ -17,6 +17,7 @@ package io.rockscript;
 
 import io.rockscript.engine.DeployScriptCommand;
 import io.rockscript.engine.DeployScriptResponse;
+import io.rockscript.engine.ParseError;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
 import io.rockscript.util.Io;
@@ -100,18 +101,27 @@ public class Deploy extends ClientCommand {
           .scriptName(file.getPath())
           .scriptText(scriptText)
         );
+
       log(request.toString("  "));
 
       HttpResponse response = request.execute();
+
+      String responseBody = (String) response.getBody();
+      if (responseBody.length()>100) {
+        response.setBody(responseBody.substring(0,100)+"...");
+      }
+
       log(response.toString("  "));
+
+      response.setBody(responseBody);
 
       DeployScriptResponse deployScriptResponse = ((HttpResponse) response)
         .getBodyAs(DeployScriptResponse.class);
 
       if (deployScriptResponse!=null && deployScriptResponse.hasErrors()) {
         log("  Errors in readable form:");
-        for (String error: deployScriptResponse.getErrors()) {
-          log("  "+error);
+        for (ParseError parseError: deployScriptResponse.getErrors()) {
+          log("  "+parseError);
         }
       }
 

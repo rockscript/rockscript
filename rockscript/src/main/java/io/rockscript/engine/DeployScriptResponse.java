@@ -22,22 +22,22 @@ import java.util.List;
  * DeployScriptResponse are serializable with Gson. */
 public class DeployScriptResponse extends Script implements CommandResponse {
 
-  protected List<String> errors;
+  protected List<ParseError> errors;
 
   /** for gson serialization */
   DeployScriptResponse() {
   }
 
-  public DeployScriptResponse(Script script, List<String> errors) {
+  public DeployScriptResponse(Script script, List<ParseError> errors) {
     super(script);
     this.errors = errors;
   }
 
-  public List<String> getErrors() {
+  public List<ParseError> getErrors() {
     return errors;
   }
 
-  public void setErrors(List<String> errors) {
+  public void setErrors(List<ParseError> errors) {
     this.errors = errors;
   }
 

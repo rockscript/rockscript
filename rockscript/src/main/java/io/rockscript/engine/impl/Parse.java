@@ -15,11 +15,11 @@
  */
 package io.rockscript.engine.impl;
 
+import io.rockscript.engine.ParseError;
 import io.rockscript.engine.antlr.ECMAScriptLexer;
 import io.rockscript.engine.antlr.ECMAScriptParser;
 import io.rockscript.engine.antlr.ECMAScriptParser.*;
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ public class Parse {
   static Logger log = LoggerFactory.getLogger(Parse.class);
 
   EngineScript engineScript;      // initialized in enterScript
-  List<String> errors;
+  List<ParseError> errors;
   int nextScriptElementId = 1;
 
   /** The parsed engineScript */
@@ -56,14 +56,15 @@ public class Parse {
     return engineScript;
   }
 
-  public List<String> getErrors() {
+  public List<ParseError> getErrors() {
     return errors;
   }
 
   public String getErrorText() {
     return errors
-        .stream()
-        .collect(Collectors.joining("\n"));
+      .stream()
+      .map(parseError->parseError.toString())
+      .collect(Collectors.joining("\n"));
   }
 
   public Parse throwIfError() {
@@ -77,11 +78,33 @@ public class Parse {
     return errors!=null && !errors.isEmpty();
   }
 
-  public void addError(String error) {
+  void addErrorUnsupportedElement(ParserRuleContext object, String elementName) {
+    addError(object, "Unsupported "+elementName+": "+(object!=null ? object.getText() : "null"));
+  }
+
+  void addError(ParserRuleContext object, String errorMessage) {
+    addError(object.getStart(), errorMessage);
+  }
+
+  void addErrorUnsupportedElement(TerminalNode terminalNode, String elementName) {
+    addError(terminalNode, "Unsupported "+elementName+": "+(terminalNode!=null ? terminalNode.getText() : "null"));
+  }
+
+  void addError(TerminalNode terminalNode, String errorMessage) {
+    addError(terminalNode.getSymbol(), errorMessage);
+  }
+
+  void addError(Token token, String errorMessage) {
+    int line = token.getLine();
+    int column = token.getCharPositionInLine();
+    addError(line, column, errorMessage);
+  }
+
+  void addError(int line, int column, String errorMessage) {
     if (errors==null) {
       errors = new ArrayList<>();
     }
-    errors.add(error);
+    errors.add(new ParseError(line, column, errorMessage));
   }
 
   /** Convenience method that creates the Parse, parses
@@ -108,7 +131,7 @@ public class Parse {
                             int line, int charPositionInLine,
                             String msg, RecognitionException e) {
       String sourceName = recognizer.getInputStream().getSourceName();
-      addError("line "+line+":"+charPositionInLine+" : "+msg);
+      addError(line, charPositionInLine, msg);
     }
   }
 
@@ -126,7 +149,11 @@ public class Parse {
     SourceElementsContext sourceElementsContext = programContext.sourceElements();
     List<SourceElement> sourceElements = parseSourceElements(sourceElementsContext);
     this.engineScript.setSourceElements(sourceElements);
-    this.engineScript.initializeScriptElements(scriptText);
+    if (!hasErrors()) {
+      this.engineScript.initializeScriptElements(scriptText);
+    } else {
+      engineScript = null;
+    }
   }
 
   private List<SourceElement> parseSourceElements(SourceElementsContext sourceElementsContext) {
@@ -173,11 +200,13 @@ public class Parse {
       return expressionStatement;
     }
 
-    throw newUnsupportedException("statement", statementContext);
+    addErrorUnsupportedElement(statementContext, "statement");
+    return null;
   }
 
   private SourceElement parseFunctionDeclaration(FunctionDeclarationContext functionDeclarationContext) {
-    throw newUnsupportedException("functionDeclaration", functionDeclarationContext);
+    addErrorUnsupportedElement(functionDeclarationContext, "functionDeclaration");
+    return null;
   }
 
   private Statement parseVariableDeclarationList(VariableDeclarationListContext variableDeclarationListContext) {
@@ -227,7 +256,8 @@ public class Parse {
       return parseObjectLiteralExpression((ObjectLiteralExpressionContext)singleExpressionContext);
 
     }
-    throw newUnsupportedException("singleExpression", singleExpressionContext);
+    addErrorUnsupportedElement(singleExpressionContext, "singleExpression");
+    return null;
   }
 
   private SingleExpression parseObjectLiteralExpression(ObjectLiteralExpressionContext objectLiteralExpressionContext) {
@@ -253,10 +283,11 @@ public class Parse {
     TerminalNode stringLiteralNode = propertyNameContext.StringLiteral();
     if (stringLiteralNode!=null) {
       String propertyNameWithQuotes = stringLiteralNode.getText();
-      String propertyNameWithoutQuotes = removeQuotesFromString(propertyNameWithQuotes);
+      String propertyNameWithoutQuotes = removeQuotesFromString(stringLiteralNode, propertyNameWithQuotes);
       return propertyNameWithoutQuotes;
     }
-    throw newUnsupportedException("propertyName", propertyNameContext);
+    addErrorUnsupportedElement(propertyNameContext, "propertyName");
+    return null;
   }
 
   private SingleExpression parseLiteralExpression(LiteralExpressionContext literalExpressionContext) {
@@ -264,7 +295,8 @@ public class Parse {
     if (literalContext!=null) {
       return parseLiteral(literalContext);
     }
-    throw newUnsupportedException("literal", literalContext);
+    addErrorUnsupportedElement(literalContext, "literal");
+    return null;
   }
 
   private SingleExpression parseLiteral(LiteralContext literalContext) {
@@ -282,13 +314,15 @@ public class Parse {
       if (numericLiteralContext.DecimalLiteral()!=null) {
         return parseDecimalNumberLiteral(numericLiteralContext);
       }
-      throw newUnsupportedException("number", numericLiteralContext);
+      addErrorUnsupportedElement(numericLiteralContext, "number");
+      return null;
     }
 
     TerminalNode regularExpressionLiteral = literalContext.RegularExpressionLiteral();
     if (regularExpressionLiteral!=null) {
       String regexText = regularExpressionLiteral.getText();
-      throw newUnsupportedException("regex", regularExpressionLiteral);
+      addErrorUnsupportedElement(regularExpressionLiteral, "regex");
+      return null;
     }
 
     TerminalNode booleanLiteral = literalContext.BooleanLiteral();
@@ -311,7 +345,7 @@ public class Parse {
   private Literal parseStringLiteral(LiteralContext literalContext) {
     Literal literal = new Literal(createNextScriptElementId(), createLocation(literalContext));
     String textWithQuotes = literalContext.getText();
-    String textWithoutQuotes = removeQuotesFromString(textWithQuotes);
+    String textWithoutQuotes = removeQuotesFromString(literalContext, textWithQuotes);
     literal.setValue(textWithoutQuotes);
     return literal;
   }
@@ -366,10 +400,6 @@ public class Parse {
     return argumentsExpression;
   }
 
-  private RuntimeException newUnsupportedException(String elementName, ParseTree object) {
-    return new RuntimeException("Unsupported "+elementName+": "+(object!=null ? object.getText()+" ("+object.getClass().getSimpleName()+")" : "null"));
-  }
-
   private <T extends ScriptElement> T initScriptElement(T scriptElement, ParserRuleContext parserRuleContext) {
     scriptElement.setIndex(createNextScriptElementId());
     scriptElement.setLocation(createLocation(parserRuleContext));
@@ -384,11 +414,19 @@ public class Parse {
     return new Location(parserRuleContext);
   }
 
-  private String removeQuotesFromString(String string) {
+  private String removeQuotesFromString(TerminalNode terminalNode, String string) {
+    return removeQuotesFromString(terminalNode.getSymbol(), string);
+  }
+
+  private String removeQuotesFromString(ParserRuleContext parserRuleContext, String string) {
+    return removeQuotesFromString(parserRuleContext.getStart(), string);
+  }
+
+  private String removeQuotesFromString(Token token, String string) {
     if (string==null
       || !string.startsWith("'")
       || !string.endsWith("'")) {
-      addError("invalid string "+string);
+      addError(token, "invalid string "+string);
       return null;
     }
     return string.substring(1, string.length()-1);

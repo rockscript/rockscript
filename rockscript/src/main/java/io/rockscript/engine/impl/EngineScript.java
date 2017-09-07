@@ -62,8 +62,10 @@ public class EngineScript extends SourceElements {
   void initializeScriptElements(List<? extends ScriptElement> children, String scriptText) {
     if (children!=null) {
       for (ScriptElement child: children) {
-        addScriptElement(child, scriptText);
-        initializeScriptElements(child.getChildren(), scriptText);
+        if (child!=null) {
+          addScriptElement(child, scriptText);
+          initializeScriptElements(child.getChildren(), scriptText);
+        }
       }
     }
   }
