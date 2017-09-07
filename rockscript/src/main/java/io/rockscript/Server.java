@@ -16,7 +16,6 @@
 package io.rockscript;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.rockscript.engine.*;
 import io.rockscript.gson.PolymorphicTypeAdapterFactory;
@@ -34,8 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import java.net.BindException;
 
-import static io.rockscript.engine.impl.Event.createEventJsonTypeAdapterFactory;
-
 public class Server extends Rock {
 
   static Logger log = LoggerFactory.getLogger(Server.class);
@@ -45,7 +42,7 @@ public class Server extends Rock {
   protected AsyncHttpServer asyncHttpServer;
 
   @Override
-  protected Options createOptions() {
+  protected Options getOptions() {
     Options options = new Options();
     return options;
   }
@@ -55,8 +52,14 @@ public class Server extends Rock {
   }
 
   @Override
-  protected String getCommandLineSyntax() {
-    return "rock server [server options]";
+  protected void showCommandUsage() {
+    log("rock server : Starts the RockScript server");
+    log();
+    logCommandUsage("rock server [server options]");
+    log();
+    log("Example:");
+    log("  rock server");
+    log("Starts the RockScript server on port 3652");
   }
 
   @Override

@@ -57,7 +57,7 @@ public abstract class Rock {
           Rock rock = getRock(command);
           if (rock!=null) {
             rock.args = args;
-            Options options = rock.createOptions();
+            Options options = rock.getOptions();
             if (options!=null) {
               CommandLineParser commandLineParser = new DefaultParser();
               CommandLine commandLine = commandLineParser.parse(options, args);
@@ -96,28 +96,26 @@ public abstract class Rock {
     }
     log("Usage: rock [command] [command options]");
     log();
-    log("rock help [command]          | shows help on a particular command");
-    log("rock server [server options] | start the rockscript server");
-    log("rock ping [ping options]     | test the connection with the server");
-    log("rock deploy [deploy options] | deploy scripts to the server");
-    log("rock                         | shows this help message");
+    log("rock help [command]          | Shows help on a particular command");
+    log("rock server [server options] | Start the rockscript server");
+    log("rock ping [ping options]     | Test the connection with the server");
+    log("rock deploy [deploy options] | Deploy script files to the server");
+    log("rock                         | Shows this help message");
     log();
-    log("More details at https://github.com/RockScript/server/wiki/RockScript-API");
+    log("More details at https://github.com/rockscript/rockscript/wiki/RockScript-API");
   }
 
   protected String[] args;
 
-  public abstract void execute() throws Exception;
-
-  protected abstract Options createOptions();
+  protected abstract void execute() throws Exception;
+  protected abstract void showCommandUsage();
+  protected abstract Options getOptions();
   protected abstract void parse(CommandLine commandLine);
 
-  protected void showCommandUsage() {
+  protected void logCommandUsage(String usage) {
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp(getCommandLineSyntax(), createOptions());
+    formatter.printHelp(usage, getOptions());
   }
-
-  protected abstract String getCommandLineSyntax();
 
   protected static void log() {
     System.out.println();

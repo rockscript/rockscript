@@ -23,8 +23,14 @@ public class Ping extends ClientCommand {
   protected String url = "http://localhost:3652";
 
   @Override
-  protected String getCommandLineSyntax() {
-    return "rock ping [ping options]";
+  protected void showCommandUsage() {
+    log("rock deploy : Tests the connection with the server");
+    log();
+    logCommandUsage("rock ping [ping options]");
+    log();
+    log("Example:");
+    log("  rock ping");
+    log("Sends a ping request to the server and logs the pong response");
   }
 
   @Override

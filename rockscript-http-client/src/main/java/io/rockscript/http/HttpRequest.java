@@ -226,7 +226,7 @@ public class HttpRequest {
     return this.entityHandler;
   }
 
-  /** See {@link #entityHandler(EntityHandler)} */
+  /** See {@link EntityHandler} */
   public void setEntityHandler(EntityHandler entityHandler) {
     this.entityHandler = entityHandler;
   }

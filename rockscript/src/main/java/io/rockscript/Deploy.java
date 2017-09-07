@@ -32,18 +32,26 @@ public class Deploy extends ClientCommand {
 
   public static final String DEFAULT_NAME_PATTERN = ".*\\.rs(t)?";
 
-  protected boolean recursive;
-  protected String namePattern;
+  protected boolean recursive = false;
+  protected String namePattern = DEFAULT_NAME_PATTERN;
   protected Pattern compiledNamePattern;
 
   @Override
-  protected String getCommandLineSyntax() {
-    return "rock deploy [deploy options] [file|directory]";
+  protected void showCommandUsage() {
+    log("rock deploy : Deploys script files to the server");
+    log();
+    logCommandUsage("rock deploy [deploy options] [file or directory]");
+    log();
+    log("Example:");
+    log("  rock deploy -r .");
+    log("Deploys all files ending with extension .rs or .rst ");
+    log("located in the current directory or one of it's nested");
+    log("directories");
   }
 
   @Override
-  protected Options createOptions() {
-    Options options = super.createOptions();
+  protected Options getOptions() {
+    Options options = super.getOptions();
     options.addOption("r",
       "Scan directory recursive. " +
       "Default is not recursive. " +
@@ -51,7 +59,8 @@ public class Deploy extends ClientCommand {
     options.addOption("n", true,
       "Script file name pattern used for scanning a directory.  " +
       "Default is *.rs  " +
-      "Ignored if a file is specified.");
+      "Ignored if a file is specified. " +
+      "See also https://docs.oracle.com/javase/tutorial/essential/regex/index.html ");
     options.addOption("v",
       "Verbose.  Prints more ");
     return options;
@@ -61,7 +70,9 @@ public class Deploy extends ClientCommand {
   protected void parse(CommandLine commandLine) {
     super.parse(commandLine);
     this.recursive = commandLine.hasOption("r");
-    this.namePattern = commandLine.getOptionValue("n", DEFAULT_NAME_PATTERN);
+    // namePattern is already initialized with the default so
+    // that Deploy also can be used programmatically.
+    this.namePattern = commandLine.getOptionValue("n", namePattern);
   }
 
   @Override
@@ -78,12 +89,12 @@ public class Deploy extends ClientCommand {
   }
 
   private void deployFile(File file) {
-    log("Deploying "+file.getPath()+" to "+url+" ...");
+    log("Deploying " + file.getPath() + " to " + server + " ...");
     try {
       String scriptText = Io.toString(new FileInputStream(file));
 
       HttpRequest request = createHttp()
-        .newPost(url + "/command")
+        .newPost(server + "/command")
         .headerContentTypeApplicationJson()
         .bodyObject(new DeployScriptCommand()
           .scriptName(file.getPath())
@@ -140,9 +151,15 @@ public class Deploy extends ClientCommand {
   public String getNamePattern() {
     return this.namePattern;
   }
+
+  /** See {@link #namePattern(String)} */
   public void setNamePattern(String namePattern) {
     this.namePattern = namePattern;
   }
+
+  /** A regex ( https://docs.oracle.com/javase/tutorial/essential/regex/index.html or
+   * https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html ) to filter
+   * the files being deployed. */
   public Deploy namePattern(String namePattern) {
     this.namePattern = namePattern;
     return this;

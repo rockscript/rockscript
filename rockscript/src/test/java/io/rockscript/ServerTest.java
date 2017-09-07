@@ -92,7 +92,6 @@ public class ServerTest extends AbstractServerTest {
     new Deploy()
       .args("deploy", "..")
       .recursive()
-      .namePattern(Deploy.DEFAULT_NAME_PATTERN)
       .execute();
   }
 }

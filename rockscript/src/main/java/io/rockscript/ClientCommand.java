@@ -5,27 +5,27 @@ import org.apache.commons.cli.Options;
 
 public abstract class ClientCommand extends Rock {
 
-  protected String url = "http://localhost:3652";
+  protected String server = "http://localhost:3652";
 
-  protected Options createOptions() {
+  protected Options getOptions() {
     Options options = new Options();
-    options.addOption("url", "The base URL of the server.  Default value is http://localhost:3652");
+    options.addOption("s", "The server URL.  Default value is http://localhost:3652");
     return options;
   }
 
   @Override
   protected void parse(CommandLine commandLine) {
-    this.url = commandLine.getOptionValue("url", url);
+    this.server = commandLine.getOptionValue("s", server);
   }
 
-  public String getUrl() {
-    return this.url;
+  public String getServer() {
+    return this.server;
   }
-  public void setUrl(String url) {
-    this.url = url;
+  public void setServer(String server) {
+    this.server = server;
   }
-  public ClientCommand url(String url) {
-    this.url = url;
+  public ClientCommand server(String server) {
+    this.server = server;
     return this;
   }
 }
