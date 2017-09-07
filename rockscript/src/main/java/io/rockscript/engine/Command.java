@@ -17,7 +17,7 @@ package io.rockscript.engine;
 
 /** Abstract base class for all commands and queries.
  * All commands are serializable with Gson. */
-public interface Command<R> {
+public interface Command<R extends CommandResponse> {
 
   /** @throws EngineException */
   R execute();

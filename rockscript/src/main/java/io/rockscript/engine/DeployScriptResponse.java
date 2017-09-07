@@ -20,7 +20,7 @@ import java.util.List;
 /** Response from the DeployScriptCommand.
  *
  * DeployScriptResponse are serializable with Gson. */
-public class DeployScriptResponse extends Script {
+public class DeployScriptResponse extends Script implements CommandResponse {
 
   protected List<String> errors;
 
@@ -43,5 +43,10 @@ public class DeployScriptResponse extends Script {
 
   public boolean hasErrors() {
     return errors!=null && !errors.isEmpty();
+  }
+
+  @Override
+  public int getStatus() {
+    return errors==null || errors.isEmpty() ? 200 : 400;
   }
 }

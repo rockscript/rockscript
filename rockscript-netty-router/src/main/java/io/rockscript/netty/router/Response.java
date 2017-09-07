@@ -75,6 +75,10 @@ public class Response {
     return status(NO_CONTENT);
   }
 
+  public Response status(int status) {
+    return status(HttpResponseStatus.valueOf(status));
+  }
+
   public Response status(HttpResponseStatus status) {
     this.status = status;
     return this;

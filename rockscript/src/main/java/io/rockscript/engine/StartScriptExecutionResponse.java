@@ -18,7 +18,7 @@ package io.rockscript.engine;
 
 import io.rockscript.engine.impl.EngineScriptExecution;
 
-public class StartScriptExecutionResponse {
+public class StartScriptExecutionResponse implements CommandResponse {
 
   String scriptExecutionId;
 
@@ -44,5 +44,10 @@ public class StartScriptExecutionResponse {
 
   public EngineScriptExecution getEngineScriptExecution() {
     return engineScriptExecution;
+  }
+
+  @Override
+  public int getStatus() {
+    return 200;
   }
 }

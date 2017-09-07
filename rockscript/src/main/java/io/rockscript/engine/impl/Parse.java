@@ -18,9 +18,7 @@ package io.rockscript.engine.impl;
 import io.rockscript.engine.antlr.ECMAScriptLexer;
 import io.rockscript.engine.antlr.ECMAScriptParser;
 import io.rockscript.engine.antlr.ECMAScriptParser.*;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
@@ -99,15 +97,31 @@ public class Parse {
    * From the returned Parse you can check the
    * {@link #getErrors()} and and get {@link #getEngineScript()}. */
   public static Parse create(String scriptText) {
-    ECMAScriptLexer l = new ECMAScriptLexer(new ANTLRInputStream(scriptText));
-    ECMAScriptParser p = new ECMAScriptParser(new CommonTokenStream(l));
-    ProgramContext programContext = p.program();
     Parse parse = new Parse();
-    parse.parseScript(programContext, scriptText);
+    parse.parseScript(scriptText);
     return parse;
   }
 
-  private void parseScript(ProgramContext programContext, String scriptText) {
+  class ErrorListener extends BaseErrorListener {
+    @Override
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
+                            int line, int charPositionInLine,
+                            String msg, RecognitionException e) {
+      String sourceName = recognizer.getInputStream().getSourceName();
+      addError("line "+line+":"+charPositionInLine+" : "+msg);
+    }
+  }
+
+  private void parseScript(String scriptText) {
+    ErrorListener errorListener = new ErrorListener();
+    ECMAScriptLexer l = new ECMAScriptLexer(new ANTLRInputStream(scriptText));
+    l.removeErrorListener(ConsoleErrorListener.INSTANCE);
+    l.addErrorListener(errorListener);
+    ECMAScriptParser p = new ECMAScriptParser(new CommonTokenStream(l));
+    p.removeErrorListener(ConsoleErrorListener.INSTANCE);
+    p.addErrorListener(errorListener);
+    ProgramContext programContext = p.program();
+
     this.engineScript = new EngineScript(null, createLocation(programContext));
     SourceElementsContext sourceElementsContext = programContext.sourceElements();
     List<SourceElement> sourceElements = parseSourceElements(sourceElementsContext);

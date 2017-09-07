@@ -134,6 +134,10 @@ public class HttpResponse {
     return assertStatus(200);
   }
 
+  public HttpResponse assertStatusBadRequest() {
+    return assertStatus(400);
+  }
+
   public HttpResponse assertStatusNotFound() {
     return assertStatus(404);
   }

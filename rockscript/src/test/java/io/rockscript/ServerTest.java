@@ -86,12 +86,4 @@ public class ServerTest extends AbstractServerTest {
       .execute()
       .assertStatusOk();
   }
-
-  @Test
-  public void testDeploy() throws Exception {
-    new Deploy()
-      .args("deploy", "..")
-      .recursive()
-      .execute();
-  }
 }

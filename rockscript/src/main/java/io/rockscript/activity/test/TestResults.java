@@ -15,7 +15,14 @@
  */
 package io.rockscript.activity.test;
 
+import io.rockscript.engine.CommandResponse;
+
 import java.util.ArrayList;
 
-public class TestResults extends ArrayList<TestResult> {
+public class TestResults extends ArrayList<TestResult> implements CommandResponse {
+
+  @Override
+  public int getStatus() {
+    return 200;
+  }
 }

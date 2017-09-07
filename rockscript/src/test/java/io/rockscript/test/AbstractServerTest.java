@@ -72,6 +72,7 @@ public abstract class AbstractServerTest {
   public static void tearDownStatic() {
     server.shutdown();
     server.waitForShutdown();
+    server = null;
   }
 
   @Rule

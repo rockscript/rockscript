@@ -82,26 +82,26 @@ public class ScriptStore {
   public DeployScriptResponse deploy(String scriptName, String scriptText) {
     Script script = new Script();
     script.setText(scriptText);
+
+    if (scriptName ==null) {
+      scriptName = "Unnamed script";
+    }
     script.setName(scriptName);
 
     Parse parse = parseScript(script);
+    if (!parse.hasErrors()) {
+      String id = script.getId();
+      if (id==null) {
+        id = configuration.getScriptIdGenerator().createId();
+        script.setId(id);
+      }
 
-    String id = script.getId();
-    if (id==null) {
-      id = configuration.getScriptIdGenerator().createId();
-      script.setId(id);
+      EngineScript engineScript = parse.getEngineScript();
+      scriptAstsById.put(id, engineScript);
+
+      // storeScript also assigns the version
+      storeScript(script);
     }
-
-    String name = script.getName();
-    if (name ==null) {
-      name = "Unnamed script";
-      script.setName(name);
-    }
-
-    EngineScript engineScript = parse.getEngineScript();
-    scriptAstsById.put(id, engineScript);
-
-    storeScript(script);
 
     return new DeployScriptResponse(script, parse.getErrors());
   }

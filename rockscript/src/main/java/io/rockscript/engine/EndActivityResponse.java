@@ -17,7 +17,7 @@ package io.rockscript.engine;
 
 import io.rockscript.engine.impl.EngineScriptExecution;
 
-public class EndActivityResponse extends ScriptExecution {
+public class EndActivityResponse extends ScriptExecution implements CommandResponse {
 
   /** transient because it must not be serialized with Gson */
   transient EngineScriptExecution engineScriptExecution;
@@ -37,5 +37,10 @@ public class EndActivityResponse extends ScriptExecution {
 
   public EngineScriptExecution getEngineScriptExecution() {
     return engineScriptExecution;
+  }
+
+  @Override
+  public int getStatus() {
+    return 200;
   }
 }

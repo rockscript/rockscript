@@ -16,9 +16,10 @@
 package io.rockscript.server.handlers;
 
 import io.rockscript.engine.Command;
-import io.rockscript.netty.router.*;
 import io.rockscript.engine.CommandImpl;
+import io.rockscript.engine.CommandResponse;
 import io.rockscript.engine.Configuration;
+import io.rockscript.netty.router.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +34,10 @@ public class CommandHandler implements RequestHandler {
     Configuration configuration = context.get(Configuration.class);
     command.setConfiguration(configuration);
 
-    Object responseBodyJson = command.execute();
+    CommandResponse commandResponse = command.execute();
 
-    response.bodyJson(responseBodyJson);
-    response.statusOk();
+    response.bodyJson(commandResponse);
+    response.status(commandResponse.getStatus());
     response.send();
   }
 }
