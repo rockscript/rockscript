@@ -17,7 +17,7 @@ package io.rockscript.activity.test;
 
 import io.rockscript.engine.EngineException;
 import io.rockscript.engine.ScriptService;
-import io.rockscript.engine.StartScriptExecutionResponse;
+import io.rockscript.engine.ServerStartScriptExecutionResponse;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.ImportObject;
 import io.rockscript.activity.ImportProvider;
@@ -32,7 +32,7 @@ public class TestImportObject extends ImportObject implements ImportProvider {
     this.testResult = testResult;
     put("start", activityInput -> {
       String scriptName = activityInput.getArgProperty("scriptName");
-      StartScriptExecutionResponse response = scriptService.newStartScriptExecutionCommand()
+      ServerStartScriptExecutionResponse response = scriptService.newStartScriptExecutionCommand()
           .scriptName(scriptName)
           .execute();
       return ActivityOutput.endFunction(response.getScriptExecution());

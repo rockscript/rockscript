@@ -65,7 +65,9 @@ public class TestRunnerTest extends HttpTest {
       .execute()
       .getId();
 
-    TestResults testResults = scriptService.newRunTestsCommand().tests("*.rst").execute();
+    TestResults testResults = scriptService.newRunTestsCommand()
+      .tests("*.rst")
+      .execute();
 
     log.debug(getConfiguration().getGson().toJson(testResults));
 

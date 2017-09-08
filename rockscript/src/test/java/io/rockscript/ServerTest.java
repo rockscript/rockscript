@@ -17,9 +17,9 @@ package io.rockscript;
 
 import com.google.gson.reflect.TypeToken;
 import io.rockscript.engine.DeployScriptCommand;
-import io.rockscript.engine.DeployScriptResponse;
+import io.rockscript.engine.ServerDeployScriptResponse;
 import io.rockscript.engine.StartScriptExecutionCommand;
-import io.rockscript.engine.StartScriptExecutionResponse;
+import io.rockscript.engine.ServerStartScriptExecutionResponse;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.test.AbstractServerTest;
 import org.junit.Test;
@@ -33,44 +33,44 @@ public class ServerTest extends AbstractServerTest {
 
   @Test
   public void testServer() {
-    DeployScriptResponse deployScriptResponse = newPost("command")
+    ServerDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
           .scriptText(""))
       .execute()
       .assertStatusOk()
-      .getBodyAs(DeployScriptResponse.class);
+      .getBodyAs(ServerDeployScriptResponse.class);
 
     String scriptId = deployScriptResponse.getId();
 
     assertNotNull(scriptId);
 
-    StartScriptExecutionResponse startScriptResponse = newPost("command")
+    ServerStartScriptExecutionResponse startScriptResponse = newPost("command")
       .bodyObject(new StartScriptExecutionCommand()
           .scriptId(scriptId))
       .execute()
       .assertStatusOk()
-      .getBodyAs(StartScriptExecutionResponse.class);
+      .getBodyAs(ServerStartScriptExecutionResponse.class);
 
     String scriptExecutionId = startScriptResponse.getScriptExecutionId();
   }
 
   @Test
   public void testEvents() {
-    DeployScriptResponse deployScriptResponse = newPost("command")
+    ServerDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
         .scriptText("var msg = {hello: 'world'};"))
       .execute()
       .assertStatusOk()
-      .getBodyAs(DeployScriptResponse.class);
+      .getBodyAs(ServerDeployScriptResponse.class);
 
     String scriptId = deployScriptResponse.getId();
 
-    StartScriptExecutionResponse startScriptResponse = newPost("command")
+    ServerStartScriptExecutionResponse startScriptResponse = newPost("command")
       .bodyObject(new StartScriptExecutionCommand()
         .scriptId(scriptId))
       .execute()
       .assertStatusOk()
-      .getBodyAs(StartScriptExecutionResponse.class);
+      .getBodyAs(ServerStartScriptExecutionResponse.class);
 
     List<Event> eventJsons = newGet("events")
       .execute()
@@ -80,10 +80,4 @@ public class ServerTest extends AbstractServerTest {
     assertTrue(eventJsons.size()>2);
   }
 
-  @Test
-  public void testPing() {
-    newGet("ping")
-      .execute()
-      .assertStatusOk();
-  }
 }

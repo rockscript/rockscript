@@ -33,7 +33,9 @@ import org.slf4j.LoggerFactory;
 
 import java.net.BindException;
 
-public class Server extends Rock {
+import static io.rockscript.Rock.log;
+
+public class Server extends CliCommand {
 
   static Logger log = LoggerFactory.getLogger(Server.class);
 

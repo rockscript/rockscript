@@ -1,0 +1,9 @@
+{
+  "name" : "approvals",
+  "version" : "0.0.1",
+  "dependencies": {
+    "express": "4.15.x",
+    "body-parser": "1.17.x",
+    "shortid": "2.2.x"
+  }
+}

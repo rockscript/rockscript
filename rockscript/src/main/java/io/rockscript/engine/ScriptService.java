@@ -31,7 +31,7 @@ import java.util.List;
  *
  * Use it like this:
  * <code>
- *   DeployScriptResponse response = scriptService.newDeployScriptCommand()
+ *   ServerDeployScriptResponse response = scriptService.newDeployScriptCommand()
  *     .name("Approval")
  *     .scriptText("...the script text...")
  *     .execute();

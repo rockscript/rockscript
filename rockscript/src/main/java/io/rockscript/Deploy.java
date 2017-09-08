@@ -29,6 +29,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.regex.Pattern;
 
+import static io.rockscript.Rock.log;
+
 public class Deploy extends ClientCommand {
 
   public static final String DEFAULT_NAME_PATTERN = ".*\\.rs(t)?";
@@ -62,8 +64,6 @@ public class Deploy extends ClientCommand {
       "Default is *.rs  " +
       "Ignored if a file is specified. " +
       "See also https://docs.oracle.com/javase/tutorial/essential/regex/index.html ");
-    options.addOption("v",
-      "Verbose.  Prints more ");
     return options;
   }
 
@@ -102,7 +102,7 @@ public class Deploy extends ClientCommand {
           .scriptText(scriptText)
         );
 
-      log(request.toString("  "));
+      if (!quiet) log(request.toString("  "));
 
       HttpResponse response = request.execute();
 
@@ -111,11 +111,11 @@ public class Deploy extends ClientCommand {
         response.setBody(responseBody.substring(0,100)+"...");
       }
 
-      log(response.toString("  "));
+      if (!quiet) log(response.toString("  "));
 
       response.setBody(responseBody);
 
-      DeployScriptResponse deployScriptResponse = ((HttpResponse) response)
+      DeployScriptResponse deployScriptResponse = response
         .getBodyAs(DeployScriptResponse.class);
 
       if (deployScriptResponse!=null && deployScriptResponse.hasErrors()) {
@@ -172,11 +172,6 @@ public class Deploy extends ClientCommand {
    * the files being deployed. */
   public Deploy namePattern(String namePattern) {
     this.namePattern = namePattern;
-    return this;
-  }
-
-  public Deploy args(String... args) {
-    this.args = args;
     return this;
   }
 }

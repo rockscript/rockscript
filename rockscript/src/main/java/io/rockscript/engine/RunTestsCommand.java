@@ -65,8 +65,8 @@ public class RunTestsCommand extends CommandImpl<TestResults> {
       String scriptId = scriptVersion.getId();
       testScriptService
         .newStartScriptExecutionCommand()
-          .scriptId(scriptId)
-          .execute();
+        .scriptId(scriptId)
+        .execute();
     } catch (Throwable t) {
       testResult.setError(new ErrorMessage(t));
     }

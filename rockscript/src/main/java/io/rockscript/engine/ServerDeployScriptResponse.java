@@ -20,28 +20,18 @@ import java.util.List;
 /** Response from the DeployScriptCommand.
  *
  * ServerDeployScriptResponse are serializable with Gson. */
-public class DeployScriptResponse extends Script {
-
-  protected List<ParseError> errors;
+public class ServerDeployScriptResponse extends DeployScriptResponse implements CommandResponse {
 
   /** for gson serialization */
-  DeployScriptResponse() {
+  ServerDeployScriptResponse() {
   }
 
-  public DeployScriptResponse(Script script, List<ParseError> errors) {
-    super(script);
-    this.errors = errors;
+  public ServerDeployScriptResponse(Script script, List<ParseError> errors) {
+    super(script, errors);
   }
 
-  public List<ParseError> getErrors() {
-    return errors;
-  }
-
-  public void setErrors(List<ParseError> errors) {
-    this.errors = errors;
-  }
-
-  public boolean hasErrors() {
-    return errors!=null && !errors.isEmpty();
+  @Override
+  public int getStatus() {
+    return !hasErrors() ? 200 : 400;
   }
 }

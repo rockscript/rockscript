@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <title>Approval Service</title>
-  <engineScript src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></engineScript>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body onload="toggleRefreshing()">
 
@@ -10,7 +10,7 @@
 <button id="refreshButton" onclick="toggleRefreshing()"></button>
 <div id="approvals"></div>
 
-<engineScript>
+<script>
 var refreshing = false;
 
 function refreshApprovals() {
@@ -71,7 +71,7 @@ function refreshInASecond() {
   }, 1000);
 }
 
-</engineScript>
+</script>
 
 </body>
 </html>

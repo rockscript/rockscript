@@ -104,7 +104,7 @@ public class ScriptTest {
   }
 
   public ScriptExecution startScriptExecution(String scriptId, Object input) {
-    StartScriptExecutionResponse response = scriptService.newStartScriptExecutionCommand()
+    ServerStartScriptExecutionResponse response = scriptService.newStartScriptExecutionCommand()
         .scriptId(scriptId)
         .input(input)
         .execute();

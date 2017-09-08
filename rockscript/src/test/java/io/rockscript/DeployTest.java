@@ -17,7 +17,7 @@
 package io.rockscript;
 
 import io.rockscript.engine.DeployScriptCommand;
-import io.rockscript.engine.DeployScriptResponse;
+import io.rockscript.engine.ServerDeployScriptResponse;
 import io.rockscript.engine.ParseError;
 import io.rockscript.test.AbstractServerTest;
 import org.junit.Test;
@@ -36,13 +36,13 @@ public class DeployTest extends AbstractServerTest {
 
   @Test
   public void testDeployOk() {
-    DeployScriptResponse deployScriptResponse = newPost("command")
+    ServerDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
         .scriptText("var a=0;")
         .scriptName("Test script"))
       .execute()
       .assertStatusOk()
-      .getBodyAs(DeployScriptResponse.class);
+      .getBodyAs(ServerDeployScriptResponse.class);
 
     assertNotNull(deployScriptResponse.getId());
     assertEquals((Integer) 0, deployScriptResponse.getVersion());
@@ -52,12 +52,12 @@ public class DeployTest extends AbstractServerTest {
 
   @Test
   public void testDeploySyntaxError() {
-    DeployScriptResponse deployScriptResponse = newPost("command")
+    ServerDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
         .scriptText("\n\ninvalid script"))
       .execute()
       .assertStatusBadRequest()
-      .getBodyAs(DeployScriptResponse.class);
+      .getBodyAs(ServerDeployScriptResponse.class);
 
     assertEquals("Unnamed script", deployScriptResponse.getName());
 
@@ -71,12 +71,12 @@ public class DeployTest extends AbstractServerTest {
 
   @Test
   public void testDeployParseError() {
-    DeployScriptResponse deployScriptResponse = newPost("command")
+    ServerDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
         .scriptText("\n\nvar a = b+c;"))
       .execute()
       .assertStatusBadRequest()
-      .getBodyAs(DeployScriptResponse.class);
+      .getBodyAs(ServerDeployScriptResponse.class);
 
     assertEquals("Unnamed script", deployScriptResponse.getName());
 
@@ -87,13 +87,4 @@ public class DeployTest extends AbstractServerTest {
     assertEquals(8, error.getColumn());
     assertEquals("Unsupported singleExpression: b+c", error.getMessage());
   }
-
-  @Test
-  public void testDeploy() throws Exception {
-    new Deploy()
-      .args("deploy", "..")
-      .recursive()
-      .execute();
-  }
-
 }

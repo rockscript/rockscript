@@ -15,26 +15,7 @@
  */
 package io.rockscript;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import io.rockscript.http.GsonCodec;
-import io.rockscript.http.Http;
-import org.apache.commons.cli.*;
-
-import java.util.Map;
-
-import static io.rockscript.Server.createCommandsTypeAdapterFactory;
-import static io.rockscript.engine.impl.Event.createEventJsonTypeAdapterFactory;
-import static io.rockscript.util.Maps.entry;
-import static io.rockscript.util.Maps.hashMap;
-
 public abstract class Rock {
-
-  static Map<String,Class<? extends Rock>> COMMAND_CLASSES = hashMap(
-    entry("server", Server.class),
-    entry("ping", Ping.class),
-    entry("deploy", Deploy.class)
-  );
 
   public static void main(String[] args) {
     try {
@@ -46,42 +27,23 @@ public abstract class Rock {
         if ("help".equals(command)) {
           if (args.length>=2) {
             String helpCommand = args[1];
-            Rock rock = getRock(helpCommand);
-            if (rock!=null) {
-              rock.showCommandUsage();
+            CliCommand cliCommand = CliCommand.createCliCommand(helpCommand);
+            if (cliCommand!=null) {
+              cliCommand.showCommandUsage();
             }
           } else {
             showCommandsOverview();
           }
         } else {
-          Rock rock = getRock(command);
-          if (rock!=null) {
-            rock.args = args;
-            Options options = rock.getOptions();
-            if (options!=null) {
-              CommandLineParser commandLineParser = new DefaultParser();
-              CommandLine commandLine = commandLineParser.parse(options, args);
-              rock.parse(commandLine);
-            }
-            rock.execute();
+          CliCommand cliCommand = CliCommand.createCliCommand(command);
+          if (cliCommand!=null) {
+            cliCommand.parseArgs(args);
+            cliCommand.execute();
           }
         }
       }
     } catch (Exception e) {
       e.printStackTrace();
-    }
-  }
-
-  static Rock getRock(String command) {
-    try {
-      Class<? extends Rock> rockClass = COMMAND_CLASSES.get(command);
-      if (rockClass==null) {
-        showCommandsOverview(command);
-        return null;
-      }
-      return rockClass.newInstance();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
     }
   }
 
@@ -100,21 +62,10 @@ public abstract class Rock {
     log("rock server [server options] | Start the rockscript server");
     log("rock ping [ping options]     | Test the connection with the server");
     log("rock deploy [deploy options] | Deploy script files to the server");
+    log("rock start [start options]   | Starts a new script execution");
     log("rock                         | Shows this help message");
     log();
     log("More details at https://github.com/rockscript/rockscript/wiki/RockScript-API");
-  }
-
-  protected String[] args;
-
-  protected abstract void execute() throws Exception;
-  protected abstract void showCommandUsage();
-  protected abstract Options getOptions();
-  protected abstract void parse(CommandLine commandLine);
-
-  protected void logCommandUsage(String usage) {
-    HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp(usage, getOptions());
   }
 
   protected static void log() {
@@ -123,16 +74,5 @@ public abstract class Rock {
 
   protected static void log(String text) {
     System.out.println(text);
-  }
-
-  protected Gson createCommonGson() {
-    return new GsonBuilder()
-      .registerTypeAdapterFactory(createCommandsTypeAdapterFactory())
-      .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
-      .create();
-  }
-
-  protected Http createHttp() {
-    return new Http(new GsonCodec(createCommonGson()));
   }
 }

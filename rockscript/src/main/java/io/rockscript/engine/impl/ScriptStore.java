@@ -16,7 +16,8 @@
 
 package io.rockscript.engine.impl;
 
-import io.rockscript.engine.DeployScriptResponse;
+import io.rockscript.engine.EngineException;
+import io.rockscript.engine.ServerDeployScriptResponse;
 import io.rockscript.engine.Script;
 import io.rockscript.engine.Configuration;
 
@@ -44,7 +45,7 @@ public class ScriptStore {
   }
 
   public EngineScript findLatestScriptAstByName(String scriptName) {
-    List<Script> scriptVersions = scriptsByName.get(scriptName);
+    List<Script> scriptVersions = findScriptVersionsByName(scriptName);
     if (scriptVersions!=null) {
       Script latestVersion = scriptVersions.get(scriptVersions.size()-1);
       String scriptId = latestVersion.getId();
@@ -53,10 +54,32 @@ public class ScriptStore {
     return null;
   }
 
+  /** only the last part of the name has to match */
+  List<Script> findScriptVersionsByName(String scriptName) {
+    if (scriptsByName.containsKey(scriptName)) {
+      return scriptsByName.get(scriptName);
+    }
+    List<String> names = new ArrayList<>();
+    for (String name: scriptsByName.keySet()) {
+      if (name.endsWith(scriptName)) {
+        names.add(name);
+      }
+    }
+    if (names.size()==1) {
+      return scriptsByName.get(names.get(0));
+    } else if (names.size()>1) {
+      throw new EngineException("Ambiguous name: "+names);
+    }
+    return null;
+  }
+
   public EngineScript findScriptAstById(String scriptId) {
     EngineScript engineScript = scriptAstsById.get(scriptId);
     if (engineScript == null) {
       Script script = findScriptById(scriptId);
+      if (script==null) {
+        throw new EngineException("Script "+scriptId+" does not exist");
+      }
       Parse parse = parseScript(script);
       if (!parse.hasErrors()) {
         engineScript = parse.getEngineScript();
@@ -79,7 +102,7 @@ public class ScriptStore {
     return null;
   }
 
-  public DeployScriptResponse deploy(String scriptName, String scriptText) {
+  public ServerDeployScriptResponse deploy(String scriptName, String scriptText) {
     Script script = new Script();
     script.setText(scriptText);
 
@@ -103,7 +126,7 @@ public class ScriptStore {
       storeScript(script);
     }
 
-    return new DeployScriptResponse(script, parse.getErrors());
+    return new ServerDeployScriptResponse(script, parse.getErrors());
   }
 
   /** Parses the script and initializes

@@ -160,6 +160,10 @@ public class HttpResponse {
     return body!=null ? body.toString() : null;
   }
 
+  public <T> T getBodyAs(Class<T> clazz) {
+    return getBodyAs((Type)clazz);
+  }
+
   public <T> T getBodyAs(Type type) {
     if (body==null) {
       return null;

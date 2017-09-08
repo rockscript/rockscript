@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, RockScript.io. All rights reserved.
+ * Copyright ©2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript;
 
+import io.rockscript.test.AbstractServerTest;
+import org.junit.Test;
 
-public class StartScriptExecutionResponse {
+public class CliTest extends AbstractServerTest {
 
-  protected String scriptExecutionId;
-  protected String error;
+  @Test
+  public void testPing() throws Exception {
+    new Ping()
+      .parseArgs("ping", "-q")
+      .execute();
 
-  public String getScriptExecutionId() {
-    return scriptExecutionId;
-  }
+    new Deploy()
+      .parseArgs("deploy", "-n", ".*resources.*\\.testscript", "-r", "..")
+      .execute();
 
-  public String getError() {
-    return this.error;
+    new Start()
+      .parseArgs("start", "-n", "short.testscript")
+      .execute();
   }
 }

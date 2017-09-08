@@ -22,7 +22,7 @@ import java.util.Map;
 
 /** Command to start a new script execution.
  * StartScriptExecutionCommand's are serializable with Gson */
-public class StartScriptExecutionCommand extends CommandImpl<StartScriptExecutionResponse> {
+public class StartScriptExecutionCommand extends CommandImpl<ServerStartScriptExecutionResponse> {
 
   protected String scriptName;
   protected String scriptId;
@@ -36,11 +36,11 @@ public class StartScriptExecutionCommand extends CommandImpl<StartScriptExecutio
   }
 
   @Override
-  protected StartScriptExecutionResponse execute(Configuration configuration) {
+  protected ServerStartScriptExecutionResponse execute(Configuration configuration) {
     EngineScriptExecution engineScriptExecution = configuration
-        .getEngine()
-        .startScriptExecution(scriptName, scriptId, input);
-    return new StartScriptExecutionResponse(engineScriptExecution);
+      .getEngine()
+      .startScriptExecution(scriptName, scriptId, input);
+    return new ServerStartScriptExecutionResponse(engineScriptExecution);
   }
 
   public String getScriptName() {

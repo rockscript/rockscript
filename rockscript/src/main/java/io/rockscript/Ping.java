@@ -16,7 +16,10 @@
 package io.rockscript;
 
 import io.rockscript.http.Http;
+import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
+
+import static io.rockscript.Rock.log;
 
 public class Ping extends ClientCommand {
 
@@ -37,23 +40,27 @@ public class Ping extends ClientCommand {
   public void execute() throws Exception {
     try {
       String pingUrl = this.url + "/ping";
-      log("> GET "+pingUrl+" ...");
-      HttpResponse response = new Http()
-        .newGet(pingUrl)
-        .execute();
+
+      log("Pinging server "+url+" ...");
+
+      HttpRequest request = new Http()
+        .newGet(pingUrl);
+
+      if (!quiet) log(request.toString("  "));
+
+      HttpResponse response = request.execute();
+
+      if (!quiet) log(response.toString("  "));
 
       int status = response.getStatus();
       String body = response.getBodyAsString();
       if (status==200) {
-        log("< 200 OK");
+        log("Successfully pinged the server");
       } else {
         log("Wrong response status: "+status);
       }
-      log("< "+body);
     } catch (Exception e) {
       log("Could not connect to "+url+" : "+e.getMessage());
     }
   }
-
-
 }
