@@ -95,10 +95,10 @@ public class Response {
     return bodyString(bodyString, UTF_8);
   }
 
-  public Response bodyString(String content, Charset charset) {
-    if (content!=null) {
-      contentStringForLog = content; // the log is produced in getHttpResponse() below 
-      byteBuf.writeBytes(content.getBytes(charset));
+  public Response bodyString(String bodyString, Charset charset) {
+    if (bodyString!=null) {
+      contentStringForLog = bodyString; // the log is produced in getHttpResponse() below
+      byteBuf.writeBytes(bodyString.getBytes(charset));
     }
     return this;
   }

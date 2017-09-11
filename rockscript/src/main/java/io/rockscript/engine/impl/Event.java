@@ -30,6 +30,7 @@ public interface Event {
       .typeName(new TypeToken<ScriptEndedEvent>(){},          "scriptEnded")
       .typeName(new TypeToken<ScriptStartedEvent>(){},        "scriptStarted")
       .typeName(new TypeToken<VariableCreatedEvent>(){},      "variableCreated")
+      .typeName(new TypeToken<ErrorExecutionEvent>(){},       "error")
       ;
   }
 

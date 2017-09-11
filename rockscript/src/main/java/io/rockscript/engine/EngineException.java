@@ -37,6 +37,11 @@ public class EngineException extends RuntimeException {
 
   public EngineException(String message, Throwable cause) {
     super(message, cause);
+    if (cause instanceof EngineException) {
+      EngineException engineException = (EngineException) cause;
+      this.scriptId = engineException.scriptId;
+      this.location = engineException.location;
+    }
   }
 
   public EngineException(String message, ActivityInput activityInput) {

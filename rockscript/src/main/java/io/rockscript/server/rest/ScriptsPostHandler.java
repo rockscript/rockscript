@@ -17,6 +17,8 @@ package io.rockscript.server.rest;
 
 import io.rockscript.engine.ScriptService;
 import io.rockscript.netty.router.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
@@ -24,21 +26,31 @@ import static io.rockscript.util.Maps.hashMap;
 @Post("/scripts")
 public class ScriptsPostHandler implements RequestHandler {
 
+  static Logger log = LoggerFactory.getLogger(ScriptsPostHandler.class);
+
   @Override
   public void handle(Request request, Response response, Context context) {
     String script = request.getBodyStringUtf8();
 
-    String scriptId = context
-      .get(ScriptService.class)
-      .newDeployScriptCommand()
-        .scriptText(script)
-        .execute()
-      .getId();
+    try {
+      String scriptId = context
+        .get(ScriptService.class)
+        .newDeployScriptCommand()
+          .scriptText(script)
+          .execute()
+        .getId();
 
-    response.statusOk();
-    response.bodyJson(hashMap(
-      entry("id", scriptId)
-    ));
-    response.send();
+      response.statusOk();
+      response.bodyJson(hashMap(
+        entry("id", scriptId)
+      ));
+      response.send();
+
+    } catch (Exception e) {
+      log.debug("Exception while deploying script: "+e.getMessage(), e);
+      response.bodyJson(hashMap(entry("message", "Error: " + e.getMessage())));
+      response.status(500);
+      response.send();
+    }
   }
 }

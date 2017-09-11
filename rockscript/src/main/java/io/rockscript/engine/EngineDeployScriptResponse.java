@@ -19,14 +19,14 @@ import java.util.List;
 
 /** Response from the DeployScriptCommand.
  *
- * ServerDeployScriptResponse are serializable with Gson. */
-public class ServerDeployScriptResponse extends DeployScriptResponse implements CommandResponse {
+ * EngineDeployScriptResponse are serializable with Gson. */
+public class EngineDeployScriptResponse extends DeployScriptResponse implements CommandResponse {
 
   /** for gson serialization */
-  ServerDeployScriptResponse() {
+  EngineDeployScriptResponse() {
   }
 
-  public ServerDeployScriptResponse(Script script, List<ParseError> errors) {
+  public EngineDeployScriptResponse(Script script, List<ParseError> errors) {
     super(script, errors);
   }
 

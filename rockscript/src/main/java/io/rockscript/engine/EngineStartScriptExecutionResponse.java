@@ -18,21 +18,22 @@ package io.rockscript.engine;
 
 import io.rockscript.engine.impl.EngineScriptExecution;
 
-public class ServerStartScriptExecutionResponse extends StartScriptExecutionResponse implements CommandResponse {
+public class EngineStartScriptExecutionResponse extends StartScriptExecutionResponse implements CommandResponse {
 
   /** transient because it must not be serialized with Gson */
   transient EngineScriptExecution engineScriptExecution;
 
   /** constructor for Gson serialization */
-  ServerStartScriptExecutionResponse() {
+  EngineStartScriptExecutionResponse() {
   }
 
-  public ServerStartScriptExecutionResponse(EngineScriptExecution engineScriptExecution) {
+  public EngineStartScriptExecutionResponse(EngineScriptExecution engineScriptExecution) {
     this.scriptExecutionId = engineScriptExecution.getId();
     this.engineScriptExecution = engineScriptExecution;
   }
 
-  public ServerStartScriptExecutionResponse(String error) {
+  // TODO use this
+  public EngineStartScriptExecutionResponse(String error) {
     this.error = error;
   }
 

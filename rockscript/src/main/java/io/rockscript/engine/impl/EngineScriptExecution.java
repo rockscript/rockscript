@@ -15,8 +15,9 @@
  */
 package io.rockscript.engine.impl;
 
-import io.rockscript.engine.EngineException;
 import io.rockscript.engine.Configuration;
+import io.rockscript.engine.EngineException;
+import io.rockscript.engine.ScriptExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,6 +117,15 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
       addWork(new ExecuteEventOperation(event, execution));
       // event.execute(execution);
     } // when rebuilding, the loop in the constructor will re-execute the ExecutableEvent's
+  }
+
+  public static void handleException(Throwable e) {
+    if (e instanceof ScriptExecutionException) {
+      ScriptExecutionException scriptExecutionException = (ScriptExecutionException) e;
+      EngineScriptExecution scriptExecution = scriptExecutionException.getScriptExecution();
+      scriptExecution.dispatch(new ErrorExecutionEvent(scriptExecutionException));
+      handleException(e.getCause());
+    }
   }
 
   private boolean rebuilding() {

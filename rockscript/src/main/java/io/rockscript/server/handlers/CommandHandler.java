@@ -23,6 +23,9 @@ import io.rockscript.netty.router.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.rockscript.util.Maps.entry;
+import static io.rockscript.util.Maps.hashMap;
+
 @Post("/command")
 public class CommandHandler implements RequestHandler {
 
@@ -34,10 +37,17 @@ public class CommandHandler implements RequestHandler {
     Configuration configuration = context.get(Configuration.class);
     command.setConfiguration(configuration);
 
-    CommandResponse commandResponse = command.execute();
+    try {
+      CommandResponse commandResponse = command.execute();
+      response.bodyJson(commandResponse);
+      response.status(commandResponse.getStatus());
+      response.send();
 
-    response.bodyJson(commandResponse);
-    response.status(commandResponse.getStatus());
-    response.send();
+    } catch (Exception e) {
+      log.debug("Exception while executing command "+command+": "+e.getMessage(), e);
+      response.bodyJson(hashMap(entry("message", "Error: " + e.getMessage())));
+      response.status(500);
+      response.send();
+    }
   }
 }

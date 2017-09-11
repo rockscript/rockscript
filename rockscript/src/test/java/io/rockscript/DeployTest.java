@@ -17,7 +17,7 @@
 package io.rockscript;
 
 import io.rockscript.engine.DeployScriptCommand;
-import io.rockscript.engine.ServerDeployScriptResponse;
+import io.rockscript.engine.EngineDeployScriptResponse;
 import io.rockscript.engine.ParseError;
 import io.rockscript.test.AbstractServerTest;
 import org.junit.Test;
@@ -36,13 +36,13 @@ public class DeployTest extends AbstractServerTest {
 
   @Test
   public void testDeployOk() {
-    ServerDeployScriptResponse deployScriptResponse = newPost("command")
+    EngineDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
         .scriptText("var a=0;")
         .scriptName("Test script"))
       .execute()
       .assertStatusOk()
-      .getBodyAs(ServerDeployScriptResponse.class);
+      .getBodyAs(EngineDeployScriptResponse.class);
 
     assertNotNull(deployScriptResponse.getId());
     assertEquals((Integer) 0, deployScriptResponse.getVersion());
@@ -52,12 +52,12 @@ public class DeployTest extends AbstractServerTest {
 
   @Test
   public void testDeploySyntaxError() {
-    ServerDeployScriptResponse deployScriptResponse = newPost("command")
+    EngineDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
         .scriptText("\n\ninvalid script"))
       .execute()
       .assertStatusBadRequest()
-      .getBodyAs(ServerDeployScriptResponse.class);
+      .getBodyAs(EngineDeployScriptResponse.class);
 
     assertEquals("Unnamed script", deployScriptResponse.getName());
 
@@ -71,12 +71,12 @@ public class DeployTest extends AbstractServerTest {
 
   @Test
   public void testDeployParseError() {
-    ServerDeployScriptResponse deployScriptResponse = newPost("command")
+    EngineDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
         .scriptText("\n\nvar a = b+c;"))
       .execute()
       .assertStatusBadRequest()
-      .getBodyAs(ServerDeployScriptResponse.class);
+      .getBodyAs(EngineDeployScriptResponse.class);
 
     assertEquals("Unnamed script", deployScriptResponse.getName());
 

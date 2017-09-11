@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestRunnerTest extends HttpTest {
 
@@ -102,7 +103,7 @@ public class TestRunnerTest extends HttpTest {
     log.debug(getConfiguration().getGson().toJson(testResults));
 
     ErrorMessage error = testResults.get(0).getError();
-    assertEquals("ReferenceError: unexistingvar is not defined", error.getMessage());
+    assertTrue(error.getMessage().contains("ReferenceError: unexistingvar is not defined"));
 
     assertEquals(scriptId, error.getScriptId());
     assertEquals(2, error.getLocation().getLine());

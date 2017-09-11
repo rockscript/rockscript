@@ -21,7 +21,7 @@ import io.rockscript.engine.impl.EngineScriptExecution;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class EndActivityCommand extends CommandImpl<EndActivityResponse> {
+public class EndActivityCommand extends CommandImpl<EngineEndActivityResponse> {
 
   protected String scriptExecutionId;
   protected String executionId;
@@ -35,12 +35,12 @@ public class EndActivityCommand extends CommandImpl<EndActivityResponse> {
   }
 
   @Override
-  protected EndActivityResponse execute(Configuration configuration) {
+  protected EngineEndActivityResponse execute(Configuration configuration) {
     ContinuationReference continuationReference = new ContinuationReference(scriptExecutionId, executionId);
     EngineScriptExecution engineScriptExecution = configuration
         .getEngine()
         .endActivity(continuationReference, result);
-    return new EndActivityResponse(engineScriptExecution);
+    return new EngineEndActivityResponse(engineScriptExecution);
   }
 
   public EndActivityCommand continuationReference(ContinuationReference continuationReference) {

@@ -110,10 +110,13 @@ public class LocalEngine implements Engine {
   public synchronized Lock acquireLock(String scriptExecutionId) {
     Lock lock = locks.get(scriptExecutionId);
     if (lock==null) {
-      lock = new Lock(scriptExecutionId);
-      locks.put(scriptExecutionId, lock);
-      return lock;
-    }
+//      EventStore eventStore = configuration.getEventStore();
+//      if (eventStore.hasScriptExecution(scriptExecutionId)) {
+        lock = new Lock(scriptExecutionId);
+        locks.put(scriptExecutionId, lock);
+        return lock;
+      }
+//    }
     return null;
   }
 

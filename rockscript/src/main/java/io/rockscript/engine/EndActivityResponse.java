@@ -15,32 +15,11 @@
  */
 package io.rockscript.engine;
 
-import io.rockscript.engine.impl.EngineScriptExecution;
+public class EndActivityResponse {
 
-public class EndActivityResponse extends ScriptExecution implements CommandResponse {
+  protected String error;
 
-  /** transient because it must not be serialized with Gson */
-  transient EngineScriptExecution engineScriptExecution;
-
-  /** constructor for Gson serialization */
-  EndActivityResponse() {
-  }
-
-  public EndActivityResponse(EngineScriptExecution engineScriptExecution) {
-    super(engineScriptExecution);
-    this.engineScriptExecution = engineScriptExecution;
-  }
-
-  public ScriptExecution getScriptExecution() {
-    return new ScriptExecution(engineScriptExecution);
-  }
-
-  public EngineScriptExecution getEngineScriptExecution() {
-    return engineScriptExecution;
-  }
-
-  @Override
-  public int getStatus() {
-    return 200;
+  public String getError() {
+    return this.error;
   }
 }

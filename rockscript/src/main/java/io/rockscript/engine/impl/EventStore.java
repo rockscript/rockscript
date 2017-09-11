@@ -151,4 +151,13 @@ public class EventStore implements EventListener {
     }
     return convertedMap;
   }
+
+  public boolean hasScriptExecution(String scriptExecutionId) {
+    return events.stream()
+      .filter(event-> event instanceof ExecutionEvent)
+      .map(event->((ExecutionEvent)event))
+      .filter(executionEvent->scriptExecutionId.equals(executionEvent.getScriptExecutionId()))
+      .findFirst()
+      .isPresent();
+  }
 }

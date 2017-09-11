@@ -16,8 +16,8 @@
 
 package io.rockscript.engine.impl;
 
+import io.rockscript.engine.EngineDeployScriptResponse;
 import io.rockscript.engine.EngineException;
-import io.rockscript.engine.ServerDeployScriptResponse;
 import io.rockscript.engine.Script;
 import io.rockscript.engine.Configuration;
 
@@ -102,7 +102,7 @@ public class ScriptStore {
     return null;
   }
 
-  public ServerDeployScriptResponse deploy(String scriptName, String scriptText) {
+  public EngineDeployScriptResponse deploy(String scriptName, String scriptText) {
     Script script = new Script();
     script.setText(scriptText);
 
@@ -126,7 +126,7 @@ public class ScriptStore {
       storeScript(script);
     }
 
-    return new ServerDeployScriptResponse(script, parse.getErrors());
+    return new EngineDeployScriptResponse(script, parse.getErrors());
   }
 
   /** Parses the script and initializes

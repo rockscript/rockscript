@@ -37,10 +37,10 @@ public class Start extends ClientCommand {
   protected void showCommandUsage() {
     log("rock start : Starts a new script execution");
     log();
-    logCommandUsage("rock start [start options] [scriptName or scriptId]");
+    logCommandUsage("rock start [start options]");
     log();
     log("Example:");
-    log("  rock start create-approval.rs");
+    log("  rock start -n \"Create approval.rs\"");
     log("Starts a new script execution in the latest version ");
     log("of the script with name ending with 'create-approval.rs'");
   }

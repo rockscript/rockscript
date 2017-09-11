@@ -24,7 +24,7 @@ import io.rockscript.engine.impl.ScriptStore;
  * Example usage:
  * Use it like this:
  * <code>
- *   ServerDeployScriptResponse response = scriptService.newDeployScriptCommand()
+ *   EngineDeployScriptResponse response = scriptService.newDeployScriptCommand()
  *     .name("Approval")
  *     .text("...the script text...")
  *     .execute();
@@ -32,7 +32,7 @@ import io.rockscript.engine.impl.ScriptStore;
  *
  * DeployScriptCommand's are serializable with Gson.
  */
-public class DeployScriptCommand extends CommandImpl<ServerDeployScriptResponse> {
+public class DeployScriptCommand extends CommandImpl<EngineDeployScriptResponse> {
 
   protected String scriptName;
   protected String scriptText;
@@ -46,7 +46,7 @@ public class DeployScriptCommand extends CommandImpl<ServerDeployScriptResponse>
   }
 
   @Override
-  protected ServerDeployScriptResponse execute(Configuration configuration) {
+  protected EngineDeployScriptResponse execute(Configuration configuration) {
     ScriptStore scriptStore = configuration.getScriptStore();
     return scriptStore.deploy(scriptName, scriptText);
   }

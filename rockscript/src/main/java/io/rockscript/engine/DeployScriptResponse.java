@@ -19,7 +19,7 @@ import java.util.List;
 
 /** Response from the DeployScriptCommand.
  *
- * ServerDeployScriptResponse are serializable with Gson. */
+ * EngineDeployScriptResponse are serializable with Gson. */
 public class DeployScriptResponse extends Script {
 
   protected List<ParseError> errors;

@@ -17,9 +17,9 @@ package io.rockscript;
 
 import com.google.gson.reflect.TypeToken;
 import io.rockscript.engine.DeployScriptCommand;
-import io.rockscript.engine.ServerDeployScriptResponse;
+import io.rockscript.engine.EngineDeployScriptResponse;
 import io.rockscript.engine.StartScriptExecutionCommand;
-import io.rockscript.engine.ServerStartScriptExecutionResponse;
+import io.rockscript.engine.EngineStartScriptExecutionResponse;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.test.AbstractServerTest;
 import org.junit.Test;
@@ -33,44 +33,44 @@ public class ServerTest extends AbstractServerTest {
 
   @Test
   public void testServer() {
-    ServerDeployScriptResponse deployScriptResponse = newPost("command")
+    EngineDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
           .scriptText(""))
       .execute()
       .assertStatusOk()
-      .getBodyAs(ServerDeployScriptResponse.class);
+      .getBodyAs(EngineDeployScriptResponse.class);
 
     String scriptId = deployScriptResponse.getId();
 
     assertNotNull(scriptId);
 
-    ServerStartScriptExecutionResponse startScriptResponse = newPost("command")
+    EngineStartScriptExecutionResponse startScriptResponse = newPost("command")
       .bodyObject(new StartScriptExecutionCommand()
           .scriptId(scriptId))
       .execute()
       .assertStatusOk()
-      .getBodyAs(ServerStartScriptExecutionResponse.class);
+      .getBodyAs(EngineStartScriptExecutionResponse.class);
 
     String scriptExecutionId = startScriptResponse.getScriptExecutionId();
   }
 
   @Test
   public void testEvents() {
-    ServerDeployScriptResponse deployScriptResponse = newPost("command")
+    EngineDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
         .scriptText("var msg = {hello: 'world'};"))
       .execute()
       .assertStatusOk()
-      .getBodyAs(ServerDeployScriptResponse.class);
+      .getBodyAs(EngineDeployScriptResponse.class);
 
     String scriptId = deployScriptResponse.getId();
 
-    ServerStartScriptExecutionResponse startScriptResponse = newPost("command")
+    EngineStartScriptExecutionResponse startScriptResponse = newPost("command")
       .bodyObject(new StartScriptExecutionCommand()
         .scriptId(scriptId))
       .execute()
       .assertStatusOk()
-      .getBodyAs(ServerStartScriptExecutionResponse.class);
+      .getBodyAs(EngineStartScriptExecutionResponse.class);
 
     List<Event> eventJsons = newGet("events")
       .execute()

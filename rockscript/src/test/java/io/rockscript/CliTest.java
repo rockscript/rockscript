@@ -33,5 +33,9 @@ public class CliTest extends AbstractServerTest {
     new Start()
       .parseArgs("start", "-n", "short.testscript")
       .execute();
+
+    new End()
+      .parseArgs("end", "-seid", "se209348", "-eid", "e98")
+      .execute();
   }
 }

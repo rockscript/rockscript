@@ -17,10 +17,12 @@ package io.rockscript.activity.test;
 
 import io.rockscript.engine.EngineException;
 import io.rockscript.engine.ScriptService;
-import io.rockscript.engine.ServerStartScriptExecutionResponse;
+import io.rockscript.engine.EngineStartScriptExecutionResponse;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.ImportObject;
 import io.rockscript.activity.ImportProvider;
+
+import static io.rockscript.engine.impl.EngineScriptExecution.handleException;
 
 public class TestImportObject extends ImportObject implements ImportProvider {
 
@@ -32,9 +34,18 @@ public class TestImportObject extends ImportObject implements ImportProvider {
     this.testResult = testResult;
     put("start", activityInput -> {
       String scriptName = activityInput.getArgProperty("scriptName");
-      ServerStartScriptExecutionResponse response = scriptService.newStartScriptExecutionCommand()
-          .scriptName(scriptName)
-          .execute();
+      EngineStartScriptExecutionResponse response = null;
+      try {
+        response = scriptService.newStartScriptExecutionCommand()
+            .scriptName(scriptName)
+            .execute();
+      } catch (Exception e) {
+        // TODO 1) dispatch an error event from the script execution,
+        //      2) leave the script execution locked
+        //      3) rethrow an exception
+        handleException(e);
+        throw new EngineException("Nested script execution "+scriptName+" failed: "+e.getMessage(), e);
+      }
       return ActivityOutput.endFunction(response.getScriptExecution());
     });
     put("assertEquals", activityInput -> {
