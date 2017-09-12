@@ -71,13 +71,17 @@ public class LocalEngine implements Engine {
 
   @Override
   public EngineScriptExecution endActivity(ContinuationReference continuationReference, Object result) {
-    EngineScriptExecution scriptExecution =null;
+    String scriptExecutionId = continuationReference.getScriptExecutionId();
+    EngineScriptExecution scriptExecution = configuration
+      .getEventStore()
+      .findScriptExecutionById(scriptExecutionId);
+    if (scriptExecution==null) {
+      throw new EngineException("Script execution "+scriptExecutionId+" doesn't exist");
+    }
+
     Lock lock = acquireLockOrAddEndActivityRequestToBacklog(continuationReference, result);
     if (lock!=null) {
       try {
-        scriptExecution = configuration
-          .getEventStore()
-          .findScriptExecutionById(continuationReference.getScriptExecutionId());
         endActivity(scriptExecution, continuationReference, result);
       } catch (RuntimeException e) {
         e.printStackTrace();
@@ -110,13 +114,10 @@ public class LocalEngine implements Engine {
   public synchronized Lock acquireLock(String scriptExecutionId) {
     Lock lock = locks.get(scriptExecutionId);
     if (lock==null) {
-//      EventStore eventStore = configuration.getEventStore();
-//      if (eventStore.hasScriptExecution(scriptExecutionId)) {
-        lock = new Lock(scriptExecutionId);
-        locks.put(scriptExecutionId, lock);
-        return lock;
-      }
-//    }
+      lock = new Lock(scriptExecutionId);
+      locks.put(scriptExecutionId, lock);
+      return lock;
+    }
     return null;
   }
 

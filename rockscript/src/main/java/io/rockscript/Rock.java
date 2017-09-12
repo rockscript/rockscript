@@ -21,7 +21,7 @@ public abstract class Rock {
     try {
       if (args==null
           || args.length==0) {
-        showCommandsOverview();
+        logCommandsOverview();
       } else {
         String command = args[0];
         if ("help".equals(command)) {
@@ -29,16 +29,22 @@ public abstract class Rock {
             String helpCommand = args[1];
             CliCommand cliCommand = CliCommand.createCliCommand(helpCommand);
             if (cliCommand!=null) {
-              cliCommand.showCommandUsage();
+              cliCommand.logCommandUsage();
             }
           } else {
-            showCommandsOverview();
+            logCommandsOverview();
           }
         } else {
           CliCommand cliCommand = CliCommand.createCliCommand(command);
           if (cliCommand!=null) {
-            cliCommand.parseArgs(args);
-            cliCommand.execute();
+            try {
+              cliCommand.parseArgs(args);
+              cliCommand.execute();
+            } catch (Exception e) {
+              log("Error: "+e.getMessage());
+              log();
+              cliCommand.logCommandUsage();
+            }
           }
         }
       }
@@ -47,11 +53,11 @@ public abstract class Rock {
     }
   }
 
-  static void showCommandsOverview() {
-    showCommandsOverview(null);
+  static void logCommandsOverview() {
+    logCommandsOverview(null);
   }
 
-  static void showCommandsOverview(String invalidCommand) {
+  static void logCommandsOverview(String invalidCommand) {
     if (invalidCommand!=null) {
       log("Invalid command: " + invalidCommand);
       log();

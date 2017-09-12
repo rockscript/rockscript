@@ -40,7 +40,7 @@ public class Deploy extends ClientCommand {
   protected Pattern compiledNamePattern;
 
   @Override
-  protected void showCommandUsage() {
+  protected void logCommandUsage() {
     log("rock deploy : Deploys script files to the server");
     log();
     logCommandUsage("rock deploy [deploy options] [file or directory]");

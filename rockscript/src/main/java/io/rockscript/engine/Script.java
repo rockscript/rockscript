@@ -21,8 +21,8 @@ public class Script {
 
   protected String id;
   protected String name;
-  protected String text;
   protected Integer version;
+  protected String text;
 
   public Script() {
   }

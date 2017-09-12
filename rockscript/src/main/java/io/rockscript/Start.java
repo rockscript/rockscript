@@ -34,7 +34,7 @@ public class Start extends ClientCommand {
   protected Properties inputProperties;
 
   @Override
-  protected void showCommandUsage() {
+  protected void logCommandUsage() {
     log("rock start : Starts a new script execution");
     log();
     logCommandUsage("rock start [start options]");
@@ -55,7 +55,7 @@ public class Start extends ClientCommand {
             "the full name. It's required to provide either sn or sid.")
       .hasArg()
       .build());
-    options.addOption(Option.builder("id")
+    options.addOption(Option.builder("sid")
       .desc("Script id. This identifies the specific version of a script" +
             "to start. It's required to provide either sn or sid.")
       .hasArg()
@@ -73,18 +73,18 @@ public class Start extends ClientCommand {
   protected void parse(CommandLine commandLine) {
     super.parse(commandLine);
     this.scriptName = commandLine.getOptionValue("n");
-    this.scriptId = commandLine.getOptionValue("id");
+    this.scriptId = commandLine.getOptionValue("sid");
     this.inputProperties = commandLine.getOptionProperties("p");
   }
 
   @Override
   public void execute() throws Exception {
     if (scriptName==null && scriptId==null) {
-      log("No -n or -id provided.  One of those two has to be specified.");
+      log("No -n or -sid provided.  One of those two has to be specified.");
       return;
     }
     if (scriptName!=null && scriptId!=null) {
-      log("Both -n and -id are provided.  -id "+scriptId+ " will be used.");
+      log("Both -n and -sid are provided.  -id "+scriptId+ " will be used.");
       scriptName = null;
     }
 

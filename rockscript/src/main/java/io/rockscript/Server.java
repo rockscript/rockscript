@@ -54,7 +54,7 @@ public class Server extends CliCommand {
   }
 
   @Override
-  protected void showCommandUsage() {
+  protected void logCommandUsage() {
     log("rock server : Starts the RockScript server");
     log();
     logCommandUsage("rock server [server options]");

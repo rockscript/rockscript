@@ -148,7 +148,7 @@ public class ScriptStore {
       scriptVersions = new ArrayList<>();
       scriptsByName.put(scriptName, scriptVersions);
     }
-    script.setVersion(scriptVersions.size());
+    script.setVersion(scriptVersions.size()+1);
     scriptVersions.add(script);
   }
 

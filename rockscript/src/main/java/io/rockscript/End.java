@@ -34,7 +34,7 @@ public class End extends ClientCommand {
   protected Properties resultProperties;
 
   @Override
-  protected void showCommandUsage() {
+  protected void logCommandUsage() {
     log("rock end : Ends a waiting activity");
     log();
     logCommandUsage("rock end [end options]");

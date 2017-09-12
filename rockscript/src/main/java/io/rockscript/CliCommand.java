@@ -25,7 +25,7 @@ public abstract class CliCommand {
   protected String[] args;
 
   protected abstract void execute() throws Exception;
-  protected abstract void showCommandUsage();
+  protected abstract void logCommandUsage();
   protected abstract Options getOptions();
   abstract void parse(CommandLine commandLine);
 
@@ -33,7 +33,7 @@ public abstract class CliCommand {
     try {
       Class<? extends CliCommand> rockClass = COMMAND_CLASSES.get(command);
       if (rockClass==null) {
-        Rock.showCommandsOverview(command);
+        Rock.logCommandsOverview(command);
         return null;
       }
       return rockClass.newInstance();
@@ -43,17 +43,13 @@ public abstract class CliCommand {
   }
 
 
-  public CliCommand parseArgs(String... args) {
+  public CliCommand parseArgs(String... args) throws ParseException {
     this.args = args;
     Options options = getOptions();
     if (options!=null) {
-      try {
-        CommandLineParser commandLineParser = new DefaultParser();
-        CommandLine commandLine = commandLineParser.parse(options, args);
-        parse(commandLine);
-      } catch (ParseException e) {
-        throw new RuntimeException(e.getMessage(), e);
-      }
+      CommandLineParser commandLineParser = new DefaultParser();
+      CommandLine commandLine = commandLineParser.parse(options, args);
+      parse(commandLine);
     }
     return this;
   }
