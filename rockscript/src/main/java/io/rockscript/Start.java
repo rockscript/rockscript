@@ -31,7 +31,7 @@ public class Start extends ClientCommand {
 
   protected String scriptName;
   protected String scriptId;
-  protected Properties inputProperties;
+  protected Properties input;
 
   @Override
   protected void logCommandUsage() {
@@ -74,7 +74,10 @@ public class Start extends ClientCommand {
     super.parse(commandLine);
     this.scriptName = commandLine.getOptionValue("n");
     this.scriptId = commandLine.getOptionValue("sid");
-    this.inputProperties = commandLine.getOptionProperties("p");
+    this.input = commandLine.getOptionProperties("p");
+    if (this.input.isEmpty()) {
+      this.input = null;
+    }
   }
 
   @Override
@@ -94,7 +97,7 @@ public class Start extends ClientCommand {
       .bodyObject(new StartScriptExecutionCommand()
         .scriptName(scriptName)
         .scriptId(scriptId)
-        .input(inputProperties)
+        .input(input)
       );
 
     if (!quiet) log(request.toString("  "));

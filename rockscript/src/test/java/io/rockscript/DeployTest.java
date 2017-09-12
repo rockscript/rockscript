@@ -45,7 +45,7 @@ public class DeployTest extends AbstractServerTest {
       .getBodyAs(EngineDeployScriptResponse.class);
 
     assertNotNull(deployScriptResponse.getId());
-    assertEquals((Integer) 0, deployScriptResponse.getVersion());
+    assertEquals((Integer) 1, deployScriptResponse.getVersion());
     assertEquals("Test script", deployScriptResponse.getName());
     assertNull(deployScriptResponse.getErrors());
   }
