@@ -24,6 +24,8 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ByteArrayEntity;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -147,6 +149,24 @@ public class HttpRequest {
 
   public void setUrl(String url) {
     this.url = url;
+  }
+
+  /** adds a query parameter if the valueUnencoded is not null,
+   * both parameterName and valueUnencoded will be encoded using URLEncoder */
+  public HttpRequest queryParameterNotNull(String parameterName, String value) {
+    if (parameterName!=null && value!=null) {
+      if (url.contains("?")) {
+        url += "&";
+      } else {
+        url += "?";
+      }
+      try {
+        url += URLEncoder.encode(parameterName, "UTF-8")+"="+URLEncoder.encode(value, "UTF-8");
+      } catch (UnsupportedEncodingException e) {
+        throw new RuntimeException("Couldn't set parameter");
+      }
+    }
+    return this;
   }
 
   public Map<String, List<String>> getHeaders() {

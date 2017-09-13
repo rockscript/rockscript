@@ -15,14 +15,15 @@
  */
 package io.rockscript.gson;
 
-import java.lang.reflect.*;
-import java.util.*;
-
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
-import com.google.gson.internal.$Gson$Types;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.*;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.JsonWriter;
+
+import java.lang.reflect.*;
+import java.util.*;
 
 public class PolymorphicTypeFields {
 
@@ -69,13 +70,15 @@ public class PolymorphicTypeFields {
   private void scanFields(TypeToken inheritanceType, Map<String, Type> actualTypeArguments, Gson gson) {
     Class rawClass = inheritanceType.getRawType();
     for (Field field: rawClass.getDeclaredFields()) {
-      Type fieldType = field.getGenericType();
-      Type concreteFieldType = concretize(fieldType, actualTypeArguments);
-      TypeToken<?> concreteFieldTypeToken = TypeToken.get(concreteFieldType);
-      TypeAdapter<?> fieldTypeAdapter = gson.getAdapter(concreteFieldTypeToken);
-      @SuppressWarnings("unchecked")
-      PolymorphicField polymorphicField = new PolymorphicField(field, fieldTypeAdapter);
-      polymorphicFields.put(field.getName(), polymorphicField);
+      if (!Modifier.isTransient(field.getModifiers())) {
+        Type fieldType = field.getGenericType();
+        Type concreteFieldType = concretize(fieldType, actualTypeArguments);
+        TypeToken<?> concreteFieldTypeToken = TypeToken.get(concreteFieldType);
+        TypeAdapter<?> fieldTypeAdapter = gson.getAdapter(concreteFieldTypeToken);
+        @SuppressWarnings("unchecked")
+        PolymorphicField polymorphicField = new PolymorphicField(field, fieldTypeAdapter);
+        polymorphicFields.put(field.getName(), polymorphicField);
+      }
     }
   }
 

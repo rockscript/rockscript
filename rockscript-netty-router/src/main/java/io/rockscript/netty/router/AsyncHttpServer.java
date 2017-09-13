@@ -125,7 +125,9 @@ public class AsyncHttpServer {
   
   public void waitForShutdown() {
     try {
-      channel.closeFuture().sync();
+      if (channel!=null) {
+        channel.closeFuture().sync();
+      }
     } catch (Throwable t) {
       t.printStackTrace();
     } finally {
@@ -134,6 +136,7 @@ public class AsyncHttpServer {
   }
 
   public void shutdown() {
+    log.debug("RockScript server is shutting down");
     bossGroup.shutdownGracefully();
     workerGroup.shutdownGracefully();
   }

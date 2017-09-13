@@ -19,7 +19,8 @@ public abstract class CliCommand {
     entry("server", Server.class),
     entry("ping", Ping.class),
     entry("deploy", Deploy.class),
-    entry("start", Start.class)
+    entry("start", Start.class),
+    entry("events", Events.class)
   );
 
   protected String[] args;

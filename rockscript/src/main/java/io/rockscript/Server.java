@@ -25,6 +25,7 @@ import io.rockscript.netty.router.JsonHandlerGson;
 import io.rockscript.server.handlers.CommandHandler;
 import io.rockscript.server.handlers.EventsHandler;
 import io.rockscript.server.handlers.PingHandler;
+import io.rockscript.server.handlers.QueryHandler;
 import io.rockscript.server.rest.ScriptsPostHandler;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
@@ -87,6 +88,7 @@ public class Server extends CliCommand {
         .scan(EventsHandler.class)
         .scan(PingHandler.class)
         .scan(ScriptsPostHandler.class)
+        .scan(QueryHandler.class)
         .jsonHandler(new JsonHandlerGson(commonGson))
         .context(ScriptService.class, scriptService)
         .context(Configuration.class, serviceConfiguration);
@@ -98,7 +100,9 @@ public class Server extends CliCommand {
       .typeName(new TypeToken<DeployScriptCommand>(){}, "deployScript")
       .typeName(new TypeToken<StartScriptExecutionCommand>(){}, "startScript")
       .typeName(new TypeToken<EndActivityCommand>(){}, "endActivity")
-      .typeName(new TypeToken<RunTestsCommand>(){}, "runTests");
+      .typeName(new TypeToken<RunTestsCommand>(){}, "runTests")
+      .typeName(new TypeToken<EventsQuery>(){}, "eventsQuery")
+      ;
   }
 
   public void startup() {
@@ -113,14 +117,22 @@ public class Server extends CliCommand {
       log("Server started on port "+asyncHttpServer.getPort());
 
     } catch (Throwable t) {
-      if ("Address already in use".equals(t.getMessage())
-        && (t instanceof BindException)) {
-        log("ERROR: Port "+asyncHttpServer.getPort()+" is already taken");
-      } else {
-        log("ERROR: RockScript server could not be started: "+t.getMessage());
-      }
-      asyncHttpServer.shutdown();
+      handleServerStartupException(t);
     }
+  }
+
+  protected void handleServerStartupException(Throwable t) {
+    if (isPortTakenException(t)) {
+      log("ERROR: Port "+asyncHttpServer.getPort()+" is already taken");
+    } else {
+      log("ERROR: RockScript server could not be started: "+t.getMessage());
+    }
+    asyncHttpServer.shutdown();
+  }
+
+  protected static boolean isPortTakenException(Throwable t) {
+    return "Address already in use".equals(t.getMessage())
+      && (t instanceof BindException);
   }
 
   public void shutdown() {

@@ -16,6 +16,7 @@
 package io.rockscript.server.handlers;
 
 import io.rockscript.engine.impl.Event;
+import io.rockscript.engine.impl.EventStore;
 import io.rockscript.netty.router.*;
 import io.rockscript.engine.Configuration;
 import org.slf4j.Logger;
@@ -30,10 +31,19 @@ public class EventsHandler implements RequestHandler {
 
   @Override
   public void handle(Request request, Response response, Context context) {
-    List<Event> events = context
+    String scriptExecutionId = request.getParameter("seid");
+
+    EventStore eventStore = context
       .get(Configuration.class)
-      .getEventStore()
-      .getEvents();
+      .getEventStore();
+
+    List<? extends Event> events = null;
+
+    if (scriptExecutionId!=null) {
+      events = eventStore.findEventsByScriptExecutionId(scriptExecutionId);
+    } else {
+      events = eventStore.getEvents();
+    }
 
     response.bodyJson(events);
     response.statusOk();

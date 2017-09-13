@@ -16,18 +16,14 @@
 package io.rockscript;
 
 import com.google.gson.reflect.TypeToken;
-import io.rockscript.engine.DeployScriptCommand;
-import io.rockscript.engine.EngineDeployScriptResponse;
-import io.rockscript.engine.StartScriptExecutionCommand;
-import io.rockscript.engine.EngineStartScriptExecutionResponse;
+import io.rockscript.engine.*;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.test.AbstractServerTest;
 import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class ServerTest extends AbstractServerTest {
 
@@ -35,7 +31,7 @@ public class ServerTest extends AbstractServerTest {
   public void testServer() {
     EngineDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
-          .scriptText(""))
+        .scriptText(""))
       .execute()
       .assertStatusOk()
       .getBodyAs(EngineDeployScriptResponse.class);
@@ -46,7 +42,7 @@ public class ServerTest extends AbstractServerTest {
 
     EngineStartScriptExecutionResponse startScriptResponse = newPost("command")
       .bodyObject(new StartScriptExecutionCommand()
-          .scriptId(scriptId))
+        .scriptId(scriptId))
       .execute()
       .assertStatusOk()
       .getBodyAs(EngineStartScriptExecutionResponse.class);
@@ -72,12 +68,29 @@ public class ServerTest extends AbstractServerTest {
       .assertStatusOk()
       .getBodyAs(EngineStartScriptExecutionResponse.class);
 
-    List<Event> eventJsons = newGet("events")
+    String scriptExecutionId = startScriptResponse.getScriptExecutionId();
+    List<Event> events = newGet("events")
+      .queryParameterNotNull("seid", scriptExecutionId)
       .execute()
       .assertStatusOk()
-      .getBodyAs(new TypeToken<List<Event>>(){}.getType());
+      .getBodyAs(new TypeToken<List<Event>>() {
+      }.getType());
 
-    assertTrue(eventJsons.size()>2);
+    assertTrue(events.size()>2);
   }
 
+//  @Test
+//  public void testEventSerialization() {
+//    Gson gson = server.serviceConfiguration.getGson();
+//    EngineScript engineScript = new EngineScript(1, null);
+//    Script script = new Script();
+//    script.setId("s1");
+//    engineScript.setScript(script);
+//    EngineScriptExecution engineScriptExecution = new EngineScriptExecution("se1", server.serviceConfiguration, engineScript);
+//    Object input = Maps.hashMap(Maps.entry("a", "b"));
+//    ScriptStartedEvent event = new ScriptStartedEvent(engineScriptExecution.getScriptExecution(), input);
+//    List<Event> eventList = new ArrayList<>();
+//    eventList.add(event);
+//    log.debug(gson.toJson(eventList));
+//  }
 }

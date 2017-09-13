@@ -70,6 +70,7 @@ public abstract class Rock {
     log("rock deploy [deploy options] | Deploy script files to the server");
     log("rock start [start options]   | Starts a new script execution");
     log("rock end [end options]       | Ends a waiting activity");
+    log("rock events [events options] | Fetches events");
     log("rock                         | Shows this help message");
     log();
     log("More details at https://github.com/rockscript/rockscript/wiki/RockScript-API");

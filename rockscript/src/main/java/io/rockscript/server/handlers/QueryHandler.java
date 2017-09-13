@@ -13,32 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript;
+package io.rockscript.server.handlers;
 
-import io.rockscript.test.AbstractServerTest;
-import org.junit.Test;
+import io.rockscript.netty.router.Post;
 
-public class CliTest extends AbstractServerTest {
-
-  @Test
-  public void testPing() throws Exception {
-    new Ping()
-      .parseArgs("ping", "-q")
-      .execute();
-
-    new Deploy()
-      .parseArgs("deploy", "-n", ".*resources.*\\.testscript", "-r", "..")
-      .execute();
-
-    new Start()
-      .parseArgs("start", "-n", "short.testscript")
-      .execute();
-
-    new End()
-      .parseArgs("end", "-seid", "se209348", "-eid", "e98")
-      .execute();
-
-    new Events()
-      .execute();
-  }
+/** Handles POST requests for /query
+ *
+ * Queries are done with a HTTP POST because they have
+ * query details in the body
+ * https://stackoverflow.com/questions/978061/http-get-with-request-body
+ *
+ * Implementation wise we don't see a difference yet between commands and
+ * queries so we leverage the command infrastructure for queries.  This
+ * could be revisited later.
+ */
+@Post("/query")
+public class QueryHandler extends CommandHandler {
 }

@@ -27,10 +27,14 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 public abstract class AbstractServerTest {
+
+  protected static Logger log = LoggerFactory.getLogger(AbstractServerTest.class);
 
   /** if you add interceptor {@link ServerExceptionInterceptor}
    * with {@link AsyncHttpServerConfiguration#interceptor(Interceptor)}
@@ -41,7 +45,7 @@ public abstract class AbstractServerTest {
   static Throwable serverException;
 
   public static Http http;
-  static TestServer server;
+  protected static TestServer server;
   static String baseUrl;
 
   @BeforeClass
@@ -65,6 +69,15 @@ public abstract class AbstractServerTest {
     protected AsyncHttpServerConfiguration createAsyncHttpServerConfiguration(Gson commonGson, ScriptService scriptService) {
       return super.createAsyncHttpServerConfiguration(commonGson, scriptService)
         .interceptor(new ServerExceptionInterceptor());
+    }
+    @Override
+    protected void handleServerStartupException(Throwable t) {
+      if (isPortTakenException(t)) {
+        // IDEA consider sending a shutdown command.  But only if you can do it safe so that it's impossible to shutdown production servers.
+        throw new RuntimeException("Port "+getPort()+" blocked.  You probably have a separate RockScript server running.  Please shut down that one and retry.");
+      } else {
+        throw new RuntimeException("Couldn't start server: "+ serverException.getMessage(), t);
+      }
     }
   }
 
