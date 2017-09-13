@@ -59,7 +59,14 @@ public class EventStore implements EventListener {
   }
 
   private EngineScriptExecution recreateScriptExecution(List<ExecutionEvent> executionEvents, String scriptExecutionId) {
+    if (executionEvents==null || executionEvents.isEmpty()) {
+      throw new EngineException("Script execution "+scriptExecutionId+" does not exist");
+    }
+
     ScriptStartedEvent scriptStartedEvent = findScriptStartedEventJson(executionEvents);
+    if (scriptStartedEvent==null) {
+      throw new EngineException("Script execution "+scriptExecutionId+" does not have a start event. Huh?!");
+    }
 
     String scriptId = scriptStartedEvent.getScriptId();
     EngineException.throwIfNull(scriptId, "EngineScript id is null in scriptStartedEvent for engineScript execution: %s", scriptExecutionId);
@@ -79,7 +86,7 @@ public class EventStore implements EventListener {
     return (ScriptStartedEvent) scriptExecutionEvents.stream()
       .filter(event->(event instanceof ScriptStartedEvent))
       .findFirst()
-      .get();
+      .orElse(null);
   }
 
   public List<EngineScriptExecution> recoverCrashedScriptExecutions() {

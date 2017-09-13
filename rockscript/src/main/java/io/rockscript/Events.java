@@ -17,14 +17,13 @@ package io.rockscript;
 
 import com.google.gson.reflect.TypeToken;
 import io.rockscript.engine.EventsQuery;
+import io.rockscript.engine.EventsResponse;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
-
-import java.util.List;
 
 public class Events extends ClientCommand {
 
@@ -71,14 +70,19 @@ public class Events extends ClientCommand {
 
     log(response);
 
-    List<Event> events = response
-      .getBodyAs(new TypeToken<List<Event>>(){}.getType());
+    EventsResponse eventsResponse = response
+      .getBodyAs(new TypeToken<EventsResponse>(){}.getType());
 
     if (response.getStatus()==200) {
       log("Events in human readable form:");
-      for (Event event: events) {
+      for (Event event: eventsResponse.getEvents()) {
         log("  "+event.toString());
       }
+    } else if (eventsResponse.getError()!=null) {
+      log("Events query error: "+eventsResponse.getError());
+
+    } else {
+      log("Invalid response status: "+response.getStatus());
     }
   }
 
