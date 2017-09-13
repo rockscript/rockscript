@@ -19,8 +19,6 @@ import io.rockscript.http.Http;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
 
-import static io.rockscript.Rock.log;
-
 public class Ping extends ClientCommand {
 
   protected String url = "http://localhost:3652";
@@ -46,11 +44,11 @@ public class Ping extends ClientCommand {
       HttpRequest request = new Http()
         .newGet(pingUrl);
 
-      if (!quiet) log(request.toString("  "));
+      log(request);
 
       HttpResponse response = request.execute();
 
-      if (!quiet) log(response.toString("  "));
+      log(response);
 
       int status = response.getStatus();
       String body = response.getBodyAsString();

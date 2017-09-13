@@ -25,8 +25,6 @@ import org.apache.commons.cli.Options;
 
 import java.util.Properties;
 
-import static io.rockscript.Rock.log;
-
 public class Start extends ClientCommand {
 
   protected String scriptName;
@@ -100,11 +98,11 @@ public class Start extends ClientCommand {
         .input(input)
       );
 
-    if (!quiet) log(request.toString("  "));
+    log(request);
 
     HttpResponse response = request.execute();
 
-    if (!quiet) log(response.toString("  "));
+    log(response);
 
     StartScriptExecutionResponse startResponse = response
       .getBodyAs(StartScriptExecutionResponse.class);

@@ -29,8 +29,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.regex.Pattern;
 
-import static io.rockscript.Rock.log;
-
 public class Deploy extends ClientCommand {
 
   public static final String DEFAULT_NAME_PATTERN = ".*\\.rs(t)?";
@@ -83,7 +81,7 @@ public class Deploy extends ClientCommand {
     if (file.isFile()) {
       deployFile(file);
     } else if (file.isDirectory()) {
-      log("Scanning directory "+file.getCanonicalPath()+(recursive?" recursive":" (not recursive)")+" for files matching "+namePattern);
+      log("Scanning directory " + file.getCanonicalPath() + (recursive?" recursive":" (not recursive)") + " for files matching " + namePattern);
       this.compiledNamePattern = Pattern.compile(namePattern);
       scanDirectory(file);
     }
@@ -102,18 +100,11 @@ public class Deploy extends ClientCommand {
           .scriptText(scriptText)
         );
 
-      if (!quiet) log(request.toString("  "));
+      log(request);
 
       HttpResponse response = request.execute();
 
-      String responseBody = (String) response.getBody();
-      if (responseBody.length()>100) {
-        response.setBody(responseBody.substring(0,100)+"...");
-      }
-
-      if (!quiet) log(response.toString("  "));
-
-      response.setBody(responseBody);
+      log(response);
 
       DeployScriptResponse deployScriptResponse = response
         .getBodyAs(DeployScriptResponse.class);
@@ -121,7 +112,7 @@ public class Deploy extends ClientCommand {
       if (deployScriptResponse!=null && deployScriptResponse.hasErrors()) {
         log("  Errors in readable form:");
         for (ParseError parseError: deployScriptResponse.getErrors()) {
-          log("  "+parseError);
+          log("  " + parseError);
         }
       }
 

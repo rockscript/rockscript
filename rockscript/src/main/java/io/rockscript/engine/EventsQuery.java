@@ -15,7 +15,7 @@
  */
 package io.rockscript.engine;
 
-import io.rockscript.engine.impl.ExecutionEvent;
+import io.rockscript.engine.impl.Event;
 
 import java.util.List;
 
@@ -38,12 +38,20 @@ public class EventsQuery extends CommandImpl<EventsResponse> {
 
   @Override
   protected EventsResponse execute(Configuration configuration) {
-    if (scriptExecutionId!=null) {
-      List<ExecutionEvent> events = configuration
-        .getEventStore()
-        .findEventsByScriptExecutionId(scriptExecutionId);
+    try {
+      List<? extends Event> events = null;
+      if (scriptExecutionId!=null) {
+        events = configuration
+          .getEventStore()
+          .findEventsByScriptExecutionId(scriptExecutionId);
+      } else {
+        events = configuration
+          .getEventStore()
+          .getEvents();
+      }
       return new EventsResponse(events);
+    } catch (Exception e) {
+      return new EventsResponse("Could not get events: "+e.getMessage());
     }
-    return new EventsResponse("Only event queries with script execution id filter are supported at the moment");
   }
 }

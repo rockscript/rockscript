@@ -81,6 +81,10 @@ public class HttpResponse {
   }
 
   public String toString(String prefix) {
+    return toString(prefix, null);
+  }
+
+  public String toString(String prefix, Integer maxBodyLength) {
     StringBuilder text = new StringBuilder();
     if (prefix==null) {
       prefix = "";
@@ -88,30 +92,36 @@ public class HttpResponse {
     text.append(prefix);
     text.append("< ");
     text.append(apacheResponse.getStatusLine());
-    text.append(NEWLINE);
     if (headers!=null) {
       for (String headerName: headers.keySet()) {
         if (headerName!=null) {
           List<String> headerListValue = headers.get(headerName);
           String headerValue = headerListToString(headerListValue);
+          text.append(NEWLINE);
           text.append(prefix);
           text.append("  ");
           text.append(headerName);
           text.append(": ");
           text.append(headerValue);
-          text.append(NEWLINE);
         }
       }
     } else {
+      text.append(NEWLINE);
       text.append(prefix);
       text.append("< ");
       text.append(status);
-      text.append(NEWLINE);
     }
     if (body!=null) {
+      text.append(NEWLINE);
       text.append(prefix);
       text.append("  ");
-      text.append(getBodyAsString());
+
+      String body = getBodyAsString();
+      if (maxBodyLength!=null && body!=null && body.length()>maxBodyLength) {
+        body = body.substring(0, maxBodyLength)+"...";
+      }
+
+      text.append(body);
     }
     return text.toString();
   }

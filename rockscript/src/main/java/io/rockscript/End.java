@@ -25,8 +25,6 @@ import org.apache.commons.cli.Options;
 
 import java.util.Properties;
 
-import static io.rockscript.Rock.log;
-
 public class End extends ClientCommand {
 
   protected String scriptExecutionId;
@@ -98,11 +96,11 @@ public class End extends ClientCommand {
         .result(resultProperties)
       );
 
-    if (!quiet) log(request.toString("  "));
+    log(request);
 
     HttpResponse response = request.execute();
 
-    if (!quiet) log(response.toString("  "));
+    log(response);
 
     EngineEndActivityResponse endResponse = response
       .getBodyAs(EngineEndActivityResponse.class);

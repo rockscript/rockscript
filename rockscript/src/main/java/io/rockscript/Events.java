@@ -16,6 +16,7 @@
 package io.rockscript;
 
 import com.google.gson.reflect.TypeToken;
+import io.rockscript.engine.EventsQuery;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
@@ -24,8 +25,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
 import java.util.List;
-
-import static io.rockscript.Rock.log;
 
 public class Events extends ClientCommand {
 
@@ -61,22 +60,24 @@ public class Events extends ClientCommand {
   @Override
   public void execute() throws Exception {
     HttpRequest request = createHttp()
-      .newGet(server + "/events")
-      .queryParameterNotNull("seid", scriptExecutionId)
+      .newPost(server + "/query")
+      .bodyObject(new EventsQuery()
+        .scriptExecutionId(scriptExecutionId))
       .headerContentTypeApplicationJson();
 
-    if (!quiet) log(request.toString("  "));
+    log(request);
 
     HttpResponse response = request.execute();
 
-    if (!quiet) log(response.toString("  "));
+    log(response);
 
     List<Event> events = response
       .getBodyAs(new TypeToken<List<Event>>(){}.getType());
 
     if (response.getStatus()==200) {
+      log("Events in human readable form:");
       for (Event event: events) {
-        log(event.toString());
+        log("  "+event.toString());
       }
     }
   }

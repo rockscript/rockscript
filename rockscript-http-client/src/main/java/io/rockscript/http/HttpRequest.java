@@ -111,6 +111,10 @@ public class HttpRequest {
   }
 
   public String toString(String prefix) {
+    return toString(prefix, null);
+  }
+
+  public String toString(String prefix, Integer maxBodyLength) {
     StringBuilder text = new StringBuilder();
     if (prefix==null) {
       prefix = "";
@@ -120,25 +124,30 @@ public class HttpRequest {
     text.append(method);
     text.append(" ");
     text.append(url);
-    text.append(NEWLINE);
     if (headers!=null) {
       for (String headerName: headers.keySet()) {
         List<String> headerListValue = headers.get(headerName);
         String headerValue = headerListValue
           .stream()
           .collect(Collectors.joining("; "));
+        text.append(NEWLINE);
         text.append(prefix);
         text.append("  ");
         text.append(headerName);
         text.append(": ");
         text.append(headerValue);
-        text.append(NEWLINE);
       }
     }
-    if (body!=null) {
+    if (body!=null && !"".equals(body)) {
+      text.append(NEWLINE);
       text.append(prefix);
       text.append("  ");
-      text.append(body);
+
+      String bodyString = body.toString();
+      if (maxBodyLength!=null && bodyString!=null && bodyString.length()>maxBodyLength) {
+        bodyString = bodyString.substring(0, maxBodyLength)+"...";
+      }
+      text.append(bodyString);
     }
     return text.toString();
   }

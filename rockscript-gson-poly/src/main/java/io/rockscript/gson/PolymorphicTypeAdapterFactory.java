@@ -21,6 +21,8 @@ import com.google.gson.TypeAdapterFactory;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.util.*;
 
 public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
@@ -65,6 +67,15 @@ public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
     // https://google.github.io/gson/apidocs/com/google/gson/TypeAdapterFactory.html
     // If a factory cannot support a given type, it must return null when that type is passed to create(com.google.gson.Gson, com.google.gson.reflect.TypeToken<T>)
 
+    if (type.getType() instanceof WildcardType) {
+      WildcardType wildcardType = (WildcardType) type.getType();
+      Type[] upperBounds = wildcardType.getUpperBounds();
+      if (upperBounds!=null && upperBounds.length==1) {
+        type = (TypeToken<T>) TypeToken.get(upperBounds[0]);
+      } else {
+        throw new RuntimeException("Unsupported wildcard type: "+type);
+      }
+    }
     if (matchingTypes.contains(type)) {
       if (typeAdapter==null) {
         typeAdapter = new PolymorphicTypeAdapter<T>(type, this, gson);

@@ -15,15 +15,12 @@
  */
 package io.rockscript;
 
-import com.google.gson.reflect.TypeToken;
 import io.rockscript.engine.*;
-import io.rockscript.engine.impl.Event;
 import io.rockscript.test.AbstractServerTest;
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class ServerTest extends AbstractServerTest {
 
@@ -69,28 +66,14 @@ public class ServerTest extends AbstractServerTest {
       .getBodyAs(EngineStartScriptExecutionResponse.class);
 
     String scriptExecutionId = startScriptResponse.getScriptExecutionId();
-    List<Event> events = newGet("events")
-      .queryParameterNotNull("seid", scriptExecutionId)
+    EventsResponse eventsResponse = newPost("query")
+      .bodyObject(new EventsQuery()
+        .scriptExecutionId(scriptExecutionId))
       .execute()
       .assertStatusOk()
-      .getBodyAs(new TypeToken<List<Event>>() {
-      }.getType());
+      .getBodyAs(EventsResponse.class);
 
-    assertTrue(events.size()>2);
+    assertTrue(eventsResponse.getEvents().size()>2);
   }
 
-//  @Test
-//  public void testEventSerialization() {
-//    Gson gson = server.serviceConfiguration.getGson();
-//    EngineScript engineScript = new EngineScript(1, null);
-//    Script script = new Script();
-//    script.setId("s1");
-//    engineScript.setScript(script);
-//    EngineScriptExecution engineScriptExecution = new EngineScriptExecution("se1", server.serviceConfiguration, engineScript);
-//    Object input = Maps.hashMap(Maps.entry("a", "b"));
-//    ScriptStartedEvent event = new ScriptStartedEvent(engineScriptExecution.getScriptExecution(), input);
-//    List<Event> eventList = new ArrayList<>();
-//    eventList.add(event);
-//    log.debug(gson.toJson(eventList));
-//  }
 }
