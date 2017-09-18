@@ -23,10 +23,8 @@ import io.rockscript.netty.router.AsyncHttpServer;
 import io.rockscript.netty.router.AsyncHttpServerConfiguration;
 import io.rockscript.netty.router.JsonHandlerGson;
 import io.rockscript.server.handlers.CommandHandler;
-import io.rockscript.server.handlers.EventsHandler;
 import io.rockscript.server.handlers.PingHandler;
 import io.rockscript.server.handlers.QueryHandler;
-import io.rockscript.server.rest.ScriptsPostHandler;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
@@ -85,9 +83,7 @@ public class Server extends CliCommand {
     return serverConfiguration
         .getAsyncHttpServerConfiguration()
         .scan(CommandHandler.class)
-        .scan(EventsHandler.class)
         .scan(PingHandler.class)
-        .scan(ScriptsPostHandler.class)
         .scan(QueryHandler.class)
         .jsonHandler(new JsonHandlerGson(commonGson))
         .context(ScriptService.class, scriptService)
