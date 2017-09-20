@@ -29,18 +29,19 @@
  */
 package io.rockscript.gson;
 
-import java.lang.reflect.Type;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.lang.reflect.Type;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class GenericPolymorphicTest {
+public class GsonPolyGenericListTest {
 
   static Gson gson = new GsonBuilder()
       .registerTypeAdapterFactory(new PolymorphicTypeAdapterFactory()
@@ -49,58 +50,31 @@ public class GenericPolymorphicTest {
       .create();
 
   public static class GenericShape<C> {
-    C color;
+    List<C> color;
   }
 
   public static class GenericCircle<X,R> extends GenericShape<X> {
     R radius;
   }
 
-  @Ignore // TODO Fix testPolymorphicGenericReadCircle
+  @Ignore // TODO Fix testPolymorphicGenericRead
   @Test
-  public void testPolymorphicGenericReadCircle() {
-    testCircle(new TypeToken<GenericCircle<Integer, String>>() {}.getType());
-    testCircle(new TypeToken<GenericShape<Integer>>() {}.getType());
-    testCircle(new TypeToken<GenericCircle>() {}.getType());
-    testCircle(new TypeToken<GenericShape>() {}.getType());
-  }
-
-  public void testCircle(Type type) {
+  public void testPolymorphicGenericRead() {
     String originalJson = JsonQuotes.quote(
         "{'circle':{" +
-          "'color':1," +
-          "'radius':'2 meters'" +
+         "'color':[1,2]," +
+         "'radius':'2 meters'" +
         "}}");
+    Type type = new TypeToken<GenericCircle<Integer, String>>() {}.getType();
 
     GenericCircle<Integer,String> circle = gson.fromJson(originalJson, type);
 
     assertNotNull(circle);
-    assertEquals(1, (int)circle.color);
+    assertEquals(1, (int) circle.color.get(0));
+    assertEquals(2, (int) circle.color.get(1));
     assertEquals("2 meters", (String)circle.radius);
 
     String reserializedJson = gson.toJson(circle);
-    assertEquals(originalJson, reserializedJson);
-
-  }
-
-  @Test
-  public void testPolymorphicGenericShape() {
-    testShape(new TypeToken<GenericShape<Integer>>() {}.getType());
-    testShape(new TypeToken<GenericShape>() {}.getType());
-  }
-
-  public void testShape(Type type) {
-    String originalJson = JsonQuotes.quote(
-        "{'shape':{" +
-          "'color':1" +
-        "}}");
-
-    GenericShape<Integer> shape = gson.fromJson(originalJson, type);
-
-    assertNotNull(shape);
-    assertEquals(1, (int)shape.color);
-
-    String reserializedJson = gson.toJson(shape);
     assertEquals(originalJson, reserializedJson);
   }
 }

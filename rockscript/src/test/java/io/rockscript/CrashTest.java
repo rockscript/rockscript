@@ -144,10 +144,13 @@ public class CrashTest {
         EngineScriptExecution recoveredScriptExecution = recoverCrashedScriptExecutions.get(0);
 
         // We don't want to compare the id's
+        // And we don't want to ignore the Execution.id field because then none of the nested execution ids are compared
         recoveredScriptExecution.setId(null);
         expectedScriptExecutionState.setId(null);
 
         new ScriptExecutionComparator()
+          .ignoreField(EngineScriptExecution.class, "start")
+          .ignoreField(EngineScriptExecution.class, "end")
           .assertEquals(expectedScriptExecutionState, recoveredScriptExecution);
       }
 

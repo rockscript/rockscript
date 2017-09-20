@@ -20,6 +20,7 @@ import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.engine.impl.Execution;
 import io.rockscript.engine.impl.Variable;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +32,8 @@ public class ScriptExecution {
   Script script;
   Map<String,Object> variables;
   List<ActivityContinuation> activityContinuations;
-  Boolean ended;
+  Instant start;
+  Instant end;
 
   public ScriptExecution() {
   }
@@ -39,7 +41,8 @@ public class ScriptExecution {
   public ScriptExecution(EngineScriptExecution engineScriptExecution) {
     this.id = engineScriptExecution.getId();
     this.script = engineScriptExecution.getEngineScript().getScript();
-    this.ended = engineScriptExecution.isEnded();
+    this.start = engineScriptExecution.getStart();
+    this.end = engineScriptExecution.getEnded();
     scanVariables(engineScriptExecution.getVariables());
     scan(engineScriptExecution.getChildren());
   }
@@ -81,7 +84,11 @@ public class ScriptExecution {
   }
 
   public boolean isEnded() {
-    return Boolean.TRUE.equals(ended);
+    return end!=null;
+  }
+
+  public Instant getEnded() {
+    return end;
   }
 
   public String getId() {

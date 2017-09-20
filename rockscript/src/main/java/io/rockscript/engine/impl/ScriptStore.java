@@ -166,4 +166,8 @@ public class ScriptStore {
     }
     return matchingScripts;
   }
+
+  public Map<String, List<Script>> getScripts() {
+    return scriptsByName;
+  }
 }

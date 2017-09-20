@@ -25,6 +25,7 @@ import io.rockscript.netty.router.JsonHandlerGson;
 import io.rockscript.server.handlers.CommandHandler;
 import io.rockscript.server.handlers.PingHandler;
 import io.rockscript.server.handlers.QueryHandler;
+import io.rockscript.server.handlers.ScriptExecutionsHandler;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
@@ -85,6 +86,8 @@ public class Server extends CliCommand {
         .scan(CommandHandler.class)
         .scan(PingHandler.class)
         .scan(QueryHandler.class)
+        .scan(ScriptExecutionsHandler.class)
+        .scan(ScriptExecutionsHandler.class)
         .jsonHandler(new JsonHandlerGson(commonGson))
         .context(ScriptService.class, scriptService)
         .context(Configuration.class, serviceConfiguration);

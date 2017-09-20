@@ -56,14 +56,15 @@ public class LocalEngine implements Engine {
     EngineScriptExecution scriptExecution = new EngineScriptExecution(scriptExecutionId, configuration, engineScript);
     scriptExecution.setInput(input);
 
-    Lock lock = null;
-    try {
-      lock = acquireLock(scriptExecutionId);
-      scriptExecution.start(input);
-      scriptExecution.doWork();
+    Lock lock = acquireLock(scriptExecutionId);
+    if (lock!=null) {
+      try {
+        scriptExecution.start(input);
+        scriptExecution.doWork();
 
-    } finally {
-      releaseLock(lock, scriptExecution);
+      } finally {
+        releaseLock(lock, scriptExecution);
+      }
     }
 
     return scriptExecution;
@@ -123,7 +124,8 @@ public class LocalEngine implements Engine {
   }
 
   public synchronized void releaseLock(Lock lock, EngineScriptExecution lockedScriptExecution) {
-    String scriptExecutionId = lockedScriptExecution.getId();
+    EngineException.throwIfNull(lock, "Bug: lock is not supposed to be null");
+    String scriptExecutionId = lock.getScriptExecutionId();
     ActivityEndRequest nextActivityEndRequest = removeNextActivityEndRequest(scriptExecutionId);
     if (nextActivityEndRequest!=null) {
       configuration

@@ -16,18 +16,18 @@
 
 package io.rockscript.gson;
 
-import java.lang.reflect.Type;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.junit.Test;
 
+import java.lang.reflect.Type;
+
 import static io.rockscript.gson.JsonQuotes.quote;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class InterfacePolymorphicTest {
+public class GsonPolyInterfaceTest {
 
   static Gson gson = new GsonBuilder().registerTypeAdapterFactory(new PolymorphicTypeAdapterFactory()
     .typeName(new TypeToken<Shape>(){},  "shape")

@@ -15,7 +15,7 @@
  */
 package io.rockscript.engine.impl;
 
-public class ScriptEndedEvent extends ExecutionEvent<EngineScriptExecution> {
+public class ScriptEndedEvent extends ExecutableEvent<EngineScriptExecution> {
 
   /** constructor for gson serialization */
   ScriptEndedEvent() {
@@ -23,6 +23,11 @@ public class ScriptEndedEvent extends ExecutionEvent<EngineScriptExecution> {
 
   public ScriptEndedEvent(EngineScriptExecution scriptExecution) {
     super(scriptExecution);
+  }
+
+  @Override
+  public void execute(EngineScriptExecution execution) {
+    execution.setEnd(time);
   }
 
   @Override

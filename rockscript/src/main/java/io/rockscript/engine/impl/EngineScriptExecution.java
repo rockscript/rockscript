@@ -21,6 +21,7 @@ import io.rockscript.engine.ScriptExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -33,7 +34,8 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
   EventListener eventListener;
   int nextInternalExecutionId = 1;
   ExecutionMode executionMode;
-  boolean isEnded;
+  Instant start;
+  Instant end;
   Queue<Operation> work = new LinkedList<Operation>();
 
   LinkedList<ExecutionEvent> unreplayedEvents;
@@ -149,8 +151,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
 
   @Override
   protected void end() {
-    this.isEnded = true;
-    dispatch(new ScriptEndedEvent(this));
+    dispatchAndExecute(new ScriptEndedEvent(this));
   }
 
   @Override
@@ -202,6 +203,22 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
   }
 
   public boolean isEnded() {
-    return isEnded;
+    return end!=null;
+  }
+
+  public Instant getEnded() {
+    return end;
+  }
+
+  public void setEnd(Instant end) {
+    this.end = end;
+  }
+
+  public void setStart(Instant start) {
+    this.start = start;
+  }
+
+  public Instant getStart() {
+    return start;
   }
 }

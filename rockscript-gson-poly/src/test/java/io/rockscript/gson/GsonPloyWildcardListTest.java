@@ -29,65 +29,56 @@
  */
 package io.rockscript.gson;
 
-import java.lang.reflect.Type;
-import java.util.List;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.junit.Test;
 
+import java.lang.reflect.Type;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class BeanPolymorphicCompositeTest {
+public class GsonPloyWildcardListTest {
 
   static Gson gson = new GsonBuilder()
       .registerTypeAdapterFactory(new PolymorphicTypeAdapterFactory()
-          .typeName(new TypeToken<Identity>(){}, "identity")
-          .typeName(new TypeToken<User>(){}, "user")
-          .typeName(new TypeToken<Group>(){}, "group"))
+          .typeName(new TypeToken<Color>(){}, "color")
+          .typeName(new TypeToken<RgBColor>(){}, "rgbColor"))
       .create();
 
-  public static class Identity {
-    String name;
+  public static class Shape {
+    List<? extends Color> colors;
   }
 
-  public static class User extends Identity {
+  public static class Color {
   }
 
-  public static class Group extends Identity {
-    List<Identity> members;
+  public static class RgBColor extends Color {
+    int r;
+    int g;
+    int b;
   }
 
   @Test
-  public void testPolymorphicCompositeTestRead() {
+  public void testWildcard() {
     String originalJson = JsonQuotes.quote(
-        "{'group':{" +
-          "'name':'company'," +
-          "'members':[" +
-            "{'group':{" +
-              "'name':'sales'," +
-              "'members':[" +
-                "{'user':{" +
-                 "'name':'john'}}]}}," +
-            "{'user':{" +
-             "'name':'mary'}}]" +
-        "}}");
-    Type type = new TypeToken<Identity>() {}.getType();
+        "{'colors':[{'rgbColor':{" +
+         "'r':1," +
+         "'g':2," +
+         "'b':3" +
+         "}}]}");
+    Type type = new TypeToken<Shape>() {}.getType();
 
-    Group company = gson.fromJson(originalJson, type);
+    Shape shape = gson.fromJson(originalJson, type);
 
-    assertNotNull(company);
-    assertEquals("company", company.name);
-    Group sales = (Group) company.members.get(0);
-    assertEquals("sales", sales.name);
-    User john = (User) sales.members.get(0);
-    assertEquals("john", john.name);
-    User mary= (User) company.members.get(1);
-    assertEquals("mary", mary.name);
+    assertNotNull(shape);
+    assertEquals(1, (int) ((RgBColor)shape.colors.get(0)).r);
+    assertEquals(2, (int) ((RgBColor)shape.colors.get(0)).g);
+    assertEquals(3, (int) ((RgBColor)shape.colors.get(0)).b);
 
-    String reserializedJson = gson.toJson(company);
+    String reserializedJson = gson.toJson(shape);
     assertEquals(originalJson, reserializedJson);
   }
 }

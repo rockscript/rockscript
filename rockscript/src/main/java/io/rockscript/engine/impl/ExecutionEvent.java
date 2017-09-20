@@ -16,8 +16,11 @@
 
 package io.rockscript.engine.impl;
 
+import java.time.Instant;
+
 public abstract class ExecutionEvent<T extends Execution> implements Event {
 
+  protected Instant time;
   protected String scriptExecutionId;
   protected String executionId;
 
@@ -26,10 +29,15 @@ public abstract class ExecutionEvent<T extends Execution> implements Event {
   }
 
   public ExecutionEvent(T execution) {
+    this.time = Instant.now();
     this.scriptExecutionId = execution.getScriptExecution().getId();
     if (! (execution instanceof EngineScriptExecution)) {
       this.executionId = execution.getId();
     }
+  }
+
+  public Instant getTime() {
+    return time;
   }
 
   public String getScriptExecutionId() {

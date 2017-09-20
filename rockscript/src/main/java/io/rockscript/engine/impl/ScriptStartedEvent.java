@@ -30,6 +30,7 @@ public class ScriptStartedEvent extends ExecutableEvent<EngineScriptExecution> {
   @Override
   public void execute(EngineScriptExecution execution) {
     execution.setInput(input);
+    execution.setStart(time);
     execution.startExecute();
   }
 
