@@ -57,7 +57,7 @@ public class Events extends ClientCommand {
   }
 
   @Override
-  public void execute() throws Exception {
+  public void execute() {
     HttpRequest request = createHttp()
       .newPost(server + "/query")
       .bodyObject(new EventsQuery()

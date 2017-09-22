@@ -75,13 +75,19 @@ public class Deploy extends ClientCommand {
   }
 
   @Override
-  public void execute() throws Exception {
+  public void execute() {
     String fileOrDirectory = args[args.length-1];
     File file = new File(fileOrDirectory);
     if (file.isFile()) {
       deployFile(file);
     } else if (file.isDirectory()) {
-      log("Scanning directory " + file.getCanonicalPath() + (recursive?" recursive":" (not recursive)") + " for files matching " + namePattern);
+      String fileName = null;
+      try {
+        fileName = file.getCanonicalPath();
+      } catch (Exception e) {
+        fileName = file.toString();
+      }
+      log("Scanning directory " + fileName + (recursive?" recursive":" (not recursive)") + " for files matching " + namePattern);
       this.compiledNamePattern = Pattern.compile(namePattern);
       scanDirectory(file);
     }

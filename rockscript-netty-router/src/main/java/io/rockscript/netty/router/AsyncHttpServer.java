@@ -22,6 +22,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.router.RouteResult;
 import io.netty.handler.codec.http.router.Router;
@@ -39,6 +40,7 @@ public class AsyncHttpServer {
   protected Context context;
   protected JsonHandler jsonHandler;
   protected List<Interceptor> interceptors;
+  protected DefaultHttpHeaders defaultResponseHeaders;
 
   protected NioEventLoopGroup bossGroup;
   protected NioEventLoopGroup workerGroup;
@@ -50,6 +52,7 @@ public class AsyncHttpServer {
     this.context = asyncHttpServerConfiguration.getContext();
     this.interceptors = asyncHttpServerConfiguration.getInterceptors();
     this.jsonHandler = asyncHttpServerConfiguration.getJsonHandler();
+    this.defaultResponseHeaders = asyncHttpServerConfiguration.getDefaultResponseHeaders();
   }
 
   public void startup() throws Exception {
@@ -75,6 +78,9 @@ public class AsyncHttpServer {
     RouteResult<Class<?>> route = router.route(fullHttpRequest.getMethod(), fullHttpRequest.getUri());
     Request request = new Request(this, fullHttpRequest, route);
     Response response = new Response(this, fullHttpRequest, ctx);
+    if (defaultResponseHeaders!=null) {
+      response.headers(defaultResponseHeaders);
+    }
 
     try {
       if (route!=null) {

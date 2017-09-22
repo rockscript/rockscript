@@ -21,8 +21,6 @@ import io.rockscript.http.HttpResponse;
 
 public class Ping extends ClientCommand {
 
-  protected String url = "http://localhost:3652";
-
   @Override
   protected void logCommandUsage() {
     log("rock deploy : Tests the connection with the server");
@@ -35,11 +33,11 @@ public class Ping extends ClientCommand {
   }
 
   @Override
-  public void execute() throws Exception {
+  public void execute() {
     try {
-      String pingUrl = this.url + "/ping";
+      String pingUrl = this.server + "/ping";
 
-      log("Pinging server "+url+" ...");
+      log("Pinging server " + server + " ...");
 
       HttpRequest request = new Http()
         .newGet(pingUrl);
@@ -58,7 +56,7 @@ public class Ping extends ClientCommand {
         log("Wrong response status: "+status);
       }
     } catch (Exception e) {
-      log("Could not connect to "+url+" : "+e.getMessage());
+      log("Could not connect to " + server + " : " + e.getMessage());
     }
   }
 }

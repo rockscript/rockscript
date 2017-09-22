@@ -24,6 +24,7 @@ public interface Event {
   static PolymorphicTypeAdapterFactory createEventJsonTypeAdapterFactory() {
     return new PolymorphicTypeAdapterFactory()
       .typeName(new TypeToken<Event>(){},                     "event") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
+      .typeName(new TypeToken<ExecutionEvent>(){},            "executionEvent") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
       .typeName(new TypeToken<ActivityEndedEvent>(){},        "activityEnd")
       .typeName(new TypeToken<ActivityStartedEvent>(){},      "activityStarted")
       .typeName(new TypeToken<ActivityWaitingEvent>(){},      "activityWaiting")

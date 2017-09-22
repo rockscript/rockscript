@@ -17,6 +17,7 @@ package io.rockscript.test;
 
 import com.google.gson.Gson;
 import io.rockscript.Server;
+import io.rockscript.ServerConfiguration;
 import io.rockscript.engine.ScriptService;
 import io.rockscript.http.Http;
 import io.rockscript.http.HttpRequest;
@@ -58,7 +59,16 @@ public abstract class AbstractServerTest {
     }
   }
 
+  public ScriptService getScriptService() {
+    return server.getScriptService();
+  }
+
   public static class TestServer extends Server {
+    @Override
+    protected ServerConfiguration createServerConfiguration() {
+      return super.createServerConfiguration()
+        .port(3333);
+    }
     public Http getHttp() {
       return serviceConfiguration.getHttp();
     }

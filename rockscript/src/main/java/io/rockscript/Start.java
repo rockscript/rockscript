@@ -79,7 +79,7 @@ public class Start extends ClientCommand {
   }
 
   @Override
-  public void execute() throws Exception {
+  public void execute() {
     if (scriptName==null && scriptId==null) {
       log("No -n or -sid provided.  One of those two has to be specified.");
       return;

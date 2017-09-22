@@ -22,10 +22,7 @@ import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.netty.router.AsyncHttpServer;
 import io.rockscript.netty.router.AsyncHttpServerConfiguration;
 import io.rockscript.netty.router.JsonHandlerGson;
-import io.rockscript.server.handlers.CommandHandler;
-import io.rockscript.server.handlers.PingHandler;
-import io.rockscript.server.handlers.QueryHandler;
-import io.rockscript.server.handlers.ScriptExecutionsHandler;
+import io.rockscript.server.handlers.*;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
@@ -46,11 +43,13 @@ public class Server extends CliCommand {
   @Override
   protected Options getOptions() {
     Options options = new Options();
+    options.addOption("ed", "Add example script and execution on startup");
     return options;
   }
 
   @Override
   protected void parse(CommandLine commandLine) {
+    super.parse(commandLine);
   }
 
   @Override
@@ -68,16 +67,32 @@ public class Server extends CliCommand {
   public void execute() {
     configure();
     startup();
+    if (commandLine!=null && commandLine.hasOption("ed")) {
+      new Deploy()
+        .parseArgs("-r", ".")
+        .execute();
+      new Start()
+        .scriptId("s1")
+        .execute();
+    }
   }
 
-  private void configure() {
-    Gson commonGson = createCommonGson();
-    this.serviceConfiguration = new DevConfiguration();
-    this.serverConfiguration = new ServerConfiguration(serviceConfiguration);
+  protected void configure() {
+    Gson commonGson = RockScriptGson.createCommonGson();
+    this.serviceConfiguration = createServiceConfiguration();
+    this.serverConfiguration = createServerConfiguration();
     this.serviceConfiguration.gson(commonGson);
     ScriptService scriptService = serviceConfiguration.build();
     AsyncHttpServerConfiguration asyncHttpServerConfiguration = createAsyncHttpServerConfiguration(commonGson, scriptService);
     this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
+  }
+
+  protected ServerConfiguration createServerConfiguration() {
+    return new ServerConfiguration(serviceConfiguration);
+  }
+
+  protected DevConfiguration createServiceConfiguration() {
+    return new DevConfiguration();
   }
 
   protected AsyncHttpServerConfiguration createAsyncHttpServerConfiguration(Gson commonGson, ScriptService scriptService) {
@@ -86,11 +101,12 @@ public class Server extends CliCommand {
         .scan(CommandHandler.class)
         .scan(PingHandler.class)
         .scan(QueryHandler.class)
-        .scan(ScriptExecutionsHandler.class)
+        .scan(ScriptExecutionHandler.class)
         .scan(ScriptExecutionsHandler.class)
         .jsonHandler(new JsonHandlerGson(commonGson))
         .context(ScriptService.class, scriptService)
-        .context(Configuration.class, serviceConfiguration);
+        .context(Configuration.class, serviceConfiguration)
+        .defaultResponseHeader("Access-Control-Allow-Origin", "*");
   }
 
   public static PolymorphicTypeAdapterFactory createCommandsTypeAdapterFactory() {
@@ -140,5 +156,13 @@ public class Server extends CliCommand {
 
   public void waitForShutdown() {
     asyncHttpServer.waitForShutdown();
+  }
+
+  public AsyncHttpServer getAsyncHttpServer() {
+    return asyncHttpServer;
+  }
+
+  public ScriptService getScriptService() {
+    return asyncHttpServer.getContext().get(ScriptService.class);
   }
 }

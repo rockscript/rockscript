@@ -16,6 +16,7 @@
 
 package io.rockscript.netty.router;
 
+import io.netty.handler.codec.http.DefaultHttpHeaders;
 import io.netty.handler.codec.http.router.Router;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class AsyncHttpServerConfiguration {
   protected List<Interceptor> interceptors;
   protected MapContext context = new MapContext();
   protected JsonHandler jsonHandler;
+  protected DefaultHttpHeaders defaultResponseHeaders;
 
   public AsyncHttpServer build() {
     return new AsyncHttpServer(this);
@@ -271,5 +273,17 @@ public class AsyncHttpServerConfiguration {
   public AsyncHttpServerConfiguration defaultNotFoundHandler() {
     router.notFound(DefaultNotFoundHandler.class);
     return this;
+  }
+
+  public AsyncHttpServerConfiguration defaultResponseHeader(String name, String value) {
+    if (defaultResponseHeaders==null) {
+      defaultResponseHeaders = new DefaultHttpHeaders();
+    }
+    defaultResponseHeaders.add(name, value);
+    return this;
+  }
+
+  public DefaultHttpHeaders getDefaultResponseHeaders() {
+    return defaultResponseHeaders;
   }
 }

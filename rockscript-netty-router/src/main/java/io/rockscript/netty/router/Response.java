@@ -103,6 +103,10 @@ public class Response {
     return this;
   }
 
+  public void headers(HttpHeaders httpHeaders) {
+    headers.add(httpHeaders);
+  }
+
   public Response header(String name, String value) {
     headers.add(name, value);
     return this;

@@ -77,7 +77,7 @@ public class End extends ClientCommand {
   }
 
   @Override
-  public void execute() throws Exception {
+  public void execute() {
     if (scriptExecutionId==null) {
       log("No -seid provided.  It's required.");
       return;

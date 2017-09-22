@@ -22,6 +22,7 @@ import io.rockscript.engine.impl.*;
 import io.rockscript.netty.router.*;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,11 +32,12 @@ import java.util.Map;
 public class ScriptExecutionsHandler implements RequestHandler {
 
   public static class ScriptExecution {
-    String id;
-    String scriptName;
-    Integer scriptVersion;
-    Instant start;
-    Instant end;
+    public String id;
+    public String scriptShortName;
+    public String scriptName;
+    public Integer scriptVersion;
+    public Instant start;
+    public Instant end;
     public ScriptExecution(){
     }
     public ScriptExecution(String scriptExecutionId) {
@@ -63,11 +65,19 @@ public class ScriptExecutionsHandler implements RequestHandler {
         String scriptId = scriptStartedEvent.getScriptId();
         Script script = scriptsById.get(scriptId);
         scriptExecution.scriptName = script.getName();
+        scriptExecution.scriptShortName = getScriptShortName(script.getName());
         scriptExecution.scriptVersion = script.getVersion();
 
       } else if (executionEvent instanceof ScriptEndedEvent) {
         scriptExecution.end = executionEvent.getTime();
       }
+    }
+    private static String getScriptShortName(String name) {
+      int lastSlashIndex = name.lastIndexOf('/');
+      if (lastSlashIndex>=0 && name.length()>lastSlashIndex+1) {
+        return name.substring(lastSlashIndex+1);
+      }
+      return name;
     }
   }
 
@@ -89,8 +99,10 @@ public class ScriptExecutionsHandler implements RequestHandler {
     eventStore
       .getEvents()
       .forEach(list::processEvent);
+
+    Collection<ScriptExecution> scriptExecutions = list.scriptExecutions.values();
     response
-      .bodyString(gson.toJson(list.scriptExecutions.values()))
+      .bodyString(gson.toJson(scriptExecutions))
       .headerContentTypeApplicationJson()
       .status(200)
       .send();

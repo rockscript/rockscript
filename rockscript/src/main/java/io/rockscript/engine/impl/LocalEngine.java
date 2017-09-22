@@ -100,6 +100,7 @@ public class LocalEngine implements Engine {
     String executionId = continuationReference.getExecutionId();
     ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) lockedScriptExecution
         .findExecutionRecursive(executionId);
+    EngineException.throwIfNull(execution, "Execution %s not found in script execution %s", executionId, lockedScriptExecution.getId());
     execution.endActivity(result);
     lockedScriptExecution.doWork();
   }
