@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /** Handles GET requests for /scripts */
 @Get("/scriptExecution/:scriptExecutionId")
@@ -35,16 +34,7 @@ public class ScriptExecutionHandler implements RequestHandler {
     public String id;
     public String scriptText;
     public String scriptName;
-    public List<Event> events;
-  }
-
-  public static class Event {
-    public Event() {
-    }
-    public Event(String text) {
-      this.text = text;
-    }
-    String text;
+    public List<ExecutionEvent> events;
   }
 
   @Override
@@ -55,24 +45,17 @@ public class ScriptExecutionHandler implements RequestHandler {
 
     ScriptExecution scriptExecution = new ScriptExecution();
     scriptExecution.id = scriptExecutionId;
-    List<ExecutionEvent> executionEvents = configuration
+    scriptExecution.events = configuration
       .getEventStore()
       .findEventsByScriptExecutionId(scriptExecutionId);
 
-    scriptExecution.events = executionEvents
-      .stream()
-      .map(e -> new Event(e.toString()))
-      .collect(Collectors.toList());
-
-    ScriptStartedEvent startEvent = (ScriptStartedEvent) executionEvents.get(0);
+    ScriptStartedEvent startEvent = (ScriptStartedEvent) scriptExecution.events.get(0);
     String scriptId = startEvent.getScriptId();
     scriptExecution.scriptText = configuration
       .getScriptStore()
       .findScriptAstById(scriptId)
       .getScript()
       .getText();
-
-    log.info("Script text: "+scriptExecution.scriptText);
 
     response
       .bodyJson(scriptExecution)
