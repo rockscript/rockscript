@@ -23,6 +23,7 @@ public abstract class ExecutionEvent<T extends Execution> implements Event {
   protected Instant time;
   protected String scriptExecutionId;
   protected String executionId;
+  protected int line;
 
   /** for Gson serialzation */
   ExecutionEvent() {
@@ -33,6 +34,7 @@ public abstract class ExecutionEvent<T extends Execution> implements Event {
     this.scriptExecutionId = execution.getScriptExecution().getId();
     if (! (execution instanceof EngineScriptExecution)) {
       this.executionId = execution.getId();
+      this.line = execution.getElement().getLocation().getLine();
     }
   }
 
