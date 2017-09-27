@@ -22,6 +22,7 @@ import io.rockscript.engine.Script;
 import io.rockscript.engine.ScriptExecution;
 import io.rockscript.engine.ScriptService;
 import io.rockscript.engine.TestConfiguration;
+import io.rockscript.engine.impl.ExecutionEvent;
 import io.rockscript.test.ScriptTest;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -71,6 +72,32 @@ public class ActivityTest extends ScriptTest {
 
     scriptExecution = endActivity(activityInput.getContinuationReference());
     assertTrue(scriptExecution.isEnded());
+  }
+
+  @Test
+  public void testEvents() {
+    getConfiguration().getImportResolver().createImport("approvalService")
+      .put("getMessage", input -> {
+        input.getEngine().endActivity(input.getContinuationReference(), "hello");
+        return ActivityOutput.waitForFunctionToCompleteAsync();
+      }).put("approve", input -> {
+      activityInputs.add(input);
+      return ActivityOutput.waitForFunctionToCompleteAsync();
+      });
+
+    Script script = deployScript(
+      "var approvalService = system.import('approvalService'); \n" +
+      "var msg = approvalService.getMessage(); " +
+      "approvalService.approve(msg); ");
+
+    ScriptExecution scriptExecution = startScriptExecution(script);
+
+    ActivityInput activityInput = activityInputs.get(0);
+    scriptExecution = endActivity(activityInput.getContinuationReference());
+
+    List<ExecutionEvent> events = getConfiguration().getEventStore()
+      .findEventsByScriptExecutionId(scriptExecution.getId());
+    events.forEach(e->log.debug(e.toString()));
   }
 
   @Test

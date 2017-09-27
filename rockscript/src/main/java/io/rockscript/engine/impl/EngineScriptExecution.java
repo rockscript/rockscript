@@ -53,10 +53,20 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
     this.executionMode = ExecutionMode.REBUILDING;
     this.unreplayedEvents = new LinkedList<>(storedEvents);
 
+    log.info("Building script execution from events:");
+    this.unreplayedEvents.forEach(e->log.info("  "+e.toString()));
+
     while (!this.unreplayedEvents.isEmpty()) {
-      ExecutableEvent executableEvent = (ExecutableEvent) removeNextUnreplayedEvent();
+      ExecutableEvent executableEvent = (ExecutableEvent) unreplayedEvents.removeFirst();
       // Script execution events do not have an executionId in the event, only the scriptExecutionId.
       Execution execution = executableEvent.executionId!=null ? findExecutionRecursive(executableEvent.executionId) : this;
+      log.info("Reexecuting event: "+executableEvent.toString());
+
+      if (executableEvent instanceof ActivityStartedEvent
+          && !isNextUnreplayedEventActivityWaitOrActivityEnd()) {
+        this.executionMode = ExecutionMode.RECOVERING;
+      }
+
       executableEvent.execute(execution);
     }
 
@@ -89,27 +99,29 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
 
   @Override
   protected void dispatch(ExecutionEvent event) {
-    if (!rebuilding()) {
+    if (executionMode!=ExecutionMode.REBUILDING) {
       eventListener.handle(event);
+      if (executionMode == ExecutionMode.RECOVERING) {
+        executionMode = ExecutionMode.EXECUTING;
+      }
     } else {
       if (!(event instanceof ExecutableEvent)) {
-        ExecutionEvent unreplayedEvent = removeNextUnreplayedEvent();
-        if (!event.toString().equals(unreplayedEvent.toString())) {
-          log.debug("Expected, unreplayed event: "+unreplayedEvent.toString());
-          throw new RuntimeException();
+        if (unreplayedEvents.isEmpty()) {
+          executionMode = ExecutionMode.EXECUTING;
+        } else {
+          log.info("Replaying event: "+event.toString());
+          ExecutionEvent unreplayedEvent = unreplayedEvents.removeFirst();
+          if (unreplayedEvents.isEmpty()) {
+            executionMode = ExecutionMode.EXECUTING;
+          }
+          if (!event.toString().equals(unreplayedEvent.toString())) {
+            log.debug("Expected, unreplayed event: "+unreplayedEvent.toString());
+            throw new RuntimeException();
+          }
+
         }
       }
     }
-  }
-
-  private ExecutionEvent removeNextUnreplayedEvent() {
-    ExecutionEvent nextUnreplayedEvent = unreplayedEvents.removeFirst();
-    if (unreplayedEvents.isEmpty()) {
-      executionMode = ExecutionMode.EXECUTING;
-    } else if (unreplayedEvents.size() == 1) {
-      executionMode = ExecutionMode.RECOVERING;
-    }
-    return nextUnreplayedEvent;
   }
 
   protected void dispatchAndExecute(ExecutableEvent event, Execution execution) {
@@ -220,5 +232,11 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
 
   public Instant getStart() {
     return start;
+  }
+
+  public boolean isNextUnreplayedEventActivityWaitOrActivityEnd() {
+    ExecutionEvent nextExecutionEvent = !unreplayedEvents.isEmpty() ? unreplayedEvents.peek() : null;
+    return (nextExecutionEvent instanceof ActivityWaitingEvent
+            || nextExecutionEvent instanceof ActivityEndedEvent);
   }
 }
