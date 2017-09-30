@@ -16,14 +16,19 @@
 
 package io.rockscript.engine.impl;
 
+import io.rockscript.activity.Activity;
+import io.rockscript.activity.NamedActivity;
 import io.rockscript.engine.EngineException;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ActivityStartedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
 
+  String serviceName;
   String activityName;
-  List<Object> args;
+  Object args;
 
   /** constructor for gson serialization */
   ActivityStartedEvent() {
@@ -34,17 +39,46 @@ public class ActivityStartedEvent extends ExecutableEvent<ArgumentsExpressionExe
     if (argumentsExpressionExecution.activity==null) {
       throw new EngineException("Activity doesn't exist: "+argumentsExpressionExecution.element.getText());
     }
-    this.activityName = getActivityName(argumentsExpressionExecution);
-    this.args = argumentsExpressionExecution.args;
+
+    Activity activity = argumentsExpressionExecution.activity;
+    if (activity instanceof NamedActivity) {
+      NamedActivity namedActivity = (NamedActivity) activity;
+      this.serviceName = namedActivity.getServiceName();
+      this.activityName = namedActivity.getActivityName();
+    } else {
+      this.activityName = activity.toString();
+    }
+
+    List<String> argNames = activity.getArgNames();
+    if (argNames==null
+      && argumentsExpressionExecution.args!=null
+      && argumentsExpressionExecution.args.size()==1
+      && argumentsExpressionExecution.args.get(0) instanceof Map) {
+      this.args = (Map<String, Object>) argumentsExpressionExecution.args.get(0);
+    } else {
+      if (argumentsExpressionExecution.args!=null) {
+        if (argNames!=null) {
+          Map<String,Object> argsMap = new LinkedHashMap<>();
+          for (int i=0; i<argumentsExpressionExecution.args.size(); i++) {
+            Object argValue = null;
+            if (argumentsExpressionExecution.args.size() > i) {
+              argValue = argumentsExpressionExecution.args.get(i);
+            }
+            String argName = argNames!=null && argNames.size() > 1 ? argNames.get(i) : "arg"+i;
+            argsMap.put(argName, argValue);
+          }
+          this.args = argsMap;
+
+        } else {
+          this.args = argumentsExpressionExecution.args;
+        }
+      }
+    }
   }
 
   @Override
   public void execute(ArgumentsExpressionExecution execution) {
     execution.startActivityExecute();
-  }
-
-  static String getActivityName(ArgumentsExpressionExecution argumentsExpressionExecution) {
-    return argumentsExpressionExecution.activity.toString();
   }
 
   @Override

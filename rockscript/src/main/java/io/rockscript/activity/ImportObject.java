@@ -17,6 +17,8 @@ package io.rockscript.activity;
 
 import io.rockscript.engine.impl.JsonObject;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 /** Special JsonObject used as import object that ensures automatic
@@ -24,7 +26,7 @@ import java.util.function.Function;
  * activities so that the toString shows the property name. */
 public class ImportObject extends JsonObject {
 
-  String url;
+  protected String url;
 
   public ImportObject(String url) {
     this.url = url;
@@ -34,15 +36,19 @@ public class ImportObject extends JsonObject {
   public ImportObject put(String propertyName, Object value) {
     if (value instanceof Activity
         && ! (value instanceof NamedActivity)) {
-      put(propertyName, new NamedActivity(url+"/"+propertyName, (Activity) value));
+      put(propertyName, new NamedActivity(url, propertyName, (Activity) value));
     } else {
       super.put(propertyName, value);
     }
     return this;
   }
 
-  public ImportObject put(String propertyName, Function<ActivityInput, ActivityOutput> activityOutput) {
+  public ImportObject put(String propertyName, Function<ActivityInput, ActivityOutput> activityOutput, final String... argNames) {
     Activity activity = new Activity() {
+      @Override
+      public List<String> getArgNames() {
+        return argNames!=null ? Arrays.asList(argNames) : null;
+      }
       @Override
       public ActivityOutput invoke(ActivityInput activityInput) {
         return activityOutput.apply(activityInput);

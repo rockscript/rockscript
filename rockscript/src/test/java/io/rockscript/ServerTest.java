@@ -124,7 +124,8 @@ public class ServerTest extends AbstractServerTest {
   public void testEvents() {
     EngineDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
-        .scriptText("var msg = {hello: 'world'};"))
+        .scriptText("var http = system.import('rockscript.io/http'); \n" +
+                    "var msg = {hello: 'world'};"))
       .execute()
       .assertStatusOk()
       .getBodyAs(EngineDeployScriptResponse.class);

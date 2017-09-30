@@ -19,22 +19,22 @@ package io.rockscript.engine.impl;
 public class VariableCreatedEvent extends ExecutionEvent<VariableDeclarationExecution> {
 
   String variableName;
-  Object valueJson;
+  Object value;
 
   /** constructor for gson serialization */
   VariableCreatedEvent() {
   }
 
-  public VariableCreatedEvent(VariableDeclarationExecution execution, Object valueJson) {
+  public VariableCreatedEvent(VariableDeclarationExecution execution, Object value) {
     super(execution);
     this.variableName = execution.getElement().getVariableName();
-    this.valueJson = valueJson;
+    this.value = value;
   }
 
   @Override
   public String toString() {
     return "[" + scriptExecutionId + "] " +
         "Created variable '" + variableName + "' = " +
-        (valueJson!=null ? valueJson : "undefined");
+        (value!=null ? value : "undefined");
   }
 }

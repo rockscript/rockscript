@@ -38,14 +38,10 @@ public class HttpRequestRunnable implements Runnable {
     this.continuationReference = continuationReference;
     this.request = request;
     this.engine = engine;
-
-    log.info("Creating HttpRequestRunnable", new Exception());
   }
 
   @Override
   public void run() {
-    log.info("Running HttpRequestRunnable", new Exception());
-
     HttpResponse response = request
       .entityHandler((httpEntity,httpResponse)->{
         try {

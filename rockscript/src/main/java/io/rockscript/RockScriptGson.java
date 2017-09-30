@@ -5,6 +5,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import io.rockscript.activity.Activity;
+import io.rockscript.activity.ImportObject;
+import io.rockscript.engine.ActivitySerializer;
+import io.rockscript.engine.ImportObjectSerializer;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -22,6 +26,8 @@ public class RockScriptGson {
       .registerTypeAdapterFactory(createCommandsTypeAdapterFactory())
       .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
       .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
+      .registerTypeHierarchyAdapter(Activity.class, new ActivitySerializer())
+      .registerTypeHierarchyAdapter(ImportObject.class, new ImportObjectSerializer())
       .create();
   }
 

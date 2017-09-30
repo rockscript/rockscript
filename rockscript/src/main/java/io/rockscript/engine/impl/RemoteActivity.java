@@ -16,19 +16,21 @@
 package io.rockscript.engine.impl;
 
 import com.google.gson.Gson;
-import io.rockscript.activity.Activity;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
+import io.rockscript.activity.NamedActivity;
 import io.rockscript.engine.EngineException;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 import static io.rockscript.http.Http.ContentTypes.APPLICATION_JSON;
 import static io.rockscript.http.Http.Headers.CONTENT_TYPE;
 
-public class RemoteActivity implements Activity {
+public class RemoteActivity extends NamedActivity {
 
   static Logger log = LoggerFactory.getLogger(RemoteActivity.class);
 
@@ -36,8 +38,18 @@ public class RemoteActivity implements Activity {
   String activityName;
 
   public RemoteActivity(String url, String activityName) {
-    this.url = url;
+    super(url, activityName, null);
+    if (!url.startsWith("http")) {
+      this.url = "http://"+url;
+    } else {
+      this.url = url;
+    }
     this.activityName = activityName;
+  }
+
+  @Override
+  public List<String> getArgNames() {
+    return null;
   }
 
   @Override
@@ -83,4 +95,5 @@ public class RemoteActivity implements Activity {
   public String toString() {
     return url+"/"+activityName;
   }
+
 }

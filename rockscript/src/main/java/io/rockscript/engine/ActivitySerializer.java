@@ -30,7 +30,7 @@ public class ActivitySerializer implements JsonSerializer<Activity> {
   public JsonElement serialize(Activity src, Type typeOfSrc, JsonSerializationContext context) {
     String name = null;
     if (src instanceof NamedActivity) {
-      name = ((NamedActivity) src).getName();
+      name = ((NamedActivity) src).getActivityName();
     } else {
       name = src.getClass().getName();
     }

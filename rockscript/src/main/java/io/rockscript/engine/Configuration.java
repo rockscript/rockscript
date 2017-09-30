@@ -18,7 +18,6 @@ package io.rockscript.engine;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.rockscript.activity.Activity;
 import io.rockscript.activity.ImportResolver;
 import io.rockscript.engine.impl.*;
 import io.rockscript.http.GsonCodec;
@@ -64,7 +63,6 @@ public abstract class Configuration {
   private Gson createDefaultGson() {
     return new GsonBuilder()
       .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
-      .registerTypeHierarchyAdapter(Activity.class, new ActivitySerializer())
       .disableHtmlEscaping()
       // .setPrettyPrinting()
       .create();

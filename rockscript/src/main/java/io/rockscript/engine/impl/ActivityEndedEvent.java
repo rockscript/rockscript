@@ -16,11 +16,8 @@
 
 package io.rockscript.engine.impl;
 
-import static io.rockscript.engine.impl.ActivityStartedEvent.getActivityName;
-
 public class ActivityEndedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
 
-  String activityName;
   Object result;
 
   /** constructor for gson serialization */
@@ -29,7 +26,6 @@ public class ActivityEndedEvent extends ExecutableEvent<ArgumentsExpressionExecu
 
   public ActivityEndedEvent(ArgumentsExpressionExecution argumentsExpressionExecution, Object result) {
     super(argumentsExpressionExecution);
-    this.activityName = getActivityName(argumentsExpressionExecution);
     this.result = result;
   }
 

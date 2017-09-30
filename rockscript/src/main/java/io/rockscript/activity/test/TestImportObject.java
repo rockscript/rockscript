@@ -55,7 +55,7 @@ public class TestImportObject extends ImportObject implements ImportProvider {
         throw new EngineException("Expected "+expected+", but was "+actual, activityInput);
       }
       return ActivityOutput.endFunction();
-    });
+    }, "actual", "expected");
   }
 
   private boolean equal(Object a, Object b) {

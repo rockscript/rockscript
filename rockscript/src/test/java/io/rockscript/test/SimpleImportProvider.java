@@ -5,10 +5,7 @@ import io.rockscript.engine.EngineEndActivityResponse;
 import io.rockscript.engine.ScriptService;
 import io.rockscript.engine.impl.ContinuationReference;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SimpleImportProvider extends ImportObject implements ImportProvider {
 
@@ -37,6 +34,10 @@ public class SimpleImportProvider extends ImportObject implements ImportProvider
     super("rockscript.io/simple");
     put("wait", new Activity() {
       @Override
+      public List<String> getArgNames() {
+        return Collections.emptyList();
+      }
+      @Override
       public ActivityOutput invoke(ActivityInput input) {
         checkWaitsInitialized();
         waits
@@ -46,6 +47,10 @@ public class SimpleImportProvider extends ImportObject implements ImportProvider
       }
     });
     put("noop", new Activity() {
+      @Override
+      public List<String> getArgNames() {
+        return Collections.emptyList();
+      }
       @Override
       public ActivityOutput invoke(ActivityInput input) {
         return ActivityOutput.endFunction("noop");

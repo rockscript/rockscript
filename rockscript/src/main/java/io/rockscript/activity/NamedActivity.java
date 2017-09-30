@@ -15,14 +15,23 @@
  */
 package io.rockscript.activity;
 
+import java.util.List;
+
 public class NamedActivity implements Activity {
 
-  String name;
+  String serviceName;
+  String activityName;
   Activity activity;
 
-  public NamedActivity(String name, Activity activity) {
-    this.name = name;
+  public NamedActivity(String serviceName, String activityName, Activity activity) {
+    this.serviceName = serviceName;
+    this.activityName = activityName;
     this.activity = activity;
+  }
+
+  @Override
+  public List<String> getArgNames() {
+    return activity.getArgNames();
   }
 
   @Override
@@ -30,12 +39,16 @@ public class NamedActivity implements Activity {
     return activity.invoke(input);
   }
 
-  public String getName() {
-    return name;
+  public String getActivityName() {
+    return activityName;
+  }
+
+  public String getServiceName() {
+    return serviceName;
   }
 
   @Override
   public String toString() {
-    return name;
+    return serviceName+"/"+activityName;
   }
 }

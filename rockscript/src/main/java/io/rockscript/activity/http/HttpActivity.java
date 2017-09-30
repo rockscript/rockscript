@@ -24,6 +24,8 @@ import io.rockscript.engine.impl.Engine;
 import io.rockscript.http.Http;
 import io.rockscript.http.HttpRequest;
 
+import java.util.List;
+
 public class HttpActivity implements Activity {
 
   public static final HttpActivity GET = new HttpActivity(Http.Methods.GET);
@@ -35,6 +37,11 @@ public class HttpActivity implements Activity {
 
   public HttpActivity(String method) {
     this.method = method;
+  }
+
+  @Override
+  public List<String> getArgNames() {
+    return null;
   }
 
   @Override

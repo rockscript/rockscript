@@ -19,12 +19,19 @@ package io.rockscript.engine.impl;
 import io.rockscript.activity.*;
 import io.rockscript.engine.Configuration;
 
+import java.util.List;
+
 public class SystemImportActivity implements Activity {
 
-  Configuration configuration;
+  transient Configuration configuration;
 
   public SystemImportActivity(Configuration configuration) {
     this.configuration = configuration;
+  }
+
+  @Override
+  public List<String> getArgNames() {
+    return null;
   }
 
   @Override

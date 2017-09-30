@@ -15,15 +15,12 @@
  */
 package io.rockscript.engine.impl;
 
-public class RemoteActivityJsonObject extends JsonObject {
+import io.rockscript.activity.ImportObject;
 
-  String url;
+public class RemoteActivityJsonObject extends ImportObject {
 
   public RemoteActivityJsonObject(String url) {
-    if (!url.startsWith("http")) {
-      url = "http://"+url;
-    }
-    this.url = url;
+    super(url);
   }
 
   @Override
@@ -34,5 +31,4 @@ public class RemoteActivityJsonObject extends JsonObject {
     }
     return activity;
   }
-
 }

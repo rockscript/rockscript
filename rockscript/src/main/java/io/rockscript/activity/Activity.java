@@ -15,7 +15,14 @@
  */
 package io.rockscript.activity;
 
+import java.util.List;
+
 public interface Activity {
+
+  /** null means undefined, empty list means no args.
+   * Activities that have 1 json object as input should also return null.
+   * Then the only input object will be used to show the args. */
+  List<String> getArgNames();
 
   ActivityOutput invoke(ActivityInput input);
 }
