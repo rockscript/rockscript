@@ -16,16 +16,18 @@
 package io.rockscript.engine;
 
 
+import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
+
 public class StartScriptExecutionResponse {
 
   protected String scriptExecutionId;
-  protected String error;
+  protected ScriptExecutionErrorEvent errorEvent;
 
   public String getScriptExecutionId() {
     return scriptExecutionId;
   }
 
-  public String getError() {
-    return this.error;
+  public ScriptExecutionErrorEvent getErrorEvent() {
+    return this.errorEvent;
   }
 }

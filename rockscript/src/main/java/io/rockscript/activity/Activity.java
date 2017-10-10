@@ -19,6 +19,10 @@ import java.util.List;
 
 public interface Activity {
 
+  String getActivityName();
+
+  String getServiceName();
+
   /** null means undefined, empty list means no args.
    * Activities that have 1 json object as input should also return null.
    * Then the only input object will be used to show the args. */

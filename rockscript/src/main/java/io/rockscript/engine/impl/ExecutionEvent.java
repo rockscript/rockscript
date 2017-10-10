@@ -49,4 +49,8 @@ public abstract class ExecutionEvent<T extends Execution> implements Event {
   public String getExecutionId() {
     return executionId;
   }
+
+  public int getLine() {
+    return line;
+  }
 }

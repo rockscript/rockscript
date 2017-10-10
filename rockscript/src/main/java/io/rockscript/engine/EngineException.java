@@ -17,18 +17,15 @@
 package io.rockscript.engine;
 
 
-import io.rockscript.activity.ActivityInput;
 import io.rockscript.engine.impl.Execution;
-import io.rockscript.engine.impl.Location;
 
 /** Base class for all RockScript exceptions. */
 public class EngineException extends RuntimeException {
 
-  String scriptId;
-  Location location;
+  Execution execution;
 
   public EngineException(String message) {
-    super(message);
+    super(message, null);
   }
 
   public EngineException(Throwable cause) {
@@ -37,23 +34,15 @@ public class EngineException extends RuntimeException {
 
   public EngineException(String message, Throwable cause) {
     super(message, cause);
-    if (cause instanceof EngineException) {
-      EngineException engineException = (EngineException) cause;
-      this.scriptId = engineException.scriptId;
-      this.location = engineException.location;
-    }
-  }
-
-  public EngineException(String message, ActivityInput activityInput) {
-    super(message);
-    this.location = activityInput.getElementLocation();
-    this.scriptId = activityInput.getExecution().getEngineScript().getScript().getId();
   }
 
   public EngineException(String message, Execution execution) {
-    super(message);
-    this.location = execution.getElement().getLocation();
-    this.scriptId = execution.getEngineScript().getScript().getId();
+    this(message, execution, null);
+  }
+
+  public EngineException(String message, Execution execution, Throwable cause) {
+    super(message, cause);
+    this.execution = execution;
   }
 
   public static <T> T throwIfNull(T value) {
@@ -72,11 +61,7 @@ public class EngineException extends RuntimeException {
     return value;
   }
 
-  public Location getLocation() {
-    return location;
-  }
-
-  public String getScriptId() {
-    return scriptId;
+  public Execution getExecution() {
+    return execution;
   }
 }

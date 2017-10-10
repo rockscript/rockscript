@@ -15,14 +15,11 @@
  */
 package io.rockscript.activity.test;
 
-import io.rockscript.engine.EngineException;
-import io.rockscript.engine.ScriptService;
-import io.rockscript.engine.EngineStartScriptExecutionResponse;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.ImportObject;
 import io.rockscript.activity.ImportProvider;
-
-import static io.rockscript.engine.impl.EngineScriptExecution.handleException;
+import io.rockscript.engine.EngineStartScriptExecutionResponse;
+import io.rockscript.engine.ScriptService;
 
 public class TestImportObject extends ImportObject implements ImportProvider {
 
@@ -39,20 +36,21 @@ public class TestImportObject extends ImportObject implements ImportProvider {
         response = scriptService.newStartScriptExecutionCommand()
             .scriptName(scriptName)
             .execute();
+
+        if (response.getErrorEvent()==null) {
+          return ActivityOutput.endFunction(response.getScriptExecution());
+        } else {
+          return ActivityOutput.error("Started script execution failed: "+response.getErrorEvent().getError());
+        }
       } catch (Exception e) {
-        // TODO 1) dispatch an error event from the script execution,
-        //      2) leave the script execution locked
-        //      3) rethrow an exception
-        handleException(e);
-        throw new EngineException("Nested script execution "+scriptName+" failed: "+e.getMessage(), e);
+        return ActivityOutput.error("Test execution error: "+e.getMessage());
       }
-      return ActivityOutput.endFunction(response.getScriptExecution());
     });
     put("assertEquals", activityInput -> {
       Object actual = activityInput.getArg(0);
       Object expected = activityInput.getArg(1);
       if (!equal(actual, expected)) {
-        throw new EngineException("Expected "+expected+", but was "+actual, activityInput);
+        return ActivityOutput.error("Expected "+expected+", but was "+actual);
       }
       return ActivityOutput.endFunction();
     }, "actual", "expected");

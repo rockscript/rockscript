@@ -15,6 +15,8 @@
  */
 package io.rockscript.engine.impl;
 
+import io.rockscript.util.Exceptions;
+
 public class ActivityEndRequestRunnable implements Runnable {
 
   ActivityEndRequest activityEndRequest;
@@ -36,8 +38,9 @@ public class ActivityEndRequestRunnable implements Runnable {
           lockedScriptExecution,
           activityEndRequest.getContinuationReference(),
           activityEndRequest.getResult());
-    } finally {
       localEngine.releaseLock(lock, lockedScriptExecution);
+    } catch(Throwable e) {
+      lockedScriptExecution.dispatch(new ScriptExecutionErrorEvent(lockedScriptExecution, Exceptions.getStackTraceString(e)));
     }
   }
 }

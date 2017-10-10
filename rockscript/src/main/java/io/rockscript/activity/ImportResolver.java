@@ -33,7 +33,7 @@ public class ImportResolver {
   }
 
   public ImportResolver add(ImportProvider importProvider) {
-    importProviders.put(importProvider.getImportObject().getUrl(), importProvider);
+    importProviders.put(importProvider.getImportObject().getServiceName(), importProvider);
     return this;
   }
 

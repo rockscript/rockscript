@@ -17,8 +17,6 @@ package io.rockscript.test;
 
 import io.rockscript.engine.*;
 import io.rockscript.engine.impl.ContinuationReference;
-import io.rockscript.engine.Configuration;
-import io.rockscript.engine.ScriptServiceImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.slf4j.Logger;
@@ -126,4 +124,11 @@ public class ScriptTest {
   protected Configuration getConfiguration() {
     return ((ScriptServiceImpl)scriptService).getConfiguration();
   }
+
+  public static void assertContains(String expectedSubstring, String text) {
+    if (text==null || !text.contains(expectedSubstring)) {
+      throw new AssertionError("Expected substring '"+expectedSubstring+"', but was '"+text+"'");
+    }
+  }
+
 }

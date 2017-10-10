@@ -32,11 +32,7 @@ public class SimpleImportProvider extends ImportObject implements ImportProvider
 
   public SimpleImportProvider() {
     super("rockscript.io/simple");
-    put("wait", new Activity() {
-      @Override
-      public List<String> getArgNames() {
-        return Collections.emptyList();
-      }
+    put(new AbstractActivity("wait", new String[]{}) {
       @Override
       public ActivityOutput invoke(ActivityInput input) {
         checkWaitsInitialized();
@@ -46,11 +42,7 @@ public class SimpleImportProvider extends ImportObject implements ImportProvider
         return ActivityOutput.waitForFunctionToCompleteAsync();
       }
     });
-    put("noop", new Activity() {
-      @Override
-      public List<String> getArgNames() {
-        return Collections.emptyList();
-      }
+    put(new AbstractActivity("noop", new String[]{}) {
       @Override
       public ActivityOutput invoke(ActivityInput input) {
         return ActivityOutput.endFunction("noop");

@@ -30,6 +30,16 @@ public class SystemImportActivity implements Activity {
   }
 
   @Override
+  public String getActivityName() {
+    return "import";
+  }
+
+  @Override
+  public String getServiceName() {
+    return "system";
+  }
+
+  @Override
   public List<String> getArgNames() {
     return null;
   }

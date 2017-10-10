@@ -17,7 +17,6 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.activity.Activity;
-import io.rockscript.activity.NamedActivity;
 import io.rockscript.engine.EngineException;
 
 import java.util.LinkedHashMap;
@@ -41,13 +40,8 @@ public class ActivityStartedEvent extends ExecutableEvent<ArgumentsExpressionExe
     }
 
     Activity activity = argumentsExpressionExecution.activity;
-    if (activity instanceof NamedActivity) {
-      NamedActivity namedActivity = (NamedActivity) activity;
-      this.serviceName = namedActivity.getServiceName();
-      this.activityName = namedActivity.getActivityName();
-    } else {
-      this.activityName = activity.toString();
-    }
+    this.serviceName = activity.getServiceName();
+    this.activityName = activity.getActivityName();
 
     List<String> argNames = activity.getArgNames();
     if (argNames==null

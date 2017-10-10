@@ -15,11 +15,15 @@
  */
 package io.rockscript.engine.impl;
 
-import io.rockscript.engine.ActivityContinuation;
 import io.rockscript.activity.Activity;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
+import io.rockscript.engine.ActivityContinuation;
+import io.rockscript.engine.job.RetryPolicy;
+import io.rockscript.engine.job.impl.ActivityRetryAfterError;
 
+import java.time.Instant;
+import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,11 +89,26 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   }
 
   public void startActivityExecute() {
-    ExecutionMode executionMode = getScriptExecution().getExecutionMode();
+    EngineScriptExecution scriptExecution = getScriptExecution();
+    ExecutionMode executionMode = scriptExecution.getExecutionMode();
     if (executionMode!=ExecutionMode.REBUILDING) {
       ActivityOutput activityOutput = startActivityInvoke();
       if (activityOutput.isEnded()) {
         endActivity(activityOutput.getResult());
+
+      } else if (activityOutput.isError()) {
+        RetryPolicy retryPolicy = activityOutput.getRetryPolicy();
+        TemporalAmount retryDelay = retryPolicy!=null ? retryPolicy.removeFirst() : null;
+        Instant retryTime = retryDelay!=null ? Instant.now().plus(retryDelay) : null;
+        scriptExecution.errorEvent = new ActivityStartErrorEvent(this, activityOutput.getError(), retryTime);
+        dispatch(scriptExecution.errorEvent);
+        if (retryTime!=null) {
+          getConfiguration().getJobService().schedule(
+            new ActivityRetryAfterError(this),
+            retryTime,
+            retryPolicy
+          );
+        }
 
       } else {
         dispatch(new ActivityWaitingEvent(this));
@@ -111,7 +130,11 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
 
   public ActivityOutput startActivityInvoke() {
     ActivityInput activityInput = new ActivityInput(this, args);
-    return activity.invoke(activityInput);
+    try {
+      return activity.invoke(activityInput);
+    } catch (Exception e) {
+      return ActivityOutput.error(e.getMessage());
+    }
   }
 
   public ActivityContinuation getActivityContinuation() {

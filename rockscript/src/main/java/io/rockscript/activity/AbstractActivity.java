@@ -15,36 +15,37 @@
  */
 package io.rockscript.activity;
 
+import java.util.Arrays;
 import java.util.List;
 
-public class NamedActivity implements Activity {
+public abstract class AbstractActivity implements Activity {
 
   String serviceName;
   String activityName;
-  Activity activity;
+  List<String> argNames;
 
-  public NamedActivity(String serviceName, String activityName, Activity activity) {
-    this.serviceName = serviceName;
+  public AbstractActivity(String activityName, String... argNames) {
     this.activityName = activityName;
-    this.activity = activity;
+    this.argNames = argNames!=null ? Arrays.asList(argNames) : null;
   }
 
   @Override
-  public List<String> getArgNames() {
-    return activity.getArgNames();
-  }
-
-  @Override
-  public ActivityOutput invoke(ActivityInput input) {
-    return activity.invoke(input);
-  }
-
   public String getActivityName() {
     return activityName;
   }
 
+  @Override
   public String getServiceName() {
     return serviceName;
+  }
+
+  public void setServiceName(String serviceName) {
+    this.serviceName = serviceName;
+  }
+
+  @Override
+  public List<String> getArgNames() {
+    return argNames;
   }
 
   @Override

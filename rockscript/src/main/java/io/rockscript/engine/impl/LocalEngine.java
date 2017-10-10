@@ -15,8 +15,9 @@
  */
 package io.rockscript.engine.impl;
 
-import io.rockscript.engine.EngineException;
 import io.rockscript.engine.Configuration;
+import io.rockscript.engine.EngineException;
+import io.rockscript.util.Exceptions;
 
 import java.util.*;
 
@@ -61,13 +62,21 @@ public class LocalEngine implements Engine {
       try {
         scriptExecution.start(input);
         scriptExecution.doWork();
-
-      } finally {
         releaseLock(lock, scriptExecution);
+
+      } catch(Throwable e) {
+        Execution execution = getExecution(e, scriptExecution);
+        scriptExecution.errorEvent = new ScriptExecutionErrorEvent(execution, e.getMessage());
+        scriptExecution.dispatch(scriptExecution.errorEvent);
       }
     }
 
     return scriptExecution;
+  }
+
+  private Execution getExecution(Throwable exception, EngineScriptExecution scriptExecution) {
+    Execution execution = exception instanceof EngineException ? ((EngineException)exception).getExecution() : null;
+    return execution!=null ? execution : scriptExecution;
   }
 
   @Override
@@ -85,11 +94,10 @@ public class LocalEngine implements Engine {
         }
 
         endActivity(scriptExecution, continuationReference, result);
-      } catch (RuntimeException e) {
-        e.printStackTrace();
-        throw e;
-      } finally {
         releaseLock(lock, scriptExecution);
+      } catch(Throwable e) {
+        scriptExecution.errorEvent = new ScriptExecutionErrorEvent(scriptExecution, Exceptions.getStackTraceString(e));
+        scriptExecution.dispatch(scriptExecution.errorEvent);
       }
     }
     return scriptExecution;

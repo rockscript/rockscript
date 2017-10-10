@@ -27,7 +27,7 @@ public class RemoteActivityJsonObject extends ImportObject {
   public Object get(String propertyName) {
     Object activity = super.get(propertyName);
     if (activity==null) {
-      activity = new RemoteActivity(url, propertyName);
+      activity = new RemoteActivity(serviceName, propertyName);
     }
     return activity;
   }

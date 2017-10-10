@@ -17,8 +17,6 @@ package io.rockscript.activity;
 
 import io.rockscript.engine.impl.JsonObject;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 
 /** Special JsonObject used as import object that ensures automatic
@@ -26,44 +24,32 @@ import java.util.function.Function;
  * activities so that the toString shows the property name. */
 public class ImportObject extends JsonObject {
 
-  protected String url;
+  protected String serviceName;
 
-  public ImportObject(String url) {
-    this.url = url;
+  public ImportObject(String serviceName) {
+    this.serviceName = serviceName;
   }
 
-  @Override
-  public ImportObject put(String propertyName, Object value) {
-    if (value instanceof Activity
-        && ! (value instanceof NamedActivity)) {
-      put(propertyName, new NamedActivity(url, propertyName, (Activity) value));
-    } else {
-      super.put(propertyName, value);
+  public ImportObject put(Activity activity) {
+    put(activity.getActivityName(), activity);
+    if (activity instanceof AbstractActivity) {
+      ((AbstractActivity)activity).setServiceName(serviceName);
     }
     return this;
   }
 
-  public ImportObject put(String propertyName, Function<ActivityInput, ActivityOutput> activityOutput, final String... argNames) {
-    Activity activity = new Activity() {
-      @Override
-      public List<String> getArgNames() {
-        return argNames!=null ? Arrays.asList(argNames) : null;
-      }
-      @Override
-      public ActivityOutput invoke(ActivityInput activityInput) {
-        return activityOutput.apply(activityInput);
-      }
-    };
-    put(propertyName, activity);
+
+  public ImportObject put(String propertyName, Function<ActivityInput, ActivityOutput> function, final String... argNames) {
+    put(new FunctionActivity(propertyName, function, argNames));
     return this;
   }
 
-  public String getUrl() {
-    return url;
+  public String getServiceName() {
+    return serviceName;
   }
 
   @Override
   public String toString() {
-    return url;
+    return serviceName;
   }
 }

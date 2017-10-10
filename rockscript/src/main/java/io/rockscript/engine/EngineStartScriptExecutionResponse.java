@@ -17,6 +17,7 @@ package io.rockscript.engine;
 
 
 import io.rockscript.engine.impl.EngineScriptExecution;
+import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
 
 public class EngineStartScriptExecutionResponse extends StartScriptExecutionResponse implements CommandResponse {
 
@@ -30,11 +31,10 @@ public class EngineStartScriptExecutionResponse extends StartScriptExecutionResp
   public EngineStartScriptExecutionResponse(EngineScriptExecution engineScriptExecution) {
     this.scriptExecutionId = engineScriptExecution.getId();
     this.engineScriptExecution = engineScriptExecution;
-  }
-
-  // TODO use this
-  public EngineStartScriptExecutionResponse(String error) {
-    this.error = error;
+    ScriptExecutionErrorEvent errorEvent = engineScriptExecution.getErrorEvent();
+    if (errorEvent!=null) {
+      this.errorEvent = errorEvent;
+    }
   }
 
   public ScriptExecution getScriptExecution() {

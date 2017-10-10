@@ -17,7 +17,7 @@ package io.rockscript.activity.http;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import io.rockscript.activity.Activity;
+import io.rockscript.activity.AbstractActivity;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.engine.impl.Engine;
@@ -26,7 +26,7 @@ import io.rockscript.http.HttpRequest;
 
 import java.util.List;
 
-public class HttpActivity implements Activity {
+public class HttpActivity extends AbstractActivity {
 
   public static final HttpActivity GET = new HttpActivity(Http.Methods.GET);
   public static final HttpActivity POST = new HttpActivity(Http.Methods.POST);
@@ -36,6 +36,7 @@ public class HttpActivity implements Activity {
   String method;
 
   public HttpActivity(String method) {
+    super(method.toLowerCase());
     this.method = method;
   }
 
@@ -64,10 +65,5 @@ public class HttpActivity implements Activity {
       .execute(command);
 
     return ActivityOutput.waitForFunctionToCompleteAsync();
-  }
-
-  @Override
-  public String toString() {
-    return method;
   }
 }

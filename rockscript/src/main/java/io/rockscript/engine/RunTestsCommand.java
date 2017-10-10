@@ -19,8 +19,7 @@ import io.rockscript.activity.test.TestImportObject;
 import io.rockscript.activity.test.TestResult;
 import io.rockscript.activity.test.TestResults;
 import io.rockscript.activity.test.TestRunConfiguration;
-import io.rockscript.engine.impl.ErrorMessage;
-import io.rockscript.engine.impl.ScriptStore;
+import io.rockscript.engine.impl.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,12 +62,13 @@ public class RunTestsCommand extends CommandImpl<TestResults> {
     testImportObject.setScriptService(testScriptService);
     try {
       String scriptId = scriptVersion.getId();
-      testScriptService
+      EngineStartScriptExecutionResponse response = testScriptService
         .newStartScriptExecutionCommand()
         .scriptId(scriptId)
         .execute();
+      ScriptExecutionErrorEvent errorEvent = response.getErrorEvent();
     } catch (Throwable t) {
-      testResult.setError(new ErrorMessage(t));
+      testResult.addError(new ErrorMessage(t));
     }
     return testResult;
   }

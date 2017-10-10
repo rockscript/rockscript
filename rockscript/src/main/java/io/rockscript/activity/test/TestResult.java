@@ -17,6 +17,7 @@ package io.rockscript.activity.test;
 
 import io.rockscript.engine.impl.ErrorMessage;
 import io.rockscript.engine.impl.Event;
+import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,21 +25,28 @@ import java.util.List;
 public class TestResult {
 
   List<Event> events = new ArrayList<>();
-  ErrorMessage error;
+  List<ErrorMessage> errors;
 
-  public void setError(ErrorMessage error) {
-    this.error = error;
+  public void addError(ErrorMessage error) {
+    if (errors==null) {
+      errors = new ArrayList<>();
+    }
+    this.errors.add(error);
   }
 
   public void addEvent(Event event) {
     events.add(event);
-  }
-
-  public ErrorMessage getError() {
-    return error;
+    if (event instanceof ScriptExecutionErrorEvent) {
+      ScriptExecutionErrorEvent errorEvent = (ScriptExecutionErrorEvent) event;
+      addError(new ErrorMessage(errorEvent.getError(), errorEvent.getScriptId(), errorEvent.getLine()));
+    }
   }
 
   public List<Event> getEvents() {
     return events;
+  }
+
+  public List<ErrorMessage> getErrors() {
+    return errors;
   }
 }

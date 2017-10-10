@@ -13,7 +13,7 @@ public class ImportObjectSerializer implements JsonSerializer<ImportObject> {
   @Override
   public JsonElement serialize(ImportObject src, Type typeOfSrc, JsonSerializationContext context) {
     if (src!=null) {
-      return new JsonPrimitive("system.import('"+src.getUrl()+")");
+      return new JsonPrimitive("import('" + src.getServiceName() + "')");
     }
     return null;
   }

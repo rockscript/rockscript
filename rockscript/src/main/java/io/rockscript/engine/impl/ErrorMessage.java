@@ -16,12 +16,11 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.engine.EngineException;
-import io.rockscript.util.Exceptions;
 
 public class ErrorMessage {
 
   String message;
-  Location location;
+  int line;
   String scriptId;
 
   public ErrorMessage(String message) {
@@ -29,23 +28,37 @@ public class ErrorMessage {
   }
 
   public ErrorMessage(Throwable t) {
-    this.message = Exceptions.getRecursiveMessage(t);
+    this.message = t.getMessage();
     if (t instanceof EngineException) {
       EngineException engineException = (EngineException) t;
-      this.location = engineException.getLocation();
-      this.scriptId = engineException.getScriptId();
+      Execution execution = engineException.getExecution();
+      if (execution!=null) {
+        this.line = execution.getElement().getLocation().getLine();
+        this.scriptId = execution.getEngineScript().getScript().getId();
+      }
     }
+  }
+
+  public ErrorMessage(String message, String scriptId, int line) {
+    this.message = message;
+    this.scriptId = scriptId;
+    this.line = line;
   }
 
   public String getMessage() {
     return message;
   }
 
-  public Location getLocation() {
-    return location;
-  }
-
   public String getScriptId() {
     return scriptId;
+  }
+
+  public int getLine() {
+    return line;
+  }
+
+  @Override
+  public String toString() {
+    return "Error [scriptId:" + scriptId +",line:" + line +"] "+message;
   }
 }

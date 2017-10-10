@@ -15,10 +15,14 @@
  */
 package io.rockscript.activity;
 
+import io.rockscript.engine.job.RetryPolicy;
+
 public class ActivityOutput {
 
-  private boolean ended = false;
+  private boolean ended;
   private Object result;
+  private String error;
+  private RetryPolicy retryPolicy;
 
   public ActivityOutput() {
   }
@@ -26,6 +30,23 @@ public class ActivityOutput {
   protected ActivityOutput(boolean ended, Object result) {
     this.ended = ended;
     this.result = result;
+  }
+
+  public ActivityOutput(String error, RetryPolicy retryPolicy) {
+    this.error = error;
+    this.retryPolicy = retryPolicy;
+  }
+
+  public static ActivityOutput error(String error) {
+    return error(error, null);
+  }
+
+  public static ActivityOutput error(String error, RetryPolicy retryPolicy) {
+    return new ActivityOutput(error, retryPolicy);
+  }
+
+  public static ActivityOutput waitForFunctionToCompleteAsync() {
+    return new ActivityOutput(false, null);
   }
 
   public static ActivityOutput endFunction() {
@@ -36,15 +57,23 @@ public class ActivityOutput {
     return new ActivityOutput(true, result);
   }
 
-  public static ActivityOutput waitForFunctionToCompleteAsync() {
-    return new ActivityOutput(false, null);
-  }
-
   public boolean isEnded() {
     return ended;
   }
 
   public Object getResult() {
     return result;
+  }
+
+  public boolean isError() {
+    return error!=null;
+  }
+
+  public String getError() {
+    return error;
+  }
+
+  public RetryPolicy getRetryPolicy() {
+    return retryPolicy;
   }
 }

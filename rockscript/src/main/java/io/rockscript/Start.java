@@ -112,7 +112,7 @@ public class Start extends ClientCommand {
         .getScriptExecutionId());
     } else {
       log("Error starting script execution: "+startResponse
-        .getError());
+        .getErrorEvent());
     }
   }
 

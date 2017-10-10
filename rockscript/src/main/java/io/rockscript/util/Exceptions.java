@@ -15,6 +15,8 @@
  */
 package io.rockscript.util;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,6 +41,21 @@ public class Exceptions {
   public static void assertContains(String expected, String text) {
     if (text==null || !text.contains(expected)) {
       throw new AssertionError("Expected '"+expected+"' to be present, but text was "+(text!=null ? "'"+text+"'" : "null"));
+    }
+  }
+
+  public static String getStackTraceString(Throwable t) {
+    StringWriter out = new StringWriter();
+    t.printStackTrace(new PrintWriter(out));
+    return out.toString();
+  }
+
+  public static void rethrowRuntimeException(Throwable e) {
+    if (e !=null) {
+      if (e instanceof RuntimeException) {
+        throw (RuntimeException)e;
+      }
+      throw new RuntimeException(e);
     }
   }
 }

@@ -20,7 +20,6 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import io.rockscript.activity.Activity;
-import io.rockscript.activity.NamedActivity;
 
 import java.lang.reflect.Type;
 
@@ -28,12 +27,6 @@ public class ActivitySerializer implements JsonSerializer<Activity> {
 
   @Override
   public JsonElement serialize(Activity src, Type typeOfSrc, JsonSerializationContext context) {
-    String name = null;
-    if (src instanceof NamedActivity) {
-      name = ((NamedActivity) src).getActivityName();
-    } else {
-      name = src.getClass().getName();
-    }
-    return new JsonPrimitive(name);
+    return new JsonPrimitive(src.getActivityName());
   }
 }

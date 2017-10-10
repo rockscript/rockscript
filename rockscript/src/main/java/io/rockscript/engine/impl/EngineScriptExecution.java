@@ -17,7 +17,6 @@ package io.rockscript.engine.impl;
 
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.EngineException;
-import io.rockscript.engine.ScriptExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +36,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
   Instant start;
   Instant end;
   Queue<Operation> work = new LinkedList<Operation>();
+  ScriptExecutionErrorEvent errorEvent;
 
   LinkedList<ExecutionEvent> unreplayedEvents;
 
@@ -131,15 +131,6 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
       addWork(new ExecuteEventOperation(event, execution));
       // event.execute(execution);
     } // when rebuilding, the loop in the constructor will re-execute the ExecutableEvent's
-  }
-
-  public static void handleException(Throwable e) {
-    if (e instanceof ScriptExecutionException) {
-      ScriptExecutionException scriptExecutionException = (ScriptExecutionException) e;
-      EngineScriptExecution scriptExecution = scriptExecutionException.getScriptExecution();
-      scriptExecution.dispatch(new ErrorExecutionEvent(scriptExecutionException));
-      handleException(e.getCause());
-    }
   }
 
   private boolean rebuilding() {
@@ -238,5 +229,9 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
     ExecutionEvent nextExecutionEvent = !unreplayedEvents.isEmpty() ? unreplayedEvents.peek() : null;
     return (nextExecutionEvent instanceof ActivityWaitingEvent
             || nextExecutionEvent instanceof ActivityEndedEvent);
+  }
+
+  public ScriptExecutionErrorEvent getErrorEvent() {
+    return errorEvent;
   }
 }
