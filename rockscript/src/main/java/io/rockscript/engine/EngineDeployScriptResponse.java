@@ -34,4 +34,9 @@ public class EngineDeployScriptResponse extends DeployScriptResponse implements 
   public int getStatus() {
     return !hasErrors() ? 200 : 400;
   }
+
+  @Override
+  public EngineDeployScriptResponse throwIfErrors() {
+    return (EngineDeployScriptResponse) super.throwIfErrors();
+  }
 }

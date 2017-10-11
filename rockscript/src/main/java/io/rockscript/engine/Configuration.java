@@ -70,7 +70,7 @@ public abstract class Configuration {
     return new GsonBuilder()
       .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
       .disableHtmlEscaping()
-      // .setPrettyPrinting()
+      .setPrettyPrinting()
       .create();
   }
 

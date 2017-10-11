@@ -73,7 +73,7 @@ public class DeployTest extends AbstractServerTest {
   public void testDeployParseError() {
     EngineDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
-        .scriptText("\n\nvar a = b+c;"))
+        .scriptText("\n\nvar a = new Object();"))
       .execute()
       .assertStatusBadRequest()
       .getBodyAs(EngineDeployScriptResponse.class);
@@ -85,6 +85,6 @@ public class DeployTest extends AbstractServerTest {
     ParseError error = errors.get(0);
     assertEquals(3, error.getLine());
     assertEquals(8, error.getColumn());
-    assertEquals("Unsupported singleExpression: b+c", error.getMessage());
+    assertEquals("Unsupported singleExpression: newObject() NewExpressionContext", error.getMessage());
   }
 }

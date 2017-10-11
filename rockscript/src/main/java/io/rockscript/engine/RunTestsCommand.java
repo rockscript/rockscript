@@ -27,7 +27,7 @@ public class RunTestsCommand extends CommandImpl<TestResults> {
 
   static Logger log = LoggerFactory.getLogger(RunTestsCommand.class);
 
-  protected String tests;
+  protected String tests = "*.rst";
 
   public RunTestsCommand(Configuration configuration) {
     super(configuration);
@@ -51,14 +51,14 @@ public class RunTestsCommand extends CommandImpl<TestResults> {
     return testResults;
   }
 
-  private TestResult runTest(Configuration engineConfiguration, Script scriptVersion) {
-    TestResult testResult = new TestResult();
+  private TestResult runTest(Configuration engineConfiguration, Script script) {
+    TestResult testResult = new TestResult(script.getName());
     TestImportObject testImportObject = new TestImportObject(testResult);
     Configuration testConfiguration = new TestRunConfiguration(engineConfiguration, testImportObject, testResult);
     ScriptService testScriptService = testConfiguration.build();
     testImportObject.setScriptService(testScriptService);
     try {
-      String scriptId = scriptVersion.getId();
+      String scriptId = script.getId();
       EngineStartScriptExecutionResponse response = testScriptService
         .newStartScriptExecutionCommand()
         .scriptId(scriptId)

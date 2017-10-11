@@ -23,8 +23,18 @@ import java.util.List;
 
 public class TestResult {
 
+  String testName;
   List<Event> events = new ArrayList<>();
   List<TestError> errors;
+
+  /** for gson serialization */
+  protected TestResult() {
+  }
+
+  public TestResult(String testName) {
+    this.testName = testName;
+  }
+
 
   public void addError(TestError error) {
     if (errors==null) {
@@ -47,5 +57,9 @@ public class TestResult {
 
   public List<TestError> getErrors() {
     return errors;
+  }
+
+  public String getTestName() {
+    return testName;
   }
 }

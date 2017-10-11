@@ -31,16 +31,18 @@ public class TestImportObject extends ImportObject implements ImportProvider {
     this.testResult = testResult;
     put("start", activityInput -> {
       String scriptName = activityInput.getArgProperty("scriptName");
+      Object input = activityInput.getArgProperty("input");
       EngineStartScriptExecutionResponse response = null;
       try {
         response = scriptService.newStartScriptExecutionCommand()
             .scriptName(scriptName)
+            .input(input)
             .execute();
 
         if (response.getErrorEvent()==null) {
           return ActivityOutput.endActivity(response.getScriptExecution());
         } else {
-          return ActivityOutput.error("Started script execution failed: "+response.getErrorEvent().getError());
+          return ActivityOutput.error("Script start failed: "+response.getErrorEvent().getError());
         }
       } catch (Exception e) {
         return ActivityOutput.error("Test execution error: "+e.getMessage());

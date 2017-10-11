@@ -86,7 +86,8 @@ public class ScriptTest {
     return scriptService
       .newDeployScriptCommand()
       .scriptText(scriptText)
-      .execute();
+      .execute()
+      .throwIfErrors();
   }
 
   public ScriptExecution startScriptExecution(Script script) {

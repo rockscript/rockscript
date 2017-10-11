@@ -2,7 +2,7 @@ package io.rockscript.engine.impl;
 
 import java.time.Instant;
 
-public class ActivityStartErrorEvent extends ScriptExecutionErrorEvent {
+public class ActivityStartErrorEvent extends ScriptExecutionErrorEvent<ArgumentsExpressionExecution> {
 
   Instant retryTime;
 
@@ -18,6 +18,11 @@ public class ActivityStartErrorEvent extends ScriptExecutionErrorEvent {
 
   public Instant getRetryTime() {
     return retryTime;
+  }
+
+  @Override
+  public void execute(ArgumentsExpressionExecution execution) {
+    execution.failedAttemptsCount++;
   }
 
   @Override

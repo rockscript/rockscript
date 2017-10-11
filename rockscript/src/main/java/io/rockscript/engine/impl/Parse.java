@@ -79,7 +79,7 @@ public class Parse {
   }
 
   void addErrorUnsupportedElement(ParserRuleContext object, String elementName) {
-    addError(object, "Unsupported "+elementName+": "+(object!=null ? object.getText() : "null"));
+    addError(object, "Unsupported "+elementName+": "+(object!=null ? object.getText() : "null")+" "+object.getClass().getSimpleName());
   }
 
   void addError(ParserRuleContext object, String errorMessage) {
@@ -190,11 +190,7 @@ public class Parse {
 
       ExpressionStatement expressionStatement = new ExpressionStatement(createNextScriptElementId(), createLocation(statementContext));
 
-      List<SingleExpression> singleExpressions = new ArrayList<>();
-      for (SingleExpressionContext singleExpressionContext: singleExpressionContexts) {
-        SingleExpression singleExpression = parseSingleExpression(singleExpressionContext);
-        singleExpressions.add(singleExpression);
-      }
+      List<SingleExpression> singleExpressions = parseSingleExpressionList(singleExpressionContexts);
 
       expressionStatement.setSingleExpressions(singleExpressions);
       return expressionStatement;
@@ -240,11 +236,17 @@ public class Parse {
   }
 
   private SingleExpression parseSingleExpression(SingleExpressionContext singleExpressionContext) {
+    if (singleExpressionContext==null) {
+      return null;
+    }
     if (singleExpressionContext instanceof ArgumentsExpressionContext) {
       return parseArgumentsExpression((ArgumentsExpressionContext) singleExpressionContext);
 
     } else if (singleExpressionContext instanceof MemberDotExpressionContext) {
       return parseMemberDotExpression((MemberDotExpressionContext) singleExpressionContext);
+
+    } else if (singleExpressionContext instanceof MemberIndexExpressionContext) {
+      return parseMemberIndexExpression((MemberIndexExpressionContext) singleExpressionContext);
 
     } else if (singleExpressionContext instanceof IdentifierExpressionContext) {
       return parseIdentifier((IdentifierExpressionContext) singleExpressionContext);
@@ -255,9 +257,17 @@ public class Parse {
     } else if (singleExpressionContext instanceof ObjectLiteralExpressionContext) {
       return parseObjectLiteralExpression((ObjectLiteralExpressionContext)singleExpressionContext);
 
+    } else if (singleExpressionContext instanceof AdditiveExpressionContext) {
+      return parseAdditiveExpression((AdditiveExpressionContext)singleExpressionContext);
     }
     addErrorUnsupportedElement(singleExpressionContext, "singleExpression");
     return null;
+  }
+
+  private SingleExpression parseAdditiveExpression(AdditiveExpressionContext additiveExpressionContext) {
+    SingleExpression left = parseSingleExpression(additiveExpressionContext.singleExpression(0));
+    SingleExpression right = parseSingleExpression(additiveExpressionContext.singleExpression(1));
+    return new AdditiveExpression(createNextScriptElementId(), createLocation(additiveExpressionContext), left, right);
   }
 
   private SingleExpression parseObjectLiteralExpression(ObjectLiteralExpressionContext objectLiteralExpressionContext) {
@@ -379,25 +389,48 @@ public class Parse {
     return memberDotExpression;
   }
 
+  private SingleExpression parseMemberIndexExpression(MemberIndexExpressionContext memberIndexExpressionContext) {
+    MemberIndexExpression memberIndexExpression = new MemberIndexExpression(createNextScriptElementId(), createLocation(memberIndexExpressionContext));
+
+    ExpressionSequenceContext expressionSequence = memberIndexExpressionContext.expressionSequence();
+    List<SingleExpressionContext> indexeContexts = expressionSequence!=null ? expressionSequence.singleExpression() : null;
+    List<SingleExpression> indexExpressions = parseSingleExpressionList(indexeContexts);
+    memberIndexExpression.setExpressionSequence(indexExpressions);
+
+    SingleExpressionContext baseExpressionContext = memberIndexExpressionContext.singleExpression();
+    SingleExpression baseExpression = parseSingleExpression(baseExpressionContext);
+    memberIndexExpression.setBaseExpression(baseExpression);
+
+    return memberIndexExpression;
+  }
+
   private SingleExpression parseArgumentsExpression(ArgumentsExpressionContext argumentsExpressionContext) {
     ArgumentsExpression argumentsExpression = new ArgumentsExpression(createNextScriptElementId(), createLocation(argumentsExpressionContext));
 
-    List<SingleExpression> argumentExpressions = new ArrayList<>();
     ArgumentsContext argumentsContext = argumentsExpressionContext.arguments();
     ArgumentListContext argumentListContext = argumentsContext.argumentList();
     if (argumentListContext!=null) {
       List<SingleExpressionContext> argumentExpressionContexts = argumentListContext.singleExpression();
-      for (SingleExpressionContext argumentExpressionContext: argumentExpressionContexts) {
-        SingleExpression argumentExpression = parseSingleExpression(argumentExpressionContext);
-        argumentExpressions.add(argumentExpression);
-      }
+      List<SingleExpression> argumentExpressions = parseSingleExpressionList(argumentExpressionContexts);
+      argumentsExpression.setArgumentExpressions(argumentExpressions);
     }
-    argumentsExpression.setArgumentExpressions(argumentExpressions);
 
     SingleExpressionContext functionExpressionContext = argumentsExpressionContext.singleExpression();
     SingleExpression functionExpression = parseSingleExpression(functionExpressionContext);
     argumentsExpression.setFunctionExpression(functionExpression);
     return argumentsExpression;
+  }
+
+  private List<SingleExpression> parseSingleExpressionList(List<SingleExpressionContext> expressionContexts) {
+    if (expressionContexts==null) {
+      return null;
+    }
+    List<SingleExpression> expressions = new ArrayList<>();
+    for (SingleExpressionContext argumentExpressionContext: expressionContexts) {
+      SingleExpression argumentExpression = parseSingleExpression(argumentExpressionContext);
+      expressions.add(argumentExpression);
+    }
+    return expressions;
   }
 
   private <T extends ScriptElement> T initScriptElement(T scriptElement, ParserRuleContext parserRuleContext) {

@@ -17,11 +17,16 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.util.Reflection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
 
 public class MemberDotExpressionExecution extends Execution<MemberDotExpression> {
+
+  static Logger log = LoggerFactory.getLogger(MemberDotExpressionExecution.class);
 
   public MemberDotExpressionExecution(MemberDotExpression element, Execution parent) {
     super(parent.createInternalExecutionId(), element, parent);
@@ -46,23 +51,26 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
     return getFieldValue(target, identifier);
   }
 
-  public Object getFieldValue(Object target, String identifier) {
-    Object fieldValue = null;
-    if (target instanceof Dereferencable) {
+  public static Object getFieldValue(Object target, Object identifier) {
+    if (target instanceof Dereferencable && identifier instanceof String) {
       Dereferencable dereferencable = (Dereferencable) target;
-      fieldValue = dereferencable.get(identifier);
+      return dereferencable.get((String)identifier);
     } else if (target instanceof Map) {
       @SuppressWarnings("unchecked")
       Map<String,Object> map = (Map) target;
-      fieldValue = map.get(identifier);
-    } else {
-      Field field = Reflection.findFieldInObject(target, identifier);
+      return map.get(identifier);
+    } else if (target instanceof List && identifier instanceof Number) {
+      List list = (List) target;
+      return list.get(((Number)identifier).intValue());
+    } else if (identifier instanceof String) {
+      Field field = Reflection.findFieldInObject(target, (String) identifier);
       if (field!=null) {
-        fieldValue = Reflection.getFieldValue(field, target);
+        return Reflection.getFieldValue(field, target);
       } else {
         throw new RuntimeException("Can't dereference '"+identifier+"': target=" + target);
       }
     }
-    return fieldValue;
+    log.debug("Can't dereference "+target+"."+identifier+", returning null");
+    return null;
   }
 }

@@ -82,6 +82,16 @@ public abstract class Execution<T extends ScriptElement> {
     children.add(child);
   }
 
+  protected List<Object> collectResultsFromChildren() {
+    List<Object> args = new ArrayList<>();
+    if (children!=null) {
+      for (Execution argExecution: children) {
+        args.add(argExecution.getResult());
+      }
+    }
+    return args;
+  }
+
   protected void end() {
     parent.childEnded(this);
   }

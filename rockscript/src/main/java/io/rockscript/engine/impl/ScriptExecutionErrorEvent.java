@@ -1,6 +1,6 @@
 package io.rockscript.engine.impl;
 
-public class ScriptExecutionErrorEvent extends ExecutionEvent<Execution> {
+public class ScriptExecutionErrorEvent<T extends Execution> extends ExecutableEvent<T> {
 
   String error;
   String scriptId;
@@ -9,7 +9,11 @@ public class ScriptExecutionErrorEvent extends ExecutionEvent<Execution> {
   ScriptExecutionErrorEvent() {
   }
 
-  public ScriptExecutionErrorEvent(Execution execution, String error) {
+  @Override
+  public void execute(T execution) {
+  }
+
+  public ScriptExecutionErrorEvent(T execution, String error) {
     super(execution);
     this.scriptId = execution.getEngineScript().getScript().getId();
     this.error = error;

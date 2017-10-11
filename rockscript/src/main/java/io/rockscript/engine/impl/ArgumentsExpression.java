@@ -51,8 +51,12 @@ public class ArgumentsExpression extends SingleExpression {
   @Override
   protected List<? extends ScriptElement> getChildren() {
     List<ScriptElement> children = new ArrayList<>();
-    children.addAll(argumentExpressions);
-    children.add(functionExpression);
+    if (argumentExpressions!=null) {
+      children.addAll(argumentExpressions);
+    }
+    if (functionExpression!=null) {
+      children.add(functionExpression);
+    }
     return children;
   }
 }

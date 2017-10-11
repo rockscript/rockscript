@@ -25,4 +25,11 @@ public class TestResults extends ArrayList<TestResult> implements CommandRespons
   public int getStatus() {
     return 200;
   }
+
+  public TestResult findTestResult(String testName) {
+    return stream()
+      .filter(tr->testName.equals(tr.testName))
+      .findFirst()
+      .orElse(null);
+  }
 }

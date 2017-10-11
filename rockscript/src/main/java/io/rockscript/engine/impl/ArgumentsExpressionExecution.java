@@ -24,7 +24,6 @@ import io.rockscript.engine.job.impl.ActivityRetryAfterError;
 
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression> {
@@ -32,6 +31,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   Activity activity = null;
   List<Object> args = null;
   boolean ended = false;
+  int failedAttemptsCount = 0;
 
   public ArgumentsExpressionExecution(ArgumentsExpression element, Execution parent) {
     super(parent.createInternalExecutionId(), element, parent);
@@ -50,13 +50,13 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   private void startNextParameter() {
     int parameterIndex = children.size()-1; // -1 because the first one is the function expression
     List<SingleExpression> parameters = element.getArgumentExpressions();
-    if (parameterIndex < parameters.size()) {
+    if (parameters!=null && parameterIndex < parameters.size()) {
       ScriptElement piece = parameters.get(parameterIndex);
       startChild(piece);
     } else {
       Execution functionExpressionExecution = children.get(0);
       this.activity = (Activity) functionExpressionExecution.getResult();
-      this.args = collectArgsFromChildren();
+      this.args = collectResultsFromChildren().subList(1, children.size());
 
       if (activity instanceof SystemImportActivity) {
         invokeSystemImportFunction();
@@ -64,15 +64,6 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
         startActivity();
       }
     }
-  }
-
-  private List<Object> collectArgsFromChildren() {
-    List<Object> args = new ArrayList<>();
-    List<Execution> argExecutions = children.subList(1, children.size());
-    for (Execution argExecution: argExecutions) {
-      args.add(argExecution.getResult());
-    }
-    return args;
   }
 
   private void invokeSystemImportFunction() {
@@ -115,10 +106,10 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   }
 
   private void handleActivityError(String errorMessage, EngineScriptExecution scriptExecution, RetryPolicy retryPolicy) {
-    TemporalAmount retryDelay = retryPolicy!=null ? retryPolicy.removeFirst() : null;
+    TemporalAmount retryDelay = retryPolicy!=null ? retryPolicy.get(failedAttemptsCount) : null;
     Instant retryTime = retryDelay!=null ? Instant.now().plus(retryDelay) : null;
     scriptExecution.errorEvent = new ActivityStartErrorEvent(this, errorMessage, retryTime);
-    dispatch(scriptExecution.errorEvent);
+    dispatchAndExecute(scriptExecution.errorEvent);
     if (retryTime!=null) {
       getConfiguration().getJobService().schedule(
         new ActivityRetryAfterError(this),

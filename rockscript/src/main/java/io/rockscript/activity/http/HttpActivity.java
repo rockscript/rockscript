@@ -23,8 +23,11 @@ import io.rockscript.activity.ActivityOutput;
 import io.rockscript.engine.impl.Engine;
 import io.rockscript.http.Http;
 import io.rockscript.http.HttpRequest;
+import io.rockscript.util.Lists;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class HttpActivity extends AbstractActivity {
 
@@ -49,8 +52,12 @@ public class HttpActivity extends AbstractActivity {
   public ActivityOutput invoke(ActivityInput input) {
     // Parse the HttpRequest object
     Object requestObject = input.getArg(0);
+
+    wrapSingleHeadersInList(requestObject);
+
     Gson gson = input.getGson();
     JsonElement requestElement = gson.toJsonTree(requestObject);
+
     HttpRequest httpRequest = gson.fromJson(requestElement, HttpRequest.class);
     httpRequest.setHttp(input.getHttp());
     httpRequest.setMethod(this.method);
@@ -65,5 +72,22 @@ public class HttpActivity extends AbstractActivity {
       .execute(command);
 
     return ActivityOutput.waitForEndActivityCallback();
+  }
+
+  private void wrapSingleHeadersInList(Object requestObject) {
+    if (requestObject instanceof Map) {
+      Object headersObject = ((Map<String,Object>)requestObject).get("headers");
+      if (headersObject instanceof Map) {
+        Map headers = (Map) headersObject;
+        for (Object key: headers.keySet()) {
+          Object value = headers.get(key);
+          if (value!=null &&
+               ( !Collection.class.isAssignableFrom(value.getClass())
+                 && !value.getClass().isArray())) {
+            headers.put(key, Lists.of(value));
+          }
+        }
+      }
+    }
   }
 }

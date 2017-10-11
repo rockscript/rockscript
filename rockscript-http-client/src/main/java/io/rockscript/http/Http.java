@@ -84,6 +84,7 @@ public class Http {
 
   public interface ContentTypes {
     String APPLICATION_JSON = "application/json";
+    String APPLICATION_LD_JSON = "application/ld+json";
   }
 
   public interface ResponseCodes {

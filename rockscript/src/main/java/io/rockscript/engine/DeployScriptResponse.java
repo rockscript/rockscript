@@ -16,6 +16,7 @@
 package io.rockscript.engine;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /** Response from the DeployScriptCommand.
  *
@@ -43,5 +44,15 @@ public class DeployScriptResponse extends Script {
 
   public boolean hasErrors() {
     return errors!=null && !errors.isEmpty();
+  }
+
+  public DeployScriptResponse throwIfErrors() {
+    if (hasErrors()) {
+      String errorPerLine = errors.stream()
+        .map(e->e.toString())
+        .collect(Collectors.joining("\n"));
+      throw new RuntimeException("Deploy errors: \n" + errorPerLine);
+    }
+    return this;
   }
 }

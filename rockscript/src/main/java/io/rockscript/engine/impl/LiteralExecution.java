@@ -20,15 +20,11 @@ public class LiteralExecution extends Execution<Literal> {
 
   public LiteralExecution(Literal element, Execution parent) {
     super(parent.createInternalExecutionId(), element, parent);
+    result = element.getValue();
   }
 
   @Override
   public void start() {
     parent.childEnded(this);
-  }
-
-  @Override
-  public Object getResult() {
-    return element.getValue();
   }
 }

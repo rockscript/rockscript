@@ -17,12 +17,16 @@ package io.rockscript.engine.impl;
 
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.EngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 
 /** A simple, fast, single-node engine. */
 public class LocalEngine implements Engine {
+
+  static Logger log = LoggerFactory.getLogger(LocalEngine.class);
 
   Configuration configuration;
   Map<String, Lock> locks = Collections.synchronizedMap(new HashMap<>());
@@ -64,6 +68,7 @@ public class LocalEngine implements Engine {
         releaseLock(lock, scriptExecution);
 
       } catch(Throwable e) {
+        log.debug("Exception while executing script: "+e.getMessage(), e);;
         Execution execution = getExecution(e, scriptExecution);
         scriptExecution.errorEvent = new ScriptExecutionErrorEvent(execution, e.getMessage());
         scriptExecution.dispatch(scriptExecution.errorEvent);
@@ -95,6 +100,7 @@ public class LocalEngine implements Engine {
         endActivity(scriptExecution, continuationReference, result);
         releaseLock(lock, scriptExecution);
       } catch(Throwable e) {
+        log.debug("Exception while executing script: "+e.getMessage(), e);;
         scriptExecution.errorEvent = new ScriptExecutionErrorEvent(scriptExecution, e.getMessage());
         scriptExecution.dispatch(scriptExecution.errorEvent);
       }

@@ -23,10 +23,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.rockscript.http.HttpRequest.NEWLINE;
@@ -167,6 +164,9 @@ public class HttpResponse {
     if (body instanceof String) {
       return (String) body;
     }
+    if (body instanceof Map || body instanceof Collection) {
+      return this.request.http.getCodec().serialize(body);
+    }
     return body!=null ? body.toString() : null;
   }
 
@@ -193,7 +193,8 @@ public class HttpResponse {
   }
 
   public boolean isContentTypeApplicationJson() {
-    return headerContains(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON);
+    return headerContains(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_JSON)
+      || headerContains(Headers.CONTENT_TYPE, ContentTypes.APPLICATION_LD_JSON);
   }
 
   public boolean headerContains(String headerName, String headerValue) {
