@@ -23,7 +23,7 @@ public abstract class ExecutionEvent<T extends Execution> implements Event {
   protected Instant time;
   protected String scriptExecutionId;
   protected String executionId;
-  protected int line;
+  protected Integer line;
 
   /** for Gson serialzation */
   ExecutionEvent() {
@@ -50,7 +50,7 @@ public abstract class ExecutionEvent<T extends Execution> implements Event {
     return executionId;
   }
 
-  public int getLine() {
+  public Integer getLine() {
     return line;
   }
 }

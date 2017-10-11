@@ -92,27 +92,39 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     EngineScriptExecution scriptExecution = getScriptExecution();
     ExecutionMode executionMode = scriptExecution.getExecutionMode();
     if (executionMode!=ExecutionMode.REBUILDING) {
-      ActivityOutput activityOutput = startActivityInvoke();
-      if (activityOutput.isEnded()) {
-        endActivity(activityOutput.getResult());
-
-      } else if (activityOutput.isError()) {
-        RetryPolicy retryPolicy = activityOutput.getRetryPolicy();
-        TemporalAmount retryDelay = retryPolicy!=null ? retryPolicy.removeFirst() : null;
-        Instant retryTime = retryDelay!=null ? Instant.now().plus(retryDelay) : null;
-        scriptExecution.errorEvent = new ActivityStartErrorEvent(this, activityOutput.getError(), retryTime);
-        dispatch(scriptExecution.errorEvent);
-        if (retryTime!=null) {
-          getConfiguration().getJobService().schedule(
-            new ActivityRetryAfterError(this),
-            retryTime,
-            retryPolicy
-          );
-        }
-
-      } else {
-        dispatch(new ActivityWaitingEvent(this));
+      ActivityOutput activityOutput = null;
+      try {
+        activityOutput = startActivityInvoke();
+      } catch (Exception e) {
+        handleActivityError(e.getMessage(), scriptExecution, null);
       }
+      if (activityOutput!=null) {
+        if (activityOutput.isEnded()) {
+          endActivity(activityOutput.getResult());
+
+        } else if (activityOutput.isError()) {
+          RetryPolicy retryPolicy = activityOutput.getRetryPolicy();
+          String errorMessage = activityOutput.getError();
+          handleActivityError(errorMessage, scriptExecution, retryPolicy);
+
+        } else {
+          dispatch(new ActivityWaitingEvent(this));
+        }
+      }
+    }
+  }
+
+  private void handleActivityError(String errorMessage, EngineScriptExecution scriptExecution, RetryPolicy retryPolicy) {
+    TemporalAmount retryDelay = retryPolicy!=null ? retryPolicy.removeFirst() : null;
+    Instant retryTime = retryDelay!=null ? Instant.now().plus(retryDelay) : null;
+    scriptExecution.errorEvent = new ActivityStartErrorEvent(this, errorMessage, retryTime);
+    dispatch(scriptExecution.errorEvent);
+    if (retryTime!=null) {
+      getConfiguration().getJobService().schedule(
+        new ActivityRetryAfterError(this),
+        retryTime,
+        retryPolicy
+      );
     }
   }
 

@@ -38,7 +38,7 @@ public class TestImportObject extends ImportObject implements ImportProvider {
             .execute();
 
         if (response.getErrorEvent()==null) {
-          return ActivityOutput.endFunction(response.getScriptExecution());
+          return ActivityOutput.endActivity(response.getScriptExecution());
         } else {
           return ActivityOutput.error("Started script execution failed: "+response.getErrorEvent().getError());
         }
@@ -52,7 +52,7 @@ public class TestImportObject extends ImportObject implements ImportProvider {
       if (!equal(actual, expected)) {
         return ActivityOutput.error("Expected "+expected+", but was "+actual);
       }
-      return ActivityOutput.endFunction();
+      return ActivityOutput.endActivity();
     }, "actual", "expected");
   }
 

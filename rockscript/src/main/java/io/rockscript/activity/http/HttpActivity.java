@@ -64,6 +64,6 @@ public class HttpActivity extends AbstractActivity {
       .getExecutor()
       .execute(command);
 
-    return ActivityOutput.waitForFunctionToCompleteAsync();
+    return ActivityOutput.waitForEndActivityCallback();
   }
 }

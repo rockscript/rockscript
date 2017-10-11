@@ -39,13 +39,13 @@ public class SimpleImportProvider extends ImportObject implements ImportProvider
         waits
           .computeIfAbsent(input.getScriptExecutionId(), seid->new ArrayList<>())
           .add(input.getContinuationReference());
-        return ActivityOutput.waitForFunctionToCompleteAsync();
+        return ActivityOutput.waitForEndActivityCallback();
       }
     });
     put(new AbstractActivity("noop", new String[]{}) {
       @Override
       public ActivityOutput invoke(ActivityInput input) {
-        return ActivityOutput.endFunction("noop");
+        return ActivityOutput.endActivity("noop");
       }
     });
   }

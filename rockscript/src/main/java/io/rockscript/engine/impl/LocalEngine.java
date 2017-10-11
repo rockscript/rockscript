@@ -17,7 +17,6 @@ package io.rockscript.engine.impl;
 
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.EngineException;
-import io.rockscript.util.Exceptions;
 
 import java.util.*;
 
@@ -96,7 +95,7 @@ public class LocalEngine implements Engine {
         endActivity(scriptExecution, continuationReference, result);
         releaseLock(lock, scriptExecution);
       } catch(Throwable e) {
-        scriptExecution.errorEvent = new ScriptExecutionErrorEvent(scriptExecution, Exceptions.getStackTraceString(e));
+        scriptExecution.errorEvent = new ScriptExecutionErrorEvent(scriptExecution, e.getMessage());
         scriptExecution.dispatch(scriptExecution.errorEvent);
       }
     }

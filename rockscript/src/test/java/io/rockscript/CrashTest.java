@@ -94,10 +94,10 @@ public class CrashTest {
       .put("aSyncFunction", input -> {
         synchronousCapturedData.add("Execution was here");
         synchronousCapturedData.add(input.getArgs().get(0));
-        return ActivityOutput.endFunction();})
+        return ActivityOutput.endActivity();})
       .put("anAsyncFunction", input -> {
         waitingAsyncFunctionInvocationIds.add(input.getExecutionId());
-        return ActivityOutput.waitForFunctionToCompleteAsync();});
+        return ActivityOutput.waitForEndActivityCallback();});
   }
 
   @Test

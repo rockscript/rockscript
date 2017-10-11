@@ -52,11 +52,11 @@ public class SerializationTest extends ScriptTest {
   public void testSerialization() {
     getConfiguration().getImportResolver().createImport("helloService")
       .put("hi", input -> {
-        return ActivityOutput.endFunction(input.getArg(0) + " world");
+        return ActivityOutput.endActivity(input.getArg(0) + " world");
       })
       .put("world", input -> {
         activityInputs.add(input);
-        return ActivityOutput.waitForFunctionToCompleteAsync();
+        return ActivityOutput.waitForEndActivityCallback();
       });
 
     Script script = deployScript(

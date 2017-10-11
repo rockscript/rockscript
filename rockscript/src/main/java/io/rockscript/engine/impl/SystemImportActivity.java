@@ -48,7 +48,7 @@ public class SystemImportActivity implements Activity {
   public ActivityOutput invoke(ActivityInput input) {
     String url = (String) input.getArgs().get(0);
     Object importedObject = configuration.getImportResolver().get(url);
-    return ActivityOutput.endFunction(importedObject);
+    return ActivityOutput.endActivity(importedObject);
   }
 
   @Override

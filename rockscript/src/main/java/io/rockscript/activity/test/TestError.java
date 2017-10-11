@@ -13,21 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine.impl;
+package io.rockscript.activity.test;
 
 import io.rockscript.engine.EngineException;
+import io.rockscript.engine.impl.Execution;
 
-public class ErrorMessage {
+public class TestError {
 
   String message;
   int line;
   String scriptId;
 
-  public ErrorMessage(String message) {
-    this.message = message;
-  }
-
-  public ErrorMessage(Throwable t) {
+  public TestError(Throwable t) {
     this.message = t.getMessage();
     if (t instanceof EngineException) {
       EngineException engineException = (EngineException) t;
@@ -39,7 +36,7 @@ public class ErrorMessage {
     }
   }
 
-  public ErrorMessage(String message, String scriptId, int line) {
+  public TestError(String message, String scriptId, int line) {
     this.message = message;
     this.scriptId = scriptId;
     this.line = line;

@@ -52,7 +52,7 @@ public class ActivityTest extends ScriptTest {
     getConfiguration().getImportResolver().createImport("approvalService")
       .put("approve", input -> {
         activityInputs.add(input);
-        return ActivityOutput.waitForFunctionToCompleteAsync();
+        return ActivityOutput.waitForEndActivityCallback();
       });
 
     Script script = deployScript(
@@ -79,10 +79,10 @@ public class ActivityTest extends ScriptTest {
     getConfiguration().getImportResolver().createImport("approvalService")
       .put("getMessage", input -> {
         input.getEngine().endActivity(input.getContinuationReference(), "hello");
-        return ActivityOutput.waitForFunctionToCompleteAsync();
+        return ActivityOutput.waitForEndActivityCallback();
       }).put("approve", input -> {
       activityInputs.add(input);
-      return ActivityOutput.waitForFunctionToCompleteAsync();
+      return ActivityOutput.waitForEndActivityCallback();
       });
 
     Script script = deployScript(
@@ -104,7 +104,7 @@ public class ActivityTest extends ScriptTest {
   public void testSynchronousActivityWithoutResult() {
     getConfiguration().getImportResolver().createImport("approvalService")
       .put("approve", input -> {
-        return ActivityOutput.endFunction();
+        return ActivityOutput.endActivity();
       });
 
     Script script = deployScript(
@@ -121,7 +121,7 @@ public class ActivityTest extends ScriptTest {
   public void testSynchronousActivityWithResult() {
     getConfiguration().getImportResolver().createImport("approvalService")
       .put("approve", input -> {
-        return ActivityOutput.endFunction("approved");
+        return ActivityOutput.endActivity("approved");
       });
 
     Script script = deployScript(

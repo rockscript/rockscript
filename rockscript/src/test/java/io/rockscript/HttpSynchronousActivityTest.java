@@ -45,7 +45,7 @@ public class HttpSynchronousActivityTest extends HttpTest {
       .post("/approve", (request,response)-> {
         ActivityInput activityInput = gson.fromJson(request.body(), ActivityInput.class);
         activityInputs.add(activityInput);
-        ActivityOutput activityOutput = ActivityOutput.endFunction(
+        ActivityOutput activityOutput = ActivityOutput.endActivity(
           hashMap(
             entry("country", "Belgium"),
             entry("currency", "EUR")

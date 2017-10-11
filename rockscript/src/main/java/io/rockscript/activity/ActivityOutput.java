@@ -45,15 +45,15 @@ public class ActivityOutput {
     return new ActivityOutput(error, retryPolicy);
   }
 
-  public static ActivityOutput waitForFunctionToCompleteAsync() {
+  public static ActivityOutput waitForEndActivityCallback() {
     return new ActivityOutput(false, null);
   }
 
-  public static ActivityOutput endFunction() {
-    return endFunction(null);
+  public static ActivityOutput endActivity() {
+    return endActivity(null);
   }
 
-  public static ActivityOutput endFunction(Object result) {
+  public static ActivityOutput endActivity(Object result) {
     return new ActivityOutput(true, result);
   }
 

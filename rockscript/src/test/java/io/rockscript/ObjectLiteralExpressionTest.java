@@ -44,7 +44,7 @@ public class ObjectLiteralExpressionTest extends ScriptTest {
     configuration.getImportResolver().createImport("example.com/assert")
       .put("assertLiteralValue", input -> {
         capturedValues.add(input.getArgs().get(0));
-        return ActivityOutput.endFunction();});
+        return ActivityOutput.endActivity();});
     return configuration.build();
   }
 

@@ -87,7 +87,7 @@ public class RemoteActivity extends AbstractActivity {
       return activityOutput;
     } else {
       // The default async activity output is returned when the HTTP response is empty.
-      return ActivityOutput.waitForFunctionToCompleteAsync();
+      return ActivityOutput.waitForEndActivityCallback();
     }
   }
 
