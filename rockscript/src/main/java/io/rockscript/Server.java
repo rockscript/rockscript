@@ -69,7 +69,7 @@ public class Server extends CliCommand {
     startup();
     if (commandLine!=null && commandLine.hasOption("ed")) {
       new Deploy()
-        .parseArgs("-r", ".")
+        .parseArgs("-r", "-n", ".*docs/examples.*\\.rs(t)?", ".")
         .execute();
       new Start()
         .scriptId("s1")

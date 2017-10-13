@@ -15,11 +15,18 @@
  */
 package io.rockscript.activity.test;
 
+import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.ImportObject;
 import io.rockscript.activity.ImportProvider;
 import io.rockscript.engine.EngineStartScriptExecutionResponse;
+import io.rockscript.engine.Script;
 import io.rockscript.engine.ScriptService;
+import io.rockscript.engine.impl.ScriptStore;
+
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 public class TestImportObject extends ImportObject implements ImportProvider {
 
@@ -30,12 +37,18 @@ public class TestImportObject extends ImportObject implements ImportProvider {
     super("rockscript.io/test");
     this.testResult = testResult;
     put("start", activityInput -> {
-      String scriptName = activityInput.getArgProperty("scriptName");
+      String scriptNamePattern = activityInput.getArgProperty("script");
       Object input = activityInput.getArgProperty("input");
       EngineStartScriptExecutionResponse response = null;
       try {
+        String scriptId = findLatestScriptIdByScriptNamePattern(scriptNamePattern, activityInput);
+
+        if (scriptId==null) {
+          return ActivityOutput.error("No script matched name patter "+scriptNamePattern);
+        }
+
         response = scriptService.newStartScriptExecutionCommand()
-            .scriptName(scriptName)
+            .scriptId(scriptId)
             .input(input)
             .execute();
 
@@ -56,6 +69,26 @@ public class TestImportObject extends ImportObject implements ImportProvider {
       }
       return ActivityOutput.endActivity();
     }, "actual", "expected");
+  }
+
+  private String findLatestScriptIdByScriptNamePattern(String scriptNamePattern, ActivityInput activityInput) {
+    ScriptStore scriptStore = activityInput.getExecution()
+      .getScriptExecution()
+      .getEngineScript()
+      .getConfiguration()
+      .getScriptStore();
+
+    Map<String, List<Script>> scripts = scriptStore.getScripts();
+    for (String scriptName: scripts.keySet()) {
+      if (Pattern.matches(scriptNamePattern, scriptName)) {
+        List<Script> scriptVersions = scripts.get(scriptName);
+        if (scriptVersions!=null && !scriptVersions.isEmpty()) {
+          Script scriptVersion = scriptVersions.get(scriptVersions.size() - 1);
+          return scriptVersion.getId();
+        }
+      }
+    }
+    return null;
   }
 
   private boolean equal(Object a, Object b) {

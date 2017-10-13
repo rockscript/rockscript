@@ -31,11 +31,13 @@ import java.util.regex.Pattern;
 
 public class Deploy extends ClientCommand {
 
-  public static final String DEFAULT_NAME_PATTERN = ".*\\.rs(t)?";
+  public static final String DEFAULT_NAME_REGEX = ".*\\.rs(t)?";
 
   protected boolean recursive = false;
-  protected String namePattern = DEFAULT_NAME_PATTERN;
+  protected String namePattern = DEFAULT_NAME_REGEX;
   protected Pattern compiledNamePattern;
+  protected int deployCountSuccessful = 0;
+  protected int deployCountFailed = 0;
 
   @Override
   protected void logCommandUsage() {
@@ -58,8 +60,9 @@ public class Deploy extends ClientCommand {
       "Default is not recursive. " +
       "Ignored if specified with a file.");
     options.addOption("n", true,
-      "Script file name pattern used for scanning a directory.  " +
-      "Default is *.rs  " +
+      "Script file name regex used for scanning a directory. The file " +
+      "name has to end with the given name. " +
+      "Default is " +DEFAULT_NAME_REGEX+" "+
       "Ignored if a file is specified. " +
       "See also https://docs.oracle.com/javase/tutorial/essential/regex/index.html ");
     return options;
@@ -71,7 +74,7 @@ public class Deploy extends ClientCommand {
     this.recursive = commandLine.hasOption("r");
     // namePattern is already initialized with the default so
     // that Deploy also can be used programmatically.
-    this.namePattern = commandLine.getOptionValue("n", namePattern);
+    this.namePattern = commandLine.getOptionValue("n", DEFAULT_NAME_REGEX);
   }
 
   @Override
@@ -90,6 +93,18 @@ public class Deploy extends ClientCommand {
       log("Scanning directory " + fileName + (recursive?" recursive":" (not recursive)") + " for files matching " + namePattern);
       this.compiledNamePattern = Pattern.compile(namePattern);
       scanDirectory(file);
+      if (deployCountSuccessful>0) {
+        log(Integer.toString(deployCountSuccessful)+" scripts successful deployed");
+      }
+      if (deployCountFailed>0) {
+        log(Integer.toString(deployCountFailed)+" script deployments failed");
+      }
+      if (deployCountSuccessful+deployCountFailed==0) {
+        log("No scripts found to deploy");
+      }
+
+    } else {
+      log("Couldn't deploy "+fileOrDirectory+".  The last argument has to be a file or directory.");
     }
   }
 
@@ -120,6 +135,9 @@ public class Deploy extends ClientCommand {
         for (ParseError parseError: deployScriptResponse.getErrors()) {
           log("  " + parseError);
         }
+        deployCountFailed++;
+      } else {
+        deployCountSuccessful++;
       }
 
     } catch (FileNotFoundException e) {

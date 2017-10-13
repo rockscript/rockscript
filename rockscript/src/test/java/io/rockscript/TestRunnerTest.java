@@ -66,15 +66,15 @@ public class TestRunnerTest extends HttpTest {
       .scriptText(
         "var test = system.import('rockscript.io/test'); \n" +
         "var scriptExecution = test.start({ \n" +
-        "  scriptName: 'The Script.rs', \n" +
+        "  script: 'The Script.rs', \n" +
         "  skipActivities: true}); \n" +
         "test.assertEquals(scriptExecution.variables.country, 'The Netherlands');")
       .scriptName("The Script Test.rst")
       .execute()
       .getId();
 
-    TestResults testResults = scriptService.newRunTestsCommand()
-      .tests("*.rst")
+    TestResults testResults = scriptService
+      .newRunTestsCommand()
       .execute();
 
     log.debug(getConfiguration().getGson().toJson(testResults));
@@ -113,13 +113,15 @@ public class TestRunnerTest extends HttpTest {
         /* 1 */ "var test = system.import('rockscript.io/test'); \n" +
         /* 2 */ "\n" +
         /* 3 */ "var scriptExecution = test.start({ \n" +
-        /* 4 */ "  scriptName: 'The Script.rs', \n" +
+        /* 4 */ "  script: 'The Script.rs', \n" +
         /* 5 */ "  skipActivities: true}); ")
       .scriptName("The Script Test.rst")
       .execute()
       .getId();
 
-    TestResults testResults = scriptService.newRunTestsCommand().tests("*.rst").execute();
+    TestResults testResults = scriptService
+      .newRunTestsCommand()
+      .execute();
 
     log.debug(getConfiguration().getGson().toJson(testResults));
 
@@ -137,7 +139,7 @@ public class TestRunnerTest extends HttpTest {
     assertNotNull(targetScriptErrorEvent.getLine());
 
     ActivityStartErrorEvent testScriptErrorEvent = (ActivityStartErrorEvent) testEvents.get(testEvents.size() - 1);
-    assertContains("Started script execution failed: ReferenceError: unexistingvar is not defined", testScriptErrorEvent.getError());
+    assertContains("Script start failed: ReferenceError: unexistingvar is not defined", testScriptErrorEvent.getError());
     assertContains(testScriptId, testScriptErrorEvent.getScriptId());
     assertNotNull(testScriptErrorEvent.getLine());
 
@@ -148,7 +150,7 @@ public class TestRunnerTest extends HttpTest {
     assertNotNull(firstTestError.getLine());
 
     TestError secondTestError = testErrors.get(1);
-    assertContains("Started script execution failed: ReferenceError: unexistingvar is not defined", secondTestError.getMessage());
+    assertContains("Script start failed: ReferenceError: unexistingvar is not defined", secondTestError.getMessage());
     assertContains(testScriptId, secondTestError.getScriptId());
     assertNotNull(secondTestError.getLine());
   }

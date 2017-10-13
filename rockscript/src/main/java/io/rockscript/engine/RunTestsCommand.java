@@ -21,13 +21,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class RunTestsCommand extends CommandImpl<TestResults> {
 
-  static Logger log = LoggerFactory.getLogger(RunTestsCommand.class);
+  transient static Logger log = LoggerFactory.getLogger(RunTestsCommand.class);
 
-  protected String tests = "*.rst";
+  protected String tests = ".*\\.rst";
+
+  public RunTestsCommand() {
+  }
 
   public RunTestsCommand(Configuration configuration) {
     super(configuration);
@@ -36,11 +38,6 @@ public class RunTestsCommand extends CommandImpl<TestResults> {
   @Override
   protected TestResults execute(Configuration configuration) {
     TestResults testResults = new TestResults();
-
-    if (!Pattern.matches("[\\w\\* -\\.]*", tests)) {
-      throw new EngineException("Invalid tests pattern: "+tests);
-    }
-    tests = tests.replace("*", ".*");
 
     ScriptStore scriptStore = configuration.getScriptStore();
     List<Script> scriptVersions = scriptStore.findLatestScriptVersionsByNamePattern(tests);
@@ -59,11 +56,10 @@ public class RunTestsCommand extends CommandImpl<TestResults> {
     testImportObject.setScriptService(testScriptService);
     try {
       String scriptId = script.getId();
-      EngineStartScriptExecutionResponse response = testScriptService
+      testScriptService
         .newStartScriptExecutionCommand()
         .scriptId(scriptId)
         .execute();
-      ScriptExecutionErrorEvent errorEvent = response.getErrorEvent();
     } catch (Throwable t) {
       testResult.addError(new TestError(t));
     }

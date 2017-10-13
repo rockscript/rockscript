@@ -42,7 +42,7 @@ public class ServerTest extends AbstractServerTest {
   public void testGetScriptExecutions() {
     String scriptText = null;
     try {
-      scriptText = Io.toString(new FileInputStream("src/test/resources/testscripts/short.testscript"));
+      scriptText = Io.toString(new FileInputStream("src/test/resources/testscripts/short-script.rs"));
     } catch (Exception e) {
       e.printStackTrace();
     }

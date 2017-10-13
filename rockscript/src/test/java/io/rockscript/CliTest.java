@@ -32,22 +32,27 @@ public class CliTest extends AbstractServerTest {
   @Test
   public void testClientCommands() {
     new Ping()
-      .parseArgs("ping", "-s", "http://localhost:3333", "-q")
+      .parseArgs("ping", "-s", "http://localhost:"+server.getPort(), "-q")
       .execute();
 
     new Deploy()
-      .parseArgs("deploy", "-s", "http://localhost:3333", "-n", ".*resources.*\\.testscript", "-r", "..")
+      .parseArgs("deploy", "-s", "http://localhost:"+server.getPort(), "-r", "-n", ".*resources\\/testscripts.*", "..")
       .execute();
 
     new Start()
-      .parseArgs("start", "-s", "http://localhost:3333", "-n", "short.testscript")
+      .parseArgs("start", "-s", "http://localhost:"+server.getPort(), "-n", "short-script.rs")
       .execute();
 
     new End()
-      .parseArgs("end", "-s", "http://localhost:3333", "-seid", "se1", "-eid", "e9")
+      .parseArgs("end", "-s", "http://localhost:"+server.getPort(), "-seid", "se1", "-eid", "e9")
       .execute();
 
-//    new Events()
+    new io.rockscript.Test()
+      .parseArgs("test", "-s", "http://localhost:"+server.getPort(), "-n", "short-test\\.rst")
+      .execute();
+
+
+    //    new Events()
 //      .parseArgs("end", "-s", "http://localhost:3333")
 //      .execute();
   }

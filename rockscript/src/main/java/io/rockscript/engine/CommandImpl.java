@@ -18,7 +18,7 @@ package io.rockscript.engine;
 public abstract class CommandImpl<R extends CommandResponse> implements Command<R> {
 
   /** transient because this field should not be serialized when using Gson */
-  transient protected Configuration configuration;
+  transient private Configuration configuration;
 
   /** This constructor is used for json serialization.
    * When using this constructor, make sure that

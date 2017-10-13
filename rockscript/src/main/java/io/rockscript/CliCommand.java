@@ -16,6 +16,7 @@ public abstract class CliCommand {
     entry("ping", Ping.class),
     entry("deploy", Deploy.class),
     entry("start", Start.class),
+    entry("test", Test.class),
     entry("events", Events.class)
   );
 

@@ -1,7 +1,7 @@
 var test = system.import('rockscript.io/test');
 
 test.start({
-  scriptName: '../docs/examples/test/list-trains.rs',
+  script: '.*/list-trains.rs',
   input: {
     host: 'irailWithATypo.be'
   }

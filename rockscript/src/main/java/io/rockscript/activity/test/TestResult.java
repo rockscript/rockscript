@@ -62,4 +62,8 @@ public class TestResult {
   public String getTestName() {
     return testName;
   }
+
+  public boolean hasError() {
+    return errors!=null && !errors.isEmpty();
+  }
 }

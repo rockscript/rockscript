@@ -56,6 +56,6 @@ public class TestError {
 
   @Override
   public String toString() {
-    return "Error [scriptId:" + scriptId +",line:" + line +"] "+message;
+    return "[scriptId:" + scriptId +",line:" + line +"] "+message;
   }
 }
