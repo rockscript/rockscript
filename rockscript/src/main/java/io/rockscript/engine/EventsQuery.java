@@ -16,6 +16,7 @@
 package io.rockscript.engine;
 
 import io.rockscript.engine.impl.Event;
+import io.rockscript.request.CommandImpl;
 
 import java.util.List;
 

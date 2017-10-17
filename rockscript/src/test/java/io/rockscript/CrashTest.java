@@ -17,12 +17,14 @@
 package io.rockscript;
 
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.engine.ScriptService;
-import io.rockscript.engine.TestConfiguration;
-import io.rockscript.engine.impl.EngineScriptExecution;
+import io.rockscript.engine.*;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.engine.impl.EventListener;
-import io.rockscript.engine.Configuration;
+import io.rockscript.request.RequestExecutorService;
+import io.rockscript.request.command.DeployScriptCommand;
+import io.rockscript.request.command.StartScriptExecutionCommand;
+import io.rockscript.request.command.RecoverCrashedScriptExecutionsCommand;
+import io.rockscript.request.command.RecoverCrashedScriptExecutionsResponse;
 import io.rockscript.test.ScriptExecutionComparator;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -44,7 +46,7 @@ public class CrashTest {
     return configuration;
   }
 
-  public ScriptService createNormalTestEngine() {
+  public RequestExecutorService createNormalTestEngine() {
     TestConfiguration configuration = new TestConfiguration();
     addHelloService(configuration);
     return configuration.build();
@@ -109,19 +111,17 @@ public class CrashTest {
       "helloService.anAsyncFunction(); \n" +
       "helloService.aSyncFunction('hello');";
 
-    EngineScriptExecution expectedScriptExecutionState = createExpectedScriptExecutionState(scriptText);
+    ScriptExecution expectedScriptExecutionState = createExpectedScriptExecutionState(scriptText);
 
     int eventsWithoutCrash = 1;
     boolean crashOccurred = false;
     Configuration configuration = createCrashTestConfiguration();
-    ScriptService scriptService = configuration.build();
+    RequestExecutorService requestExecutorService = configuration.build();
     CrashEventListener eventListener = (CrashEventListener) configuration
         .getEventListener();
 
-    String scriptId = scriptService
-      .newDeployScriptCommand()
-        .scriptText(scriptText)
-        .execute()
+    String scriptId = requestExecutorService.execute(new DeployScriptCommand()
+        .scriptText(scriptText))
       .getId();
     do {
       try  {
@@ -130,9 +130,8 @@ public class CrashTest {
         eventListener.throwAfterEventCount(eventsWithoutCrash);
 
         log.debug("\n\n----- Starting script execution and throwing after "+eventsWithoutCrash+" events ------");
-        scriptService.newStartScriptExecutionCommand()
-          .scriptId(scriptId)
-          .execute();
+        requestExecutorService.execute(new StartScriptExecutionCommand()
+          .scriptId(scriptId));
 
       } catch (RuntimeException e) {
         log.debug("----- Recovering script execution and throwing after "+eventsWithoutCrash+" events ------");
@@ -140,33 +139,28 @@ public class CrashTest {
         eventsWithoutCrash++;
 
         eventListener.stopThrowing();
-        List<EngineScriptExecution> recoverCrashedScriptExecutions = scriptService.recoverCrashedScriptExecutions();
-        EngineScriptExecution recoveredScriptExecution = recoverCrashedScriptExecutions.get(0);
-
-        // We don't want to compare the id's
-        // And we don't want to ignore the Execution.id field because then none of the nested execution ids are compared
-        recoveredScriptExecution.setId(null);
-        expectedScriptExecutionState.setId(null);
+        RecoverCrashedScriptExecutionsResponse recoverCrashedScriptExecutionsResponse = requestExecutorService.execute(new RecoverCrashedScriptExecutionsCommand());
+        List<ScriptExecution> recoverCrashedScriptExecutions = recoverCrashedScriptExecutionsResponse.getScriptExecutions();
+        ScriptExecution recoveredScriptExecution = (ScriptExecution) recoverCrashedScriptExecutions.get(0);
 
         new ScriptExecutionComparator()
-          .ignoreField(EngineScriptExecution.class, "start")
-          .ignoreField(EngineScriptExecution.class, "end")
+          .ignoreField(ScriptExecution.class, "id")
+          .ignoreField(ScriptExecution.class, "start")
+          .ignoreField(ScriptExecution.class, "end")
           .assertEquals(expectedScriptExecutionState, recoveredScriptExecution);
       }
 
     } while (crashOccurred);
   }
 
-  private EngineScriptExecution createExpectedScriptExecutionState(String scriptText) {
-    ScriptService scriptService = createNormalTestEngine();
-    String scriptId = scriptService
-      .newDeployScriptCommand()
-        .scriptText(scriptText)
-        .execute()
+  private ScriptExecution createExpectedScriptExecutionState(String scriptText) {
+    RequestExecutorService requestExecutorService = createNormalTestEngine();
+    String scriptId = requestExecutorService.execute(new DeployScriptCommand()
+        .scriptText(scriptText))
       .getId();
-    return scriptService.newStartScriptExecutionCommand()
-      .scriptId(scriptId)
-      .execute()
-      .getEngineScriptExecution();
+    return requestExecutorService.execute(new StartScriptExecutionCommand()
+        .scriptId(scriptId))
+      .getEngineScriptExecution()
+      .toScriptExecution();
   }
 }

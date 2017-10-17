@@ -15,11 +15,11 @@
  */
 package io.rockscript.server.handlers;
 
-import io.rockscript.engine.Command;
-import io.rockscript.engine.CommandImpl;
-import io.rockscript.engine.CommandResponse;
 import io.rockscript.engine.Configuration;
 import io.rockscript.netty.router.*;
+import io.rockscript.request.Command;
+import io.rockscript.request.CommandImpl;
+import io.rockscript.request.CommandResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

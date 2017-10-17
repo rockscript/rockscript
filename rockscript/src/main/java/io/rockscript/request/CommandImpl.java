@@ -13,7 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript.request;
+
+import io.rockscript.engine.Configuration;
 
 public abstract class CommandImpl<R extends CommandResponse> implements Command<R> {
 

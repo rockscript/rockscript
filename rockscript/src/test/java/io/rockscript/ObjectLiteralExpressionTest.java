@@ -17,9 +17,9 @@
 package io.rockscript;
 
 import io.rockscript.activity.ActivityOutput;
+import io.rockscript.request.RequestExecutorService;
 import io.rockscript.engine.Script;
 import io.rockscript.engine.ScriptExecution;
-import io.rockscript.engine.ScriptService;
 import io.rockscript.engine.TestConfiguration;
 import io.rockscript.test.ScriptTest;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class ObjectLiteralExpressionTest extends ScriptTest {
   List<Object> capturedValues = new ArrayList<>();
 
   @Override
-  protected ScriptService initializeScriptService() {
+  protected RequestExecutorService initializeScriptService() {
     TestConfiguration configuration = new TestConfiguration();
     configuration.getImportResolver().createImport("example.com/assert")
       .put("assertLiteralValue", input -> {

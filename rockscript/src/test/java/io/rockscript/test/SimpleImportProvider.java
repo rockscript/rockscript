@@ -1,11 +1,15 @@
 package io.rockscript.test;
 
 import io.rockscript.activity.*;
-import io.rockscript.engine.EngineEndActivityResponse;
-import io.rockscript.engine.ScriptService;
+import io.rockscript.request.command.EndActivityCommand;
+import io.rockscript.request.command.EngineEndActivityResponse;
+import io.rockscript.request.RequestExecutorService;
 import io.rockscript.engine.impl.ContinuationReference;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SimpleImportProvider extends ImportObject implements ImportProvider {
 
@@ -15,12 +19,11 @@ public class SimpleImportProvider extends ImportObject implements ImportProvider
     waits = new HashMap<>();
   }
 
-  public static EngineEndActivityResponse endWait(String scriptExecutionId, ScriptService scriptService) {
+  public static EngineEndActivityResponse endWait(String scriptExecutionId, RequestExecutorService requestExecutorService) {
     ContinuationReference continuationReference = removeFirstContinuationReference(scriptExecutionId);
-    return scriptService.newEndActivityCommand()
+    return requestExecutorService.execute(new EndActivityCommand()
       .scriptExecutionId(scriptExecutionId)
-      .continuationReference(continuationReference)
-      .execute();
+      .continuationReference(continuationReference));
   }
 
   public static ContinuationReference removeFirstContinuationReference(String scriptExecutionId) {

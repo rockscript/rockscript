@@ -13,23 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.activity.test;
 
-import io.rockscript.request.CommandResponse;
+package io.rockscript.request;
 
-import java.util.ArrayList;
+import io.rockscript.engine.Configuration;
 
-public class TestResults extends ArrayList<TestResult> implements CommandResponse {
+public class RequestExecutorServiceImpl implements RequestExecutorService {
 
-  @Override
-  public int getStatus() {
-    return 200;
+  protected Configuration configuration;
+
+  public RequestExecutorServiceImpl(Configuration configuration) {
+    this.configuration = configuration;
   }
 
-  public TestResult findTestResult(String testName) {
-    return stream()
-      .filter(tr->testName.equals(tr.testName))
-      .findFirst()
-      .orElse(null);
+  @Override
+  public <R extends CommandResponse> R execute(Command<R> command) {
+    CommandImpl<R> commandImpl = (CommandImpl<R>) command;
+    commandImpl.setConfiguration(configuration);
+    return commandImpl.execute();
+  }
+
+  public Configuration getConfiguration() {
+    return configuration;
   }
 }

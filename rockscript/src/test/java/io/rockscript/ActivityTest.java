@@ -18,9 +18,9 @@ package io.rockscript;
 
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
+import io.rockscript.request.RequestExecutorService;
 import io.rockscript.engine.Script;
 import io.rockscript.engine.ScriptExecution;
-import io.rockscript.engine.ScriptService;
 import io.rockscript.engine.TestConfiguration;
 import io.rockscript.engine.impl.ExecutionEvent;
 import io.rockscript.test.ScriptTest;
@@ -40,8 +40,8 @@ public class ActivityTest extends ScriptTest {
   List<ActivityInput> activityInputs = new ArrayList<>();
 
   @Override
-  protected ScriptService initializeScriptService() {
-    // This ensures that each test will get a new ScriptService
+  protected RequestExecutorService initializeScriptService() {
+    // This ensures that each test will get a new RequestExecutorService
     // so that the tests can customize the import resolver without
     // polluting any cached script services.
     return new TestConfiguration().build();

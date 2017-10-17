@@ -13,10 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript.request.command;
 
 import io.rockscript.activity.test.*;
+import io.rockscript.engine.Configuration;
+import io.rockscript.engine.Script;
 import io.rockscript.engine.impl.*;
+import io.rockscript.request.RequestExecutorService;
+import io.rockscript.request.CommandImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,14 +56,12 @@ public class RunTestsCommand extends CommandImpl<TestResults> {
     TestResult testResult = new TestResult(script.getName());
     TestImportObject testImportObject = new TestImportObject(testResult);
     Configuration testConfiguration = new TestRunConfiguration(engineConfiguration, testImportObject, testResult);
-    ScriptService testScriptService = testConfiguration.build();
-    testImportObject.setScriptService(testScriptService);
+    RequestExecutorService testRequestExecutorService = testConfiguration.build();
+    testImportObject.setRequestExecutorService(testRequestExecutorService);
     try {
       String scriptId = script.getId();
-      testScriptService
-        .newStartScriptExecutionCommand()
-        .scriptId(scriptId)
-        .execute();
+      testRequestExecutorService.execute(new StartScriptExecutionCommand()
+        .scriptId(scriptId));
     } catch (Throwable t) {
       testResult.addError(new TestError(t));
     }

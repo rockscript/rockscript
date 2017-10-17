@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package io.rockscript.engine;
-
-import io.rockscript.engine.impl.EngineScriptExecution;
-
-import java.util.List;
+package io.rockscript.request;
 
 /** Access to the RockScript functionality
  *
- * Obtain a ScriptService like this:
+ * Obtain a RequestExecutorService like this:
  * <code>
- *   ScriptService scriptService = new TestConfiguration()
+ *   RequestExecutorService scriptService = new TestConfiguration()
  *     // potentially apply fluent configuration tweaks
  *     .build();
  * </code>
@@ -37,13 +33,8 @@ import java.util.List;
  *     .execute();
  * </code>
  */
-public interface ScriptService {
+public interface RequestExecutorService {
 
-  DeployScriptCommand newDeployScriptCommand();
-  StartScriptExecutionCommand newStartScriptExecutionCommand();
-  EndActivityCommand newEndActivityCommand();
+  <R extends CommandResponse> R execute(Command<R> command);
 
-  List<EngineScriptExecution> recoverCrashedScriptExecutions();
-
-  RunTestsCommand newRunTestsCommand();
 }

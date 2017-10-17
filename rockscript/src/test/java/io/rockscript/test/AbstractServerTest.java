@@ -18,7 +18,7 @@ package io.rockscript.test;
 import com.google.gson.Gson;
 import io.rockscript.Server;
 import io.rockscript.ServerConfiguration;
-import io.rockscript.engine.ScriptService;
+import io.rockscript.request.RequestExecutorService;
 import io.rockscript.http.Http;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
@@ -59,7 +59,7 @@ public abstract class AbstractServerTest {
     }
   }
 
-  public ScriptService getScriptService() {
+  public RequestExecutorService getScriptService() {
     return server.getScriptService();
   }
 
@@ -76,8 +76,8 @@ public abstract class AbstractServerTest {
       return serverConfiguration.getAsyncHttpServerConfiguration().getPort();
     }
     @Override
-    protected AsyncHttpServerConfiguration createAsyncHttpServerConfiguration(Gson commonGson, ScriptService scriptService) {
-      return super.createAsyncHttpServerConfiguration(commonGson, scriptService)
+    protected AsyncHttpServerConfiguration createAsyncHttpServerConfiguration(Gson commonGson, RequestExecutorService requestExecutorService) {
+      return super.createAsyncHttpServerConfiguration(commonGson, requestExecutorService)
         .interceptor(new ServerExceptionInterceptor());
     }
     @Override

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript.request.command;
 
 
 import io.rockscript.engine.impl.ScriptExecutionErrorEvent;

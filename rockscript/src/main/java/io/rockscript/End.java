@@ -15,8 +15,8 @@
  */
 package io.rockscript;
 
-import io.rockscript.engine.EndActivityCommand;
-import io.rockscript.engine.EngineEndActivityResponse;
+import io.rockscript.request.command.EndActivityCommand;
+import io.rockscript.request.command.EngineEndActivityResponse;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
 import org.apache.commons.cli.CommandLine;

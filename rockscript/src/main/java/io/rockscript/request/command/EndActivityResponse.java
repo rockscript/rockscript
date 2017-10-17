@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript.request.command;
 
-/** Abstract base class for all commands and queries.
- * All commands are serializable with Gson. */
-public interface Command<R extends CommandResponse> {
+public class EndActivityResponse {
 
-  /** @throws EngineException */
-  R execute();
+  protected String error;
+
+  public String getError() {
+    return this.error;
+  }
 }

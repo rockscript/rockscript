@@ -17,7 +17,7 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.engine.Configuration;
-import io.rockscript.engine.EngineDeployScriptResponse;
+import io.rockscript.request.command.EngineDeployScriptResponse;
 import io.rockscript.engine.EngineException;
 import io.rockscript.engine.Script;
 

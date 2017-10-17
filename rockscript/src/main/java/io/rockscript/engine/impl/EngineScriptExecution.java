@@ -17,6 +17,7 @@ package io.rockscript.engine.impl;
 
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.EngineException;
+import io.rockscript.engine.ScriptExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -233,5 +234,9 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
 
   public ScriptExecutionErrorEvent getErrorEvent() {
     return errorEvent;
+  }
+
+  public ScriptExecution toScriptExecution() {
+    return new ScriptExecution(this);
   }
 }

@@ -23,6 +23,8 @@ import io.rockscript.engine.impl.*;
 import io.rockscript.engine.job.JobService;
 import io.rockscript.http.GsonCodec;
 import io.rockscript.http.Http;
+import io.rockscript.request.RequestExecutorService;
+import io.rockscript.request.RequestExecutorServiceImpl;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.Executor;
@@ -57,13 +59,13 @@ public abstract class Configuration {
     this.jobService = new JobService(this);
   }
 
-  public ScriptService build() {
+  public RequestExecutorService build() {
     if (gson==null) {
       gson = createDefaultGson();
     }
     this.http = new Http(new GsonCodec(gson));
     throwIfNotProperlyConfigured();
-    return new ScriptServiceImpl(this);
+    return new RequestExecutorServiceImpl(this);
   }
 
   private Gson createDefaultGson() {

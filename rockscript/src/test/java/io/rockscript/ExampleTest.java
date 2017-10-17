@@ -18,6 +18,8 @@ package io.rockscript;
 
 import io.rockscript.activity.test.TestResult;
 import io.rockscript.activity.test.TestResults;
+import io.rockscript.request.command.DeployScriptCommand;
+import io.rockscript.request.command.RunTestsCommand;
 import io.rockscript.test.ScriptTest;
 import io.rockscript.util.Io;
 import org.junit.Test;
@@ -41,8 +43,7 @@ public class ExampleTest extends ScriptTest {
     deployScriptResource("../docs/examples/test/list-trains-test-ok.rst");
     deployScriptResource("../docs/examples/test/list-trains-test-nok.rst");
 
-    TestResults testResults = scriptService.newRunTestsCommand()
-      .execute();
+    TestResults testResults = requestExecutorService.execute(new RunTestsCommand());
 
     TestResult okTestResult = testResults.findTestResult("../docs/examples/test/list-trains-test-ok.rst");
     assertNull(okTestResult.getErrors());
@@ -59,10 +60,9 @@ public class ExampleTest extends ScriptTest {
   private void deployScriptResource(String fileName) throws FileNotFoundException {
     File file = new File(fileName);
     String scriptText = Io.toString(new FileInputStream(file));
-    scriptService.newDeployScriptCommand()
-      .scriptName(fileName)
-      .scriptText(scriptText)
-      .execute()
+    requestExecutorService.execute(new DeployScriptCommand()
+        .scriptName(fileName)
+        .scriptText(scriptText))
       .throwIfErrors();
   }
 }

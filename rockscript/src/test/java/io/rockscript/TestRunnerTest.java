@@ -15,9 +15,11 @@
  */
 package io.rockscript;
 
+import io.rockscript.activity.test.TestError;
 import io.rockscript.activity.test.TestResult;
 import io.rockscript.activity.test.TestResults;
-import io.rockscript.activity.test.TestError;
+import io.rockscript.request.command.DeployScriptCommand;
+import io.rockscript.request.command.RunTestsCommand;
 import io.rockscript.engine.impl.ActivityStartErrorEvent;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
@@ -31,9 +33,7 @@ import java.util.List;
 
 import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class TestRunnerTest extends HttpTest {
 
@@ -53,29 +53,25 @@ public class TestRunnerTest extends HttpTest {
 
   @Test
   public void testTestRunnerAssertionFailure() {
-    scriptService.newDeployScriptCommand()
-      .scriptText(
-        "var http = system.import('rockscript.io/http'); \n" +
-        "var country = http \n" +
-        "  .get({url: 'http://localhost:4000/ole'}) \n" +
-        "  .body.country;")
-      .scriptName("The Script.rs")
-      .execute();
+    requestExecutorService.execute(new DeployScriptCommand()
+        .scriptText(
+          "var http = system.import('rockscript.io/http'); \n" +
+          "var country = http \n" +
+          "  .get({url: 'http://localhost:4000/ole'}) \n" +
+          "  .body.country;")
+        .scriptName("The Script.rs"));
 
-    String testScriptId = scriptService.newDeployScriptCommand()
-      .scriptText(
-        "var test = system.import('rockscript.io/test'); \n" +
-        "var scriptExecution = test.start({ \n" +
-        "  script: 'The Script.rs', \n" +
-        "  skipActivities: true}); \n" +
-        "test.assertEquals(scriptExecution.variables.country, 'The Netherlands');")
-      .scriptName("The Script Test.rst")
-      .execute()
+    String testScriptId = requestExecutorService.execute(new DeployScriptCommand()
+        .scriptText(
+          "var test = system.import('rockscript.io/test'); \n" +
+          "var scriptExecution = test.start({ \n" +
+          "  script: 'The Script.rs', \n" +
+          "  skipActivities: true}); \n" +
+          "test.assertEquals(scriptExecution.variables.country, 'The Netherlands');")
+        .scriptName("The Script Test.rst"))
       .getId();
 
-    TestResults testResults = scriptService
-      .newRunTestsCommand()
-      .execute();
+    TestResults testResults = requestExecutorService.execute(new RunTestsCommand());
 
     log.debug(getConfiguration().getGson().toJson(testResults));
 
@@ -100,28 +96,24 @@ public class TestRunnerTest extends HttpTest {
 
   @Test
   public void testTestRunnerScriptFailure() {
-    String targetScriptId = scriptService.newDeployScriptCommand()
-      .scriptText(
-        /* 1 */ "var http = system.import('rockscript.io/http'); \n" +
-        /* 2 */ "unexistingvar.unexistingmethod();")
-      .scriptName("The Script.rs")
-      .execute()
+    String targetScriptId = requestExecutorService.execute(new DeployScriptCommand()
+        .scriptText(
+          /* 1 */ "var http = system.import('rockscript.io/http'); \n" +
+          /* 2 */ "unexistingvar.unexistingmethod();")
+        .scriptName("The Script.rs"))
       .getId();
 
-    String testScriptId = scriptService.newDeployScriptCommand()
-      .scriptText(
-        /* 1 */ "var test = system.import('rockscript.io/test'); \n" +
-        /* 2 */ "\n" +
-        /* 3 */ "var scriptExecution = test.start({ \n" +
-        /* 4 */ "  script: 'The Script.rs', \n" +
-        /* 5 */ "  skipActivities: true}); ")
-      .scriptName("The Script Test.rst")
-      .execute()
+    String testScriptId = requestExecutorService.execute(new DeployScriptCommand()
+        .scriptText(
+          /* 1 */ "var test = system.import('rockscript.io/test'); \n" +
+          /* 2 */ "\n" +
+          /* 3 */ "var scriptExecution = test.start({ \n" +
+          /* 4 */ "  script: 'The Script.rs', \n" +
+          /* 5 */ "  skipActivities: true}); ")
+        .scriptName("The Script Test.rst"))
       .getId();
 
-    TestResults testResults = scriptService
-      .newRunTestsCommand()
-      .execute();
+    TestResults testResults = requestExecutorService.execute(new RunTestsCommand());
 
     log.debug(getConfiguration().getGson().toJson(testResults));
 

@@ -17,6 +17,12 @@ package io.rockscript.test;
 
 import io.rockscript.engine.*;
 import io.rockscript.engine.impl.ContinuationReference;
+import io.rockscript.request.RequestExecutorService;
+import io.rockscript.request.RequestExecutorServiceImpl;
+import io.rockscript.request.command.DeployScriptCommand;
+import io.rockscript.request.command.EndActivityCommand;
+import io.rockscript.request.command.EngineStartScriptExecutionResponse;
+import io.rockscript.request.command.StartScriptExecutionCommand;
 import org.junit.After;
 import org.junit.Before;
 import org.slf4j.Logger;
@@ -30,63 +36,61 @@ public class ScriptTest {
 
   protected static Logger log = LoggerFactory.getLogger(ScriptTest.class);
 
-  protected static Map<Class<? extends ScriptServiceProvider>,ScriptService> scriptServiceCache = new HashMap<>();
+  protected static Map<Class<? extends ScriptServiceProvider>,RequestExecutorService> scriptServiceCache = new HashMap<>();
 
-  protected ScriptService scriptService;
+  protected RequestExecutorService requestExecutorService;
 
   @Before
   public void setUp() {
-    scriptService = initializeScriptService();
+    requestExecutorService = initializeScriptService();
   }
 
   @SuppressWarnings("deprecation")
   @After
   public void tearDown() {
-    ((ScriptServiceImpl)scriptService).getConfiguration()
+    ((RequestExecutorServiceImpl) requestExecutorService).getConfiguration()
       .getHttp()
       .getApacheHttpClient()
       .getConnectionManager()
       .closeIdleConnections(0, TimeUnit.NANOSECONDS);
   }
 
-  /** Override this method if you want your ScriptService to be
+  /** Override this method if you want your RequestExecutorService to be
    * created for each test.
    *
    * Overwrite {@link #getScriptServiceProvider()} if you want to
-   * customize and cache a ScriptService in your tests. */
-  protected ScriptService initializeScriptService() {
+   * customize and cache a RequestExecutorService in your tests. */
+  protected RequestExecutorService initializeScriptService() {
     ScriptServiceProvider scriptServiceProvider = getScriptServiceProvider();
     Class<? extends ScriptServiceProvider> providerClass = scriptServiceProvider.getClass();
-    ScriptService scriptService = scriptServiceCache.get(providerClass);
-    if (scriptService==null) {
-      scriptService = scriptServiceProvider.createScriptService();
-      scriptServiceCache.put(providerClass, scriptService);
+    RequestExecutorService requestExecutorService = scriptServiceCache.get(providerClass);
+    if (requestExecutorService==null) {
+      requestExecutorService = scriptServiceProvider.createScriptService();
+      scriptServiceCache.put(providerClass, requestExecutorService);
     }
-    return scriptService;
+    return requestExecutorService;
   }
 
   protected interface ScriptServiceProvider {
-    ScriptService createScriptService();
+    RequestExecutorService createScriptService();
   }
 
-  /** Override this method to customize and cache a ScriptService in your tests.
+  /** Override this method to customize and cache a RequestExecutorService in your tests.
    *
-   * Overwrite {@link #initializeScriptService()} if you want your ScriptService
+   * Overwrite {@link #initializeScriptService()} if you want your RequestExecutorService
    * to be created for each test. */
   protected ScriptServiceProvider getScriptServiceProvider() {
     return new ScriptServiceProvider() {
       @Override
-      public ScriptService createScriptService() {
+      public RequestExecutorService createScriptService() {
         return new TestConfiguration().build();
       }
     };
   }
 
   public Script deployScript(String scriptText) {
-    return scriptService
-      .newDeployScriptCommand()
-      .scriptText(scriptText)
-      .execute()
+    return requestExecutorService.execute(new DeployScriptCommand()
+        .scriptText(scriptText))
       .throwIfErrors();
   }
 
@@ -103,10 +107,9 @@ public class ScriptTest {
   }
 
   public ScriptExecution startScriptExecution(String scriptId, Object input) {
-    EngineStartScriptExecutionResponse response = scriptService.newStartScriptExecutionCommand()
+    EngineStartScriptExecutionResponse response = requestExecutorService.execute(new StartScriptExecutionCommand()
         .scriptId(scriptId)
-        .input(input)
-        .execute();
+        .input(input));
     return response.getScriptExecution();
   }
 
@@ -115,15 +118,14 @@ public class ScriptTest {
   }
 
   public ScriptExecution endActivity(ContinuationReference continuationReference, Object result) {
-    return scriptService.newEndActivityCommand()
-      .continuationReference(continuationReference)
-      .result(result)
-      .execute()
+    return requestExecutorService.execute(new EndActivityCommand()
+        .continuationReference(continuationReference)
+        .result(result))
       .getScriptExecution();
   }
 
   protected Configuration getConfiguration() {
-    return ((ScriptServiceImpl)scriptService).getConfiguration();
+    return ((RequestExecutorServiceImpl) requestExecutorService).getConfiguration();
   }
 
   public static void assertContains(String expectedSubstring, String text) {
@@ -131,5 +133,4 @@ public class ScriptTest {
       throw new AssertionError("Expected substring '"+expectedSubstring+"', but was '"+text+"'");
     }
   }
-
 }

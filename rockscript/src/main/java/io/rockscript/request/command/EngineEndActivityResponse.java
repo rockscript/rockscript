@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript.request.command;
 
+import io.rockscript.engine.ScriptExecution;
 import io.rockscript.engine.impl.EngineScriptExecution;
+import io.rockscript.request.CommandResponse;
 
 public class EngineEndActivityResponse extends EndActivityResponse implements CommandResponse {
 
@@ -36,7 +38,7 @@ public class EngineEndActivityResponse extends EndActivityResponse implements Co
   }
 
   public ScriptExecution getScriptExecution() {
-    return new ScriptExecution(engineScriptExecution);
+    return engineScriptExecution.toScriptExecution();
   }
 
   public EngineScriptExecution getEngineScriptExecution() {

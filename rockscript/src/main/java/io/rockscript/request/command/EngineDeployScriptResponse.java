@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript.request.command;
+
+import io.rockscript.engine.ParseError;
+import io.rockscript.engine.Script;
+import io.rockscript.request.CommandResponse;
 
 import java.util.List;
 

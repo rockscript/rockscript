@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript.request.command;
 
+import io.rockscript.engine.Configuration;
 import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.EngineScriptExecution;
+import io.rockscript.request.CommandImpl;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

@@ -22,6 +22,12 @@ import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.netty.router.AsyncHttpServer;
 import io.rockscript.netty.router.AsyncHttpServerConfiguration;
 import io.rockscript.netty.router.JsonHandlerGson;
+import io.rockscript.request.Command;
+import io.rockscript.request.RequestExecutorService;
+import io.rockscript.request.command.DeployScriptCommand;
+import io.rockscript.request.command.EndActivityCommand;
+import io.rockscript.request.command.RunTestsCommand;
+import io.rockscript.request.command.StartScriptExecutionCommand;
 import io.rockscript.server.handlers.*;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
@@ -82,8 +88,8 @@ public class Server extends CliCommand {
     this.serviceConfiguration = createServiceConfiguration();
     this.serverConfiguration = createServerConfiguration();
     this.serviceConfiguration.gson(commonGson);
-    ScriptService scriptService = serviceConfiguration.build();
-    AsyncHttpServerConfiguration asyncHttpServerConfiguration = createAsyncHttpServerConfiguration(commonGson, scriptService);
+    RequestExecutorService requestExecutorService = serviceConfiguration.build();
+    AsyncHttpServerConfiguration asyncHttpServerConfiguration = createAsyncHttpServerConfiguration(commonGson, requestExecutorService);
     this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
   }
 
@@ -95,7 +101,7 @@ public class Server extends CliCommand {
     return new DevConfiguration();
   }
 
-  protected AsyncHttpServerConfiguration createAsyncHttpServerConfiguration(Gson commonGson, ScriptService scriptService) {
+  protected AsyncHttpServerConfiguration createAsyncHttpServerConfiguration(Gson commonGson, RequestExecutorService requestExecutorService) {
     return serverConfiguration
         .getAsyncHttpServerConfiguration()
         .scan(CommandHandler.class)
@@ -104,7 +110,7 @@ public class Server extends CliCommand {
         .scan(ScriptExecutionHandler.class)
         .scan(ScriptExecutionsHandler.class)
         .jsonHandler(new JsonHandlerGson(commonGson))
-        .context(ScriptService.class, scriptService)
+        .context(RequestExecutorService.class, requestExecutorService)
         .context(Configuration.class, serviceConfiguration)
         .defaultResponseHeader("Access-Control-Allow-Origin", "*");
   }
@@ -162,7 +168,7 @@ public class Server extends CliCommand {
     return asyncHttpServer;
   }
 
-  public ScriptService getScriptService() {
-    return asyncHttpServer.getContext().get(ScriptService.class);
+  public RequestExecutorService getScriptService() {
+    return asyncHttpServer.getContext().get(RequestExecutorService.class);
   }
 }

@@ -18,6 +18,7 @@ package io.rockscript;
 import com.google.gson.reflect.TypeToken;
 import io.rockscript.engine.*;
 import io.rockscript.engine.impl.ContinuationReference;
+import io.rockscript.request.command.*;
 import io.rockscript.server.handlers.ScriptExecutionHandler;
 import io.rockscript.server.handlers.ScriptExecutionsHandler;
 import io.rockscript.test.AbstractServerTest;

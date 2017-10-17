@@ -1,4 +1,4 @@
-package io.rockscript.engine;
+package io.rockscript.request;
 
 public interface CommandResponse {
 
