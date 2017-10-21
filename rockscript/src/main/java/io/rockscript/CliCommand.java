@@ -54,7 +54,7 @@ public abstract class CliCommand {
         CommandLine commandLine = commandLineParser.parse(options, args);
         parse(commandLine);
       } catch (ParseException e) {
-        throw new RuntimeException("Command line args parsing exception: "+e.getMessage(), e);
+        throw new RuntimeException("AsyncHttpRequest line args parsing exception: "+e.getMessage(), e);
       }
     }
     return this;

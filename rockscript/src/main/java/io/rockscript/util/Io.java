@@ -30,4 +30,17 @@ public class Io {
       return "";
     }
   }
+
+  public static String getResourceAsString(String resource) {
+    InputStream resourceAsStream = Io.class.getClassLoader().getResourceAsStream(resource);
+    if (resourceAsStream==null) {
+      throw new RuntimeException("Resource "+resource+" doesn't exist");
+    }
+    try {
+      return Io.toString(resourceAsStream);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new RuntimeException("Couldn't get resource as string: "+e.getMessage(), e);
+    }
+  }
 }

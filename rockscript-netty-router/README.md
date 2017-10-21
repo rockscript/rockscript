@@ -20,9 +20,9 @@ public class SomeHttpPost extends RequestHandler {
 
   @Override
   public void handle() {
-    RequestBodyJsonBean command = request.getBodyJson(RequestBodyJsonBean.class);
+    RequestBodyJsonBean command = command.getBodyJson(RequestBodyJsonBean.class);
 
-    ... request handling code ...
+    ... command handling code ...
 
     response.statusOk();
   }

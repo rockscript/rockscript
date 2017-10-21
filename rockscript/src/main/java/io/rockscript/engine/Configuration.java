@@ -23,10 +23,13 @@ import io.rockscript.engine.impl.*;
 import io.rockscript.engine.job.JobService;
 import io.rockscript.http.GsonCodec;
 import io.rockscript.http.Http;
-import io.rockscript.request.RequestExecutorService;
-import io.rockscript.request.RequestExecutorServiceImpl;
+import io.rockscript.cqrs.CommandExecutorService;
+import io.rockscript.cqrs.CommandExecutorServiceImpl;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.concurrent.Executor;
 
 import static io.rockscript.engine.impl.Event.createEventJsonTypeAdapterFactory;
@@ -46,6 +49,7 @@ public abstract class Configuration {
   protected Gson gson;
   protected Http http;
   protected JobService jobService;
+  protected Map<String,Object> objects = new HashMap<>();
 
   public Configuration() {
     this.eventStore = new EventStore(this);
@@ -59,13 +63,19 @@ public abstract class Configuration {
     this.jobService = new JobService(this);
   }
 
-  public RequestExecutorService build() {
+  public CommandExecutorService build() {
     if (gson==null) {
       gson = createDefaultGson();
     }
     this.http = new Http(new GsonCodec(gson));
     throwIfNotProperlyConfigured();
-    return new RequestExecutorServiceImpl(this);
+
+    ServiceLoader<EngineModule> engineModules = ServiceLoader.load(EngineModule.class);
+    for (EngineModule engineModule: engineModules) {
+      engineModule.configured(this);
+    }
+
+    return new CommandExecutorServiceImpl(this);
   }
 
   private Gson createDefaultGson() {
@@ -87,6 +97,37 @@ public abstract class Configuration {
       }
       EngineException.throwIfNull(value, "ServiceLocator field '%s' is null", field.getName());
     }
+  }
+
+  public Configuration object(String key, Object value) {
+    objects.put(key, value);
+    return this;
+  }
+
+  public Configuration object(Class<?> key, Object value) {
+    if (value!=null && key!=Object.class) {
+      objects.put(key.getName(), value);
+      for (Class<?> interfaceClass: key.getInterfaces()) {
+        object(interfaceClass, value);
+      }
+      object(key.getSuperclass(), value);
+    }
+    return this;
+  }
+
+  public Configuration object(Object value) {
+    if (value!=null) {
+      object(value.getClass(), value);
+    }
+    return this;
+  }
+
+  public <T> T getObject(String key) {
+    return (T) objects.get(key);
+  }
+
+  public <T> T getObject(Class<T> clazz) {
+    return (T) objects.get(clazz.getName());
   }
 
   public Configuration gson(Gson gson) {

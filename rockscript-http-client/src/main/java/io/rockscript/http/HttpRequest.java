@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 
 import static io.rockscript.http.Http.Methods.*;
 
-/** Request builder */
+/** AsyncHttpRequest builder */
 public class HttpRequest {
 
   static final String NEWLINE = System.getProperty("line.separator");

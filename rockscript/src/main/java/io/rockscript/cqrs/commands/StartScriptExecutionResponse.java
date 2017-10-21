@@ -13,26 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.activity.test;
+package io.rockscript.cqrs.commands;
 
-import io.rockscript.engine.impl.Event;
-import io.rockscript.engine.impl.EventListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class TestLogger implements EventListener {
-  static final Logger log = LoggerFactory.getLogger(TestLogger.class.getName());
+import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
 
-  TestResult testResult;
-  EventListener next;
-  public TestLogger(TestResult testResult, EventListener next) {
-    this.testResult = testResult;
-    this.next = next;
+public class StartScriptExecutionResponse {
+
+  protected String scriptExecutionId;
+  protected ScriptExecutionErrorEvent errorEvent;
+
+  public String getScriptExecutionId() {
+    return scriptExecutionId;
   }
-  @Override
-  public void handle(Event event) {
-    testResult.addEvent(event);
-    log.debug(event.toString());
-    next.handle(event);
+
+  public ScriptExecutionErrorEvent getErrorEvent() {
+    return this.errorEvent;
   }
 }

@@ -18,8 +18,8 @@ package io.rockscript;
 import io.rockscript.activity.test.TestError;
 import io.rockscript.activity.test.TestResult;
 import io.rockscript.activity.test.TestResults;
-import io.rockscript.request.command.DeployScriptCommand;
-import io.rockscript.request.command.RunTestsCommand;
+import io.rockscript.cqrs.commands.DeployScriptCommand;
+import io.rockscript.cqrs.commands.RunTestsCommand;
 import io.rockscript.engine.impl.ActivityStartErrorEvent;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
@@ -53,7 +53,7 @@ public class TestRunnerTest extends HttpTest {
 
   @Test
   public void testTestRunnerAssertionFailure() {
-    requestExecutorService.execute(new DeployScriptCommand()
+    commandExecutorService.execute(new DeployScriptCommand()
         .scriptText(
           "var http = system.import('rockscript.io/http'); \n" +
           "var country = http \n" +
@@ -61,7 +61,7 @@ public class TestRunnerTest extends HttpTest {
           "  .body.country;")
         .scriptName("The Script.rs"));
 
-    String testScriptId = requestExecutorService.execute(new DeployScriptCommand()
+    String testScriptId = commandExecutorService.execute(new DeployScriptCommand()
         .scriptText(
           "var test = system.import('rockscript.io/test'); \n" +
           "var scriptExecution = test.start({ \n" +
@@ -71,7 +71,7 @@ public class TestRunnerTest extends HttpTest {
         .scriptName("The Script Test.rst"))
       .getId();
 
-    TestResults testResults = requestExecutorService.execute(new RunTestsCommand());
+    TestResults testResults = commandExecutorService.execute(new RunTestsCommand());
 
     log.debug(getConfiguration().getGson().toJson(testResults));
 
@@ -96,14 +96,14 @@ public class TestRunnerTest extends HttpTest {
 
   @Test
   public void testTestRunnerScriptFailure() {
-    String targetScriptId = requestExecutorService.execute(new DeployScriptCommand()
+    String targetScriptId = commandExecutorService.execute(new DeployScriptCommand()
         .scriptText(
           /* 1 */ "var http = system.import('rockscript.io/http'); \n" +
           /* 2 */ "unexistingvar.unexistingmethod();")
         .scriptName("The Script.rs"))
       .getId();
 
-    String testScriptId = requestExecutorService.execute(new DeployScriptCommand()
+    String testScriptId = commandExecutorService.execute(new DeployScriptCommand()
         .scriptText(
           /* 1 */ "var test = system.import('rockscript.io/test'); \n" +
           /* 2 */ "\n" +
@@ -113,7 +113,7 @@ public class TestRunnerTest extends HttpTest {
         .scriptName("The Script Test.rst"))
       .getId();
 
-    TestResults testResults = requestExecutorService.execute(new RunTestsCommand());
+    TestResults testResults = commandExecutorService.execute(new RunTestsCommand());
 
     log.debug(getConfiguration().getGson().toJson(testResults));
 

@@ -15,14 +15,19 @@
  */
 package io.rockscript.test;
 
-import io.rockscript.engine.*;
+import io.rockscript.cqrs.Command;
+import io.rockscript.cqrs.CommandExecutorService;
+import io.rockscript.cqrs.CommandExecutorServiceImpl;
+import io.rockscript.cqrs.Response;
+import io.rockscript.cqrs.commands.DeployScriptCommand;
+import io.rockscript.cqrs.commands.EndActivityCommand;
+import io.rockscript.cqrs.commands.EngineStartScriptExecutionResponse;
+import io.rockscript.cqrs.commands.StartScriptExecutionCommand;
+import io.rockscript.engine.Configuration;
+import io.rockscript.engine.Script;
+import io.rockscript.engine.ScriptExecution;
+import io.rockscript.engine.TestConfiguration;
 import io.rockscript.engine.impl.ContinuationReference;
-import io.rockscript.request.RequestExecutorService;
-import io.rockscript.request.RequestExecutorServiceImpl;
-import io.rockscript.request.command.DeployScriptCommand;
-import io.rockscript.request.command.EndActivityCommand;
-import io.rockscript.request.command.EngineStartScriptExecutionResponse;
-import io.rockscript.request.command.StartScriptExecutionCommand;
 import org.junit.After;
 import org.junit.Before;
 import org.slf4j.Logger;
@@ -36,60 +41,64 @@ public class ScriptTest {
 
   protected static Logger log = LoggerFactory.getLogger(ScriptTest.class);
 
-  protected static Map<Class<? extends ScriptServiceProvider>,RequestExecutorService> scriptServiceCache = new HashMap<>();
+  protected static Map<Class<? extends ScriptServiceProvider>,CommandExecutorService> scriptServiceCache = new HashMap<>();
 
-  protected RequestExecutorService requestExecutorService;
+  protected CommandExecutorService commandExecutorService;
 
   @Before
   public void setUp() {
-    requestExecutorService = initializeScriptService();
+    commandExecutorService = initializeScriptService();
   }
 
   @SuppressWarnings("deprecation")
   @After
   public void tearDown() {
-    ((RequestExecutorServiceImpl) requestExecutorService).getConfiguration()
+    ((CommandExecutorServiceImpl) commandExecutorService).getConfiguration()
       .getHttp()
       .getApacheHttpClient()
       .getConnectionManager()
       .closeIdleConnections(0, TimeUnit.NANOSECONDS);
   }
 
-  /** Override this method if you want your RequestExecutorService to be
+  /** Override this method if you want your CommandExecutorService to be
    * created for each test.
    *
    * Overwrite {@link #getScriptServiceProvider()} if you want to
-   * customize and cache a RequestExecutorService in your tests. */
-  protected RequestExecutorService initializeScriptService() {
+   * customize and cache a CommandExecutorService in your tests. */
+  protected CommandExecutorService initializeScriptService() {
     ScriptServiceProvider scriptServiceProvider = getScriptServiceProvider();
     Class<? extends ScriptServiceProvider> providerClass = scriptServiceProvider.getClass();
-    RequestExecutorService requestExecutorService = scriptServiceCache.get(providerClass);
-    if (requestExecutorService==null) {
-      requestExecutorService = scriptServiceProvider.createScriptService();
-      scriptServiceCache.put(providerClass, requestExecutorService);
+    CommandExecutorService commandExecutorService = scriptServiceCache.get(providerClass);
+    if (commandExecutorService==null) {
+      commandExecutorService = scriptServiceProvider.createScriptService();
+      scriptServiceCache.put(providerClass, commandExecutorService);
     }
-    return requestExecutorService;
+    return commandExecutorService;
   }
 
   protected interface ScriptServiceProvider {
-    RequestExecutorService createScriptService();
+    CommandExecutorService createScriptService();
   }
 
-  /** Override this method to customize and cache a RequestExecutorService in your tests.
+  /** Override this method to customize and cache a CommandExecutorService in your tests.
    *
-   * Overwrite {@link #initializeScriptService()} if you want your RequestExecutorService
+   * Overwrite {@link #initializeScriptService()} if you want your CommandExecutorService
    * to be created for each test. */
   protected ScriptServiceProvider getScriptServiceProvider() {
     return new ScriptServiceProvider() {
       @Override
-      public RequestExecutorService createScriptService() {
+      public CommandExecutorService createScriptService() {
         return new TestConfiguration().build();
       }
     };
   }
 
+  public <R extends Response> R execute(Command<R> command) {
+    return commandExecutorService.execute(command);
+  }
+
   public Script deployScript(String scriptText) {
-    return requestExecutorService.execute(new DeployScriptCommand()
+    return execute(new DeployScriptCommand()
         .scriptText(scriptText))
       .throwIfErrors();
   }
@@ -107,7 +116,7 @@ public class ScriptTest {
   }
 
   public ScriptExecution startScriptExecution(String scriptId, Object input) {
-    EngineStartScriptExecutionResponse response = requestExecutorService.execute(new StartScriptExecutionCommand()
+    EngineStartScriptExecutionResponse response = commandExecutorService.execute(new StartScriptExecutionCommand()
         .scriptId(scriptId)
         .input(input));
     return response.getScriptExecution();
@@ -118,14 +127,14 @@ public class ScriptTest {
   }
 
   public ScriptExecution endActivity(ContinuationReference continuationReference, Object result) {
-    return requestExecutorService.execute(new EndActivityCommand()
+    return commandExecutorService.execute(new EndActivityCommand()
         .continuationReference(continuationReference)
         .result(result))
       .getScriptExecution();
   }
 
   protected Configuration getConfiguration() {
-    return ((RequestExecutorServiceImpl) requestExecutorService).getConfiguration();
+    return ((CommandExecutorServiceImpl) commandExecutorService).getConfiguration();
   }
 
   public static void assertContains(String expectedSubstring, String text) {

@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.request.command;
+package io.rockscript.cqrs.commands;
 
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.EngineScriptExecution;
-import io.rockscript.request.CommandImpl;
+import io.rockscript.cqrs.Command;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class EndActivityCommand extends CommandImpl<EngineEndActivityResponse> {
+public class EndActivityCommand extends Command<EngineEndActivityResponse> {
 
   protected String scriptExecutionId;
   protected String executionId;

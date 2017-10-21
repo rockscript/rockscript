@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.server.handlers;
+package io.rockscript.cqrs.commands;
 
-import io.rockscript.netty.router.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class EndActivityResponse {
 
-@Get("/ping")
-public class PingHandler implements RequestHandler {
+  protected String error;
 
-  static Logger log = LoggerFactory.getLogger(PingHandler.class);
-
-  @Override
-  public void handle(Request request, Response response, Context context) {
-    response.statusOk();
-    response.bodyString("pong");
-    response.headerContentTypeTextPlain();
-    response.send();
+  public String getError() {
+    return this.error;
   }
 }

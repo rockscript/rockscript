@@ -16,26 +16,27 @@
 
 package io.rockscript.netty.router;
 
-import java.nio.charset.Charset;
-import java.util.List;
-
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.router.RouteResult;
 import org.slf4j.Logger;
 
+import java.nio.charset.Charset;
+import java.util.List;
+
 import static io.netty.util.CharsetUtil.UTF_8;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class Request {
+/** Wrapper around the Netty router request API */
+public class AsyncHttpRequest {
 
-  static final Logger log = getLogger(Request.class);
+  static final Logger log = getLogger(AsyncHttpRequest.class);
 
   AsyncHttpServer asyncHttpServer;
   FullHttpRequest fullHttpRequest;
   RouteResult<?> route;
 
-  public Request(AsyncHttpServer asyncHttpServer, FullHttpRequest fullHttpRequest, RouteResult<?> route) {
+  public AsyncHttpRequest(AsyncHttpServer asyncHttpServer, FullHttpRequest fullHttpRequest, RouteResult<?> route) {
     this.asyncHttpServer = asyncHttpServer;
     this.fullHttpRequest = fullHttpRequest;
     this.route = route;

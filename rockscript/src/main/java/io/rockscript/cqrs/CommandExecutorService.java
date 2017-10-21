@@ -13,20 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.server.handlers;
 
-import io.rockscript.netty.router.Post;
+package io.rockscript.cqrs;
 
-/** Handles POST requests for /query
+/** Access to the RockScript functionality
  *
- * Queries are done with a HTTP POST because they have
- * query details in the body
- * https://stackoverflow.com/questions/978061/http-get-with-request-body
+ * Obtain a CommandExecutorService like this:
+ * <code>
+ *   CommandExecutorService scriptService = new TestConfiguration()
+ *     // potentially apply fluent configuration tweaks
+ *     .build();
+ * </code>
  *
- * Implementation wise we don't see a difference yet between commands and
- * queries so we leverage the command infrastructure for queries.  This
- * could be revisited later.
+ * Use it like this:
+ * <code>
+ *   EngineDeployScriptResponse response = scriptService.newDeployScriptCommand()
+ *     .name("Approval")
+ *     .scriptText("...the script text...")
+ *     .execute();
+ * </code>
  */
-@Post("/query")
-public class QueryHandler extends CommandHandler {
+public interface CommandExecutorService {
+
+  <R extends Response> R execute(Command<R> command);
+
 }

@@ -1,9 +1,9 @@
 package io.rockscript.test;
 
 import io.rockscript.activity.*;
-import io.rockscript.request.command.EndActivityCommand;
-import io.rockscript.request.command.EngineEndActivityResponse;
-import io.rockscript.request.RequestExecutorService;
+import io.rockscript.cqrs.commands.EndActivityCommand;
+import io.rockscript.cqrs.commands.EngineEndActivityResponse;
+import io.rockscript.cqrs.CommandExecutorService;
 import io.rockscript.engine.impl.ContinuationReference;
 
 import java.util.ArrayList;
@@ -19,9 +19,9 @@ public class SimpleImportProvider extends ImportObject implements ImportProvider
     waits = new HashMap<>();
   }
 
-  public static EngineEndActivityResponse endWait(String scriptExecutionId, RequestExecutorService requestExecutorService) {
+  public static EngineEndActivityResponse endWait(String scriptExecutionId, CommandExecutorService commandExecutorService) {
     ContinuationReference continuationReference = removeFirstContinuationReference(scriptExecutionId);
-    return requestExecutorService.execute(new EndActivityCommand()
+    return commandExecutorService.execute(new EndActivityCommand()
       .scriptExecutionId(scriptExecutionId)
       .continuationReference(continuationReference));
   }

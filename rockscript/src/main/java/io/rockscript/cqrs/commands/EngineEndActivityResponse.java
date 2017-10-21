@@ -13,34 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.request.command;
-
+package io.rockscript.cqrs.commands;
 
 import io.rockscript.engine.ScriptExecution;
 import io.rockscript.engine.impl.EngineScriptExecution;
-import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
-import io.rockscript.request.CommandResponse;
+import io.rockscript.cqrs.Response;
 
-public class EngineStartScriptExecutionResponse extends StartScriptExecutionResponse implements CommandResponse {
+public class EngineEndActivityResponse extends EndActivityResponse implements Response {
 
   /** transient because it must not be serialized with Gson */
   transient EngineScriptExecution engineScriptExecution;
 
   /** constructor for Gson serialization */
-  EngineStartScriptExecutionResponse() {
+  EngineEndActivityResponse() {
   }
 
-  public EngineStartScriptExecutionResponse(EngineScriptExecution engineScriptExecution) {
-    this.scriptExecutionId = engineScriptExecution.getId();
+  public EngineEndActivityResponse(EngineScriptExecution engineScriptExecution) {
     this.engineScriptExecution = engineScriptExecution;
-    ScriptExecutionErrorEvent errorEvent = engineScriptExecution.getErrorEvent();
-    if (errorEvent!=null) {
-      this.errorEvent = errorEvent;
-    }
+  }
+
+  // TODO use this
+  public EngineEndActivityResponse(String error) {
+    this.error = error;
   }
 
   public ScriptExecution getScriptExecution() {
-    return new ScriptExecution(engineScriptExecution);
+    return engineScriptExecution.toScriptExecution();
   }
 
   public EngineScriptExecution getEngineScriptExecution() {

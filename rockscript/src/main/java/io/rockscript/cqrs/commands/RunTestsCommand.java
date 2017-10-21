@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.request.command;
+package io.rockscript.cqrs.commands;
 
 import io.rockscript.activity.test.*;
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.Script;
 import io.rockscript.engine.impl.*;
-import io.rockscript.request.RequestExecutorService;
-import io.rockscript.request.CommandImpl;
+import io.rockscript.cqrs.Command;
+import io.rockscript.cqrs.CommandExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class RunTestsCommand extends CommandImpl<TestResults> {
+public class RunTestsCommand extends Command<TestResults> {
 
   transient static Logger log = LoggerFactory.getLogger(RunTestsCommand.class);
 
@@ -56,11 +56,11 @@ public class RunTestsCommand extends CommandImpl<TestResults> {
     TestResult testResult = new TestResult(script.getName());
     TestImportObject testImportObject = new TestImportObject(testResult);
     Configuration testConfiguration = new TestRunConfiguration(engineConfiguration, testImportObject, testResult);
-    RequestExecutorService testRequestExecutorService = testConfiguration.build();
-    testImportObject.setRequestExecutorService(testRequestExecutorService);
+    CommandExecutorService testCommandExecutorService = testConfiguration.build();
+    testImportObject.setCommandExecutorService(testCommandExecutorService);
     try {
       String scriptId = script.getId();
-      testRequestExecutorService.execute(new StartScriptExecutionCommand()
+      testCommandExecutorService.execute(new StartScriptExecutionCommand()
         .scriptId(scriptId));
     } catch (Throwable t) {
       testResult.addError(new TestError(t));

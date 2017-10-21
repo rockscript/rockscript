@@ -18,10 +18,14 @@ package io.rockscript;
 
 import io.rockscript.activity.test.TestResult;
 import io.rockscript.activity.test.TestResults;
-import io.rockscript.request.command.DeployScriptCommand;
-import io.rockscript.request.command.RunTestsCommand;
+import io.rockscript.cqrs.commands.DeployScriptCommand;
+import io.rockscript.cqrs.commands.EngineDeployScriptResponse;
+import io.rockscript.cqrs.commands.RunTestsCommand;
+import io.rockscript.engine.ScriptExecution;
+import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.test.ScriptTest;
 import io.rockscript.util.Io;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +35,26 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+@Ignore // Because requires internet access
 public class ExampleTest extends ScriptTest {
 
   protected static Logger log = LoggerFactory.getLogger(ExampleTest.class);
+
+  @Test
+  public void testApproval() throws Exception {
+    String scriptId = deployScriptResource("../docs/examples/approvals/create-approval.rs")
+      .getId();
+
+    ScriptExecution scriptExecution = startScriptExecution(scriptId);
+
+    EngineScriptExecution engineScriptExecution = getConfiguration().getEventStore()
+      .findScriptExecutionById(scriptExecution.getId());
+
+    assertNotNull(engineScriptExecution);
+  }
 
   @Test
   public void testTrainsTestOk() throws Exception {
@@ -43,7 +62,7 @@ public class ExampleTest extends ScriptTest {
     deployScriptResource("../docs/examples/test/list-trains-test-ok.rst");
     deployScriptResource("../docs/examples/test/list-trains-test-nok.rst");
 
-    TestResults testResults = requestExecutorService.execute(new RunTestsCommand());
+    TestResults testResults = commandExecutorService.execute(new RunTestsCommand());
 
     TestResult okTestResult = testResults.findTestResult("../docs/examples/test/list-trains-test-ok.rst");
     assertNull(okTestResult.getErrors());
@@ -57,10 +76,10 @@ public class ExampleTest extends ScriptTest {
     assertEquals(2, testResults.get(0).getErrors().size());
   }
 
-  private void deployScriptResource(String fileName) throws FileNotFoundException {
+  private EngineDeployScriptResponse deployScriptResource(String fileName) throws FileNotFoundException {
     File file = new File(fileName);
     String scriptText = Io.toString(new FileInputStream(file));
-    requestExecutorService.execute(new DeployScriptCommand()
+    return commandExecutorService.execute(new DeployScriptCommand()
         .scriptName(fileName)
         .scriptText(scriptText))
       .throwIfErrors();

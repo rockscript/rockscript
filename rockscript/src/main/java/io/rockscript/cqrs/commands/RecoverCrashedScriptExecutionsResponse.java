@@ -1,11 +1,11 @@
-package io.rockscript.request.command;
+package io.rockscript.cqrs.commands;
 
 import io.rockscript.engine.ScriptExecution;
-import io.rockscript.request.CommandResponse;
+import io.rockscript.cqrs.Response;
 
 import java.util.List;
 
-public class RecoverCrashedScriptExecutionsResponse implements CommandResponse {
+public class RecoverCrashedScriptExecutionsResponse implements Response {
 
   public List<ScriptExecution> scriptExecutions;
 

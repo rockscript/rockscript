@@ -13,21 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.request.command;
 
+package io.rockscript.cqrs;
 
-import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
+import io.rockscript.engine.Configuration;
 
-public class StartScriptExecutionResponse {
+public class CommandExecutorServiceImpl implements CommandExecutorService {
 
-  protected String scriptExecutionId;
-  protected ScriptExecutionErrorEvent errorEvent;
+  protected Configuration configuration;
 
-  public String getScriptExecutionId() {
-    return scriptExecutionId;
+  public CommandExecutorServiceImpl(Configuration configuration) {
+    this.configuration = configuration;
   }
 
-  public ScriptExecutionErrorEvent getErrorEvent() {
-    return this.errorEvent;
+  @Override
+  public <R extends Response> R execute(Command<R> command) {
+    Command<R> commandImpl = (Command<R>) command;
+    commandImpl.setConfiguration(configuration);
+    return commandImpl.execute();
+  }
+
+  public Configuration getConfiguration() {
+    return configuration;
   }
 }

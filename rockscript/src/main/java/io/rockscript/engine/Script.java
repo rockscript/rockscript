@@ -15,7 +15,7 @@
  */
 package io.rockscript.engine;
 
-/** Script data as exposed in the RequestExecutorService API.
+/** Script data as exposed in the CommandExecutorService API.
  * Script's are serializable with Gson. */
 public class Script {
 

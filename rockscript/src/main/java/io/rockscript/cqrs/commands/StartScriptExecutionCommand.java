@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.request.command;
+package io.rockscript.cqrs.commands;
 
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.impl.EngineScriptExecution;
-import io.rockscript.request.CommandImpl;
+import io.rockscript.cqrs.Command;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/** Command to start a new script execution.
+/** AsyncHttpRequest to start a new script execution.
  * StartScriptExecutionCommand's are serializable with Gson */
-public class StartScriptExecutionCommand extends CommandImpl<EngineStartScriptExecutionResponse> {
+public class StartScriptExecutionCommand extends Command<EngineStartScriptExecutionResponse> {
 
   protected String scriptName;
   protected String scriptId;

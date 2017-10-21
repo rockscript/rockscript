@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.request.command;
+package io.rockscript.cqrs.commands;
 
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.impl.ScriptStore;
-import io.rockscript.request.CommandImpl;
+import io.rockscript.cqrs.Command;
 
 /** Deploys a new script version to the script service.
  *
@@ -34,7 +34,7 @@ import io.rockscript.request.CommandImpl;
  *
  * DeployScriptCommand's are serializable with Gson.
  */
-public class DeployScriptCommand extends CommandImpl<EngineDeployScriptResponse> {
+public class DeployScriptCommand extends Command<EngineDeployScriptResponse> {
 
   protected String scriptName;
   protected String scriptText;

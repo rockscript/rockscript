@@ -16,8 +16,8 @@
  */
 package io.rockscript;
 
-import io.rockscript.request.command.DeployScriptCommand;
-import io.rockscript.request.command.EngineDeployScriptResponse;
+import io.rockscript.cqrs.commands.DeployScriptCommand;
+import io.rockscript.cqrs.commands.EngineDeployScriptResponse;
 import io.rockscript.engine.ParseError;
 import io.rockscript.test.AbstractServerTest;
 import org.junit.Test;

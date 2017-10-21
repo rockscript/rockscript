@@ -17,24 +17,29 @@ package io.rockscript;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import io.rockscript.engine.*;
+import io.rockscript.cqrs.Command;
+import io.rockscript.cqrs.CommandExecutorService;
+import io.rockscript.cqrs.CommandHandler;
+import io.rockscript.cqrs.CommandsModule;
+import io.rockscript.cqrs.commands.DeployScriptCommand;
+import io.rockscript.cqrs.commands.EndActivityCommand;
+import io.rockscript.cqrs.commands.RunTestsCommand;
+import io.rockscript.cqrs.commands.StartScriptExecutionCommand;
+import io.rockscript.app.cqrs.queries.EventsQuery;
+import io.rockscript.engine.Configuration;
+import io.rockscript.engine.DevConfiguration;
+import io.rockscript.engine.PingHandler;
 import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.netty.router.AsyncHttpServer;
 import io.rockscript.netty.router.AsyncHttpServerConfiguration;
 import io.rockscript.netty.router.JsonHandlerGson;
-import io.rockscript.request.Command;
-import io.rockscript.request.RequestExecutorService;
-import io.rockscript.request.command.DeployScriptCommand;
-import io.rockscript.request.command.EndActivityCommand;
-import io.rockscript.request.command.RunTestsCommand;
-import io.rockscript.request.command.StartScriptExecutionCommand;
-import io.rockscript.server.handlers.*;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.BindException;
+import java.util.ServiceLoader;
 
 import static io.rockscript.Rock.log;
 
@@ -88,8 +93,8 @@ public class Server extends CliCommand {
     this.serviceConfiguration = createServiceConfiguration();
     this.serverConfiguration = createServerConfiguration();
     this.serviceConfiguration.gson(commonGson);
-    RequestExecutorService requestExecutorService = serviceConfiguration.build();
-    AsyncHttpServerConfiguration asyncHttpServerConfiguration = createAsyncHttpServerConfiguration(commonGson, requestExecutorService);
+    CommandExecutorService commandExecutorService = serviceConfiguration.build();
+    AsyncHttpServerConfiguration asyncHttpServerConfiguration = createAsyncHttpServerConfiguration(commonGson, commandExecutorService);
     this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
   }
 
@@ -101,28 +106,31 @@ public class Server extends CliCommand {
     return new DevConfiguration();
   }
 
-  protected AsyncHttpServerConfiguration createAsyncHttpServerConfiguration(Gson commonGson, RequestExecutorService requestExecutorService) {
+  protected AsyncHttpServerConfiguration createAsyncHttpServerConfiguration(Gson commonGson, CommandExecutorService commandExecutorService) {
     return serverConfiguration
-        .getAsyncHttpServerConfiguration()
-        .scan(CommandHandler.class)
-        .scan(PingHandler.class)
-        .scan(QueryHandler.class)
-        .scan(ScriptExecutionHandler.class)
-        .scan(ScriptExecutionsHandler.class)
-        .jsonHandler(new JsonHandlerGson(commonGson))
-        .context(RequestExecutorService.class, requestExecutorService)
-        .context(Configuration.class, serviceConfiguration)
-        .defaultResponseHeader("Access-Control-Allow-Origin", "*");
+      .getAsyncHttpServerConfiguration()
+      .scan(CommandHandler.class)
+      .scan(PingHandler.class)
+      .scan(EventsQuery.class)
+      .loadAsyncHttpServerModulesFromClassPath()
+      .jsonHandler(new JsonHandlerGson(commonGson))
+      .context(CommandExecutorService.class, commandExecutorService)
+      .context(Configuration.class, serviceConfiguration)
+      .defaultResponseHeader("Access-Control-Allow-Origin", "*");
   }
 
   public static PolymorphicTypeAdapterFactory createCommandsTypeAdapterFactory() {
-    return new PolymorphicTypeAdapterFactory()
-      .typeName(new TypeToken<Command>(){}, "command")
-      .typeName(new TypeToken<DeployScriptCommand>(){}, "deployScript")
-      .typeName(new TypeToken<StartScriptExecutionCommand>(){}, "startScript")
-      .typeName(new TypeToken<EndActivityCommand>(){}, "endActivity")
-      .typeName(new TypeToken<RunTestsCommand>(){}, "runTests")
-      .typeName(new TypeToken<EventsQuery>(){}, "eventsQuery")
+    PolymorphicTypeAdapterFactory polymorphicTypeAdapterFactory = new PolymorphicTypeAdapterFactory();
+    ServiceLoader<CommandsModule> commandModules = ServiceLoader.load(CommandsModule.class);
+    for (CommandsModule commandsModule : commandModules) {
+      commandsModule.registerCommands(polymorphicTypeAdapterFactory);
+    }
+    return polymorphicTypeAdapterFactory
+      .typeName(new TypeToken<Command>(){}, "request")
+      .typeName(DeployScriptCommand.class, "deployScript")
+      .typeName(StartScriptExecutionCommand.class, "startScript")
+      .typeName(EndActivityCommand.class, "endActivity")
+      .typeName(RunTestsCommand.class, "runTests")
       ;
   }
 
@@ -168,7 +176,7 @@ public class Server extends CliCommand {
     return asyncHttpServer;
   }
 
-  public RequestExecutorService getScriptService() {
-    return asyncHttpServer.getContext().get(RequestExecutorService.class);
+  public CommandExecutorService getCommandExecutorService() {
+    return asyncHttpServer.getContext().get(CommandExecutorService.class);
   }
 }

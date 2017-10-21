@@ -32,9 +32,10 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 import static io.netty.util.CharsetUtil.UTF_8;
 import static org.slf4j.LoggerFactory.getLogger;
 
-public class Response {
+/** Wrapper around the Netty router response API */
+public class AsyncHttpResponse {
 
-  private static final Logger log = getLogger(Response.class);
+  private static final Logger log = getLogger(AsyncHttpResponse.class);
 
   protected AsyncHttpServer asyncHttpServer;
   protected ChannelHandlerContext channelHandlerContext;
@@ -45,57 +46,57 @@ public class Response {
   protected String contentStringForLog;
   protected FullHttpRequest fullHttpRequest;
 
-  public Response(AsyncHttpServer asyncHttpServer, FullHttpRequest fullHttpRequest, ChannelHandlerContext channelHandlerContext) {
+  public AsyncHttpResponse(AsyncHttpServer asyncHttpServer, FullHttpRequest fullHttpRequest, ChannelHandlerContext channelHandlerContext) {
     this.asyncHttpServer = asyncHttpServer;
     this.fullHttpRequest = fullHttpRequest;
     this.channelHandlerContext = channelHandlerContext;
   }
 
-  public Response statusOk() {
+  public AsyncHttpResponse statusOk() {
     return status(OK);
   }
 
-  public Response statusNotFound() {
+  public AsyncHttpResponse statusNotFound() {
     return status(NOT_FOUND);
   }
 
-  public Response statusBadRequest() {
+  public AsyncHttpResponse statusBadRequest() {
     return status(BAD_REQUEST);
   }
 
-  public Response statusInternalServerError() {
+  public AsyncHttpResponse statusInternalServerError() {
     return status(INTERNAL_SERVER_ERROR);
   }
 
-  public Response statusCreated() {
+  public AsyncHttpResponse statusCreated() {
     return status(CREATED);
   }
 
-  public Response statusNoContent() {
+  public AsyncHttpResponse statusNoContent() {
     return status(NO_CONTENT);
   }
 
-  public Response status(int status) {
+  public AsyncHttpResponse status(int status) {
     return status(HttpResponseStatus.valueOf(status));
   }
 
-  public Response status(HttpResponseStatus status) {
+  public AsyncHttpResponse status(HttpResponseStatus status) {
     this.status = status;
     return this;
   }
 
-  public Response bodyJson(Object jsonBodyObject) {
+  public AsyncHttpResponse bodyJson(Object jsonBodyObject) {
     String jsonBodyString = asyncHttpServer.getJsonHandler().toJsonString(jsonBodyObject);
     bodyString(jsonBodyString);
     headerContentTypeApplicationJson();
     return this;
   }
 
-  public Response bodyString(String bodyString) {
+  public AsyncHttpResponse bodyString(String bodyString) {
     return bodyString(bodyString, UTF_8);
   }
 
-  public Response bodyString(String bodyString, Charset charset) {
+  public AsyncHttpResponse bodyString(String bodyString, Charset charset) {
     if (bodyString!=null) {
       contentStringForLog = bodyString; // the log is produced in getHttpResponse() below
       byteBuf.writeBytes(bodyString.getBytes(charset));
@@ -107,22 +108,22 @@ public class Response {
     headers.add(httpHeaders);
   }
 
-  public Response header(String name, String value) {
+  public AsyncHttpResponse header(String name, String value) {
     headers.add(name, value);
     return this;
   }
 
-  public Response headerContentType(String contentType) {
+  public AsyncHttpResponse headerContentType(String contentType) {
     header(CONTENT_TYPE, contentType);
     return this;
   }
 
-  public Response headerContentTypeApplicationJson() {
+  public AsyncHttpResponse headerContentTypeApplicationJson() {
     headerContentType("application/json");
     return this;
   }
 
-  public Response headerContentTypeTextPlain() {
+  public AsyncHttpResponse headerContentTypeTextPlain() {
     headerContentType("text/plain");
     return this;
   }

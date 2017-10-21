@@ -16,7 +16,7 @@
  */
 package io.rockscript;
 
-import io.rockscript.request.RequestExecutorService;
+import io.rockscript.cqrs.CommandExecutorService;
 import io.rockscript.engine.Script;
 import io.rockscript.engine.ScriptExecution;
 import io.rockscript.engine.TestConfiguration;
@@ -30,8 +30,8 @@ public class ErrorTest extends ScriptTest {
   protected static Logger log = LoggerFactory.getLogger(ErrorTest.class);
 
   @Override
-  protected RequestExecutorService initializeScriptService() {
-    // This ensures that each test will get a new RequestExecutorService
+  protected CommandExecutorService initializeScriptService() {
+    // This ensures that each test will get a new CommandExecutorService
     // so that the tests can customize the import resolver without
     // polluting any cached script services.
     return new TestConfiguration().build();

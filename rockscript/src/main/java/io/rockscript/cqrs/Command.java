@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.request;
+package io.rockscript.cqrs;
 
 import io.rockscript.engine.Configuration;
 
-public abstract class CommandImpl<R extends CommandResponse> implements Command<R> {
+/** Abstract base class for all commands and queries.
+ * All commands are serializable with Gson. */
+public abstract class Command<R extends Response> {
 
   /** transient because this field should not be serialized when using Gson */
   transient private Configuration configuration;
@@ -26,16 +28,15 @@ public abstract class CommandImpl<R extends CommandResponse> implements Command<
    * When using this constructor, make sure that
    * {@link #setConfiguration(Configuration)} is called
    * before {@link #execute()} is invoked. */
-  public CommandImpl() {
+  public Command() {
   }
 
-  public CommandImpl(Configuration configuration) {
+  public Command(Configuration configuration) {
     this.configuration = configuration;
   }
 
   protected abstract R execute(Configuration configuration);
 
-  @Override
   public R execute() {
     return execute(configuration);
   }

@@ -19,10 +19,10 @@ import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.ImportObject;
 import io.rockscript.activity.ImportProvider;
-import io.rockscript.request.command.EngineStartScriptExecutionResponse;
-import io.rockscript.request.RequestExecutorService;
+import io.rockscript.cqrs.commands.EngineStartScriptExecutionResponse;
+import io.rockscript.cqrs.CommandExecutorService;
 import io.rockscript.engine.Script;
-import io.rockscript.request.command.StartScriptExecutionCommand;
+import io.rockscript.cqrs.commands.StartScriptExecutionCommand;
 import io.rockscript.engine.impl.ScriptStore;
 
 import java.util.List;
@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 public class TestImportObject extends ImportObject implements ImportProvider {
 
   private TestResult testResult;
-  private RequestExecutorService requestExecutorService;
+  private CommandExecutorService commandExecutorService;
 
   public TestImportObject(TestResult testResult) {
     super("rockscript.io/test");
@@ -48,7 +48,7 @@ public class TestImportObject extends ImportObject implements ImportProvider {
           return ActivityOutput.error("No script matched name patter "+scriptNamePattern);
         }
 
-        response = requestExecutorService.execute(new StartScriptExecutionCommand()
+        response = commandExecutorService.execute(new StartScriptExecutionCommand()
             .scriptId(scriptId)
             .input(input));
 
@@ -110,7 +110,7 @@ public class TestImportObject extends ImportObject implements ImportProvider {
     return this;
   }
 
-  public void setRequestExecutorService(RequestExecutorService requestExecutorService) {
-    this.requestExecutorService = requestExecutorService;
+  public void setCommandExecutorService(CommandExecutorService commandExecutorService) {
+    this.commandExecutorService = commandExecutorService;
   }
 }

@@ -8,7 +8,7 @@ The following terms are used throughout this agreement:
 
 **Contribution** - any type of work that is submitted to a Project, including any modifications or additions to existing work.
 
-**Submitted** - conveyed to a Project via a pull request, commit, issue, or any form of electronic, written, or verbal communication with RockScript.io, contributors or maintainers.
+**Submitted** - conveyed to a Project via a pull command, commit, issue, or any form of electronic, written, or verbal communication with RockScript.io, contributors or maintainers.
 
 #### 1. Grant of Copyright License.
 

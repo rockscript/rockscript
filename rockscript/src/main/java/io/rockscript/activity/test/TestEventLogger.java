@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.rockscript.activity.test;
 
-package io.rockscript.request;
+import io.rockscript.engine.impl.Event;
+import io.rockscript.engine.impl.EventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import io.rockscript.engine.Configuration;
+public class TestEventLogger implements EventListener {
 
-public class RequestExecutorServiceImpl implements RequestExecutorService {
+  static final Logger log = LoggerFactory.getLogger(TestEventLogger.class.getName());
 
-  protected Configuration configuration;
-
-  public RequestExecutorServiceImpl(Configuration configuration) {
-    this.configuration = configuration;
+  TestResult testResult;
+  EventListener next;
+  public TestEventLogger(TestResult testResult, EventListener next) {
+    this.testResult = testResult;
+    this.next = next;
   }
-
   @Override
-  public <R extends CommandResponse> R execute(Command<R> command) {
-    CommandImpl<R> commandImpl = (CommandImpl<R>) command;
-    commandImpl.setConfiguration(configuration);
-    return commandImpl.execute();
-  }
-
-  public Configuration getConfiguration() {
-    return configuration;
+  public void handle(Event event) {
+    testResult.addEvent(event);
+    log.debug(event.toString());
+    next.handle(event);
   }
 }

@@ -21,6 +21,7 @@ import io.netty.handler.codec.http.router.Router;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ServiceLoader;
 
 public class AsyncHttpServerConfiguration {
 
@@ -285,5 +286,17 @@ public class AsyncHttpServerConfiguration {
 
   public DefaultHttpHeaders getDefaultResponseHeaders() {
     return defaultResponseHeaders;
+  }
+
+  /** Load EventHandlerModule's from the classpath using ServiceLoader,
+   * to add a module, add the classname in a resource file called
+   * META-INF/services/io.rockscript.netty.router.AsyncHttpServerModule */
+  public AsyncHttpServerConfiguration loadAsyncHttpServerModulesFromClassPath() {
+    // Load pluggable requesthandler dynamically
+    ServiceLoader<AsyncHttpServerModule> requestHandlers = ServiceLoader.load(AsyncHttpServerModule.class);
+    for (AsyncHttpServerModule asyncHttpServerModule : requestHandlers) {
+      asyncHttpServerModule.register(this);
+    }
+    return this;
   }
 }

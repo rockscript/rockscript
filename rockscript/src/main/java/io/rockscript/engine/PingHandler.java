@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, RockScript.io. All rights reserved.
+ * Copyright ©2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.request;
+package io.rockscript.engine;
 
-import io.rockscript.engine.EngineException;
+import io.rockscript.netty.router.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/** Abstract base class for all commands and queries.
- * All commands are serializable with Gson. */
-public interface Command<R extends CommandResponse> {
+@Get("/ping")
+public class PingHandler implements RequestHandler {
 
-  /** @throws EngineException */
-  R execute();
+  static Logger log = LoggerFactory.getLogger(PingHandler.class);
+
+  @Override
+  public void handle(AsyncHttpRequest request, AsyncHttpResponse response, Context context) {
+    response.statusOk();
+    response.bodyString("pong");
+    response.headerContentTypeTextPlain();
+    response.send();
+  }
 }

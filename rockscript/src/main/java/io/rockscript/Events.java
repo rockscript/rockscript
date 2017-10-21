@@ -16,14 +16,15 @@
 package io.rockscript;
 
 import com.google.gson.reflect.TypeToken;
-import io.rockscript.engine.EventsQuery;
-import io.rockscript.engine.EventsResponse;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
+
+import java.util.List;
+import java.util.Map;
 
 public class Events extends ClientCommand {
 
@@ -59,9 +60,7 @@ public class Events extends ClientCommand {
   @Override
   public void execute() {
     HttpRequest request = createHttp()
-      .newPost(server + "/query")
-      .bodyObject(new EventsQuery()
-        .scriptExecutionId(scriptExecutionId))
+      .newGet(server + "/events?scriptExecutionId="+scriptExecutionId)
       .headerContentTypeApplicationJson();
 
     log(request);
@@ -70,19 +69,18 @@ public class Events extends ClientCommand {
 
     log(response);
 
-    EventsResponse eventsResponse = response
-      .getBodyAs(new TypeToken<EventsResponse>(){}.getType());
-
     if (response.getStatus()==200) {
       log("Events in human readable form:");
-      for (Event event: eventsResponse.getEvents()) {
+      List<Event> events = response
+        .getBodyAs(new TypeToken<List<Event>>(){}.getType());
+      for (Event event: events) {
         log("  "+event.toString());
       }
-    } else if (eventsResponse.getError()!=null) {
-      log("Events query error: "+eventsResponse.getError());
-
     } else {
-      log("Invalid response status: "+response.getStatus());
+      String message = (String) response
+        .getBodyAs(Map.class)
+        .get("message");
+      log("Events query error: "+message);
     }
   }
 

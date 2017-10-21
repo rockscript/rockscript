@@ -18,5 +18,5 @@ package io.rockscript.netty.router;
 
 public interface RequestHandler {
 
-  void handle(Request request, Response response, Context context);
+  void handle(AsyncHttpRequest request, AsyncHttpResponse response, Context context);
 }

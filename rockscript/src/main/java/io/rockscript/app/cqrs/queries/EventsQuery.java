@@ -1,5 +1,5 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,38 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.server.handlers;
+package io.rockscript.app.cqrs.queries;
 
 import io.rockscript.engine.Configuration;
+import io.rockscript.engine.impl.Event;
 import io.rockscript.netty.router.*;
-import io.rockscript.request.Command;
-import io.rockscript.request.CommandImpl;
-import io.rockscript.request.CommandResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
 
-@Post("/command")
-public class CommandHandler implements RequestHandler {
+/** Query to fetch events */
+@Get("/events")
+public class EventsQuery implements RequestHandler {
 
-  static Logger log = LoggerFactory.getLogger(CommandHandler.class);
+  static Logger log = LoggerFactory.getLogger(EventsQuery.class);
 
   @Override
-  public void handle(Request request, Response response, Context context) {
-    CommandImpl<?> command = (CommandImpl<?>) request.getBodyJson(Command.class);
+  public void handle(AsyncHttpRequest request, AsyncHttpResponse response, Context context) {
     Configuration configuration = context.get(Configuration.class);
-    command.setConfiguration(configuration);
-
+    String scriptExecutionId = request.getQueryParameter("scriptExecutionId");
     try {
-      CommandResponse commandResponse = command.execute();
-      response.bodyJson(commandResponse);
-      response.status(commandResponse.getStatus());
+      List<? extends Event> events = null;
+      if (scriptExecutionId!=null) {
+        events = configuration
+          .getEventStore()
+          .findEventsByScriptExecutionId(scriptExecutionId);
+      } else {
+        events = configuration
+          .getEventStore()
+          .getEvents();
+      }
+      response.bodyJson(events);
+      response.status(200);
       response.send();
 
     } catch (Exception e) {
-      log.debug("Exception while executing command "+command+": "+e.getMessage(), e);
+      log.debug("Exception while querying events: " + e.getMessage(), e);
       response.bodyJson(hashMap(entry("message", "Error: " + e.getMessage())));
       response.status(500);
       response.send();

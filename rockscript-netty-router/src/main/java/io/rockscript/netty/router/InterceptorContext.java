@@ -22,11 +22,11 @@ public class InterceptorContext {
   int index = -1;
   List<Interceptor> interceptors;
   RequestHandler requestHandler;
-  Request request;
-  Response response;
+  AsyncHttpRequest request;
+  AsyncHttpResponse response;
   AsyncHttpServer asyncHttpServer;
 
-  public InterceptorContext(List<Interceptor> interceptors, RequestHandler requestHandler, Request request, Response response, AsyncHttpServer asyncHttpServer) {
+  public InterceptorContext(List<Interceptor> interceptors, RequestHandler requestHandler, AsyncHttpRequest request, AsyncHttpResponse response, AsyncHttpServer asyncHttpServer) {
     this.interceptors = interceptors;
     this.requestHandler = requestHandler;
     this.request = request;
@@ -37,17 +37,18 @@ public class InterceptorContext {
   public void next() {
     index++;
     if (index<interceptors.size()) {
-      interceptors.get(index).intercept(this);
+      Interceptor interceptor = interceptors.get(index);
+      interceptor.intercept(this);
     } else if (index==interceptors.size()) {
       requestHandler.handle(request, response, asyncHttpServer.getContext());
     }
   }
 
-  public Request getRequest() {
+  public AsyncHttpRequest getRequest() {
     return request;
   }
 
-  public Response getResponse() {
+  public AsyncHttpResponse getResponse() {
     return response;
   }
 

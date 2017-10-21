@@ -76,15 +76,15 @@ public class AsyncHttpServer {
 
   public void handleRequest(FullHttpRequest fullHttpRequest, ChannelHandlerContext ctx) {
     RouteResult<Class<?>> route = router.route(fullHttpRequest.getMethod(), fullHttpRequest.getUri());
-    Request request = new Request(this, fullHttpRequest, route);
-    Response response = new Response(this, fullHttpRequest, ctx);
+    AsyncHttpRequest request = new AsyncHttpRequest(this, fullHttpRequest, route);
+    AsyncHttpResponse response = new AsyncHttpResponse(this, fullHttpRequest, ctx);
     if (defaultResponseHeaders!=null) {
       response.headers(defaultResponseHeaders);
     }
 
     try {
       if (route!=null) {
-        Request.log.debug(">>> "+fullHttpRequest.getMethod()+" "+fullHttpRequest.getUri());
+        AsyncHttpRequest.log.debug(">>> " + fullHttpRequest.getMethod() + " " + fullHttpRequest.getUri());
         Class<?> requestHandlerClass = route.target();
 
         RequestHandler requestHandler = instantiate(requestHandlerClass);
@@ -148,12 +148,12 @@ public class AsyncHttpServer {
   }
 
   public void handleDecoderFailure(Throwable t, ChannelHandlerContext ctx) {
-    log.error("Request decoding failed: "+t.getMessage(), t);
+    log.error("AsyncHttpRequest decoding failed: "+t.getMessage(), t);
     t.printStackTrace();
   }
   
   public void requestException(Throwable t, ChannelHandlerContext ctx) {
-    log.error("Request exception: "+t.getMessage(), t);
+    log.error("AsyncHttpRequest exception: "+t.getMessage(), t);
   }
 
   public Context getContext() {

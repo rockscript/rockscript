@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.request.command;
+package io.rockscript.cqrs.commands;
 
 import io.rockscript.engine.ParseError;
 import io.rockscript.engine.Script;
-import io.rockscript.request.CommandResponse;
+import io.rockscript.cqrs.Response;
 
 import java.util.List;
 
-/** Response from the DeployScriptCommand.
+/** AsyncHttpResponse from the DeployScriptCommand.
  *
  * EngineDeployScriptResponse are serializable with Gson. */
-public class EngineDeployScriptResponse extends DeployScriptResponse implements CommandResponse {
+public class EngineDeployScriptResponse extends DeployScriptResponse implements Response {
 
   /** for gson serialization */
   EngineDeployScriptResponse() {

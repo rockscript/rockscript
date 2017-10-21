@@ -19,9 +19,9 @@ import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.engine.*;
 import io.rockscript.engine.impl.EngineScriptExecution;
-import io.rockscript.request.RequestExecutorService;
-import io.rockscript.request.command.EndActivityCommand;
-import io.rockscript.request.command.StartScriptExecutionCommand;
+import io.rockscript.cqrs.CommandExecutorService;
+import io.rockscript.cqrs.commands.EndActivityCommand;
+import io.rockscript.cqrs.commands.StartScriptExecutionCommand;
 import io.rockscript.test.ScriptExecutionComparator;
 import io.rockscript.test.ScriptTest;
 import org.junit.Test;
@@ -42,8 +42,8 @@ public class SerializationTest extends ScriptTest {
   List<ActivityInput> activityInputs = new ArrayList<>();
 
   @Override
-  protected RequestExecutorService initializeScriptService() {
-    // This ensures that each test will get a new RequestExecutorService
+  protected CommandExecutorService initializeScriptService() {
+    // This ensures that each test will get a new CommandExecutorService
     // so that the tests can customize the import resolver without
     // polluting any cached script services.
     return new TestConfiguration().build();
@@ -65,7 +65,7 @@ public class SerializationTest extends ScriptTest {
             "var response = helloService.hi(system.input.message); \n" +
             "helloService.world(response);");
 
-    EngineScriptExecution engineScriptExecution = requestExecutorService.execute(new StartScriptExecutionCommand()
+    EngineScriptExecution engineScriptExecution = commandExecutorService.execute(new StartScriptExecutionCommand()
         .scriptId(script.getId())
         .input(hashMap(
             entry("message", "hello")
@@ -81,7 +81,7 @@ public class SerializationTest extends ScriptTest {
 
     assertEquals("hello world", activityInput.getArg(0));
 
-    engineScriptExecution = requestExecutorService.execute(new EndActivityCommand()
+    engineScriptExecution = commandExecutorService.execute(new EndActivityCommand()
           .continuationReference(activityInput.getContinuationReference())
           .result(null))
         .getEngineScriptExecution();

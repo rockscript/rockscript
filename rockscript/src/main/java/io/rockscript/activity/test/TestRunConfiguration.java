@@ -24,6 +24,6 @@ public class TestRunConfiguration extends TestConfiguration {
   public TestRunConfiguration(Configuration engineConfiguration, TestImportObject testImportObject, TestResult testResult) {
     getImportResolver().add(testImportObject);
     this.scriptStore = new ScriptStore(this, engineConfiguration.getScriptStore());
-    this.eventListener = new TestLogger(testResult, eventStore);
+    this.eventListener = new TestEventLogger(testResult, eventStore);
   }
 }
