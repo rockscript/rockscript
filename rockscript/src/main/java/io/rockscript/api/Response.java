@@ -1,4 +1,4 @@
-package io.rockscript.cqrs;
+package io.rockscript.api;
 
 public interface Response {
 

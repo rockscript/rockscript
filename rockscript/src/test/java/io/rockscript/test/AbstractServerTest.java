@@ -18,9 +18,11 @@ package io.rockscript.test;
 import com.google.gson.Gson;
 import io.rockscript.Server;
 import io.rockscript.ServerConfiguration;
-import io.rockscript.cqrs.Command;
-import io.rockscript.cqrs.CommandExecutorService;
-import io.rockscript.cqrs.Response;
+import io.rockscript.api.Command;
+import io.rockscript.api.CommandExecutorService;
+import io.rockscript.api.CommandExecutorServiceImpl;
+import io.rockscript.api.Response;
+import io.rockscript.engine.Configuration;
 import io.rockscript.http.Http;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
@@ -72,6 +74,10 @@ public abstract class AbstractServerTest {
 
   public CommandExecutorService getCommandExecutorService() {
     return server.getCommandExecutorService();
+  }
+
+  public Configuration getConfiguration() {
+    return ((CommandExecutorServiceImpl)getCommandExecutorService()).getConfiguration();
   }
 
   public static class TestServer extends Server {

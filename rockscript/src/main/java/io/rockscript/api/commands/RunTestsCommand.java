@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.cqrs.commands;
+package io.rockscript.api.commands;
 
 import io.rockscript.activity.test.*;
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.Script;
 import io.rockscript.engine.impl.*;
-import io.rockscript.cqrs.Command;
-import io.rockscript.cqrs.CommandExecutorService;
+import io.rockscript.api.Command;
+import io.rockscript.api.CommandExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,15 +32,8 @@ public class RunTestsCommand extends Command<TestResults> {
 
   protected String tests = ".*\\.rst";
 
-  public RunTestsCommand() {
-  }
-
-  public RunTestsCommand(Configuration configuration) {
-    super(configuration);
-  }
-
   @Override
-  protected TestResults execute(Configuration configuration) {
+  public TestResults execute(Configuration configuration) {
     TestResults testResults = new TestResults();
 
     ScriptStore scriptStore = configuration.getScriptStore();

@@ -15,14 +15,14 @@
  */
 package io.rockscript.test;
 
-import io.rockscript.cqrs.Command;
-import io.rockscript.cqrs.CommandExecutorService;
-import io.rockscript.cqrs.CommandExecutorServiceImpl;
-import io.rockscript.cqrs.Response;
-import io.rockscript.cqrs.commands.DeployScriptCommand;
-import io.rockscript.cqrs.commands.EndActivityCommand;
-import io.rockscript.cqrs.commands.EngineStartScriptExecutionResponse;
-import io.rockscript.cqrs.commands.StartScriptExecutionCommand;
+import io.rockscript.api.Command;
+import io.rockscript.api.CommandExecutorService;
+import io.rockscript.api.CommandExecutorServiceImpl;
+import io.rockscript.api.Response;
+import io.rockscript.api.commands.DeployScriptCommand;
+import io.rockscript.api.commands.EndActivityCommand;
+import io.rockscript.api.commands.EngineStartScriptExecutionResponse;
+import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.Script;
 import io.rockscript.engine.ScriptExecution;

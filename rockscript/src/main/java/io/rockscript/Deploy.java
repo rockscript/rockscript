@@ -15,8 +15,8 @@
  */
 package io.rockscript;
 
-import io.rockscript.cqrs.commands.DeployScriptCommand;
-import io.rockscript.cqrs.commands.DeployScriptResponse;
+import io.rockscript.api.commands.DeployScriptCommand;
+import io.rockscript.api.commands.DeployScriptResponse;
 import io.rockscript.engine.ParseError;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;

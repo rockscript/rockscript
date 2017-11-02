@@ -35,7 +35,6 @@ public class RemoteActivity extends AbstractActivity {
   static Logger log = LoggerFactory.getLogger(RemoteActivity.class);
 
   String url;
-  String activityName;
 
   public RemoteActivity(String url, String activityName) {
     super(url, activityName, null);
@@ -45,6 +44,7 @@ public class RemoteActivity extends AbstractActivity {
       this.url = url;
     }
     this.activityName = activityName;
+    this.serviceName = url;
   }
 
   @Override

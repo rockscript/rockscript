@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.cqrs.commands;
+package io.rockscript.api.commands;
 
 import io.rockscript.engine.Configuration;
+import io.rockscript.engine.Script;
+import io.rockscript.engine.impl.EngineScript;
+import io.rockscript.engine.impl.Parse;
 import io.rockscript.engine.impl.ScriptStore;
-import io.rockscript.cqrs.Command;
+import io.rockscript.api.Command;
 
 /** Deploys a new script version to the script service.
  *
@@ -39,18 +42,34 @@ public class DeployScriptCommand extends Command<EngineDeployScriptResponse> {
   protected String scriptName;
   protected String scriptText;
 
-  /** used by gson deserialization */
-  public DeployScriptCommand() {
-  }
-
-  public DeployScriptCommand(Configuration configuration) {
-    super(configuration);
-  }
-
   @Override
-  protected EngineDeployScriptResponse execute(Configuration configuration) {
+  public EngineDeployScriptResponse execute(Configuration configuration) {
     ScriptStore scriptStore = configuration.getScriptStore();
-    return scriptStore.deploy(scriptName, scriptText);
+    String scriptName1 = scriptName;
+    Script script = new Script();
+    script.setText(scriptText);
+
+    if (scriptName1==null) {
+      scriptName1 = "Unnamed script";
+    }
+    script.setName(scriptName1);
+
+    Parse parse = scriptStore.parseScript(script);
+    if (!parse.hasErrors()) {
+      String id = script.getId();
+      if (id==null) {
+        id = configuration.getScriptIdGenerator().createId();
+        script.setId(id);
+      }
+
+      EngineScript engineScript = parse.getEngineScript();
+      scriptStore.scriptAstsById.put(id, engineScript);
+
+      // storeScript also assigns the version
+      scriptStore.storeScript(script);
+    }
+
+    return new EngineDeployScriptResponse(script, parse.getErrors());
   }
 
   public String getScriptName() {

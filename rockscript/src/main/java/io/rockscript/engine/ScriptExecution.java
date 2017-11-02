@@ -29,7 +29,7 @@ import java.util.Map;
 public class ScriptExecution {
 
   String id;
-  Script script;
+//  Script script;
   Map<String,Object> variables;
   List<ActivityContinuation> activityContinuations;
   Instant start;
@@ -40,7 +40,7 @@ public class ScriptExecution {
 
   public ScriptExecution(EngineScriptExecution engineScriptExecution) {
     this.id = engineScriptExecution.getId();
-    this.script = engineScriptExecution.getEngineScript().getScript();
+//    this.script = engineScriptExecution.getEngineScript().getScript();
     this.start = engineScriptExecution.getStart();
     this.end = engineScriptExecution.getEnded();
     scanVariables(engineScriptExecution.getVariables());
@@ -75,9 +75,9 @@ public class ScriptExecution {
     }
   }
 
-  public Script getScript() {
-    return script;
-  }
+//  public Script getScript() {
+//    return script;
+//  }
 
   public List<ActivityContinuation> getActivityContinuations() {
     return activityContinuations;

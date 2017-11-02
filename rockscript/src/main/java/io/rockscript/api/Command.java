@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.cqrs;
+package io.rockscript.api;
 
 import io.rockscript.engine.Configuration;
 
@@ -21,27 +21,6 @@ import io.rockscript.engine.Configuration;
  * All commands are serializable with Gson. */
 public abstract class Command<R extends Response> {
 
-  /** transient because this field should not be serialized when using Gson */
-  transient private Configuration configuration;
+  public abstract R execute(Configuration configuration);
 
-  /** This constructor is used for json serialization.
-   * When using this constructor, make sure that
-   * {@link #setConfiguration(Configuration)} is called
-   * before {@link #execute()} is invoked. */
-  public Command() {
-  }
-
-  public Command(Configuration configuration) {
-    this.configuration = configuration;
-  }
-
-  protected abstract R execute(Configuration configuration);
-
-  public R execute() {
-    return execute(configuration);
-  }
-
-  public void setConfiguration(Configuration configuration) {
-    this.configuration = configuration;
-  }
 }

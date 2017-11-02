@@ -22,7 +22,7 @@ public class HttpImportProvider extends ImportObject implements ImportProvider {
 
   public HttpImportProvider() {
     super("rockscript.io/http");
-    put("get", HttpActivity.GET);
+    put(HttpActivity.GET);
   }
 
   @Override

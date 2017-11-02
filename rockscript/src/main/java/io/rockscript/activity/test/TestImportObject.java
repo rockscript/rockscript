@@ -19,10 +19,10 @@ import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.ImportObject;
 import io.rockscript.activity.ImportProvider;
-import io.rockscript.cqrs.commands.EngineStartScriptExecutionResponse;
-import io.rockscript.cqrs.CommandExecutorService;
+import io.rockscript.api.commands.EngineStartScriptExecutionResponse;
+import io.rockscript.api.CommandExecutorService;
 import io.rockscript.engine.Script;
-import io.rockscript.cqrs.commands.StartScriptExecutionCommand;
+import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.engine.impl.ScriptStore;
 
 import java.util.List;

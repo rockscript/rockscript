@@ -16,7 +16,7 @@
  */
 package io.rockscript;
 
-import io.rockscript.cqrs.CommandExecutorService;
+import io.rockscript.api.CommandExecutorService;
 import io.rockscript.engine.Script;
 import io.rockscript.engine.ScriptExecution;
 import io.rockscript.engine.TestConfiguration;

@@ -17,10 +17,10 @@ package io.rockscript;
 
 import com.google.gson.reflect.TypeToken;
 import io.rockscript.engine.impl.Event;
-import io.rockscript.cqrs.commands.DeployScriptCommand;
-import io.rockscript.cqrs.commands.EngineDeployScriptResponse;
-import io.rockscript.cqrs.commands.EngineStartScriptExecutionResponse;
-import io.rockscript.cqrs.commands.StartScriptExecutionCommand;
+import io.rockscript.api.commands.DeployScriptCommand;
+import io.rockscript.api.commands.EngineDeployScriptResponse;
+import io.rockscript.api.commands.EngineStartScriptExecutionResponse;
+import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.test.AbstractServerTest;
 import io.rockscript.test.SimpleImportProvider;
 import org.junit.Test;
@@ -41,7 +41,8 @@ public class ServerTest extends AbstractServerTest {
   public void testEvents() {
     EngineDeployScriptResponse deployScriptResponse = newPost("command")
       .bodyObject(new DeployScriptCommand()
-        .scriptText("var http = system.import('rockscript.io/http'); \n" +
+        .scriptText("var simple = system.import('rockscript.io/simple'); \n" +
+                    "simple.wait();" +
                     "var msg = {hello: 'world'};"))
       .execute()
       .assertStatusOk()

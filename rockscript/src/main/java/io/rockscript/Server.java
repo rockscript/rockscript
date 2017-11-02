@@ -17,15 +17,12 @@ package io.rockscript;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import io.rockscript.cqrs.Command;
-import io.rockscript.cqrs.CommandExecutorService;
-import io.rockscript.cqrs.CommandHandler;
-import io.rockscript.cqrs.CommandsModule;
-import io.rockscript.cqrs.commands.DeployScriptCommand;
-import io.rockscript.cqrs.commands.EndActivityCommand;
-import io.rockscript.cqrs.commands.RunTestsCommand;
-import io.rockscript.cqrs.commands.StartScriptExecutionCommand;
-import io.rockscript.app.cqrs.queries.EventsQuery;
+import io.rockscript.api.*;
+import io.rockscript.api.commands.DeployScriptCommand;
+import io.rockscript.api.commands.EndActivityCommand;
+import io.rockscript.api.commands.RunTestsCommand;
+import io.rockscript.api.commands.StartScriptExecutionCommand;
+import io.rockscript.api.queries.EventsQuery;
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.DevConfiguration;
 import io.rockscript.engine.PingHandler;
@@ -126,7 +123,7 @@ public class Server extends CliCommand {
       commandsModule.registerCommands(polymorphicTypeAdapterFactory);
     }
     return polymorphicTypeAdapterFactory
-      .typeName(new TypeToken<Command>(){}, "request")
+      .typeName(new TypeToken<Command>(){}, "command")
       .typeName(DeployScriptCommand.class, "deployScript")
       .typeName(StartScriptExecutionCommand.class, "startScript")
       .typeName(EndActivityCommand.class, "endActivity")

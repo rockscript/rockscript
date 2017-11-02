@@ -20,7 +20,7 @@ import com.google.gson.GsonBuilder;
 import io.rockscript.activity.test.TestError;
 import io.rockscript.activity.test.TestResult;
 import io.rockscript.activity.test.TestResults;
-import io.rockscript.cqrs.commands.RunTestsCommand;
+import io.rockscript.api.commands.RunTestsCommand;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
 import org.apache.commons.cli.CommandLine;

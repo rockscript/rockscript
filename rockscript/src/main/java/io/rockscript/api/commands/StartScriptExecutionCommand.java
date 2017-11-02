@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.cqrs.commands;
+package io.rockscript.api.commands;
 
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.impl.EngineScriptExecution;
-import io.rockscript.cqrs.Command;
+import io.rockscript.api.Command;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -30,15 +30,8 @@ public class StartScriptExecutionCommand extends Command<EngineStartScriptExecut
   protected String scriptId;
   protected Object input;
 
-  public StartScriptExecutionCommand() {
-  }
-
-  public StartScriptExecutionCommand(Configuration configuration) {
-    super(configuration);
-  }
-
   @Override
-  protected EngineStartScriptExecutionResponse execute(Configuration configuration) {
+  public EngineStartScriptExecutionResponse execute(Configuration configuration) {
     EngineScriptExecution engineScriptExecution = configuration
       .getEngine()
       .startScriptExecution(scriptName, scriptId, input);

@@ -1,9 +1,9 @@
 package io.rockscript.test;
 
 import io.rockscript.activity.*;
-import io.rockscript.cqrs.commands.EndActivityCommand;
-import io.rockscript.cqrs.commands.EngineEndActivityResponse;
-import io.rockscript.cqrs.CommandExecutorService;
+import io.rockscript.api.commands.EndActivityCommand;
+import io.rockscript.api.commands.EngineEndActivityResponse;
+import io.rockscript.api.CommandExecutorService;
 import io.rockscript.engine.impl.ContinuationReference;
 
 import java.util.ArrayList;

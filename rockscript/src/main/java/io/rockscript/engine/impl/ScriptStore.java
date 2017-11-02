@@ -17,7 +17,6 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.engine.Configuration;
-import io.rockscript.cqrs.commands.EngineDeployScriptResponse;
 import io.rockscript.engine.EngineException;
 import io.rockscript.engine.Script;
 
@@ -33,7 +32,7 @@ public class ScriptStore {
   /** maps script name to script versions */
   Map<String, List<Script>> scriptsByName = new HashMap<>();
   /** maps script ids to parsed EngineScript's */
-  Map<String, EngineScript> scriptAstsById = new HashMap<>();
+  public Map<String, EngineScript> scriptAstsById = new HashMap<>();
 
   public ScriptStore(Configuration configuration) {
     this.configuration = configuration;
@@ -102,46 +101,13 @@ public class ScriptStore {
     return null;
   }
 
-  public EngineDeployScriptResponse deploy(String scriptName, String scriptText) {
-    Script script = new Script();
-    script.setText(scriptText);
-
-    if (scriptName ==null) {
-      scriptName = "Unnamed script";
-    }
-    script.setName(scriptName);
-
-    Parse parse = parseScript(script);
-    if (!parse.hasErrors()) {
-      String id = script.getId();
-      if (id==null) {
-        id = configuration.getScriptIdGenerator().createId();
-        script.setId(id);
-      }
-
-      EngineScript engineScript = parse.getEngineScript();
-      scriptAstsById.put(id, engineScript);
-
-      // storeScript also assigns the version
-      storeScript(script);
-    }
-
-    return new EngineDeployScriptResponse(script, parse.getErrors());
-  }
-
   /** Parses the script and initializes
    * the engineScript if parse is succesfull. */
-  Parse parseScript(Script script) {
-    Parse parse = Parse.create(script.getText());
-    if (!parse.hasErrors()) {
-      EngineScript engineScript = parse.getEngineScript();
-      engineScript.setConfiguration(configuration);
-      engineScript.setScript(script);
-    }
-    return parse;
+  public Parse parseScript(Script script) {
+    return Parse.parse(script, configuration);
   }
 
-  void storeScript(Script script) {
+  public void storeScript(Script script) {
     String scriptName = script.getName();
     List<Script> scriptVersions = scriptsByName.get(scriptName);
     if (scriptVersions==null) {

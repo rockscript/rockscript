@@ -15,8 +15,8 @@
  */
 package io.rockscript;
 
-import io.rockscript.cqrs.commands.StartScriptExecutionCommand;
-import io.rockscript.cqrs.commands.StartScriptExecutionResponse;
+import io.rockscript.api.commands.StartScriptExecutionCommand;
+import io.rockscript.api.commands.StartScriptExecutionResponse;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
 import org.apache.commons.cli.CommandLine;

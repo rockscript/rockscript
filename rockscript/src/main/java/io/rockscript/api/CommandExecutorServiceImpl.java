@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rockscript.cqrs;
+package io.rockscript.api;
 
 import io.rockscript.engine.Configuration;
 
@@ -29,8 +29,7 @@ public class CommandExecutorServiceImpl implements CommandExecutorService {
   @Override
   public <R extends Response> R execute(Command<R> command) {
     Command<R> commandImpl = (Command<R>) command;
-    commandImpl.setConfiguration(configuration);
-    return commandImpl.execute();
+    return commandImpl.execute(configuration);
   }
 
   public Configuration getConfiguration() {

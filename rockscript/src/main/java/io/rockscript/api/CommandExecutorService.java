@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.rockscript.cqrs;
+package io.rockscript.api;
 
 /** Access to the RockScript functionality
  *

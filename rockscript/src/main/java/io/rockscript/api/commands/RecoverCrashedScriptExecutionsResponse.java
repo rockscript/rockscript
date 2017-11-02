@@ -1,7 +1,7 @@
-package io.rockscript.cqrs.commands;
+package io.rockscript.api.commands;
 
 import io.rockscript.engine.ScriptExecution;
-import io.rockscript.cqrs.Response;
+import io.rockscript.api.Response;
 
 import java.util.List;
 

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.cqrs.commands;
+package io.rockscript.api.commands;
 
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.EngineScriptExecution;
-import io.rockscript.cqrs.Command;
+import io.rockscript.api.Command;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -29,15 +29,8 @@ public class EndActivityCommand extends Command<EngineEndActivityResponse> {
   protected String executionId;
   protected Object result;
 
-  public EndActivityCommand() {
-  }
-
-  public EndActivityCommand(Configuration configuration) {
-    super(configuration);
-  }
-
   @Override
-  protected EngineEndActivityResponse execute(Configuration configuration) {
+  public EngineEndActivityResponse execute(Configuration configuration) {
     ContinuationReference continuationReference = new ContinuationReference(scriptExecutionId, executionId);
     EngineScriptExecution engineScriptExecution = configuration
         .getEngine()

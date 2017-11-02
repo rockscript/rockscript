@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.cqrs.commands;
+package io.rockscript.api.commands;
 
 public class EndActivityResponse {
 

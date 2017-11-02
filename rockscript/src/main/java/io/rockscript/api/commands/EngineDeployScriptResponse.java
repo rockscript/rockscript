@@ -13,49 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.cqrs.commands;
+package io.rockscript.api.commands;
 
 import io.rockscript.engine.ParseError;
 import io.rockscript.engine.Script;
+import io.rockscript.api.Response;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /** AsyncHttpResponse from the DeployScriptCommand.
  *
  * EngineDeployScriptResponse are serializable with Gson. */
-public class DeployScriptResponse extends Script {
-
-  protected List<ParseError> errors;
+public class EngineDeployScriptResponse extends DeployScriptResponse implements Response {
 
   /** for gson serialization */
-  DeployScriptResponse() {
+  EngineDeployScriptResponse() {
   }
 
-  public DeployScriptResponse(Script script, List<ParseError> errors) {
-    super(script);
-    this.errors = errors;
+  public EngineDeployScriptResponse(Script script, List<ParseError> errors) {
+    super(script, errors);
   }
 
-  public List<ParseError> getErrors() {
-    return errors;
+  @Override
+  public int getStatus() {
+    return !hasErrors() ? 200 : 400;
   }
 
-  public void setErrors(List<ParseError> errors) {
-    this.errors = errors;
-  }
-
-  public boolean hasErrors() {
-    return errors!=null && !errors.isEmpty();
-  }
-
-  public DeployScriptResponse throwIfErrors() {
-    if (hasErrors()) {
-      String errorPerLine = errors.stream()
-        .map(e->e.toString())
-        .collect(Collectors.joining("\n"));
-      throw new RuntimeException("Deploy errors: \n" + errorPerLine);
-    }
-    return this;
+  @Override
+  public EngineDeployScriptResponse throwIfErrors() {
+    return (EngineDeployScriptResponse) super.throwIfErrors();
   }
 }

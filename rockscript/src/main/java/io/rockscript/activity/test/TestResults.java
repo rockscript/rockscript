@@ -15,7 +15,7 @@
  */
 package io.rockscript.activity.test;
 
-import io.rockscript.cqrs.Response;
+import io.rockscript.api.Response;
 
 import java.util.ArrayList;
 

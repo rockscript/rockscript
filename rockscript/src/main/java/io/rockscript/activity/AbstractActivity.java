@@ -20,9 +20,9 @@ import java.util.List;
 
 public abstract class AbstractActivity implements Activity {
 
-  String serviceName;
-  String activityName;
-  List<String> argNames;
+  protected String serviceName;
+  protected String activityName;
+  protected List<String> argNames;
 
   public AbstractActivity(String activityName, String... argNames) {
     this.activityName = activityName;

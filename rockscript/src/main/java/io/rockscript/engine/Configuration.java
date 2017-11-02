@@ -23,8 +23,8 @@ import io.rockscript.engine.impl.*;
 import io.rockscript.engine.job.JobService;
 import io.rockscript.http.GsonCodec;
 import io.rockscript.http.Http;
-import io.rockscript.cqrs.CommandExecutorService;
-import io.rockscript.cqrs.CommandExecutorServiceImpl;
+import io.rockscript.api.CommandExecutorService;
+import io.rockscript.api.CommandExecutorServiceImpl;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
