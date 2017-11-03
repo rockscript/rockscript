@@ -19,13 +19,13 @@ import io.rockscript.api.Command;
 import io.rockscript.api.CommandExecutorService;
 import io.rockscript.api.CommandExecutorServiceImpl;
 import io.rockscript.api.Response;
-import io.rockscript.api.commands.DeployScriptCommand;
+import io.rockscript.api.commands.SaveScriptVersionCommand;
 import io.rockscript.api.commands.EndActivityCommand;
 import io.rockscript.api.commands.EngineStartScriptExecutionResponse;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.engine.Configuration;
-import io.rockscript.engine.Script;
-import io.rockscript.engine.ScriptExecution;
+import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.engine.TestConfiguration;
 import io.rockscript.engine.impl.ContinuationReference;
 import org.junit.After;
@@ -97,27 +97,28 @@ public class ScriptTest {
     return commandExecutorService.execute(command);
   }
 
-  public Script deployScript(String scriptText) {
-    return execute(new DeployScriptCommand()
-        .scriptText(scriptText))
+  public ScriptVersion deployScript(String scriptText) {
+    return execute(new SaveScriptVersionCommand()
+        .scriptText(scriptText)
+        .activate())
       .throwIfErrors();
   }
 
-  public ScriptExecution startScriptExecution(Script script) {
-    return startScriptExecution(script.getId(), null);
+  public ScriptExecution startScriptExecution(ScriptVersion scriptVersion) {
+    return startScriptExecution(scriptVersion.getId(), null);
   }
 
-  public ScriptExecution startScriptExecution(Script script, Object input) {
-    return startScriptExecution(script.getId(), input);
+  public ScriptExecution startScriptExecution(ScriptVersion scriptVersion, Object input) {
+    return startScriptExecution(scriptVersion.getId(), input);
   }
 
-  public ScriptExecution startScriptExecution(String scriptId) {
-    return startScriptExecution(scriptId, null);
+  public ScriptExecution startScriptExecution(String scriptVersionId) {
+    return startScriptExecution(scriptVersionId, null);
   }
 
-  public ScriptExecution startScriptExecution(String scriptId, Object input) {
-    EngineStartScriptExecutionResponse response = commandExecutorService.execute(new StartScriptExecutionCommand()
-        .scriptId(scriptId)
+  public ScriptExecution startScriptExecution(String scriptVersionId, Object input) {
+    EngineStartScriptExecutionResponse response = execute(new StartScriptExecutionCommand()
+        .scriptVersionId(scriptVersionId)
         .input(input));
     return response.getScriptExecution();
   }

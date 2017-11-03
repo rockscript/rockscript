@@ -17,6 +17,7 @@ package io.rockscript;
 
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
+import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.*;
 import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.api.CommandExecutorService;
@@ -60,13 +61,13 @@ public class SerializationTest extends ScriptTest {
         return ActivityOutput.waitForEndActivityCallback();
       });
 
-    Script script = deployScript(
+    ScriptVersion scriptVersion = deployScript(
         "var helloService = system.import('helloService'); \n" +
             "var response = helloService.hi(system.input.message); \n" +
             "helloService.world(response);");
 
     EngineScriptExecution engineScriptExecution = commandExecutorService.execute(new StartScriptExecutionCommand()
-        .scriptId(script.getId())
+        .scriptVersionId(scriptVersion.getId())
         .input(hashMap(
             entry("message", "hello")
         )))

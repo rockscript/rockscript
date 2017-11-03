@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript;
+package io.rockscript.http;
 
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.engine.Script;
-import io.rockscript.engine.ScriptExecution;
+import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.test.HttpTest;
 import io.rockscript.test.HttpTestServer;
 import org.junit.Test;
@@ -33,9 +33,9 @@ import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class HttpSynchronousActivityTest extends HttpTest {
+public class SynchronousActivityHttpTest extends HttpTest {
 
-  protected static Logger log = LoggerFactory.getLogger(HttpSynchronousActivityTest.class);
+  protected static Logger log = LoggerFactory.getLogger(SynchronousActivityHttpTest.class);
 
   List<ActivityInput> activityInputs = new ArrayList<>();
 
@@ -61,11 +61,11 @@ public class HttpSynchronousActivityTest extends HttpTest {
 
   @Test
   public void testHttpActivity() {
-    Script script = deployScript(
+    ScriptVersion scriptVersion = deployScript(
         "var approvals = system.import('localhost:"+PORT+"'); \n" +
             "var currency = approvals.approve('oo',7).currency; ");
 
-    ScriptExecution scriptExecution = startScriptExecution(script);
+    ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
 
     ActivityInput activityInput = activityInputs.get(0);
     assertEquals("EUR", scriptExecution.getVariable("currency"));

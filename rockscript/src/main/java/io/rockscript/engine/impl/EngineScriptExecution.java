@@ -17,7 +17,7 @@ package io.rockscript.engine.impl;
 
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.EngineException;
-import io.rockscript.engine.ScriptExecution;
+import io.rockscript.api.model.ScriptExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,12 +54,12 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
     this.executionMode = ExecutionMode.REBUILDING;
     this.unreplayedEvents = new LinkedList<>(storedEvents);
 
-    log.info("Building script execution from events:");
+    log.info("Building scriptVersion execution from events:");
     this.unreplayedEvents.forEach(e->log.info("  "+e.toString()));
 
     while (!this.unreplayedEvents.isEmpty()) {
       ExecutableEvent executableEvent = (ExecutableEvent) unreplayedEvents.removeFirst();
-      // Script execution events do not have an executionId in the event, only the scriptExecutionId.
+      // ScriptVersion execution events do not have an executionId in the event, only the scriptExecutionId.
       Execution execution = executableEvent.executionId!=null ? findExecutionRecursive(executableEvent.executionId) : this;
       log.info("Reexecuting event: "+executableEvent.toString());
 

@@ -37,21 +37,15 @@ public class LocalEngine implements Engine {
   }
 
   @Override
-  public EngineScriptExecution startScriptExecution(String scriptName, String scriptId, Object input) {
-    EngineScript engineScript;
-    if (scriptId!=null) {
-      engineScript = configuration
-          .getScriptStore()
-          .findScriptAstById(scriptId);
-    } else if (scriptName!=null) {
-      engineScript = configuration
-          .getScriptStore()
-          .findLatestScriptAstByName(scriptName);
-    } else {
-      throw new EngineException("Either scriptName or scriptId are mandatory");
+  public EngineScriptExecution startScriptExecution(String scriptVersionId, Object input) {
+    if (scriptVersionId==null) {
+      throw new EngineException("No scriptVersionId specified");
     }
 
-    EngineException.throwIfNull(engineScript, "Script %s not found", (scriptId!=null?scriptId:scriptName));
+    ScriptStore scriptStore = configuration.getScriptStore();
+    EngineScript engineScript = scriptStore.findScriptAstByScriptVersionId(scriptVersionId);
+
+    EngineException.throwIfNull(engineScript, "ScriptVersion %s not found", scriptVersionId);
 
     String scriptExecutionId = configuration
       .getScriptExecutionIdGenerator()
@@ -94,7 +88,7 @@ public class LocalEngine implements Engine {
           .getEventStore()
           .findScriptExecutionById(scriptExecutionId);
         if (scriptExecution==null) {
-          throw new EngineException("Script execution "+scriptExecutionId+" doesn't exist");
+          throw new EngineException("ScriptVersion execution "+scriptExecutionId+" doesn't exist");
         }
 
         endActivity(scriptExecution, continuationReference, result);

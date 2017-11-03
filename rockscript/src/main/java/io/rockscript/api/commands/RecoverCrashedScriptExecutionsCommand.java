@@ -1,7 +1,7 @@
 package io.rockscript.api.commands;
 
 import io.rockscript.engine.Configuration;
-import io.rockscript.engine.ScriptExecution;
+import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.Command;
 
 import java.util.List;

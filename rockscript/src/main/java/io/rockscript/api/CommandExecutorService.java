@@ -27,7 +27,7 @@ package io.rockscript.api;
  *
  * Use it like this:
  * <code>
- *   EngineDeployScriptResponse response = scriptService.newDeployScriptCommand()
+ *   SaveScriptVersionResponse response = scriptService.newDeployScriptCommand()
  *     .name("Approval")
  *     .scriptText("...the script text...")
  *     .execute();

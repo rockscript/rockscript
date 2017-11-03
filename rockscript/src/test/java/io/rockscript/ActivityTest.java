@@ -19,8 +19,8 @@ package io.rockscript;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.api.CommandExecutorService;
-import io.rockscript.engine.Script;
-import io.rockscript.engine.ScriptExecution;
+import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.engine.TestConfiguration;
 import io.rockscript.engine.impl.ExecutionEvent;
 import io.rockscript.test.ScriptTest;
@@ -55,11 +55,11 @@ public class ActivityTest extends ScriptTest {
         return ActivityOutput.waitForEndActivityCallback();
       });
 
-    Script script = deployScript(
+    ScriptVersion scriptVersion = deployScript(
       "var approvalService = system.import('approvalService'); \n" +
       "approvalService.approve('primus'); ");
 
-    ScriptExecution scriptExecution = startScriptExecution(script);
+    ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
 
     ActivityInput activityInput = activityInputs.get(0);
     assertEquals("primus", activityInput.getArgs().get(0));
@@ -85,12 +85,12 @@ public class ActivityTest extends ScriptTest {
       return ActivityOutput.waitForEndActivityCallback();
       });
 
-    Script script = deployScript(
+    ScriptVersion scriptVersion = deployScript(
       "var approvalService = system.import('approvalService'); \n" +
       "var msg = approvalService.getMessage(); " +
       "approvalService.approve(msg); ");
 
-    ScriptExecution scriptExecution = startScriptExecution(script);
+    ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
 
     ActivityInput activityInput = activityInputs.get(0);
     scriptExecution = endActivity(activityInput.getContinuationReference());
@@ -107,11 +107,11 @@ public class ActivityTest extends ScriptTest {
         return ActivityOutput.endActivity();
       });
 
-    Script script = deployScript(
+    ScriptVersion scriptVersion = deployScript(
       "var approvalService = system.import('approvalService'); \n" +
       "approvalService.approve('primus'); ");
 
-    ScriptExecution scriptExecution = startScriptExecution(script);
+    ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
 
     assertEquals(0, activityInputs.size());
     assertTrue(scriptExecution.isEnded());
@@ -124,11 +124,11 @@ public class ActivityTest extends ScriptTest {
         return ActivityOutput.endActivity("approved");
       });
 
-    Script script = deployScript(
+    ScriptVersion scriptVersion = deployScript(
         "var approvalService = system.import('approvalService'); \n" +
             "var approveResult = approvalService.approve('primus'); ");
 
-    ScriptExecution scriptExecution = startScriptExecution(script);
+    ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
 
     Object approveResult = scriptExecution.getVariable("approveResult");
     assertEquals("approved", approveResult);

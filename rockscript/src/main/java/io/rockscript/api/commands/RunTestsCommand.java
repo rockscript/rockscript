@@ -17,7 +17,7 @@ package io.rockscript.api.commands;
 
 import io.rockscript.activity.test.*;
 import io.rockscript.engine.Configuration;
-import io.rockscript.engine.Script;
+import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.*;
 import io.rockscript.api.Command;
 import io.rockscript.api.CommandExecutorService;
@@ -37,24 +37,24 @@ public class RunTestsCommand extends Command<TestResults> {
     TestResults testResults = new TestResults();
 
     ScriptStore scriptStore = configuration.getScriptStore();
-    List<Script> scriptVersions = scriptStore.findLatestScriptVersionsByNamePattern(tests);
-    for (Script scriptVersion: scriptVersions) {
+    List<ScriptVersion> scriptVersions = scriptStore.findLatestScriptVersionsByNamePattern(tests);
+    for (ScriptVersion scriptVersion: scriptVersions) {
       TestResult testResult = runTest(configuration, scriptVersion);
       testResults.add(testResult);
     }
     return testResults;
   }
 
-  private TestResult runTest(Configuration engineConfiguration, Script script) {
-    TestResult testResult = new TestResult(script.getName());
+  private TestResult runTest(Configuration engineConfiguration, ScriptVersion scriptVersion) {
+    TestResult testResult = new TestResult(scriptVersion.getName());
     TestImportObject testImportObject = new TestImportObject(testResult);
     Configuration testConfiguration = new TestRunConfiguration(engineConfiguration, testImportObject, testResult);
     CommandExecutorService testCommandExecutorService = testConfiguration.build();
     testImportObject.setCommandExecutorService(testCommandExecutorService);
     try {
-      String scriptId = script.getId();
+      String scriptVersionId = scriptVersion.getId();
       testCommandExecutorService.execute(new StartScriptExecutionCommand()
-        .scriptId(scriptId));
+        .scriptVersionId(scriptVersionId));
     } catch (Throwable t) {
       testResult.addError(new TestError(t));
     }

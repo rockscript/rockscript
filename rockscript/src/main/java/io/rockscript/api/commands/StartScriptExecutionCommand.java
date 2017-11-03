@@ -15,9 +15,12 @@
  */
 package io.rockscript.api.commands;
 
+import io.rockscript.api.model.Script;
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.api.Command;
+import io.rockscript.engine.impl.ScriptStore;
+import io.rockscript.netty.router.BadRequestException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -26,16 +29,44 @@ import java.util.Map;
  * StartScriptExecutionCommand's are serializable with Gson */
 public class StartScriptExecutionCommand extends Command<EngineStartScriptExecutionResponse> {
 
-  protected String scriptName;
   protected String scriptId;
+  protected String scriptName;
+  protected String scriptVersionId;
   protected Object input;
 
   @Override
   public EngineStartScriptExecutionResponse execute(Configuration configuration) {
+    if (scriptVersionId==null) {
+      ScriptStore scriptStore = configuration.getScriptStore();
+      Script script = null;
+      if (scriptId!=null) {
+        script = scriptStore.findScriptById(scriptId);
+        BadRequestException.checkNotNull(script, "No script found with id %s", scriptId);
+      } else if (scriptName!=null) {
+        script = scriptStore.findScriptById(scriptName);
+        BadRequestException.checkNotNull(script, "No script found with name %s", scriptName);
+      } else {
+        throw new BadRequestException("No script version specified. Please provide one of scriptId, scriptName or scriptVersionId in the command");
+      }
+      scriptVersionId = script.getActiveScriptVersionId();
+      BadRequestException.checkNotNull(scriptVersionId, "Script %s does not have an active version yet", scriptId);
+    }
+
     EngineScriptExecution engineScriptExecution = configuration
       .getEngine()
-      .startScriptExecution(scriptName, scriptId, input);
+      .startScriptExecution(scriptVersionId, input);
     return new EngineStartScriptExecutionResponse(engineScriptExecution);
+  }
+
+  public String getScriptId() {
+    return this.scriptId;
+  }
+  public void setScriptId(String scriptId) {
+    this.scriptId = scriptId;
+  }
+  public StartScriptExecutionCommand scriptId(String scriptId) {
+    this.scriptId = scriptId;
+    return this;
   }
 
   public String getScriptName() {
@@ -44,7 +75,7 @@ public class StartScriptExecutionCommand extends Command<EngineStartScriptExecut
   public void setScriptName(String scriptName) {
     this.scriptName = scriptName;
   }
-  /** (Optional, but this or {@link #scriptId(String)} is Required) the script
+  /** (Optional, but this or {@link #scriptVersionId(String)} is Required) the script
    * for which the latest version will be started. */
   public StartScriptExecutionCommand scriptName(String scriptName) {
     this.scriptName = scriptName;
@@ -52,16 +83,16 @@ public class StartScriptExecutionCommand extends Command<EngineStartScriptExecut
   }
 
 
-  public String getScriptId() {
-    return this.scriptId;
+  public String getScriptVersionId() {
+    return this.scriptVersionId;
   }
-  public void setScriptId(String scriptId) {
-    this.scriptId = scriptId;
+  public void setScriptVersionId(String scriptVersionId) {
+    this.scriptVersionId = scriptVersionId;
   }
   /** (Optional, but this or {@link #scriptName(String)} is Required) the specific
    * script version that has to be started. */
-  public StartScriptExecutionCommand scriptId(String scriptId) {
-    this.scriptId = scriptId;
+  public StartScriptExecutionCommand scriptVersionId(String scriptVersionId) {
+    this.scriptVersionId = scriptVersionId;
     return this;
   }
 
@@ -90,5 +121,4 @@ public class StartScriptExecutionCommand extends Command<EngineStartScriptExecut
     objectMap.put(propertyName, propertyValue);
     return this;
   }
-
 }

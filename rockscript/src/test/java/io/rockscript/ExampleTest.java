@@ -18,10 +18,10 @@ package io.rockscript;
 
 import io.rockscript.activity.test.TestResult;
 import io.rockscript.activity.test.TestResults;
-import io.rockscript.api.commands.DeployScriptCommand;
-import io.rockscript.api.commands.EngineDeployScriptResponse;
+import io.rockscript.api.commands.SaveScriptVersionCommand;
+import io.rockscript.api.commands.SaveScriptVersionResponse;
 import io.rockscript.api.commands.RunTestsCommand;
-import io.rockscript.engine.ScriptExecution;
+import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.test.ScriptTest;
 import io.rockscript.util.Io;
@@ -76,12 +76,13 @@ public class ExampleTest extends ScriptTest {
     assertEquals(2, testResults.get(0).getErrors().size());
   }
 
-  private EngineDeployScriptResponse deployScriptResource(String fileName) throws FileNotFoundException {
+  private SaveScriptVersionResponse deployScriptResource(String fileName) throws FileNotFoundException {
     File file = new File(fileName);
     String scriptText = Io.toString(new FileInputStream(file));
-    return commandExecutorService.execute(new DeployScriptCommand()
+    return commandExecutorService.execute(new SaveScriptVersionCommand()
         .scriptName(fileName)
-        .scriptText(scriptText))
+        .scriptText(scriptText)
+        .activate())
       .throwIfErrors();
   }
 }

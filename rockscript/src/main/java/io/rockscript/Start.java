@@ -47,14 +47,14 @@ public class Start extends ClientCommand {
   protected Options getOptions() {
     Options options = super.getOptions();
     options.addOption(Option.builder("n")
-      .desc("Script name. The latest version of the script with the " +
+      .desc("ScriptVersion name. The latest version of the script with the " +
             "given name will be started.  The name has to identify one " +
             "script by matching the last part so you don't have to type " +
             "the full name. It's required to provide either sn or sid.")
       .hasArg()
       .build());
     options.addOption(Option.builder("sid")
-      .desc("Script id. This identifies the specific version of a script" +
+      .desc("ScriptVersion id. This identifies the specific version of a script" +
             "to start. It's required to provide either sn or sid.")
       .hasArg()
       .build());
@@ -94,7 +94,7 @@ public class Start extends ClientCommand {
       .headerContentTypeApplicationJson()
       .bodyObject(new StartScriptExecutionCommand()
         .scriptName(scriptName)
-        .scriptId(scriptId)
+        .scriptVersionId(scriptId)
         .input(input)
       );
 

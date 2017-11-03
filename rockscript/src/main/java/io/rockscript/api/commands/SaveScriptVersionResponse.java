@@ -15,23 +15,20 @@
  */
 package io.rockscript.api.commands;
 
-import io.rockscript.engine.ParseError;
-import io.rockscript.engine.Script;
 import io.rockscript.api.Response;
+import io.rockscript.api.model.ScriptVersion;
 
-import java.util.List;
-
-/** AsyncHttpResponse from the DeployScriptCommand.
+/** AsyncHttpResponse from the SaveScriptVersionCommand.
  *
- * EngineDeployScriptResponse are serializable with Gson. */
-public class EngineDeployScriptResponse extends DeployScriptResponse implements Response {
+ * This class is serializable with Gson. */
+public class SaveScriptVersionResponse extends ScriptVersion implements Response {
 
   /** for gson serialization */
-  EngineDeployScriptResponse() {
+  SaveScriptVersionResponse() {
   }
 
-  public EngineDeployScriptResponse(Script script, List<ParseError> errors) {
-    super(script, errors);
+  public SaveScriptVersionResponse(ScriptVersion scriptVersion) {
+    super(scriptVersion);
   }
 
   @Override
@@ -40,7 +37,7 @@ public class EngineDeployScriptResponse extends DeployScriptResponse implements 
   }
 
   @Override
-  public EngineDeployScriptResponse throwIfErrors() {
-    return (EngineDeployScriptResponse) super.throwIfErrors();
+  public SaveScriptVersionResponse throwIfErrors() {
+    return (SaveScriptVersionResponse) super.throwIfErrors();
   }
 }

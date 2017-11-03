@@ -15,9 +15,8 @@
  */
 package io.rockscript.engine.impl;
 
+import io.rockscript.api.model.ParseError;
 import io.rockscript.engine.Configuration;
-import io.rockscript.engine.ParseError;
-import io.rockscript.engine.Script;
 import io.rockscript.engine.antlr.ECMAScriptLexer;
 import io.rockscript.engine.antlr.ECMAScriptParser;
 import io.rockscript.engine.antlr.ECMAScriptParser.*;
@@ -121,13 +120,12 @@ public class Parse {
   /** Creates a Parse and parses the given scriptText.
    * From the returned Parse you can check the
    * {@link #getErrors()} and and get {@link #getEngineScript()}. */
-  public static Parse parse(Script script, Configuration configuration) {
+  public static Parse parse(String scriptText, Configuration configuration) {
     Parse parse = new Parse();
-    parse.parseScript(script.getText());
+    parse.parseScript(scriptText);
     if (!parse.hasErrors()) {
       EngineScript engineScript = parse.getEngineScript();
       engineScript.setConfiguration(configuration);
-      engineScript.setScript(script);
     }
     return parse;
   }

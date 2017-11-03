@@ -17,8 +17,8 @@
 package io.rockscript;
 
 import io.rockscript.api.CommandExecutorService;
-import io.rockscript.engine.Script;
-import io.rockscript.engine.ScriptExecution;
+import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.engine.TestConfiguration;
 import io.rockscript.test.ScriptTest;
 import org.junit.Test;
@@ -44,11 +44,11 @@ public class ErrorTest extends ScriptTest {
         throw new RuntimeException("buzzz");
       });
 
-    Script script = deployScript(
+    ScriptVersion scriptVersion = deployScript(
       "var problematicService = system.import('problematicService'); \n" +
       "problematicService.buzzz(); ");
 
-    ScriptExecution scriptExecution = startScriptExecution(script);
+    ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
 
     getConfiguration().getEventStore().getEvents().forEach(e-> log.debug(e.toString()));
   }

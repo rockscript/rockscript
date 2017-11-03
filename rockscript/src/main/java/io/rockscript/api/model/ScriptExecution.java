@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript.engine;
+package io.rockscript.api.model;
 
+import io.rockscript.engine.ActivityContinuation;
 import io.rockscript.engine.impl.ArgumentsExpressionExecution;
 import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.engine.impl.Execution;
@@ -29,7 +30,7 @@ import java.util.Map;
 public class ScriptExecution {
 
   String id;
-//  Script script;
+//  ScriptVersion script;
   Map<String,Object> variables;
   List<ActivityContinuation> activityContinuations;
   Instant start;
@@ -40,7 +41,7 @@ public class ScriptExecution {
 
   public ScriptExecution(EngineScriptExecution engineScriptExecution) {
     this.id = engineScriptExecution.getId();
-//    this.script = engineScriptExecution.getEngineScript().getScript();
+//    this.script = engineScriptExecution.getEngineScript().getScriptVersion();
     this.start = engineScriptExecution.getStart();
     this.end = engineScriptExecution.getEnded();
     scanVariables(engineScriptExecution.getVariables());
@@ -75,7 +76,7 @@ public class ScriptExecution {
     }
   }
 
-//  public Script getScript() {
+//  public ScriptVersion getScriptVersion() {
 //    return script;
 //  }
 

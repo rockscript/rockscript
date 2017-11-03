@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript;
+package io.rockscript.server;
 
+import io.rockscript.Deploy;
+import io.rockscript.End;
+import io.rockscript.Ping;
+import io.rockscript.Start;
 import io.rockscript.test.AbstractServerTest;
 import io.rockscript.test.SimpleImportProvider;
 import org.junit.Before;
 import org.junit.Test;
 
-public class CliTest extends AbstractServerTest {
+public class CliServerTest extends AbstractServerTest {
 
   @Before
   @Override

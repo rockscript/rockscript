@@ -23,7 +23,7 @@ public abstract class CliCommand {
   protected String[] args;
   protected CommandLine commandLine;
 
-  protected abstract void execute();
+  public abstract void execute();
   protected abstract void logCommandUsage();
   protected abstract Options getOptions();
 

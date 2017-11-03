@@ -18,7 +18,7 @@ package io.rockscript;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.rockscript.api.*;
-import io.rockscript.api.commands.DeployScriptCommand;
+import io.rockscript.api.commands.SaveScriptVersionCommand;
 import io.rockscript.api.commands.EndActivityCommand;
 import io.rockscript.api.commands.RunTestsCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
@@ -80,7 +80,7 @@ public class Server extends CliCommand {
         .parseArgs("-r", "-n", ".*docs/examples.*\\.rs(t)?", ".")
         .execute();
       new Start()
-        .scriptId("s1")
+        .scriptId("sv1")
         .execute();
     }
   }
@@ -124,7 +124,7 @@ public class Server extends CliCommand {
     }
     return polymorphicTypeAdapterFactory
       .typeName(new TypeToken<Command>(){}, "command")
-      .typeName(DeployScriptCommand.class, "deployScript")
+      .typeName(SaveScriptVersionCommand.class, "saveScript")
       .typeName(StartScriptExecutionCommand.class, "startScript")
       .typeName(EndActivityCommand.class, "endActivity")
       .typeName(RunTestsCommand.class, "runTests")

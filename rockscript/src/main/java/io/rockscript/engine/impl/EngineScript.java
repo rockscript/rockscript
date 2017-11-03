@@ -15,7 +15,7 @@
  */
 package io.rockscript.engine.impl;
 
-import io.rockscript.engine.Script;
+import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +23,12 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-/** The Abstract Syntax Tree (AST) of a script. */
+/** The Abstract Syntax Tree (AST) of a script version. */
 public class EngineScript extends SourceElements {
 
   static Logger log = LoggerFactory.getLogger(EngineScript.class);
 
-  Script script;
+  ScriptVersion scriptVersion;
   Configuration configuration;
   List<ScriptElement> elements;
 
@@ -87,11 +87,11 @@ public class EngineScript extends SourceElements {
     return elements;
   }
 
-  public Script getScript() {
-    return script;
+  public ScriptVersion getScriptVersion() {
+    return scriptVersion;
   }
 
-  public void setScript(Script script) {
-    this.script = script;
+  public void setScriptVersion(ScriptVersion scriptVersion) {
+    this.scriptVersion = scriptVersion;
   }
 }

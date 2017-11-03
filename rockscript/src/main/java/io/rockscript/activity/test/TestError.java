@@ -22,7 +22,7 @@ public class TestError {
 
   String message;
   int line;
-  String scriptId;
+  String scriptVersionId;
 
   public TestError(Throwable t) {
     this.message = t.getMessage();
@@ -31,14 +31,14 @@ public class TestError {
       Execution execution = engineException.getExecution();
       if (execution!=null) {
         this.line = execution.getElement().getLocation().getLine();
-        this.scriptId = execution.getEngineScript().getScript().getId();
+        this.scriptVersionId = execution.getEngineScript().getScriptVersion().getId();
       }
     }
   }
 
-  public TestError(String message, String scriptId, int line) {
+  public TestError(String message, String scriptVersionId, int line) {
     this.message = message;
-    this.scriptId = scriptId;
+    this.scriptVersionId = scriptVersionId;
     this.line = line;
   }
 
@@ -46,8 +46,8 @@ public class TestError {
     return message;
   }
 
-  public String getScriptId() {
-    return scriptId;
+  public String getScriptVersionId() {
+    return scriptVersionId;
   }
 
   public int getLine() {
@@ -56,6 +56,6 @@ public class TestError {
 
   @Override
   public String toString() {
-    return "[scriptId:" + scriptId +",line:" + line +"] "+message;
+    return "[scriptId:" + scriptVersionId + ",line:" + line + "] " + message;
   }
 }

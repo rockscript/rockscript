@@ -17,11 +17,12 @@
 package io.rockscript;
 
 import io.rockscript.activity.ActivityOutput;
+import io.rockscript.api.commands.SaveScriptVersionCommand;
+import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.engine.*;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.engine.impl.EventListener;
 import io.rockscript.api.CommandExecutorService;
-import io.rockscript.api.commands.DeployScriptCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.commands.RecoverCrashedScriptExecutionsCommand;
 import io.rockscript.api.commands.RecoverCrashedScriptExecutionsResponse;
@@ -120,8 +121,9 @@ public class CrashTest {
     CrashEventListener eventListener = (CrashEventListener) configuration
         .getEventListener();
 
-    String scriptId = commandExecutorService.execute(new DeployScriptCommand()
-        .scriptText(scriptText))
+    String scriptId = commandExecutorService.execute(new SaveScriptVersionCommand()
+        .scriptText(scriptText)
+        .activate())
       .getId();
     do {
       try  {
@@ -131,7 +133,7 @@ public class CrashTest {
 
         log.debug("\n\n----- Starting script execution and throwing after "+eventsWithoutCrash+" events ------");
         commandExecutorService.execute(new StartScriptExecutionCommand()
-          .scriptId(scriptId));
+          .scriptVersionId(scriptId));
 
       } catch (RuntimeException e) {
         log.debug("----- Recovering script execution and throwing after "+eventsWithoutCrash+" events ------");
@@ -155,11 +157,12 @@ public class CrashTest {
 
   private ScriptExecution createExpectedScriptExecutionState(String scriptText) {
     CommandExecutorService commandExecutorService = createNormalTestEngine();
-    String scriptId = commandExecutorService.execute(new DeployScriptCommand()
-        .scriptText(scriptText))
+    String scriptVersionId = commandExecutorService.execute(new SaveScriptVersionCommand()
+        .scriptText(scriptText)
+        .activate())
       .getId();
     return commandExecutorService.execute(new StartScriptExecutionCommand()
-        .scriptId(scriptId))
+        .scriptVersionId(scriptVersionId))
       .getEngineScriptExecution()
       .toScriptExecution();
   }

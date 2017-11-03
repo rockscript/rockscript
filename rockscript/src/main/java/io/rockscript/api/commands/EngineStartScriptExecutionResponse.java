@@ -16,7 +16,7 @@
 package io.rockscript.api.commands;
 
 
-import io.rockscript.engine.ScriptExecution;
+import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
 import io.rockscript.api.Response;

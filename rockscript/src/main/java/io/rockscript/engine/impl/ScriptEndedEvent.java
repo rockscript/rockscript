@@ -33,7 +33,7 @@ public class ScriptEndedEvent extends ExecutableEvent<EngineScriptExecution> {
   @Override
   public String toString() {
     return "[" + scriptExecutionId + "] " +
-        "Script execution ended";
+        "ScriptVersion execution ended";
   }
 
 }

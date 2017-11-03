@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript;
+package io.rockscript.http;
 
 import io.rockscript.activity.ActivityInput;
-import io.rockscript.engine.Script;
-import io.rockscript.engine.ScriptExecution;
+import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.test.HttpTest;
 import io.rockscript.test.HttpTestServer;
 import org.junit.Test;
@@ -29,9 +29,9 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
-public class HttpAsynchronousActivityTest extends HttpTest {
+public class AsynchronousActivityHttpTest extends HttpTest {
 
-  protected static Logger log = LoggerFactory.getLogger(HttpAsynchronousActivityTest.class);
+  protected static Logger log = LoggerFactory.getLogger(AsynchronousActivityHttpTest.class);
 
   List<ActivityInput> activityInputs = new ArrayList<>();
 
@@ -84,11 +84,11 @@ public class HttpAsynchronousActivityTest extends HttpTest {
   }
 
   private void executeApprovalScript() {
-    Script script = deployScript(
+    ScriptVersion scriptVersion = deployScript(
         "var approvals = system.import('localhost:"+PORT+"'); \n" +
         "approvals.approve('oo',7); ");
 
-    startScriptExecution(script);
+    startScriptExecution(scriptVersion);
 
     ActivityInput activityInput = activityInputs.get(0);
     ScriptExecution scriptExecution = endActivity(activityInput.getContinuationReference());

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.rockscript;
+package io.rockscript.server;
 
 import com.google.gson.reflect.TypeToken;
+import io.rockscript.api.commands.SaveScriptVersionResponse;
+import io.rockscript.api.commands.SaveScriptVersionCommand;
 import io.rockscript.engine.impl.Event;
-import io.rockscript.api.commands.DeployScriptCommand;
-import io.rockscript.api.commands.EngineDeployScriptResponse;
 import io.rockscript.api.commands.EngineStartScriptExecutionResponse;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.test.AbstractServerTest;
@@ -39,20 +39,21 @@ public class ServerTest extends AbstractServerTest {
 
   @Test
   public void testEvents() {
-    EngineDeployScriptResponse deployScriptResponse = newPost("command")
-      .bodyObject(new DeployScriptCommand()
+    SaveScriptVersionResponse saveScriptVersionResponse = newPost("command")
+      .bodyObject(new SaveScriptVersionCommand()
         .scriptText("var simple = system.import('rockscript.io/simple'); \n" +
                     "simple.wait();" +
-                    "var msg = {hello: 'world'};"))
+                    "var msg = {hello: 'world'};")
+        .activate())
       .execute()
       .assertStatusOk()
-      .getBodyAs(EngineDeployScriptResponse.class);
+      .getBodyAs(SaveScriptVersionResponse.class);
 
-    String scriptId = deployScriptResponse.getId();
+    String scriptId = saveScriptVersionResponse.getId();
 
     EngineStartScriptExecutionResponse startScriptResponse = newPost("command")
       .bodyObject(new StartScriptExecutionCommand()
-        .scriptId(scriptId))
+        .scriptVersionId(scriptId))
       .execute()
       .assertStatusOk()
       .getBodyAs(EngineStartScriptExecutionResponse.class);

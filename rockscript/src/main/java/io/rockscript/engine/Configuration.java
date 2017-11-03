@@ -37,6 +37,7 @@ import static io.rockscript.engine.impl.Event.createEventJsonTypeAdapterFactory;
 public abstract class Configuration {
 
   protected IdGenerator scriptIdGenerator;
+  protected IdGenerator scriptVersionIdGenerator;
   protected IdGenerator scriptExecutionIdGenerator;
   protected IdGenerator jobIdGenerator;
 
@@ -57,6 +58,7 @@ public abstract class Configuration {
     this.eventListener = new EventLogger(this, eventStore);
     this.jobIdGenerator = new TestIdGenerator(this, "j");
     this.scriptIdGenerator = new TestIdGenerator(this, "s");
+    this.scriptVersionIdGenerator = new TestIdGenerator(this, "sv");
     this.scriptExecutionIdGenerator = new TestIdGenerator(this, "se");
     this.engine = new LocalEngine(this);
     this.importResolver = new ImportResolver(this);
@@ -181,5 +183,9 @@ public abstract class Configuration {
 
   public JobService getJobService() {
     return jobService;
+  }
+
+  public IdGenerator getScriptVersionIdGenerator() {
+    return scriptVersionIdGenerator;
   }
 }

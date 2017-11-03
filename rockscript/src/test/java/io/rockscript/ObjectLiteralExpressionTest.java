@@ -18,8 +18,8 @@ package io.rockscript;
 
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.api.CommandExecutorService;
-import io.rockscript.engine.Script;
-import io.rockscript.engine.ScriptExecution;
+import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.engine.TestConfiguration;
 import io.rockscript.test.ScriptTest;
 import org.junit.Test;
@@ -50,10 +50,10 @@ public class ObjectLiteralExpressionTest extends ScriptTest {
 
   @Test
   public void testSimpleStaticObjectLiteralExpressionWithIdentifier() {
-    Script script = deployScript(
+    ScriptVersion scriptVersion = deployScript(
         "var o = {msg: 'hello'};");
 
-    ScriptExecution scriptExecution = startScriptExecution(script);
+    ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
     @SuppressWarnings("unchecked")
     Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariable("o");
     assertEquals("hello", o.get("msg"));
@@ -61,10 +61,10 @@ public class ObjectLiteralExpressionTest extends ScriptTest {
 
   @Test
   public void testSimpleStaticObjectLiteralExpressionWithPropertyString() {
-    Script script = deployScript(
+    ScriptVersion scriptVersion = deployScript(
         "var o = {'m s g': 'hello'};");
 
-    ScriptExecution scriptExecution = startScriptExecution(script);
+    ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
     @SuppressWarnings("unchecked")
     Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariable("o");
     assertEquals("hello", o.get("m s g"));
@@ -72,11 +72,11 @@ public class ObjectLiteralExpressionTest extends ScriptTest {
 
   @Test
   public void testDynamicObjectLiteralExpression() {
-    Script script = deployScript(
+    ScriptVersion scriptVersion = deployScript(
         "var greeting = 'hello'; \n"+
         "var o = {msg: greeting}; ");
 
-    ScriptExecution scriptExecution = startScriptExecution(script);
+    ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
     @SuppressWarnings("unchecked")
     Map<String,Object> o = (Map<String, Object>) scriptExecution.getVariable("o");
     assertEquals("hello", o.get("msg"));

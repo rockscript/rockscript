@@ -16,9 +16,11 @@
 
 package io.rockscript.engine.impl;
 
+import io.rockscript.api.model.Script;
+import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.Configuration;
 import io.rockscript.engine.EngineException;
-import io.rockscript.engine.Script;
+import io.rockscript.netty.router.BadRequestException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,10 +31,12 @@ import java.util.regex.Pattern;
 public class ScriptStore {
 
   Configuration configuration;
-  /** maps script name to script versions */
-  Map<String, List<Script>> scriptsByName = new HashMap<>();
-  /** maps script ids to parsed EngineScript's */
-  public Map<String, EngineScript> scriptAstsById = new HashMap<>();
+
+  /** all stored scripts */
+  List<Script> scripts = new ArrayList<>();
+
+  /** maps script version ids to parsed EngineScript's */
+  public Map<String, EngineScript> parsedScriptAsts = new HashMap<>();
 
   public ScriptStore(Configuration configuration) {
     this.configuration = configuration;
@@ -40,58 +44,142 @@ public class ScriptStore {
 
   public ScriptStore(Configuration configuration, ScriptStore other) {
     this.configuration = configuration;
-    this.scriptsByName = other.scriptsByName;
+    this.scripts = other.scripts;
   }
 
-  public EngineScript findLatestScriptAstByName(String scriptName) {
-    List<Script> scriptVersions = findScriptVersionsByName(scriptName);
-    if (scriptVersions!=null) {
-      Script latestVersion = scriptVersions.get(scriptVersions.size()-1);
-      String scriptId = latestVersion.getId();
-      return findScriptAstById(scriptId);
-    }
-    return null;
+  /** Parses the scriptVersion and initializes
+   * the engineScript if parse is succesfull. */
+  // TODO move this method into a ScriptParser in Configuration
+  public Parse parseScriptText(String scriptText) {
+    return Parse.parse(scriptText, configuration);
   }
 
-  /** only the last part of the name has to match */
-  List<Script> findScriptVersionsByName(String scriptName) {
-    if (scriptsByName.containsKey(scriptName)) {
-      return scriptsByName.get(scriptName);
+  public Script findScriptByName(String scriptName) {
+    if (scriptName==null) {
+      return null;
     }
-    List<String> names = new ArrayList<>();
-    for (String name: scriptsByName.keySet()) {
-      if (name.endsWith(scriptName)) {
-        names.add(name);
+    return scripts.stream()
+      .filter(script->scriptName.equals(script.getName()))
+      .findFirst()
+      .orElse(null);
+  }
+
+  public Script findScriptById(String scriptId) {
+    if (scriptId==null) {
+      return null;
+    }
+    return scripts.stream()
+      .filter(script->scriptId.equals(script.getId()))
+      .findFirst()
+      .orElse(null);
+  }
+
+  public void insertScript(Script script) {
+    EngineException.throwIfNull(script.getName(), "Scripts must have a name");
+    if (findScriptByName(script.getName())!=null) {
+      throw new BadRequestException("Script with name '"+script.getName()+"' already exists");
+    }
+    if (script.getId()==null) {
+      String scriptId = configuration.getScriptIdGenerator().createId();
+      script.setId(scriptId);
+    }
+    if (findScriptById(script.getId())!=null) {
+      throw new BadRequestException("Script with id '"+script.getId()+"' already exists");
+    }
+    scripts.add(script);
+  }
+
+  public ScriptVersion createScriptVersion(String scriptId, String scriptText, Boolean activate) {
+    Script script = findScriptById(scriptId);
+    EngineException.throwIfNull(script, "No script found with id %s", scriptId);
+
+    ScriptVersion scriptVersion = new ScriptVersion();
+    String scriptVersionId = scriptVersion.getId();
+    if (scriptVersionId==null) {
+      scriptVersionId = configuration.getScriptVersionIdGenerator().createId();
+    }
+    scriptVersion.setId(scriptVersionId);
+    scriptVersion.setScriptId(script.getId());
+    scriptVersion.setName(script.getName());
+    scriptVersion.setText(scriptText);
+
+    List<ScriptVersion> scriptVersions = script.getScriptVersions();
+
+    if (Boolean.TRUE.equals(activate)) {
+      script.setActiveScriptVersionId(scriptVersionId);
+
+    } else {
+      // Find the latest script version id (if there is one)
+      ScriptVersion latestVersion = !scriptVersions.isEmpty() ? scriptVersions.get(scriptVersions.size()-1) : null;
+      String latestScriptVersionId = latestVersion!=null ? latestVersion.getId() : null;
+      // If the latest version was not the active version
+      if (latestScriptVersionId!=null && !latestScriptVersionId.equals(script.getActiveScriptVersionId())) {
+        // Remove the latest version because it becomes irrelevant
+        // Only one non-active version should be maintained
+        scriptVersions.remove(scriptVersions.size()-1);
       }
     }
-    if (names.size()==1) {
-      return scriptsByName.get(names.get(0));
-    } else if (names.size()>1) {
-      throw new EngineException("Ambiguous name: "+names);
+
+    scriptVersions.add(scriptVersion);
+    scriptVersion.setVersion(scriptVersions.size());
+
+    return scriptVersion;
+  }
+
+  public void addParsedScriptAstToCache(String scriptVersionId, EngineScript parsedScriptAst) {
+    parsedScriptAsts.put(scriptVersionId, parsedScriptAst);
+  }
+
+  private ScriptVersion findScriptVersion(Script script, String scriptVersionId) {
+    if (scriptVersionId!=null && script!=null && script.getScriptVersions()!=null) {
+      return script.getScriptVersions().stream()
+        .filter(scriptVersion->scriptVersionId.equals(scriptVersion.getId()))
+        .findFirst()
+        .orElse(null);
     }
     return null;
   }
 
-  public EngineScript findScriptAstById(String scriptId) {
-    EngineScript engineScript = scriptAstsById.get(scriptId);
+  public void addParsedScriptAstToCache(Parse parse, ScriptVersion scriptVersion) {
+    EngineScript parsedScriptAst = parse.getEngineScript();
+    parsedScriptAst.setScriptVersion(scriptVersion);
+    parsedScriptAsts.put(scriptVersion.getId(), parse.getEngineScript());
+  }
+
+  public EngineScript findScriptAstByScriptVersionId(String scriptVersionId) {
+    EngineScript engineScript = parsedScriptAsts.get(scriptVersionId);
     if (engineScript == null) {
-      Script script = findScriptById(scriptId);
-      if (script==null) {
-        throw new EngineException("Script "+scriptId+" does not exist");
-      }
-      Parse parse = parseScript(script);
-      if (!parse.hasErrors()) {
-        engineScript = parse.getEngineScript();
-        scriptAstsById.put(scriptId, engineScript);
+      ScriptVersion scriptVersion = findScriptVersionById(scriptVersionId);
+      if (scriptVersion!=null) {
+        Parse parse = parseScriptText(scriptVersion.getText());
+        if (!parse.hasErrors()) {
+          addParsedScriptAstToCache(parse, scriptVersion);
+          engineScript = parse.getEngineScript();
+        }
       }
     }
     return engineScript;
   }
 
-  Script findScriptById(String scriptId) {
-    if (scriptId!=null && scriptsByName!=null) {
-      for (List<Script> scriptVersions: scriptsByName.values()) {
-        for (Script scriptVersion: scriptVersions) {
+  /** Collects the latest version of each scriptVersion that has a matching name.
+   * @param namePatternRegex is a {@link Pattern regex}*/
+  public List<ScriptVersion> findLatestScriptVersionsByNamePattern(String namePatternRegex) {
+    List<ScriptVersion> matchingScriptVersions = new ArrayList<>();
+    for (Script script: scripts) {
+      if (Pattern.matches(namePatternRegex, script.getName())) {
+        List<ScriptVersion> scriptVersions = script.getScriptVersions();
+        if (!scriptVersions.isEmpty()) {
+          matchingScriptVersions.add(scriptVersions.get(scriptVersions.size() - 1));
+        }
+      }
+    }
+    return matchingScriptVersions;
+  }
+
+  ScriptVersion findScriptVersionById(String scriptId) {
+    if (scriptId!=null && scripts!=null) {
+      for (Script script: scripts) {
+        for (ScriptVersion scriptVersion: script.getScriptVersions()) {
           if (scriptId.equals(scriptVersion.getId())) {
             return scriptVersion;
           }
@@ -101,39 +189,7 @@ public class ScriptStore {
     return null;
   }
 
-  /** Parses the script and initializes
-   * the engineScript if parse is succesfull. */
-  public Parse parseScript(Script script) {
-    return Parse.parse(script, configuration);
-  }
-
-  public void storeScript(Script script) {
-    String scriptName = script.getName();
-    List<Script> scriptVersions = scriptsByName.get(scriptName);
-    if (scriptVersions==null) {
-      scriptVersions = new ArrayList<>();
-      scriptsByName.put(scriptName, scriptVersions);
-    }
-    script.setVersion(scriptVersions.size()+1);
-    scriptVersions.add(script);
-  }
-
-  /** Collects the latest version of each script that has a matching name.
-   * @param namePatternRegex is a {@link Pattern regex}*/
-  public List<Script> findLatestScriptVersionsByNamePattern(String namePatternRegex) {
-    List<Script> matchingScripts = new ArrayList<>();
-    for (String name: scriptsByName.keySet()) {
-      if (Pattern.matches(namePatternRegex, name)) {
-        List<Script> scriptVersions = scriptsByName.get(name);
-        if (!scriptVersions.isEmpty()) {
-          matchingScripts.add(scriptVersions.get(scriptVersions.size()-1));
-        }
-      }
-    }
-    return matchingScripts;
-  }
-
-  public Map<String, List<Script>> getScripts() {
-    return scriptsByName;
+  public List<Script> getScripts() {
+    return scripts;
   }
 }

@@ -19,14 +19,14 @@ import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.ImportObject;
 import io.rockscript.activity.ImportProvider;
-import io.rockscript.api.commands.EngineStartScriptExecutionResponse;
 import io.rockscript.api.CommandExecutorService;
-import io.rockscript.engine.Script;
+import io.rockscript.api.commands.EngineStartScriptExecutionResponse;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
+import io.rockscript.api.model.Script;
+import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.ScriptStore;
 
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class TestImportObject extends ImportObject implements ImportProvider {
@@ -42,20 +42,20 @@ public class TestImportObject extends ImportObject implements ImportProvider {
       Object input = activityInput.getArgProperty("input");
       EngineStartScriptExecutionResponse response = null;
       try {
-        String scriptId = findLatestScriptIdByScriptNamePattern(scriptNamePattern, activityInput);
+        String scriptVersionId = findLatestScriptVersionIdByScriptNamePattern(scriptNamePattern, activityInput);
 
-        if (scriptId==null) {
+        if (scriptVersionId==null) {
           return ActivityOutput.error("No script matched name patter "+scriptNamePattern);
         }
 
         response = commandExecutorService.execute(new StartScriptExecutionCommand()
-            .scriptId(scriptId)
+            .scriptVersionId(scriptVersionId)
             .input(input));
 
         if (response.getErrorEvent()==null) {
           return ActivityOutput.endActivity(response.getScriptExecution());
         } else {
-          return ActivityOutput.error("Script start failed: "+response.getErrorEvent().getError());
+          return ActivityOutput.error("ScriptVersion start failed: "+response.getErrorEvent().getError());
         }
       } catch (Exception e) {
         return ActivityOutput.error("Test execution error: "+e.getMessage());
@@ -71,19 +71,19 @@ public class TestImportObject extends ImportObject implements ImportProvider {
     }, "actual", "expected");
   }
 
-  private String findLatestScriptIdByScriptNamePattern(String scriptNamePattern, ActivityInput activityInput) {
+  private String findLatestScriptVersionIdByScriptNamePattern(String scriptNamePattern, ActivityInput activityInput) {
     ScriptStore scriptStore = activityInput.getExecution()
       .getScriptExecution()
       .getEngineScript()
       .getConfiguration()
       .getScriptStore();
 
-    Map<String, List<Script>> scripts = scriptStore.getScripts();
-    for (String scriptName: scripts.keySet()) {
-      if (Pattern.matches(scriptNamePattern, scriptName)) {
-        List<Script> scriptVersions = scripts.get(scriptName);
+    List<Script> scripts = scriptStore.getScripts();
+    for (Script script: scripts) {
+      if (Pattern.matches(scriptNamePattern, script.getName())) {
+        List<ScriptVersion> scriptVersions = script.getScriptVersions();
         if (scriptVersions!=null && !scriptVersions.isEmpty()) {
-          Script scriptVersion = scriptVersions.get(scriptVersions.size() - 1);
+          ScriptVersion scriptVersion = scriptVersions.get(scriptVersions.size() - 1);
           return scriptVersion.getId();
         }
       }

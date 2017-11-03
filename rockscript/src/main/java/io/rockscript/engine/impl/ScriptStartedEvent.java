@@ -15,12 +15,14 @@
  */
 package io.rockscript.engine.impl;
 
-import io.rockscript.engine.Script;
+import io.rockscript.api.model.ScriptVersion;
 
 public class ScriptStartedEvent extends ExecutableEvent<EngineScriptExecution> {
 
   String scriptId;
+  String scriptVersionId;
   String scriptName;
+  Integer scriptVersion;
   Object input;
 
   /** constructor for gson serialization */
@@ -37,17 +39,19 @@ public class ScriptStartedEvent extends ExecutableEvent<EngineScriptExecution> {
   public ScriptStartedEvent(EngineScriptExecution scriptExecution, Object input) {
     super(scriptExecution);
 
-    Script script = scriptExecution
+    ScriptVersion scriptVersion = scriptExecution
         .getEngineScript()
-        .getScript();
+        .getScriptVersion();
 
-    this.scriptId = script.getId();
-    this.scriptName = script.getName();
+    this.scriptVersionId = scriptVersion.getId();
+    this.scriptId = scriptVersion.getScriptId();
+    this.scriptName = scriptVersion.getName();
+    this.scriptVersion = scriptVersion.getVersion();
     this.input = input;
   }
 
-  public String getScriptId() {
-    return scriptId;
+  public String getScriptVersionId() {
+    return scriptVersionId;
   }
 
   public String getScriptExecutionId() {
@@ -61,8 +65,8 @@ public class ScriptStartedEvent extends ExecutableEvent<EngineScriptExecution> {
   @Override
   public String toString() {
     return "[" + scriptExecutionId + "] " +
-        "Started script [" +
-        scriptId + "|" +
+        "Started scriptVersion [" +
+           scriptVersionId + "|" +
         scriptName + "]" +
         (input!=null ? " with input "+input.toString() : " without input");
   }

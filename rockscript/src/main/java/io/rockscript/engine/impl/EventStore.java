@@ -60,19 +60,19 @@ public class EventStore implements EventListener {
 
   private EngineScriptExecution recreateScriptExecution(List<ExecutionEvent> executionEvents, String scriptExecutionId) {
     if (executionEvents==null || executionEvents.isEmpty()) {
-      throw new EngineException("Script execution "+scriptExecutionId+" does not exist");
+      throw new EngineException("ScriptVersion execution "+scriptExecutionId+" does not exist");
     }
 
     ScriptStartedEvent scriptStartedEvent = findScriptStartedEventJson(executionEvents);
     if (scriptStartedEvent==null) {
-      throw new EngineException("Script execution "+scriptExecutionId+" does not have a start event. Huh?!");
+      throw new EngineException("ScriptVersion execution "+scriptExecutionId+" does not have a start event. Huh?!");
     }
 
-    String scriptId = scriptStartedEvent.getScriptId();
+    String scriptId = scriptStartedEvent.getScriptVersionId();
     EngineException.throwIfNull(scriptId, "EngineScript id is null in scriptStartedEvent for engineScript execution: %s", scriptExecutionId);
     EngineScript engineScript = configuration
       .getScriptStore()
-      .findScriptAstById(scriptId);
+      .findScriptAstByScriptVersionId(scriptId);
     EngineException.throwIfNull(scriptId, "EngineScript not found for scriptId %s in engineScript execution %s", scriptId, scriptExecutionId);
 
     EngineScriptExecution scriptExecution = new EngineScriptExecution(scriptExecutionId, configuration, engineScript, executionEvents);

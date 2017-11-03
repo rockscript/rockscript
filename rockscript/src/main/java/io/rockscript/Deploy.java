@@ -15,9 +15,9 @@
  */
 package io.rockscript;
 
-import io.rockscript.api.commands.DeployScriptCommand;
-import io.rockscript.api.commands.DeployScriptResponse;
-import io.rockscript.engine.ParseError;
+import io.rockscript.api.commands.SaveScriptVersionCommand;
+import io.rockscript.api.commands.SaveScriptVersionResponse;
+import io.rockscript.api.model.ParseError;
 import io.rockscript.http.HttpRequest;
 import io.rockscript.http.HttpResponse;
 import io.rockscript.util.Io;
@@ -60,7 +60,7 @@ public class Deploy extends ClientCommand {
       "Default is not recursive. " +
       "Ignored if specified with a file.");
     options.addOption("n", true,
-      "Script file name regex used for scanning a directory. The file " +
+      "ScriptVersion file name regex used for scanning a directory. The file " +
       "name has to end with the given name. " +
       "Default is " +DEFAULT_NAME_REGEX+" "+
       "Ignored if a file is specified. " +
@@ -116,9 +116,10 @@ public class Deploy extends ClientCommand {
       HttpRequest request = createHttp()
         .newPost(server + "/command")
         .headerContentTypeApplicationJson()
-        .bodyObject(new DeployScriptCommand()
+        .bodyObject(new SaveScriptVersionCommand()
           .scriptName(file.getPath())
           .scriptText(scriptText)
+          .activate()
         );
 
       log(request);
@@ -127,12 +128,12 @@ public class Deploy extends ClientCommand {
 
       log(response);
 
-      DeployScriptResponse deployScriptResponse = response
-        .getBodyAs(DeployScriptResponse.class);
+      SaveScriptVersionResponse saveScriptVersionResponse = response
+        .getBodyAs(SaveScriptVersionResponse.class);
 
-      if (deployScriptResponse!=null && deployScriptResponse.hasErrors()) {
+      if (saveScriptVersionResponse!=null && saveScriptVersionResponse.hasErrors()) {
         log("  Errors in readable form:");
-        for (ParseError parseError: deployScriptResponse.getErrors()) {
+        for (ParseError parseError: saveScriptVersionResponse.getErrors()) {
           log("  " + parseError);
         }
         deployCountFailed++;

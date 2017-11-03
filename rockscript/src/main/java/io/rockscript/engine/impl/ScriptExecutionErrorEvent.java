@@ -15,7 +15,7 @@ public class ScriptExecutionErrorEvent<T extends Execution> extends ExecutableEv
 
   public ScriptExecutionErrorEvent(T execution, String error) {
     super(execution);
-    this.scriptId = execution.getEngineScript().getScript().getId();
+    this.scriptId = execution.getEngineScript().getScriptVersion().getId();
     this.error = error;
   }
 
@@ -26,7 +26,7 @@ public class ScriptExecutionErrorEvent<T extends Execution> extends ExecutableEv
   @Override
   public String toString() {
     return "[" + scriptExecutionId +"] " +
-           "Error [script:"+scriptId+",line:"+line+"] "+error;
+           "Error [scriptVersion:"+scriptId+",line:"+line+"] "+error;
   }
 
   public String getScriptId() {

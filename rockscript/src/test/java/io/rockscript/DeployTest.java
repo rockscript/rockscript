@@ -16,75 +16,41 @@
  */
 package io.rockscript;
 
-import io.rockscript.api.commands.DeployScriptCommand;
-import io.rockscript.api.commands.EngineDeployScriptResponse;
-import io.rockscript.engine.ParseError;
-import io.rockscript.test.AbstractServerTest;
+import io.rockscript.api.commands.SaveScriptVersionCommand;
+import io.rockscript.api.commands.StartScriptExecutionCommand;
+import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.engine.impl.EngineScriptExecution;
+import io.rockscript.test.ScriptTest;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
-public class DeployTest extends AbstractServerTest {
+public class DeployTest extends ScriptTest {
 
   protected static Logger log = LoggerFactory.getLogger(DeployTest.class);
 
   @Test
-  public void testDeployOk() {
-    EngineDeployScriptResponse deployScriptResponse = newPost("command")
-      .bodyObject(new DeployScriptCommand()
-        .scriptText("var a=0;")
-        .scriptName("Test script"))
-      .execute()
-      .assertStatusOk()
-      .getBodyAs(EngineDeployScriptResponse.class);
+  public void testSaveVsDeploy() {
+    ScriptVersion scriptVersion = execute(new SaveScriptVersionCommand()
+        .scriptText("var a = 1;"))
+      .throwIfErrors();
 
-    assertNotNull(deployScriptResponse.getId());
-    assertEquals((Integer) 1, deployScriptResponse.getVersion());
-    assertEquals("Test script", deployScriptResponse.getName());
-    assertNull(deployScriptResponse.getErrors());
+    scriptVersion = execute(new SaveScriptVersionCommand()
+        .scriptText("var a = 2;")
+        .activate())
+      .throwIfErrors();
+
+    scriptVersion = execute(new SaveScriptVersionCommand()
+        .scriptText("var a = 3;"))
+      .throwIfErrors();
+
+    EngineScriptExecution scriptExecution = execute(new StartScriptExecutionCommand()
+      .scriptId(scriptVersion.getScriptId()))
+      .getEngineScriptExecution();
+
+    assertEquals(2d, scriptExecution.getVariable("a").getValue());
   }
 
-  @Test
-  public void testDeploySyntaxError() {
-    EngineDeployScriptResponse deployScriptResponse = newPost("command")
-      .bodyObject(new DeployScriptCommand()
-        .scriptText("\n\ninvalid script"))
-      .execute()
-      .assertStatusBadRequest()
-      .getBodyAs(EngineDeployScriptResponse.class);
-
-    assertEquals("Unnamed script", deployScriptResponse.getName());
-
-    List<ParseError> errors = deployScriptResponse.getErrors();
-    assertEquals(1, errors.size());
-    ParseError error = errors.get(0);
-    assertEquals(3, error.getLine());
-    assertEquals(8, error.getColumn());
-    assertEquals("no viable alternative at input 'script'", error.getMessage());
-  }
-
-  @Test
-  public void testDeployParseError() {
-    EngineDeployScriptResponse deployScriptResponse = newPost("command")
-      .bodyObject(new DeployScriptCommand()
-        .scriptText("\n\nvar a = new Object();"))
-      .execute()
-      .assertStatusBadRequest()
-      .getBodyAs(EngineDeployScriptResponse.class);
-
-    assertEquals("Unnamed script", deployScriptResponse.getName());
-
-    List<ParseError> errors = deployScriptResponse.getErrors();
-    assertEquals(1, errors.size());
-    ParseError error = errors.get(0);
-    assertEquals(3, error.getLine());
-    assertEquals(8, error.getColumn());
-    assertEquals("Unsupported singleExpression: newObject() NewExpressionContext", error.getMessage());
-  }
 }
