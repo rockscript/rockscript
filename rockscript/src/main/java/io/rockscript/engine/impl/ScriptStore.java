@@ -54,6 +54,17 @@ public class ScriptStore {
     return Parse.parse(scriptText, configuration);
   }
 
+  /** Finds the first script for which the name ends with the given scriptNameSuffix */
+  public Script findScriptByNameEnd(String scriptNameSuffix) {
+    if (scriptNameSuffix==null) {
+      return null;
+    }
+    return scripts.stream()
+      .filter(script->script.getName()!=null && script.getName().endsWith(scriptNameSuffix))
+      .findFirst()
+      .orElse(null);
+  }
+
   public Script findScriptByName(String scriptName) {
     if (scriptName==null) {
       return null;
@@ -77,7 +88,7 @@ public class ScriptStore {
   public void insertScript(Script script) {
     EngineException.throwIfNull(script.getName(), "Scripts must have a name");
     if (findScriptByName(script.getName())!=null) {
-      throw new BadRequestException("Script with name '"+script.getName()+"' already exists");
+      throw new BadRequestException("Script with name '" + script.getName() + "' already exists");
     }
     if (script.getId()==null) {
       String scriptId = configuration.getScriptIdGenerator().createId();
