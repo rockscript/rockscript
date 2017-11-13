@@ -99,7 +99,14 @@ public class AsyncHttpResponse {
   public AsyncHttpResponse bodyString(String bodyString, Charset charset) {
     if (bodyString!=null) {
       contentStringForLog = bodyString; // the log is produced in getHttpResponse() below
-      byteBuf.writeBytes(bodyString.getBytes(charset));
+      bodyBytes(bodyString.getBytes(charset));
+    }
+    return this;
+  }
+
+  public AsyncHttpResponse bodyBytes(byte[] bytes) {
+    if (bytes!=null) {
+      byteBuf.writeBytes(bytes);
     }
     return this;
   }
