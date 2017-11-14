@@ -15,6 +15,8 @@
  */
 package io.rockscript.util;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Scanner;
 
@@ -23,7 +25,6 @@ public class Io {
   public static String toString(InputStream inputStream) {
     Scanner scanner = new Scanner(inputStream)
       .useDelimiter("\\A");
-
     if (scanner.hasNext()) {
       return scanner.next();
     } else {
@@ -41,6 +42,25 @@ public class Io {
     } catch (Exception e) {
       e.printStackTrace();
       throw new RuntimeException("Couldn't get resource as string: "+e.getMessage(), e);
+    }
+  }
+
+  public static byte[] readBytesFromStream(InputStream is) {
+    try {
+      ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+      int nRead;
+      byte[] data = new byte[16384];
+
+      while ((nRead = is.read(data, 0, data.length)) != -1) {
+        buffer.write(data, 0, nRead);
+      }
+
+      buffer.flush();
+
+      return buffer.toByteArray();
+    } catch (IOException e) {
+      throw new RuntimeException("Couldn't read bytes from stream: "+e.getMessage(), e);
     }
   }
 }

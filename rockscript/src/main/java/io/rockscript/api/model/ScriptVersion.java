@@ -27,6 +27,7 @@ public class ScriptVersion {
   protected String name;
   protected Integer version;
   protected String text;
+  protected Boolean active;
   protected List<ParseError> errors;
 
   public ScriptVersion() {
@@ -39,6 +40,7 @@ public class ScriptVersion {
       this.name = other.name;
       this.text = other.text;
       this.version = other.version;
+      this.active = other.active;
       this.errors = other.errors;
     }
   }
@@ -81,6 +83,13 @@ public class ScriptVersion {
 
   public void setVersion(Integer version) {
     this.version = version;
+  }
+
+  public Boolean getActive() {
+    return this.active;
+  }
+  public void setActive(Boolean active) {
+    this.active = active;
   }
 
   public List<ParseError> getErrors() {

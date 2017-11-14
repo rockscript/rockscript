@@ -117,6 +117,11 @@ public class ScriptStore {
     List<ScriptVersion> scriptVersions = script.getScriptVersions();
 
     if (Boolean.TRUE.equals(activate)) {
+      ScriptVersion scriptVersionToInactivate = findScriptVersionById(script.getActiveScriptVersionId());
+      if (scriptVersionToInactivate!=null) {
+        scriptVersionToInactivate.setActive(null);
+      }
+      scriptVersion.setActive(true);
       script.setActiveScriptVersionId(scriptVersionId);
 
     } else {
@@ -153,8 +158,10 @@ public class ScriptStore {
 
   public void addParsedScriptAstToCache(Parse parse, ScriptVersion scriptVersion) {
     EngineScript parsedScriptAst = parse.getEngineScript();
-    parsedScriptAst.setScriptVersion(scriptVersion);
-    parsedScriptAsts.put(scriptVersion.getId(), parse.getEngineScript());
+    if (parsedScriptAst!=null) {
+      parsedScriptAst.setScriptVersion(scriptVersion);
+      parsedScriptAsts.put(scriptVersion.getId(), parsedScriptAst);
+    }
   }
 
   public EngineScript findScriptAstByScriptVersionId(String scriptVersionId) {

@@ -33,7 +33,7 @@ public class SaveScriptVersionResponse extends ScriptVersion implements Response
 
   @Override
   public int getStatus() {
-    return !hasErrors() ? 200 : 400;
+    return 200;
   }
 
   @Override

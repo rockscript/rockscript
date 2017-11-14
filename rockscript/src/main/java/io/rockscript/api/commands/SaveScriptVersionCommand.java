@@ -53,13 +53,6 @@ public class SaveScriptVersionCommand extends Command<SaveScriptVersionResponse>
     ScriptStore scriptStore = configuration.getScriptStore();
 
     Parse parse = scriptStore.parseScriptText(scriptText);
-    if (parse.hasErrors()) {
-      SaveScriptVersionResponse saveScriptVersionResponse = new SaveScriptVersionResponse();
-      saveScriptVersionResponse.setText(scriptText);
-      saveScriptVersionResponse.setErrors(parse.getErrors());
-      return saveScriptVersionResponse;
-    }
-
     if (scriptId!=null) {
       Script script = scriptStore.findScriptById(scriptId);
       BadRequestException.checkNotNull(script, "Script %s does not exist", scriptId);
@@ -80,6 +73,7 @@ public class SaveScriptVersionCommand extends Command<SaveScriptVersionResponse>
     }
 
     ScriptVersion scriptVersion = scriptStore.createScriptVersion(scriptId, scriptText, activate);
+    scriptVersion.setErrors(parse.getErrors());
     scriptStore.addParsedScriptAstToCache(parse, scriptVersion);
 
     return new SaveScriptVersionResponse(scriptVersion);

@@ -42,6 +42,8 @@ public class DeployTest extends ScriptTest {
         .activate())
       .throwIfErrors();
 
+    assertEquals(Boolean.TRUE, scriptVersion.getActive());
+
     scriptVersion = execute(new SaveScriptVersionCommand()
         .scriptText("var a = 3;"))
       .throwIfErrors();
