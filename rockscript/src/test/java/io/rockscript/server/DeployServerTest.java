@@ -58,7 +58,7 @@ public class DeployServerTest extends AbstractServerTest {
         .scriptText("\n\ninvalid script")
         .activate())
       .execute()
-      .assertStatusBadRequest()
+      .assertStatusOk()
       .getBodyAs(SaveScriptVersionResponse.class);
 
     List<ParseError> errors = saveScriptVersionResponse.getErrors();
@@ -76,7 +76,7 @@ public class DeployServerTest extends AbstractServerTest {
         .scriptText("\n\nvar a = new Object();")
         .activate())
       .execute()
-      .assertStatusBadRequest()
+      .assertStatusOk()
       .getBodyAs(SaveScriptVersionResponse.class);
 
     List<ParseError> errors = saveScriptVersionResponse.getErrors();
