@@ -26,6 +26,7 @@ public class TestResult {
   String testName;
   List<Event> events = new ArrayList<>();
   List<TestError> errors;
+  TestScriptExecution scriptExecution;
 
   /** for gson serialization */
   protected TestResult() {
@@ -34,7 +35,6 @@ public class TestResult {
   public TestResult(String testName) {
     this.testName = testName;
   }
-
 
   public void addError(TestError error) {
     if (errors==null) {
@@ -65,5 +65,13 @@ public class TestResult {
 
   public boolean hasError() {
     return errors!=null && !errors.isEmpty();
+  }
+
+  public TestScriptExecution getScriptExecution() {
+    return scriptExecution;
+  }
+
+  public void setScriptExecution(TestScriptExecution scriptExecution) {
+    this.scriptExecution = scriptExecution;
   }
 }

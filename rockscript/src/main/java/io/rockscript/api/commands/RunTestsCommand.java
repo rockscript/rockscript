@@ -16,11 +16,13 @@
 package io.rockscript.api.commands;
 
 import io.rockscript.activity.test.*;
-import io.rockscript.engine.Configuration;
-import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.engine.impl.*;
 import io.rockscript.api.Command;
 import io.rockscript.api.CommandExecutorService;
+import io.rockscript.api.model.ScriptExecution;
+import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.engine.Configuration;
+import io.rockscript.engine.impl.EngineScriptExecution;
+import io.rockscript.engine.impl.ScriptStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,8 +55,22 @@ public class RunTestsCommand extends Command<TestResults> {
     testImportObject.setCommandExecutorService(testCommandExecutorService);
     try {
       String scriptVersionId = scriptVersion.getId();
-      testCommandExecutorService.execute(new StartScriptExecutionCommand()
+      EngineStartScriptExecutionResponse response = testCommandExecutorService.execute(new StartScriptExecutionCommand()
         .scriptVersionId(scriptVersionId));
+      ScriptExecution scriptExecution = response.getScriptExecution();
+      EngineScriptExecution engineScriptExecution = response.getEngineScriptExecution();
+
+      TestScriptExecution testScriptExecution = new TestScriptExecution();
+      testScriptExecution.setId("test-"+scriptExecution.getId());
+      testScriptExecution.setScriptName(engineScriptExecution.getEngineScript().getScriptVersion().getName());
+      String scriptText = engineScriptExecution.getEngineScript().getScriptVersion().getText();
+      log.debug("Script text: "+scriptText);
+      testScriptExecution.setScriptText(scriptText);
+      testScriptExecution.setStart(scriptExecution.getStart());
+      testScriptExecution.setEnd(scriptExecution.getEnd());
+
+      testResult.setScriptExecution(testScriptExecution);
+
     } catch (Throwable t) {
       testResult.addError(new TestError(t));
     }

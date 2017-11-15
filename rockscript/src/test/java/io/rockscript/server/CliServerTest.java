@@ -52,7 +52,7 @@ public class CliServerTest extends AbstractServerTest {
       .execute();
 
     new io.rockscript.Test()
-      .parseArgs("test", "-s", "http://localhost:"+server.getPort(), "-n", "short-test\\.rst")
+      .parseArgs("test", "-s", "http://localhost:"+server.getPort())
       .execute();
 
 

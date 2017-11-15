@@ -105,4 +105,32 @@ public class ScriptExecution {
   public Object getVariable(String variableName) {
     return variables !=null ? variables.get(variableName): null;
   }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public void setVariables(Map<String, Object> variables) {
+    this.variables = variables;
+  }
+
+  public void setActivityContinuations(List<ActivityContinuation> activityContinuations) {
+    this.activityContinuations = activityContinuations;
+  }
+
+  public Instant getStart() {
+    return start;
+  }
+
+  public void setStart(Instant start) {
+    this.start = start;
+  }
+
+  public Instant getEnd() {
+    return end;
+  }
+
+  public void setEnd(Instant end) {
+    this.end = end;
+  }
 }
