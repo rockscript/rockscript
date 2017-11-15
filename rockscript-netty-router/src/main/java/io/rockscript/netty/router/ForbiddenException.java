@@ -15,40 +15,29 @@
  */
 package io.rockscript.netty.router;
 
-import static java.lang.String.format;
 
-public class InternalServerException extends HttpException {
+public class ForbiddenException extends HttpException {
 
   private static final long serialVersionUID = 1L;
 
-  public InternalServerException() {
+  public ForbiddenException() {
     super();
   }
 
-  public static void checkNotNull(Object o, String message, Object... args) {
-    checkTrue(o==null, message, args);
-  }
-
-  public static void checkTrue(boolean condition, String message, Object... args) {
-    if (condition) {
-      throw new InternalServerException(format(message, args));
-    }
-  }
-
-  public InternalServerException(String message, Throwable cause) {
+  public ForbiddenException(String message, Throwable cause) {
     super(message, cause);
   }
 
-  public InternalServerException(String message) {
+  public ForbiddenException(String message) {
     super(message);
   }
 
-  public InternalServerException(Throwable cause) {
+  public ForbiddenException(Throwable cause) {
     super(cause);
   }
 
   @Override
   public int getStatusCode() {
-    return 500;
+    return 403;
   }
 }

@@ -104,12 +104,14 @@ public class AsyncHttpServer {
       }
 
     } catch (RuntimeException e) {
-      if (e instanceof BadRequestException) {
-        response.statusBadRequest();
+      String message = "oops";
+      if (e instanceof HttpException) {
+        response.status(((HttpException)e).getStatusCode());
+        message = e.getMessage();
       } else {
         response.statusInternalServerError();
       }
-      response.bodyString("{ \"message\": \"oops\" }");
+      response.bodyString("{ \"message\": \""+message+"\" }");
       response.headerContentTypeApplicationJson();
       response.send();
       requestException(e, ctx);

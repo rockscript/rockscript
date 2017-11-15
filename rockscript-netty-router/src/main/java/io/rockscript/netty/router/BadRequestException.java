@@ -16,7 +16,7 @@
 package io.rockscript.netty.router;
 
 
-public class BadRequestException extends RuntimeException {
+public class BadRequestException extends HttpException {
 
   private static final long serialVersionUID = 1L;
 
@@ -24,10 +24,6 @@ public class BadRequestException extends RuntimeException {
     super();
   }
 
-  public BadRequestException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-    super(message, cause, enableSuppression, writableStackTrace);
-  }
-  
   public static void checkNotNull(Object o, String message, Object... args) {
     checkTrue(o!=null, message, args);
   }
@@ -48,5 +44,10 @@ public class BadRequestException extends RuntimeException {
 
   public BadRequestException(Throwable cause) {
     super(cause);
+  }
+
+  @Override
+  public int getStatusCode() {
+    return 400;
   }
 }
