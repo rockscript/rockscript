@@ -1,3 +1,22 @@
+/*
+ * Copyright (c) 2017 RockScript.io.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 package io.rockscript.db;
 
 import io.rockscript.db.columntypes.VarChar;
@@ -7,9 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.rockscript.db.WhereCondition.and;
-import static io.rockscript.db.WhereCondition.equal;
-import static io.rockscript.db.WhereCondition.isNull;
+import static io.rockscript.db.WhereCondition.*;
 
 public class SchemaUpdatesTable extends Table {
 
@@ -56,7 +73,7 @@ public class SchemaUpdatesTable extends Table {
 
   public boolean acquireSchemaLock(Tx tx, SchemaUpdatesTable schemaUpdatesTable) {
     int rowCount = tx.newUpdate(this)
-      // .setString(UPDATE, "locked")
+      .setString(UPDATE, "locked")
       .where(and(equal(ID, ID_DATABASE_LOCK),
                  equal(TABLE_NAME, ALL_TABLES),
                  isNull(UPDATE)))
