@@ -21,69 +21,86 @@ package io.rockscript.db;
 
 import io.rockscript.db.columntypes.VarChar;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static io.rockscript.db.WhereCondition.*;
 
 public class SchemaUpdatesTable extends Table {
 
   public static final Column ID = new Column("id", new VarChar()).primaryKey();
-  public static final Column TABLE_NAME = new Column("table_name", new VarChar());
-  public static final Column UPDATE = new Column("update", new VarChar());
+  public static final Column NAME = new Column("name", new VarChar());
+  public static final Column LOCK_ID = new Column("lock_id", new VarChar());
 
-  private static final String ID_DATABASE_LOCK = "database-lock";
-  private static final String ALL_TABLES = "*";
+  private static final String NAME_DATABASE_LOCK = "database-lock";
 
   public SchemaUpdatesTable() {
     super("schema_updates",
       ID,
-      TABLE_NAME,
-      UPDATE);
+      NAME,
+      LOCK_ID);
   }
 
-  public Map<String,List<String>> findAllSchemaUpdates(Tx tx) {
-    Map<String,List<String>> schemaUpdates = new HashMap<>();
+  public void create(Tx tx) {
+    tx.newCreateTable(this).execute();
+    insertLockRow(tx);
+  }
+
+  private void insertLockRow(Tx tx) {
+    tx.newInsert(this)
+      .valueString(ID, tx.generateId())
+      .valueString(NAME, NAME_DATABASE_LOCK)
+      .execute()
+      .assertInsertHappened();
+  }
+
+  public List<String> findAllSchemaUpdateNames(Tx tx) {
+    List<String> schemaUpdateNames = new ArrayList<>();
     SelectResult selectResult = tx.newSelect()
       .from(this)
       .execute();
     while (selectResult.next()) {
-      String tableName = selectResult.get(TABLE_NAME);
-      String update = selectResult.get(UPDATE);
-      List<String> tableUpdates = schemaUpdates.get(tableName);
-      if (tableUpdates==null) {
-        tableUpdates = new ArrayList<>();
-        schemaUpdates.put(tableName, tableUpdates);
-      }
-      tableUpdates.add(update);
+      String updateName = selectResult.get(NAME);
+      schemaUpdateNames.add(updateName);
     }
-    return schemaUpdates;
+    return schemaUpdateNames;
   }
 
-  public void insertLockRow(Tx tx) {
-    tx.newInsert(this)
-      .setString(ID, ID_DATABASE_LOCK)
-      .setString(TABLE_NAME, ALL_TABLES)
-      .execute()
-      .assertRowUpdated()
-      .assertNoException();
-  }
-
-  public boolean acquireSchemaLock(Tx tx, SchemaUpdatesTable schemaUpdatesTable) {
+  /** returns the lockId that should be passed into {@link #releaseSchemaLock(Tx,String)} */
+  public String acquireSchemaLock(Tx tx) {
+    String lockId = generateLockId();
     int rowCount = tx.newUpdate(this)
-      .setString(UPDATE, "locked")
-      .where(and(equal(ID, ID_DATABASE_LOCK),
-                 equal(TABLE_NAME, ALL_TABLES),
-                 isNull(UPDATE)))
+      .setString(LOCK_ID, lockId)
+      .where(and(equal(NAME, NAME_DATABASE_LOCK),
+                 isNull(LOCK_ID)))
       .execute()
-      .assertNoException()
+      .assertUpdateHappened()
       .getRowCount();
-    return rowCount==1;
+    return rowCount==1 ? lockId : null;
   }
 
-  public void releaseSchemaLock() {
-    throw new UnsupportedOperationException();
+  private String generateLockId() {
+    return ""
+      + new Random().nextInt(10)
+      + new Random().nextInt(10)
+      + new Random().nextInt(10)
+      + new Random().nextInt(10);
+  }
+
+  public void insertSchemaUpdateName(Tx tx, String schemaUpdateName) {
+    tx.newInsert(this)
+      .valueString(NAME, schemaUpdateName)
+      .execute()
+      .assertInsertHappened();
+  }
+
+  /** returns true if the lock was released */
+  public void releaseSchemaLock(Tx tx, String lockId) {
+    tx
+      .newUpdate(this)
+      .setString(LOCK_ID, null)
+      .where(and(equal(NAME, NAME_DATABASE_LOCK),
+                 equal(LOCK_ID, lockId)))
+      .execute()
+      .assertUpdateHappened();
   }
 }

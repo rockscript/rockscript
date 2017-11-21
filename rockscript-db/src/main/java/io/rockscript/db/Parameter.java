@@ -21,22 +21,30 @@ package io.rockscript.db;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Types;
 
-public class OtherParameterValue implements ParameterValue {
+public abstract class Parameter<T> {
 
-  Object value;
+  int index;
+  T value;
 
-  public OtherParameterValue(Object value) {
+  public Parameter(T value) {
     this.value = value;
   }
 
-  @Override
-  public void set(PreparedStatement preparedStatement, int index) throws SQLException {
-    preparedStatement.setObject(index, value, Types.OTHER);
+  /** used for logging */
+  public String toString() {
+    return formatValue()+"[" + index +"]";
   }
 
-  public String toString() {
-    return value!=null ? value.toString() : null;
+  protected abstract String formatValue();
+
+  public abstract void set(PreparedStatement preparedStatement) throws SQLException;
+
+  public int getIndex() {
+    return index;
+  }
+
+  public void setIndex(int index) {
+    this.index = index;
   }
 }

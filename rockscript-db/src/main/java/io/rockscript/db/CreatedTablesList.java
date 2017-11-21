@@ -19,35 +19,25 @@
  */
 package io.rockscript.db;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class UpdateResult {
+public class CreatedTablesList {
 
-  Update update;
-  int rowCount = 0;
-  SQLException exception = null;
+  List<Table> tables = new ArrayList<>();
 
-  public UpdateResult(Update update, int rowCount) {
-    this.update = update;
-    this.rowCount = rowCount;
+  public CreatedTablesList(List<Table> tables) {
+    this.tables = tables;
   }
 
-  public UpdateResult(Update update, SQLException e) {
-    this.update = update;
-    this.exception = exception;
+  public boolean isCreated(String tableName) {
+    return tables.stream()
+      .filter(table->tableName.equals(table.getName()))
+      .findFirst()
+      .isPresent();
   }
 
-  public UpdateResult assertUpdateHappened() {
-    if (exception!=null) {
-      throw new DbException("Couldn't execute update: "+ exception.getMessage(), exception);
-    }
-    if (rowCount==0) {
-      throw new RuntimeException("No row was updated during "+update.toString());
-    }
-    return this;
-  }
-
-  public int getRowCount() {
-    return rowCount;
+  public boolean isCreated(Table table) {
+    return tables.contains(table);
   }
 }

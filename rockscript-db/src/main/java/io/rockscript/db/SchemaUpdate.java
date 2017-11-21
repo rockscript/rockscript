@@ -19,13 +19,23 @@
  */
 package io.rockscript.db;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.function.BiConsumer;
 
-public interface ParameterValue {
+public class SchemaUpdate {
 
-  /** used for logging */
-  String toString();
+  String name;
+  BiConsumer<Tx,CreatedTablesList> update;
 
-  void set(PreparedStatement preparedStatement, int index) throws SQLException;
+  public SchemaUpdate(String name, BiConsumer<Tx,CreatedTablesList> update) {
+    this.name = name;
+    this.update = update;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public BiConsumer<Tx,CreatedTablesList> getUpdate() {
+    return update;
+  }
 }

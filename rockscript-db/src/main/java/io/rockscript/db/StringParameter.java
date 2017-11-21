@@ -22,20 +22,18 @@ package io.rockscript.db;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class StringParameterValue implements ParameterValue {
+public class StringParameter extends Parameter<String> {
 
-  String value;
-
-  public StringParameterValue(String value) {
-    this.value = value;
+  public StringParameter(String value) {
+    super(value);
   }
 
   @Override
-  public String toString() {
-    return "'"+value+"'";
+  protected String formatValue() {
+    return value!=null ? "'"+value+"'" : "NULL";
   }
 
-  public void set(PreparedStatement preparedStatement, int index) throws SQLException {
+  public void set(PreparedStatement preparedStatement) throws SQLException {
     preparedStatement.setString(index, value);
   }
 }

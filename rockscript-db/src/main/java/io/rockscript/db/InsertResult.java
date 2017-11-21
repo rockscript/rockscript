@@ -37,14 +37,10 @@ public class InsertResult {
     this.exception = exception;
   }
 
-  public InsertResult assertRowUpdated() {
+  public InsertResult assertInsertHappened() {
     if (rowCount!=1) {
       throw new RuntimeException("Expected 1 row created, but rowCount was "+rowCount);
     }
-    return this;
-  }
-
-  public InsertResult assertNoException() {
     if (exception!=null) {
       throw new DbException("Couldn't execute insert: "+ exception.getMessage(), exception);
     }

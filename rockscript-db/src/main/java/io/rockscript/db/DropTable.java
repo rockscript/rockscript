@@ -39,7 +39,7 @@ public class DropTable {
   public void execute() {
     try {
       String sql = toString();
-      log.debug(tx+" " +sql);
+      tx.logSQL(sql);
       int result = tx.getConnection()
         .createStatement()
         .executeUpdate(sql);
@@ -49,7 +49,7 @@ public class DropTable {
   }
 
   public String toString() {
-    return  "DROP TABLE "+table.getName()+" CASCADE";
+    return  "DROP TABLE "+table.getName();
   }
 
   public Table getTable() {

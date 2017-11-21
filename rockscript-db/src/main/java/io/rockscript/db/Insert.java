@@ -24,15 +24,16 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Insert extends ParametrizedDbOperation {
 
   static Logger log = LoggerFactory.getLogger(Insert.class);
 
   Table table;
-  List<Column> columns = new ArrayList<>();
+  Map<Column,Parameter> columns = new LinkedHashMap<>();
 
   public Insert(Tx tx, Table table) {
     super(tx);
@@ -41,13 +42,11 @@ public class Insert extends ParametrizedDbOperation {
 
   public InsertResult execute() {
     try {
+      tx.logSQL(toString(true));
       String sql = toString();
-      log.debug(tx+"\n" +sql);
       PreparedStatement preparedStatement = tx.getConnection().prepareStatement(sql);
-      if (parameterValues!=null) {
-        ParameterMap parameterMap = new ParameterMap();
-        columns.forEach(column->parameterMap.add(column.getName()));
-        setParameters(preparedStatement, parameterMap, log);
+      if (parameters!=null) {
+        setParameters(preparedStatement);
       }
       int rowCount = preparedStatement.executeUpdate();
       return new InsertResult(this, rowCount);
@@ -56,13 +55,25 @@ public class Insert extends ParametrizedDbOperation {
     }
   }
 
-  public Insert setString(Column column, String value) {
-    return set(column, new StringParameterValue(value));
+  @Override
+  public String toString(boolean showParameterNames) {
+    return
+      "INSERT INTO "+table.getName()+ " (" +
+      columns.keySet().stream()
+        .map(column->column.getName())
+        .collect(Collectors.joining(",")) + ") \n" +
+      "VALUES ( " +
+      columns.values().stream()
+        .map(parameter->(showParameterNames ? parameter.toString() : "?"))
+        .collect(Collectors.joining(", ")) + " )";
   }
 
-  public Insert set(Column column, ParameterValue value) {
-    columns.add(column);
-    set(column.getName(), value);
+  public Insert valueString(Column column, String value) {
+    return set(column, setParameterString(value));
+  }
+
+  public Insert set(Column column, Parameter parameter) {
+    columns.put(column, parameter);
     return this;
   }
 

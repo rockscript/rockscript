@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 public abstract class WhereCondition {
 
-  public abstract void mapParameterNames(ParameterMap parameterMap, ParametrizedDbOperation operation);
+  public abstract void setParameters(ParametrizedDbOperation operation);
 
   public String toString() {
     return toString(false);
@@ -33,25 +33,34 @@ public abstract class WhereCondition {
   public abstract String toString(boolean showParameterNames);
 
   public static WhereCondition equal(final Column column, final String value) {
-    return new WhereCondition() {
+    return new EqualCondition(column, value) {
       @Override
-      public void mapParameterNames(ParameterMap parameterMap, ParametrizedDbOperation operation) {
-        parameterMap.add(column.getName());
-        operation.setString(column.getName(), value);
-      }
-      @Override
-      public String toString(boolean showParameterNames) {
-        return column.getName()+" = ?"+(showParameterNames ? column.getName() : "");
+      public void setParameters(ParametrizedDbOperation operation) {
+        this.parameter = operation.setParameterString(value);
       }
     };
+  }
+
+  static abstract class EqualCondition extends WhereCondition {
+    Column column;
+    Parameter parameter = null;
+    String value;
+    public EqualCondition(Column column, String value) {
+      this.column = column;
+      this.value = value;
+    }
+    @Override
+    public String toString(boolean showParameterNames) {
+      return column.getName()+" = "+(showParameterNames ? parameter.toString() : "?");
+    }
   }
 
   public static WhereCondition and(final WhereCondition... andConditions) {
     return new WhereCondition() {
       @Override
-      public void mapParameterNames(ParameterMap parameterMap, ParametrizedDbOperation operation) {
+      public void setParameters(ParametrizedDbOperation operation) {
         Arrays.stream(andConditions)
-          .forEach(andCondition->andCondition.mapParameterNames(parameterMap, operation));
+          .forEach(andCondition->andCondition.setParameters(operation));
       }
       @Override
       public String toString(boolean showParameterNames) {
@@ -67,7 +76,7 @@ public abstract class WhereCondition {
   public static WhereCondition isNull(final Column column) {
     return new WhereCondition() {
       @Override
-      public void mapParameterNames(ParameterMap parameterMap, ParametrizedDbOperation operation) {
+      public void setParameters(ParametrizedDbOperation operation) {
       }
       @Override
       public String toString(boolean showParameterNames) {
