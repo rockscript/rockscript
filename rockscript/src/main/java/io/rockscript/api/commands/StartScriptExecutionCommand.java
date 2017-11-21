@@ -41,15 +41,15 @@ public class StartScriptExecutionCommand extends Command<EngineStartScriptExecut
       Script script = null;
       if (scriptId!=null) {
         script = scriptStore.findScriptById(scriptId);
-        BadRequestException.checkNotNull(script, "No script found with id %s", scriptId);
+        BadRequestException.throwIfNull(script, "No script found with id %s", scriptId);
       } else if (scriptName!=null) {
         script = scriptStore.findScriptByNameEnd(scriptName);
-        BadRequestException.checkNotNull(script, "No script found with name %s", scriptName);
+        BadRequestException.throwIfNull(script, "No script found with name %s", scriptName);
       } else {
         throw new BadRequestException("No script version specified. Please provide one of scriptId, scriptName or scriptVersionId in the command");
       }
       scriptVersionId = script.getActiveScriptVersionId();
-      BadRequestException.checkNotNull(scriptVersionId, "Script %s does not have an active version yet", scriptId);
+      BadRequestException.throwIfNull(scriptVersionId, "Script %s does not have an active version yet", scriptId);
     }
 
     EngineScriptExecution engineScriptExecution = configuration

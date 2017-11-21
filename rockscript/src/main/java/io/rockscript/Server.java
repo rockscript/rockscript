@@ -31,6 +31,7 @@ import io.rockscript.netty.router.AsyncHttpServer;
 import io.rockscript.netty.router.AsyncHttpServerConfiguration;
 import io.rockscript.netty.router.JsonHandlerGson;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,13 @@ public class Server extends CliCommand {
   @Override
   protected Options getOptions() {
     Options options = new Options();
-    options.addOption("ed", "Add example script and execution on startup");
+    options.addOption(Option.builder("p")
+        .desc("The port the server should use")
+        .hasArg()
+        .build());
+    options.addOption(Option.builder("ed")
+        .desc("Add example script and execution on startup")
+        .build());
     return options;
   }
 
@@ -91,8 +98,19 @@ public class Server extends CliCommand {
     this.serverConfiguration = createServerConfiguration();
     this.serviceConfiguration.gson(commonGson);
     CommandExecutorService commandExecutorService = serviceConfiguration.build();
-    AsyncHttpServerConfiguration asyncHttpServerConfiguration = createAsyncHttpServerConfiguration(commonGson, commandExecutorService);
+    AsyncHttpServerConfiguration asyncHttpServerConfiguration = createAsyncHttpServerConfiguration(commonGson, commandExecutorService)
+      .port(getPort());
     this.asyncHttpServer = new AsyncHttpServer(asyncHttpServerConfiguration);
+  }
+
+  private int getPort() {
+    if (commandLine!=null && commandLine.hasOption("p")) {
+      String portText = commandLine.getOptionValue("p", null);
+      if (portText!=null) {
+        return Integer.parseInt(portText);
+      }
+    }
+    return AsyncHttpServerConfiguration.ROCKSCRIPT_DEFAULT_PORT;
   }
 
   protected ServerConfiguration createServerConfiguration() {

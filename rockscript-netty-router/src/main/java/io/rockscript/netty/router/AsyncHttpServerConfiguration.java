@@ -25,8 +25,10 @@ import java.util.ServiceLoader;
 
 public class AsyncHttpServerConfiguration {
 
+  public static final int ROCKSCRIPT_DEFAULT_PORT = 3652;
+
   protected Router<Class<?>> router = new Router<>();
-  protected int port = 3652;  // The default RockScript port number
+  protected int port = ROCKSCRIPT_DEFAULT_PORT;
   protected List<Interceptor> interceptors;
   protected MapContext context = new MapContext();
   protected JsonHandler jsonHandler;

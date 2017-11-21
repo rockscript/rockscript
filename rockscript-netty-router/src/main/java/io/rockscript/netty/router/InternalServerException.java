@@ -25,12 +25,8 @@ public class InternalServerException extends HttpException {
     super();
   }
 
-  public static void checkNotNull(Object o, String message, Object... args) {
-    checkTrue(o==null, message, args);
-  }
-
-  public static void checkTrue(boolean condition, String message, Object... args) {
-    if (condition) {
+  public static void throwIfNull(Object o, String message, Object... args) {
+    if (o==null) {
       throw new InternalServerException(format(message, args));
     }
   }

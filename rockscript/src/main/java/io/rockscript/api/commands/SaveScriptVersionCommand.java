@@ -55,7 +55,7 @@ public class SaveScriptVersionCommand extends Command<SaveScriptVersionResponse>
     Parse parse = scriptStore.parseScriptText(scriptText);
     if (scriptId!=null) {
       Script script = scriptStore.findScriptById(scriptId);
-      BadRequestException.checkNotNull(script, "Script %s does not exist", scriptId);
+      BadRequestException.throwIfNull(script, "Script %s does not exist", scriptId);
 
     } else {
       if (scriptName==null) {

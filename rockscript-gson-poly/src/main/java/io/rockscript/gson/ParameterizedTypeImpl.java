@@ -39,7 +39,7 @@ public class ParameterizedTypeImpl implements ParameterizedType, Serializable {
     this.rawType = canonicalize(rawType);
     this.typeArguments = typeArguments.clone();
     for (int t = 0; t < this.typeArguments.length; t++) {
-      checkNotNull(this.typeArguments[t], "type parameter");
+      throwIfNull(this.typeArguments[t], "type parameter");
       checkNotPrimitive(this.typeArguments[t], "type parameters");
       this.typeArguments[t] = canonicalize(this.typeArguments[t]);
     }
@@ -128,7 +128,7 @@ public class ParameterizedTypeImpl implements ParameterizedType, Serializable {
     }
   }
 
-  private static <T> T checkNotNull(T reference, Object errorMessage) {
+  private static <T> T throwIfNull(T reference, Object errorMessage) {
     if (reference == null) {
       throw new NullPointerException(String.valueOf(errorMessage));
     }
