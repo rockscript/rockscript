@@ -1,6 +1,6 @@
 package io.rockscript.engine.job.impl;
 
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.engine.impl.ArgumentsExpressionExecution;
 
 public class ActivityRetryAfterError extends Job implements JobHandler {
@@ -10,7 +10,7 @@ public class ActivityRetryAfterError extends Job implements JobHandler {
   }
 
   @Override
-  public void execute(Configuration configuration) {
+  public void execute(Engine engine) {
 
   }
 }

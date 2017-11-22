@@ -16,12 +16,12 @@
 package io.rockscript.activity;
 
 import com.google.gson.Gson;
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.engine.impl.ContinuationReference;
-import io.rockscript.engine.impl.Engine;
+import io.rockscript.engine.impl.ScriptRunner;
 import io.rockscript.engine.impl.Execution;
 import io.rockscript.engine.impl.Location;
-import io.rockscript.http.Http;
+import io.rockscript.http.client.Http;
 
 import java.util.List;
 import java.util.Map;
@@ -63,8 +63,8 @@ public class ActivityInput {
     return args;
   }
 
-  Configuration getConfiguration() {
-    return execution.getEngineScript().getConfiguration();
+  public Engine getEngine() {
+    return execution.getEngineScript().getEngine();
   }
 
   /** Convenience method to get the argument by index. */
@@ -83,11 +83,11 @@ public class ActivityInput {
   }
 
   public Gson getGson() {
-    return getConfiguration().getGson();
+    return getEngine().getGson();
   }
 
-  public Engine getEngine() {
-    return getConfiguration().getEngine();
+  public ScriptRunner getScriptRunner() {
+    return getEngine().getScriptRunner();
   }
 
   public Location getElementLocation() {
@@ -95,7 +95,7 @@ public class ActivityInput {
   }
 
   public Executor getExecutor() {
-    return getConfiguration().getExecutor();
+    return getEngine().getExecutor();
   }
 
   public Execution<?> getExecution() {
@@ -103,6 +103,6 @@ public class ActivityInput {
   }
 
   public Http getHttp() {
-    return getConfiguration().getHttp();
+    return getEngine().getHttp();
   }
 }

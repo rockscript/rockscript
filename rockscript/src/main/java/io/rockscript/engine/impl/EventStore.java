@@ -16,9 +16,9 @@
 
 package io.rockscript.engine.impl;
 
+import io.rockscript.Engine;
 import io.rockscript.engine.EngineException;
 import io.rockscript.activity.Activity;
-import io.rockscript.engine.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,11 +29,11 @@ public class EventStore implements EventListener {
 
   static final Logger log = LoggerFactory.getLogger(EventStore.class);
 
-  Configuration configuration;
+  Engine engine;
   List<Event> events = new ArrayList<>();
 
-  public EventStore(Configuration configuration) {
-    this.configuration = configuration;
+  public EventStore(Engine engine) {
+    this.engine = engine;
   }
 
   @Override
@@ -70,12 +70,12 @@ public class EventStore implements EventListener {
 
     String scriptId = scriptStartedEvent.getScriptVersionId();
     EngineException.throwIfNull(scriptId, "EngineScript id is null in scriptStartedEvent for engineScript execution: %s", scriptExecutionId);
-    EngineScript engineScript = configuration
+    EngineScript engineScript = engine
       .getScriptStore()
       .findScriptAstByScriptVersionId(scriptId);
     EngineException.throwIfNull(scriptId, "EngineScript not found for scriptId %s in engineScript execution %s", scriptId, scriptExecutionId);
 
-    EngineScriptExecution scriptExecution = new EngineScriptExecution(scriptExecutionId, configuration, engineScript, executionEvents);
+    EngineScriptExecution scriptExecution = new EngineScriptExecution(scriptExecutionId, engine, engineScript, executionEvents);
     scriptExecution.doWork();
 
     return scriptExecution;

@@ -22,10 +22,10 @@ import io.rockscript.api.Command;
 import io.rockscript.api.CommandExecutorService;
 import io.rockscript.api.CommandExecutorServiceImpl;
 import io.rockscript.api.Response;
-import io.rockscript.engine.Configuration;
-import io.rockscript.http.Http;
-import io.rockscript.http.HttpRequest;
-import io.rockscript.http.HttpResponse;
+import io.rockscript.Engine;
+import io.rockscript.http.client.ClientRequest;
+import io.rockscript.http.client.ClientResponse;
+import io.rockscript.http.client.Http;
 import io.rockscript.netty.router.AsyncHttpServerConfiguration;
 import io.rockscript.netty.router.Interceptor;
 import org.junit.AfterClass;
@@ -76,8 +76,8 @@ public abstract class AbstractServerTest {
     return server.getCommandExecutorService();
   }
 
-  public Configuration getConfiguration() {
-    return ((CommandExecutorServiceImpl)getCommandExecutorService()).getConfiguration();
+  public Engine getConfiguration() {
+    return ((CommandExecutorServiceImpl)getCommandExecutorService()).getEngine();
   }
 
   public static class TestServer extends Server {
@@ -127,38 +127,38 @@ public abstract class AbstractServerTest {
     return baseUrl+path;
   }
 
-  public HttpRequest newGet(final String path) {
-    return new TestHttpRequest(http, Http.Methods.GET, createUri(path));
+  public ClientRequest newGet(final String path) {
+    return new TestClientRequest(http, Http.Methods.GET, createUri(path));
   }
 
-  public HttpRequest newPost(final String path) {
-    return new TestHttpRequest(http, Http.Methods.POST, createUri(path));
+  public ClientRequest newPost(final String path) {
+    return new TestClientRequest(http, Http.Methods.POST, createUri(path));
   }
 
-  public HttpRequest newPut(final String path) {
-    return new TestHttpRequest(http, Http.Methods.PUT, createUri(path));
+  public ClientRequest newPut(final String path) {
+    return new TestClientRequest(http, Http.Methods.PUT, createUri(path));
   }
 
-  public HttpRequest newDelete(final String path) {
-    return new TestHttpRequest(http, Http.Methods.DELETE, createUri(path));
+  public ClientRequest newDelete(final String path) {
+    return new TestClientRequest(http, Http.Methods.DELETE, createUri(path));
   }
 
-  static class TestHttpRequest extends HttpRequest {
-    public TestHttpRequest(Http http, String method, String url) {
+  static class TestClientRequest extends ClientRequest {
+    public TestClientRequest(Http http, String method, String url) {
       super(http, method, url);
     }
     @Override
-    protected HttpResponse createHttpResponse() throws IOException {
-      return new TestHttpResponse(this);
+    protected ClientResponse createHttpResponse() throws IOException {
+      return new TestClientResponse(this);
     }
   }
 
-  static class TestHttpResponse extends HttpResponse {
-    public TestHttpResponse(TestHttpRequest testHttpRequest) throws IOException {
-      super(testHttpRequest);
+  static class TestClientResponse extends ClientResponse {
+    public TestClientResponse(TestClientRequest testHttpRequest) throws IOException {
+      super(testHttpRequest, responseBodyHandler);
     }
     @Override
-    public HttpResponse assertStatus(int expectedStatus) {
+    public ClientResponse assertStatus(int expectedStatus) {
       if (status!=expectedStatus) {
         Throwable serverCause = serverException;
         throw new RuntimeException("Status was " + status + ", expected " + expectedStatus, serverCause);

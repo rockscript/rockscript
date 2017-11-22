@@ -15,20 +15,27 @@
  */
 package io.rockscript.engine;
 
-import io.rockscript.netty.router.*;
+import io.rockscript.Engine;
+import io.rockscript.api.AbstractRequestHandler;
+import io.rockscript.http.servlet.Get;
+import io.rockscript.http.servlet.HttpRequest;
+import io.rockscript.http.servlet.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Get("/ping")
-public class PingHandler implements RequestHandler {
+public class PingHandler extends AbstractRequestHandler {
 
   static Logger log = LoggerFactory.getLogger(PingHandler.class);
 
+  public PingHandler(Engine engine) {
+    super(engine);
+  }
+
   @Override
-  public void handle(AsyncHttpRequest request, AsyncHttpResponse response, Context context) {
+  public void handle(HttpRequest request, HttpResponse response) {
     response.statusOk();
     response.bodyString("pong");
     response.headerContentTypeTextPlain();
-    response.send();
   }
 }

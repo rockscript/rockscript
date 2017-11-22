@@ -20,15 +20,16 @@ import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.AbstractActivity;
 import io.rockscript.engine.EngineException;
-import io.rockscript.http.HttpRequest;
-import io.rockscript.http.HttpResponse;
+import io.rockscript.http.client.ClientRequest;
+import io.rockscript.http.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static io.rockscript.http.Http.ContentTypes.APPLICATION_JSON;
-import static io.rockscript.http.Http.Headers.CONTENT_TYPE;
+import static io.rockscript.engine.impl.GsonBodyParser.parseResponseBody;
+import static io.rockscript.http.client.Http.ContentTypes.APPLICATION_JSON;
+import static io.rockscript.http.client.Http.Headers.CONTENT_TYPE;
 
 public class RemoteActivity extends AbstractActivity {
 
@@ -60,14 +61,14 @@ public class RemoteActivity extends AbstractActivity {
     ContinuationReference continuationReference = input.getContinuationReference();
     String logPrefix = "["+continuationReference.getScriptExecutionId()+"|"+continuationReference.getExecutionId()+"]";
 
-    HttpRequest request = input.getHttp()
+    ClientRequest request = input.getHttp()
       .newPost(url + "/" + activityName)
       .header(CONTENT_TYPE, APPLICATION_JSON)
       .body(activityInputJson);
 
     log.debug(request.toString(logPrefix));
 
-    HttpResponse response = request.execute();
+    ClientResponse response = request.execute(parseResponseBody(gson,ActivityOutput.class));
 
     log.debug(response.toString(logPrefix));
 
@@ -78,7 +79,7 @@ public class RemoteActivity extends AbstractActivity {
 
     ActivityOutput activityOutput = null;
     try {
-      activityOutput = response.getBodyAs(ActivityOutput.class);
+      activityOutput = response.getBody();
     } catch (Exception e) {
       throw new EngineException("Couldn't parse remote HTTP activity response as ActivityOutput: " + e.getMessage(), e);
     }

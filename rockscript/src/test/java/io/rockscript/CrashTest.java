@@ -19,7 +19,6 @@ package io.rockscript;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.api.commands.SaveScriptVersionCommand;
 import io.rockscript.api.model.ScriptExecution;
-import io.rockscript.engine.*;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.engine.impl.EventListener;
 import io.rockscript.api.CommandExecutorService;
@@ -41,20 +40,20 @@ public class CrashTest {
   List<Object> synchronousCapturedData = new ArrayList<>();
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
-  public Configuration createCrashTestConfiguration() {
-    Configuration configuration = new CrashConfiguration();
-    addHelloService(configuration);
-    return configuration;
+  public Engine createCrashTestConfiguration() {
+    Engine engine = new CrashEngine();
+    addHelloService(engine);
+    return engine;
   }
 
   public CommandExecutorService createNormalTestEngine() {
-    TestConfiguration configuration = new TestConfiguration();
+    TestEngine configuration = new TestEngine();
     addHelloService(configuration);
-    return configuration.build();
+    return configuration.initialize();
   }
 
-  public static class CrashConfiguration extends TestConfiguration {
-    public CrashConfiguration() {
+  public static class CrashEngine extends TestEngine {
+    public CrashEngine() {
       eventListener = new CrashEventListener(this.eventListener);
     }
   }
@@ -92,8 +91,8 @@ public class CrashTest {
     }
   }
 
-  private void addHelloService(Configuration configuration) {
-    configuration.getImportResolver().createImport("example.com/hello")
+  private void addHelloService(Engine engine) {
+    engine.getImportResolver().createImport("example.com/hello")
       .put("aSyncFunction", input -> {
         synchronousCapturedData.add("Execution was here");
         synchronousCapturedData.add(input.getArgs().get(0));
@@ -116,9 +115,9 @@ public class CrashTest {
 
     int eventsWithoutCrash = 1;
     boolean crashOccurred = false;
-    Configuration configuration = createCrashTestConfiguration();
-    CommandExecutorService commandExecutorService = configuration.build();
-    CrashEventListener eventListener = (CrashEventListener) configuration
+    Engine engine = createCrashTestConfiguration();
+    CommandExecutorService commandExecutorService = engine.initialize();
+    CrashEventListener eventListener = (CrashEventListener) engine
         .getEventListener();
 
     String scriptId = commandExecutorService.execute(new SaveScriptVersionCommand()

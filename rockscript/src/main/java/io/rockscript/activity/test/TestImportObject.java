@@ -15,11 +15,11 @@
  */
 package io.rockscript.activity.test;
 
+import io.rockscript.Engine;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.ImportObject;
 import io.rockscript.activity.ImportProvider;
-import io.rockscript.api.CommandExecutorService;
 import io.rockscript.api.commands.EngineStartScriptExecutionResponse;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.Script;
@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
 public class TestImportObject extends ImportObject implements ImportProvider {
 
   private TestResult testResult;
-  private CommandExecutorService commandExecutorService;
+  private Engine engine;
 
   public TestImportObject(TestResult testResult) {
     super("rockscript.io/test");
@@ -48,9 +48,10 @@ public class TestImportObject extends ImportObject implements ImportProvider {
           return ActivityOutput.error("No script matched name patter "+scriptNamePattern);
         }
 
-        response = commandExecutorService.execute(new StartScriptExecutionCommand()
+        response = new StartScriptExecutionCommand()
             .scriptVersionId(scriptVersionId)
-            .input(input));
+            .input(input)
+            .execute(engine);
 
         if (response.getErrorEvent()==null) {
           return ActivityOutput.endActivity(response.getScriptExecution());
@@ -75,7 +76,7 @@ public class TestImportObject extends ImportObject implements ImportProvider {
     ScriptStore scriptStore = activityInput.getExecution()
       .getScriptExecution()
       .getEngineScript()
-      .getConfiguration()
+      .getEngine()
       .getScriptStore();
 
     List<Script> scripts = scriptStore.getScripts();
@@ -110,7 +111,7 @@ public class TestImportObject extends ImportObject implements ImportProvider {
     return this;
   }
 
-  public void setCommandExecutorService(CommandExecutorService commandExecutorService) {
-    this.commandExecutorService = commandExecutorService;
+  public void setEngine(Engine engine) {
+    this.engine = engine;
   }
 }

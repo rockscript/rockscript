@@ -15,7 +15,7 @@
  */
 package io.rockscript.engine.impl;
 
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.engine.EngineException;
 import io.rockscript.api.model.ScriptExecution;
 import org.slf4j.Logger;
@@ -41,15 +41,15 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
 
   LinkedList<ExecutionEvent> unreplayedEvents;
 
-  public EngineScriptExecution(String scriptExecutionId, Configuration configuration, EngineScript engineScript) {
+  public EngineScriptExecution(String scriptExecutionId, Engine engine, EngineScript engineScript) {
     super(scriptExecutionId, engineScript, null);
-    this.eventListener = configuration.getEventListener();
+    this.eventListener = engine.getEventListener();
     this.executionMode = ExecutionMode.EXECUTING;
-    initializeSystemVariable(configuration);
+    initializeSystemVariable(engine);
   }
 
-  public EngineScriptExecution(String scriptExecutionId, Configuration configuration, EngineScript engineScript, List<ExecutionEvent> storedEvents) {
-    this(scriptExecutionId, configuration, engineScript);
+  public EngineScriptExecution(String scriptExecutionId, Engine engine, EngineScript engineScript, List<ExecutionEvent> storedEvents) {
+    this(scriptExecutionId, engine, engineScript);
 
     this.executionMode = ExecutionMode.REBUILDING;
     this.unreplayedEvents = new LinkedList<>(storedEvents);
@@ -75,9 +75,9 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
     this.unreplayedEvents = null;
   }
 
-  private void initializeSystemVariable(Configuration configuration) {
+  private void initializeSystemVariable(Engine engine) {
     JsonObject systemJsonObject = new JsonObject();
-    systemJsonObject.put("import", new SystemImportActivity(configuration));
+    systemJsonObject.put("import", new SystemImportActivity(engine));
     createVariable("system")
       .setValue(systemJsonObject);
   }

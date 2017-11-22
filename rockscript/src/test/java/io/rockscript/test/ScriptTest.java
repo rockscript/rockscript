@@ -23,10 +23,10 @@ import io.rockscript.api.commands.SaveScriptVersionCommand;
 import io.rockscript.api.commands.EndActivityCommand;
 import io.rockscript.api.commands.EngineStartScriptExecutionResponse;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.api.model.ScriptExecution;
-import io.rockscript.engine.TestConfiguration;
+import io.rockscript.TestEngine;
 import io.rockscript.engine.impl.ContinuationReference;
 import org.junit.After;
 import org.junit.Before;
@@ -53,7 +53,7 @@ public class ScriptTest {
   @SuppressWarnings("deprecation")
   @After
   public void tearDown() {
-    ((CommandExecutorServiceImpl) commandExecutorService).getConfiguration()
+    ((CommandExecutorServiceImpl) commandExecutorService).getEngine()
       .getHttp()
       .getApacheHttpClient()
       .getConnectionManager()
@@ -88,7 +88,7 @@ public class ScriptTest {
     return new ScriptServiceProvider() {
       @Override
       public CommandExecutorService createScriptService() {
-        return new TestConfiguration().build();
+        return new TestEngine().initialize();
       }
     };
   }
@@ -134,8 +134,8 @@ public class ScriptTest {
       .getScriptExecution();
   }
 
-  protected Configuration getConfiguration() {
-    return ((CommandExecutorServiceImpl) commandExecutorService).getConfiguration();
+  protected Engine getConfiguration() {
+    return ((CommandExecutorServiceImpl) commandExecutorService).getEngine();
   }
 
   public static void assertContains(String expectedSubstring, String text) {

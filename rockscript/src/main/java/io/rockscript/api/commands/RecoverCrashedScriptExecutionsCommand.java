@@ -1,6 +1,6 @@
 package io.rockscript.api.commands;
 
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.Command;
 
@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 
 public class RecoverCrashedScriptExecutionsCommand extends Command<RecoverCrashedScriptExecutionsResponse> {
   @Override
-  public RecoverCrashedScriptExecutionsResponse execute(Configuration configuration) {
-    List<ScriptExecution> recoveredScriptExecutions = (List) configuration
+  public RecoverCrashedScriptExecutionsResponse execute(Engine engine) {
+    List<ScriptExecution> recoveredScriptExecutions = (List) engine
       .getEventStore()
       .recoverCrashedScriptExecutions()
       .stream()

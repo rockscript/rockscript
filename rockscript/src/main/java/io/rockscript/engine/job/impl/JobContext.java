@@ -1,20 +1,20 @@
 package io.rockscript.engine.job.impl;
 
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.engine.job.JobService;
 
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 
-public class JobContext extends Configuration {
+public class JobContext extends Engine {
 
-  Configuration configuration;
+  Engine engine;
   Job job;
   JobRun jobRun;
   JobService jobService;
 
-  public JobContext(Configuration configuration, Job job, JobRun jobRun, JobService jobService) {
-    this.configuration = configuration;
+  public JobContext(Engine engine, Job job, JobRun jobRun, JobService jobService) {
+    this.engine = engine;
     this.job = job;
     this.jobRun = jobRun;
     this.jobService = jobService;

@@ -1,48 +1,52 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017 RockScript.io.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 package io.rockscript.api;
 
-import io.rockscript.netty.router.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static io.rockscript.util.Maps.entry;
-import static io.rockscript.util.Maps.hashMap;
+import com.google.gson.Gson;
+import io.rockscript.Engine;
+import io.rockscript.http.servlet.HttpRequest;
+import io.rockscript.http.servlet.HttpResponse;
+import io.rockscript.http.servlet.Post;
 
 @Post("/command")
-public class CommandHandler implements RequestHandler {
+public class CommandHandler extends AbstractRequestHandler {
 
-  static Logger log = LoggerFactory.getLogger(CommandHandler.class);
+  public CommandHandler(Engine engine) {
+    super(engine);
+  }
 
   @Override
-  public void handle(AsyncHttpRequest request, AsyncHttpResponse response, Context context) {
-    Command<?> command = request.getBodyJson(Command.class);
-    CommandExecutorService commandExecutorService = context.get(CommandExecutorService.class);
-
+  public void handle(HttpRequest request, HttpResponse response) {
+    Command command = null;
     try {
-      Response commandResponse = commandExecutorService.execute(command);
-      response.bodyJson(commandResponse);
+      Gson gson = engine.getGson();
+      String jsonBodyString = request.getBodyStringUtf8();
+      command = gson.fromJson(jsonBodyString, Command.class);
+      Response commandResponse = command.execute(engine);
+
+      String responseBodyJson = gson.toJson(commandResponse);
+      response.bodyString(responseBodyJson);
       response.status(commandResponse.getStatus());
-      response.send();
 
     } catch (Exception e) {
-      log.debug("Exception while executing command "+command+": "+e.getMessage(), e);
-      response.bodyJson(hashMap(entry("message", "Error: " + e.getMessage())));
-      response.status(500);
-      response.send();
+      response.statusInternalServerError();
     }
   }
 }

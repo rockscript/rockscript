@@ -18,10 +18,10 @@ package io.rockscript.api.commands;
 import io.rockscript.api.Command;
 import io.rockscript.api.model.Script;
 import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.engine.impl.Parse;
 import io.rockscript.engine.impl.ScriptStore;
-import io.rockscript.netty.router.BadRequestException;
+import io.rockscript.http.servlet.BadRequestException;
 
 /** Saves a new script version.
  *
@@ -49,8 +49,8 @@ public class SaveScriptVersionCommand extends Command<SaveScriptVersionResponse>
   protected Boolean activate;
 
   @Override
-  public SaveScriptVersionResponse execute(Configuration configuration) {
-    ScriptStore scriptStore = configuration.getScriptStore();
+  public SaveScriptVersionResponse execute(Engine engine) {
+    ScriptStore scriptStore = engine.getScriptStore();
 
     Parse parse = scriptStore.parseScriptText(scriptText);
     if (scriptId!=null) {

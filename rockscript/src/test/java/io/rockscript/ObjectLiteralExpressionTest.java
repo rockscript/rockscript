@@ -20,7 +20,6 @@ import io.rockscript.activity.ActivityOutput;
 import io.rockscript.api.CommandExecutorService;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.api.model.ScriptExecution;
-import io.rockscript.engine.TestConfiguration;
 import io.rockscript.test.ScriptTest;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -40,12 +39,12 @@ public class ObjectLiteralExpressionTest extends ScriptTest {
 
   @Override
   protected CommandExecutorService initializeScriptService() {
-    TestConfiguration configuration = new TestConfiguration();
+    TestEngine configuration = new TestEngine();
     configuration.getImportResolver().createImport("example.com/assert")
       .put("assertLiteralValue", input -> {
         capturedValues.add(input.getArgs().get(0));
         return ActivityOutput.endActivity();});
-    return configuration.build();
+    return configuration.initialize();
   }
 
   @Test

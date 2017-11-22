@@ -29,8 +29,8 @@ public class ScriptExecutionComparator extends DeepComparator {
     ignoreField(EngineScriptExecution.class, "eventListener");
     ignoreField(Execution.class, "element");
     ignoreField(EngineScript.class, "elements");
-    ignoreField(EngineScript.class, "configuration");
-    ignoreField(SystemImportActivity.class, "configuration");
+    ignoreField(EngineScript.class, "engine");
+    ignoreField(SystemImportActivity.class, "engine");
     ignoreAnonymousField(Activity.class, "val$functionHandler");
     ignoreAnonymousField(Activity.class, "arg$1");
     ignoreAnonymousField(Function.class, "arg$1");

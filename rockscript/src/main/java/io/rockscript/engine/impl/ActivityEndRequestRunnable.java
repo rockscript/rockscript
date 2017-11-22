@@ -22,9 +22,9 @@ public class ActivityEndRequestRunnable implements Runnable {
   ActivityEndRequest activityEndRequest;
   Lock lock;
   EngineScriptExecution lockedScriptExecution;
-  LocalEngine localEngine;
+  LocalScriptRunner localEngine;
 
-  public ActivityEndRequestRunnable(ActivityEndRequest activityEndRequest, Lock lock, EngineScriptExecution lockedScriptExecution, LocalEngine localEngine) {
+  public ActivityEndRequestRunnable(ActivityEndRequest activityEndRequest, Lock lock, EngineScriptExecution lockedScriptExecution, LocalScriptRunner localEngine) {
     this.activityEndRequest = activityEndRequest;
     this.lock = lock;
     this.lockedScriptExecution = lockedScriptExecution;

@@ -17,16 +17,16 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.activity.*;
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 
 import java.util.List;
 
 public class SystemImportActivity implements Activity {
 
-  transient Configuration configuration;
+  transient Engine engine;
 
-  public SystemImportActivity(Configuration configuration) {
-    this.configuration = configuration;
+  public SystemImportActivity(Engine engine) {
+    this.engine = engine;
   }
 
   @Override
@@ -47,7 +47,7 @@ public class SystemImportActivity implements Activity {
   @Override
   public ActivityOutput invoke(ActivityInput input) {
     String url = (String) input.getArgs().get(0);
-    Object importedObject = configuration.getImportResolver().get(url);
+    Object importedObject = engine.getImportResolver().get(url);
     return ActivityOutput.endActivity(importedObject);
   }
 

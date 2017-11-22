@@ -1,6 +1,6 @@
 package io.rockscript.engine.job;
 
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.engine.impl.IdGenerator;
 import io.rockscript.engine.job.impl.Job;
 import io.rockscript.engine.job.impl.JobContext;
@@ -18,17 +18,17 @@ import java.util.TimerTask;
 
 public class JobService {
 
-  Configuration configuration;
+  Engine engine;
   Timer timer;
   List<Job> jobs = new ArrayList<>();
   IdGenerator idGenerator;
   /** jobs that are stuck */
   List<Job> errorJobs = new ArrayList<>();
 
-  public JobService(Configuration configuration) {
-    this.configuration = configuration;
+  public JobService(Engine engine) {
+    this.engine = engine;
     timer = new Timer();
-    idGenerator = configuration.getJobIdGenerator();
+    idGenerator = engine.getJobIdGenerator();
   }
 
   public void startup() {
@@ -72,7 +72,7 @@ public class JobService {
     JobRun jobRun = new JobRun();
     job.addJobRun(jobRun);
     try {
-      jobHandler.execute(new JobContext(configuration, job, jobRun, this));
+      jobHandler.execute(new JobContext(engine, job, jobRun, this));
       jobRun.endOk();
     } catch (Exception e) {
       String error = Exceptions.getStackTraceString(e);

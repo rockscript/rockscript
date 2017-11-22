@@ -19,7 +19,6 @@ package io.rockscript;
 import io.rockscript.api.CommandExecutorService;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.api.model.ScriptExecution;
-import io.rockscript.engine.TestConfiguration;
 import io.rockscript.test.ScriptTest;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -34,7 +33,7 @@ public class ErrorTest extends ScriptTest {
     // This ensures that each test will get a new CommandExecutorService
     // so that the tests can customize the import resolver without
     // polluting any cached script services.
-    return new TestConfiguration().build();
+    return new TestEngine().initialize();
   }
 
   @Test

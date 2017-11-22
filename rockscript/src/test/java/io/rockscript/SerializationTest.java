@@ -18,7 +18,6 @@ package io.rockscript;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.engine.*;
 import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.api.CommandExecutorService;
 import io.rockscript.api.commands.EndActivityCommand;
@@ -47,7 +46,7 @@ public class SerializationTest extends ScriptTest {
     // This ensures that each test will get a new CommandExecutorService
     // so that the tests can customize the import resolver without
     // polluting any cached script services.
-    return new TestConfiguration().build();
+    return new TestEngine().initialize();
   }
 
   @Test

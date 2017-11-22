@@ -16,11 +16,11 @@
 package io.rockscript.api.commands;
 
 import io.rockscript.api.model.Script;
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.api.Command;
 import io.rockscript.engine.impl.ScriptStore;
-import io.rockscript.netty.router.BadRequestException;
+import io.rockscript.http.servlet.BadRequestException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -35,9 +35,9 @@ public class StartScriptExecutionCommand extends Command<EngineStartScriptExecut
   protected Object input;
 
   @Override
-  public EngineStartScriptExecutionResponse execute(Configuration configuration) {
+  public EngineStartScriptExecutionResponse execute(Engine engine) {
     if (scriptVersionId==null) {
-      ScriptStore scriptStore = configuration.getScriptStore();
+      ScriptStore scriptStore = engine.getScriptStore();
       Script script = null;
       if (scriptId!=null) {
         script = scriptStore.findScriptById(scriptId);
@@ -52,8 +52,8 @@ public class StartScriptExecutionCommand extends Command<EngineStartScriptExecut
       BadRequestException.throwIfNull(scriptVersionId, "Script %s does not have an active version yet", scriptId);
     }
 
-    EngineScriptExecution engineScriptExecution = configuration
-      .getEngine()
+    EngineScriptExecution engineScriptExecution = engine
+      .getScriptRunner()
       .startScriptExecution(scriptVersionId, input);
     return new EngineStartScriptExecutionResponse(engineScriptExecution);
   }

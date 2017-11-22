@@ -15,7 +15,7 @@
  */
 package io.rockscript.engine.impl;
 
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ public class EventLogger implements EventListener {
 
   EventListener next;
 
-  public EventLogger(Configuration configuration, EventListener next) {
+  public EventLogger(Engine engine, EventListener next) {
     this.next = next;
   }
 

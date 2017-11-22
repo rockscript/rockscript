@@ -21,7 +21,6 @@ import io.rockscript.activity.ActivityOutput;
 import io.rockscript.api.CommandExecutorService;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.api.model.ScriptExecution;
-import io.rockscript.engine.TestConfiguration;
 import io.rockscript.engine.impl.ExecutionEvent;
 import io.rockscript.test.ScriptTest;
 import org.junit.Test;
@@ -44,7 +43,7 @@ public class ActivityTest extends ScriptTest {
     // This ensures that each test will get a new CommandExecutorService
     // so that the tests can customize the import resolver without
     // polluting any cached script services.
-    return new TestConfiguration().build();
+    return new TestEngine().initialize();
   }
 
   @Test
@@ -78,7 +77,7 @@ public class ActivityTest extends ScriptTest {
   public void testEvents() {
     getConfiguration().getImportResolver().createImport("approvalService")
       .put("getMessage", input -> {
-        input.getEngine().endActivity(input.getContinuationReference(), "hello");
+        input.getScriptRunner().endActivity(input.getContinuationReference(), "hello");
         return ActivityOutput.waitForEndActivityCallback();
       }).put("approve", input -> {
       activityInputs.add(input);

@@ -15,7 +15,7 @@
  */
 package io.rockscript.api.commands;
 
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.api.Command;
@@ -30,10 +30,10 @@ public class EndActivityCommand extends Command<EngineEndActivityResponse> {
   protected Object result;
 
   @Override
-  public EngineEndActivityResponse execute(Configuration configuration) {
+  public EngineEndActivityResponse execute(Engine engine) {
     ContinuationReference continuationReference = new ContinuationReference(scriptExecutionId, executionId);
-    EngineScriptExecution engineScriptExecution = configuration
-        .getEngine()
+    EngineScriptExecution engineScriptExecution = engine
+        .getScriptRunner()
         .endActivity(continuationReference, result);
     return new EngineEndActivityResponse(engineScriptExecution);
   }

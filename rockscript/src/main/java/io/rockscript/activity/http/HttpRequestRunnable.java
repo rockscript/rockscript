@@ -16,10 +16,12 @@
 
 package io.rockscript.activity.http;
 
+import com.google.gson.Gson;
+import io.rockscript.Engine;
 import io.rockscript.engine.impl.ContinuationReference;
-import io.rockscript.engine.impl.Engine;
-import io.rockscript.http.HttpRequest;
-import io.rockscript.http.HttpResponse;
+import io.rockscript.engine.impl.ScriptRunner;
+import io.rockscript.http.client.ClientRequest;
+import io.rockscript.http.client.ClientResponse;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +33,10 @@ public class HttpRequestRunnable implements Runnable {
   static Logger log = LoggerFactory.getLogger(HttpRequestRunnable.class);
 
   ContinuationReference continuationReference;
-  HttpRequest request;
+  ClientRequest request;
   Engine engine;
 
-  public HttpRequestRunnable(ContinuationReference continuationReference, HttpRequest request, Engine engine) {
+  public HttpRequestRunnable(ContinuationReference continuationReference, ClientRequest request, Engine engine) {
     this.continuationReference = continuationReference;
     this.request = request;
     this.engine = engine;
@@ -42,23 +44,20 @@ public class HttpRequestRunnable implements Runnable {
 
   @Override
   public void run() {
-    HttpResponse response = request
-      .entityHandler((httpEntity,httpResponse)->{
+    Gson gson = engine.getGson();
+    ClientResponse response = request
+      .execute((httpEntity,httpResponse)->{
         try {
           Object body = EntityUtils.toString(httpEntity, "UTF-8");
           if (httpResponse.isContentTypeApplicationJson()) {
-            body = httpResponse
-              .getRequest()
-              .getHttp()
-              .getCodec()
-              .deserialize((String)body, Object.class);
+            body = gson.fromJson((String)body, Object.class);
           }
           return body;
         } catch (IOException e) {
           throw new RuntimeException("Couldn't ready body/entity from http request "+httpResponse.toString());
         }
-      })
-      .execute();
-    engine.endActivity(continuationReference, response);
+      });
+    ScriptRunner scriptRunner = engine.getScriptRunner();
+    scriptRunner.endActivity(continuationReference, response);
   }
 }

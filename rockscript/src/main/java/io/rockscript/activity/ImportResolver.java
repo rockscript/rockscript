@@ -17,7 +17,7 @@
 package io.rockscript.activity;
 
 import io.rockscript.engine.impl.RemoteActivityJsonObject;
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class ImportResolver {
   /** importProviders by name */
   Map<String,ImportProvider> importProviders = new HashMap<>();
 
-  public ImportResolver(Configuration configuration) {
+  public ImportResolver(Engine engine) {
     loadAllAvailableOnClassPath();
   }
 

@@ -17,12 +17,12 @@ package io.rockscript.activity.http;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import io.rockscript.Engine;
 import io.rockscript.activity.AbstractActivity;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.engine.impl.Engine;
-import io.rockscript.http.Http;
-import io.rockscript.http.HttpRequest;
+import io.rockscript.http.client.ClientRequest;
+import io.rockscript.http.client.Http;
 import io.rockscript.util.Lists;
 
 import java.util.Collection;
@@ -50,7 +50,7 @@ public class HttpActivity extends AbstractActivity {
 
   @Override
   public ActivityOutput invoke(ActivityInput input) {
-    // Parse the HttpRequest object
+    // Parse the ClientRequest object
     Object requestObject = input.getArg(0);
 
     wrapSingleHeadersInList(requestObject);
@@ -58,13 +58,13 @@ public class HttpActivity extends AbstractActivity {
     Gson gson = input.getGson();
     JsonElement requestElement = gson.toJsonTree(requestObject);
 
-    HttpRequest httpRequest = gson.fromJson(requestElement, HttpRequest.class);
-    httpRequest.setHttp(input.getHttp());
-    httpRequest.setMethod(this.method);
+    ClientRequest clientRequest = gson.fromJson(requestElement, ClientRequest.class);
+    clientRequest.setHttp(input.getHttp());
+    clientRequest.setMethod(this.method);
 
     // Create the HttpRequestRunnable command
     Engine engine = input.getEngine();
-    HttpRequestRunnable command = new HttpRequestRunnable(input.getContinuationReference(), httpRequest, engine);
+    HttpRequestRunnable command = new HttpRequestRunnable(input.getContinuationReference(), clientRequest, engine);
 
     // Schedule the HttpRequestRunnable command for execution asynchronously
     input

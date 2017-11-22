@@ -18,9 +18,9 @@ package io.rockscript.engine.impl;
 
 import io.rockscript.api.model.Script;
 import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.engine.EngineException;
-import io.rockscript.netty.router.BadRequestException;
+import io.rockscript.http.servlet.BadRequestException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 public class ScriptStore {
 
-  Configuration configuration;
+  Engine engine;
 
   /** all stored scripts */
   List<Script> scripts = new ArrayList<>();
@@ -38,20 +38,20 @@ public class ScriptStore {
   /** maps script version ids to parsed EngineScript's */
   public Map<String, EngineScript> parsedScriptAsts = new HashMap<>();
 
-  public ScriptStore(Configuration configuration) {
-    this.configuration = configuration;
+  public ScriptStore(Engine engine) {
+    this.engine = engine;
   }
 
-  public ScriptStore(Configuration configuration, ScriptStore other) {
-    this.configuration = configuration;
+  public ScriptStore(Engine engine, ScriptStore other) {
+    this.engine = engine;
     this.scripts = other.scripts;
   }
 
   /** Parses the scriptVersion and initializes
    * the engineScript if parse is succesfull. */
-  // TODO move this method into a ScriptParser in Configuration
+  // TODO move this method into a ScriptParser in Engine
   public Parse parseScriptText(String scriptText) {
-    return Parse.parse(scriptText, configuration);
+    return Parse.parse(scriptText, engine);
   }
 
   /** Finds the first script for which the name ends with the given scriptNameSuffix */
@@ -91,7 +91,7 @@ public class ScriptStore {
       throw new BadRequestException("Script with name '" + script.getName() + "' already exists");
     }
     if (script.getId()==null) {
-      String scriptId = configuration.getScriptIdGenerator().createId();
+      String scriptId = engine.getScriptIdGenerator().createId();
       script.setId(scriptId);
     }
     if (findScriptById(script.getId())!=null) {
@@ -107,7 +107,7 @@ public class ScriptStore {
     ScriptVersion scriptVersion = new ScriptVersion();
     String scriptVersionId = scriptVersion.getId();
     if (scriptVersionId==null) {
-      scriptVersionId = configuration.getScriptVersionIdGenerator().createId();
+      scriptVersionId = engine.getScriptVersionIdGenerator().createId();
     }
     scriptVersion.setId(scriptVersionId);
     scriptVersion.setScriptId(script.getId());
