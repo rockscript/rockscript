@@ -36,7 +36,7 @@ public class Path {
   /** returns true if this request path matches the given request.
    * If the request path matches, this method also sets the request path
    * parameters on the request. */
-  public boolean matches(HttpRequest request) {
+  public boolean matches(ServerRequest request) {
     String[] actualParts = request.getPathInfo().split("/");
     if (pathParts.size()==actualParts.length) {
       Map<String,String> pathParameters = new HashMap<>();

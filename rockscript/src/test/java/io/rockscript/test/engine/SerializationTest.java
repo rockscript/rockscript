@@ -1,29 +1,33 @@
 /*
- * Copyright (c) 2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017 RockScript.io.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-package io.rockscript;
+package io.rockscript.test.engine;
 
+import io.rockscript.Engine;
+import io.rockscript.TestEngine;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.engine.impl.EngineScriptExecution;
-import io.rockscript.api.CommandExecutorService;
 import io.rockscript.api.commands.EndActivityCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
+import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.test.ScriptExecutionComparator;
-import io.rockscript.test.ScriptTest;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,14 +39,14 @@ import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.assertEquals;
 
-public class SerializationTest extends ScriptTest {
+public class SerializationTest extends AbstractEngineTest {
 
   protected static Logger log = LoggerFactory.getLogger(SerializationTest.class);
 
   List<ActivityInput> activityInputs = new ArrayList<>();
 
   @Override
-  protected CommandExecutorService initializeScriptService() {
+  protected Engine initializeEngine() {
     // This ensures that each test will get a new CommandExecutorService
     // so that the tests can customize the import resolver without
     // polluting any cached script services.
@@ -51,7 +55,7 @@ public class SerializationTest extends ScriptTest {
 
   @Test
   public void testSerialization() {
-    getConfiguration().getImportResolver().createImport("helloService")
+    engine.getImportResolver().createImport("helloService")
       .put("hi", input -> {
         return ActivityOutput.endActivity(input.getArg(0) + " world");
       })
@@ -65,12 +69,13 @@ public class SerializationTest extends ScriptTest {
             "var response = helloService.hi(system.input.message); \n" +
             "helloService.world(response);");
 
-    EngineScriptExecution engineScriptExecution = commandExecutorService.execute(new StartScriptExecutionCommand()
+    EngineScriptExecution engineScriptExecution = new StartScriptExecutionCommand()
         .scriptVersionId(scriptVersion.getId())
         .input(hashMap(
             entry("message", "hello")
-        )))
-      .getEngineScriptExecution();
+        ))
+        .execute(engine)
+        .getEngineScriptExecution();
 
     String scriptExecutionId = engineScriptExecution.getId();
 
@@ -81,17 +86,18 @@ public class SerializationTest extends ScriptTest {
 
     assertEquals("hello world", activityInput.getArg(0));
 
-    engineScriptExecution = commandExecutorService.execute(new EndActivityCommand()
+    engineScriptExecution = new EndActivityCommand()
           .continuationReference(activityInput.getContinuationReference())
-          .result(null))
-        .getEngineScriptExecution();
+          .result(null)
+          .execute(engine)
+          .getEngineScriptExecution();
 
     new ScriptExecutionComparator()
         .assertEquals(engineScriptExecution, reloadScriptExecution(scriptExecutionId));
   }
 
   private EngineScriptExecution reloadScriptExecution(String scriptExecutionId) {
-    return getConfiguration()
+    return engine
         .getEventStore()
         .findScriptExecutionById(scriptExecutionId);
   }

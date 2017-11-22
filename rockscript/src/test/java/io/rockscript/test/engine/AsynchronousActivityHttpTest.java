@@ -17,13 +17,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.http.client;
+package io.rockscript.test.engine;
 
 import io.rockscript.activity.ActivityInput;
-import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.api.model.ScriptExecution;
-import io.rockscript.test.HttpTest;
-import io.rockscript.test.HttpTestServer;
+import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.http.servlet.RouterServlet;
+import io.rockscript.http.client.Http;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,56 +33,55 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
-public class AsynchronousActivityHttpTest extends HttpTest {
+public class AsynchronousActivityHttpTest extends AbstractHttpTest {
 
   protected static Logger log = LoggerFactory.getLogger(AsynchronousActivityHttpTest.class);
 
   List<ActivityInput> activityInputs = new ArrayList<>();
 
   @Override
-  protected void configure(HttpTestServer httpTestServer) {
-    // The HttpTestServer is configured at the beginning of each test
+  protected void configure(RouterServlet routerServlet) {
+    // The routerServlet is configured at the beginning of each test
   }
 
   @Test
   public void testHttpActivityNoBodyResponse() {
-    httpTestServer
-        .post("/approve", (request,response)-> {
-          ActivityInput activityInput = gson.fromJson(request.body(), ActivityInput.class);
+    routerServlet
+      .requestHandler(Http.Methods.POST, "/approve", (request,response)-> {
+          ActivityInput activityInput = parseBodyAs(request, ActivityInput.class);
           activityInputs.add(activityInput);
-          response
-              .status(200)
-              .send(); });
+          response.status(200);
+      });
 
     executeApprovalScript();
   }
 
   @Test
   public void testHttpActivityFullBodyResponse() {
-    httpTestServer
-        .post("/approve", (request,response)-> {
-          ActivityInput activityInput = gson.fromJson(request.body(), ActivityInput.class);
+    routerServlet
+      .requestHandler(Http.Methods.POST, "/approve", (request,response)-> {
+          ActivityInput activityInput = parseBodyAs(request, ActivityInput.class);
           activityInputs.add(activityInput);
           response
               .status(200)
               .headerContentTypeApplicationJson()
-              .body("{ \"ended\": \"false\" }")
-              .send(); });
+              .bodyString("{ \"ended\": \"false\" }");
+      });
 
     executeApprovalScript();
   }
 
   @Test
   public void testHttpActivityEmptyBodyResponse() {
-    httpTestServer
-        .post("/approve", (request,response)-> {
-          ActivityInput activityInput = gson.fromJson(request.body(), ActivityInput.class);
+    routerServlet
+      .requestHandler(Http.Methods.POST, "/approve", (request,response)-> {
+          ActivityInput activityInput = parseBodyAs(request, ActivityInput.class);
           activityInputs.add(activityInput);
           response
               .status(200)
               .headerContentTypeApplicationJson()
-              .body("{}")
-              .send(); });
+              .bodyString("{}");
+      });
 
     executeApprovalScript();
   }

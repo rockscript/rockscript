@@ -19,6 +19,7 @@
  */
 package io.rockscript.http.servlet;
 
+import com.google.gson.Gson;
 import io.rockscript.http.client.Http;
 
 import javax.servlet.ServletOutputStream;
@@ -26,31 +27,38 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
-public class HttpResponse {
+public class ServerResponse {
 
   HttpServletResponse response;
+  Gson gson;
 
-  public HttpResponse(HttpServletResponse response) {
+  public ServerResponse(HttpServletResponse response) {
     this.response = response;
   }
 
-  public void statusOk() {
-    status(200);
+  public ServerResponse(HttpServletResponse response, Gson gson) {
+    this.response = response;
+    this.gson = gson;
   }
 
-  public void statusNotFound() {
-    status(404);
+  public ServerResponse statusOk() {
+    return status(200);
   }
 
-  public void statusInternalServerError() {
-    status(500);
+  public ServerResponse statusNotFound() {
+    return status(404);
   }
 
-  public void status(int status) {
+  public ServerResponse statusInternalServerError() {
+    return status(500);
+  }
+
+  public ServerResponse status(int status) {
     this.response.setStatus(status);
+    return this;
   }
 
-  public void bodyString(String responseBody) {
+  public ServerResponse bodyString(String responseBody) {
     try {
       ServletOutputStream out = response.getOutputStream();
       byte[] bytes = responseBody.getBytes(Charset.forName("UTF-8"));
@@ -59,19 +67,29 @@ public class HttpResponse {
     } catch (IOException e) {
       throw new RuntimeException("Couldn't send body: "+e.getMessage(), e);
     }
+    return this;
   }
 
-  public void header(String name, String value) {
+  public ServerResponse bodyJson(Object object) {
+    return bodyString(gson.toJson(object));
+  }
+
+  public ServerResponse header(String name, String value) {
     if (name!=null && value!=null) {
       response.addHeader(name, value);
     }
+    return this;
   }
 
-  public void headerContentTypeTextPlain() {
-    header(Http.Headers.CONTENT_TYPE, Http.ContentTypes.TEXT_PLAIN);
+  public ServerResponse headerContentType(String value) {
+    return header(Http.Headers.CONTENT_TYPE, value);
   }
 
-  public void headerContentType(String value) {
-    header(Http.Headers.CONTENT_TYPE, value);
+  public ServerResponse headerContentTypeTextPlain() {
+    return header(Http.Headers.CONTENT_TYPE, Http.ContentTypes.TEXT_PLAIN);
+  }
+
+  public ServerResponse headerContentTypeApplicationJson() {
+    return header(Http.Headers.CONTENT_TYPE, Http.ContentTypes.APPLICATION_JSON);
   }
 }

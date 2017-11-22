@@ -23,6 +23,7 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServlet;
@@ -48,6 +49,16 @@ public class TestServer {
 
   public TestServer servlet(Class<? extends HttpServlet> servletClass, String path) {
     servletHandler.addServletWithMapping(servletClass, path);
+    return this;
+  }
+
+  public TestServer servlet(HttpServlet servlet) {
+    return servlet(servlet, "/*");
+  }
+
+  public TestServer servlet(HttpServlet servlet, String path) {
+    ServletHolder servletHolder = new ServletHolder(servlet);
+    servletHandler.addServletWithMapping(servletHolder, path);
     return this;
   }
 

@@ -16,8 +16,8 @@
 package io.rockscript.api.queries;
 
 import io.rockscript.http.servlet.Get;
-import io.rockscript.http.servlet.HttpRequest;
-import io.rockscript.http.servlet.HttpResponse;
+import io.rockscript.http.servlet.ServerRequest;
+import io.rockscript.http.servlet.ServerResponse;
 import io.rockscript.http.servlet.RequestHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +29,7 @@ public class EventsQuery implements RequestHandler {
   static Logger log = LoggerFactory.getLogger(EventsQuery.class);
 
   @Override
-  public void handle(HttpRequest request, HttpResponse response) {
+  public void handle(ServerRequest request, ServerResponse response) {
     throw new UnsupportedOperationException("TODO");
   }
 

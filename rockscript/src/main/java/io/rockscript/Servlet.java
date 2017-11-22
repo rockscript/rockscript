@@ -43,12 +43,15 @@ public class Servlet extends RouterServlet {
     log.debug("|_| \\_\\___/ \\___|_|\\_\\|____/ \\___|_|  |_| .__/ \\__| ");
     log.debug("                                        |_|         ");
 
-    Engine engine = new DevEngine()
-      .initialize();
+    Engine engine = createEngine();
 
     requestHandler(new CommandHandler(engine));
     requestHandler(new PingHandler(engine));
 
     defaultResponseHeader("Access-Control-Allow-Origin", "*");
+  }
+
+  protected Engine createEngine() {
+    return new DevEngine().initialize();
   }
 }

@@ -26,8 +26,12 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.message.BasicHeaderValueParser;
 import org.apache.http.message.HeaderValueParser;
+import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -51,7 +55,7 @@ public class ClientResponse {
   protected Map<String,List<String>> headers;
   protected Object body;
 
-  protected ClientResponse(ClientRequest request, ClientResponseBodyHandler responseBodyHandler) throws IOException {
+  protected ClientResponse(ClientRequest request, Type type) throws IOException {
     this.request = request;
     this.apacheResponse = request.http.apacheHttpClient.execute(request.apacheRequest);
     try {
@@ -61,7 +65,14 @@ public class ClientResponse {
       HttpEntity entity = apacheResponse.getEntity();
       if (entity != null) {
         try {
-          this.body = responseBodyHandler.getBody(entity, this);
+          if (type!=null) {
+            String charset = getContentTypeCharset("UTF-8");
+            InputStream content = entity.getContent();
+            InputStreamReader reader = new InputStreamReader(content, charset);
+            this.body = request.getHttp().getGson().fromJson(reader, type);
+          } else {
+            this.body = EntityUtils.toString(entity, "UTF-8");
+          }
         } catch (Exception e) {
           throw new RuntimeException("Couldn't ready body/entity from http request " + toString());
         }

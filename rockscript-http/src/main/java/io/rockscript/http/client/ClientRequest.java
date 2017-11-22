@@ -25,9 +25,11 @@ import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.entity.ByteArrayEntity;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,8 +42,6 @@ public class ClientRequest {
 
   static final String NEWLINE = System.getProperty("line.separator");
 
-  private static final ClientResponseBodyHandler DEFAULT_ENTITY_HANDLER = new StringClientResponseBodyHandler();
-
   /** transient because this field should not be serialized by gson */
   transient Http http;
   /** transient because this field should not be serialized by gson */
@@ -50,7 +50,7 @@ public class ClientRequest {
   protected String method;
   protected String url;
   protected Map<String,List<String>> headers;
-  protected ClientRequestBodyHandler body;
+  protected HttpEntity body;
 
   protected ClientRequest(Http http, String method, String url) {
     this.http = http;
@@ -61,11 +61,11 @@ public class ClientRequest {
   /** Executes the request and returns the response
    * using the default string response body handler. */
   public ClientResponse execute() {
-    return execute(DEFAULT_ENTITY_HANDLER);
+    return execute(null);
   }
 
   /** Executes the request and returns the response. */
-  public ClientResponse execute(ClientResponseBodyHandler responseBodyHandler) {
+  public ClientResponse execute(Type type) {
     try {
       if (Http.Methods.GET.equals(method)) {
         this.apacheRequest = new HttpGet(url);
@@ -88,19 +88,18 @@ public class ClientRequest {
       }
 
       if (body!=null) {
-        HttpEntity entity = body.getEntity();
-        ((HttpEntityEnclosingRequestBase)apacheRequest).setEntity(entity);
+        ((HttpEntityEnclosingRequestBase)apacheRequest).setEntity(body);
       }
 
-      return createHttpResponse(responseBodyHandler);
+      return createHttpResponse(type);
 
     } catch (IOException e) {
       throw new RuntimeException("Couldn't execute request "+url+": "+e.getMessage(), e);
     }
   }
 
-  protected ClientResponse createHttpResponse(ClientResponseBodyHandler responseBodyHandler) throws IOException {
-    return new ClientResponse(this, responseBodyHandler);
+  protected ClientResponse createHttpResponse(Type type) throws IOException {
+    return new ClientResponse(this, type);
   }
 
   @Override
@@ -207,24 +206,41 @@ public class ClientRequest {
     return this;
   }
 
-  public ClientRequestBodyHandler getBody() {
-    return this.body;
+  public HttpEntity getBody() {
+    return body;
   }
 
-  public void setBody(ClientRequestBodyHandler body) {
+  public void setBody(HttpEntity body) {
     this.body = body;
+  }
+
+  /** Sets a String as the body for the request
+   * with encoding UTF-8 */
+  public ClientRequest body(String body) {
+    return body(body, "UTF-8");
   }
 
   /** Sets a String as the body for the request */
-  public ClientRequest body(String body) {
-    setBody(new StringClientRequestBodyHandler(body));
+  public ClientRequest body(String body, String charset) {
+    try {
+      this.body = new ByteArrayEntity(body.getBytes(charset));
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException("Couldn't get bytes from http request body string: "+e.getMessage(), e);
+    }
     return this;
   }
 
-  /** User defined streaming into the request body when this
-   * request is {@link #execute() executed}. */
-  public void body(ClientRequestBodyHandler body) {
-    this.body = body;
+  /** Uses {@link Http#getGson()} to serialize the given object and sets
+   * the resulting String as the body for the request with encoding UTF-8 */
+  public ClientRequest bodyJson(Object jsonObject) {
+    return bodyJson(jsonObject, "UTF-8");
+  }
+
+  /** Uses {@link Http#getGson()} to serialize the given object and sets
+   * the resulting String as the body for the request */
+  public ClientRequest bodyJson(Object jsonObject, String charset) {
+    String json = http.getGson().toJson(jsonObject);
+    return body(json, charset);
   }
 
   public Http getHttp() {

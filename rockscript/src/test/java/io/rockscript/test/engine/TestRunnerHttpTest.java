@@ -17,18 +17,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.http.client;
+package io.rockscript.test.engine;
 
 import io.rockscript.activity.test.TestError;
 import io.rockscript.activity.test.TestResult;
 import io.rockscript.activity.test.TestResults;
-import io.rockscript.api.commands.SaveScriptVersionCommand;
 import io.rockscript.api.commands.RunTestsCommand;
+import io.rockscript.api.commands.SaveScriptVersionCommand;
 import io.rockscript.engine.impl.ActivityStartErrorEvent;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
-import io.rockscript.test.HttpTest;
-import io.rockscript.test.HttpTestServer;
+import io.rockscript.http.client.Http;
+import io.rockscript.http.servlet.RouterServlet;
+import io.rockscript.test.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,34 +40,34 @@ import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.*;
 
-public class TestRunnerHttpTest extends HttpTest {
+public class TestRunnerHttpTest extends AbstractHttpTest {
 
   protected static Logger log = LoggerFactory.getLogger(TestRunnerHttpTest.class);
 
   @Override
-  protected void configure(HttpTestServer httpTestServer) {
-    httpTestServer.get("/ole", (request, response) -> {
+  protected void configure(RouterServlet routerServlet) {
+    routerServlet.requestHandler(Http.Methods.GET, "/ole", (request, response) -> {
       response.status(200)
         .headerContentTypeApplicationJson()
-        .body(gson.toJson(hashMap(
+        .bodyJson(hashMap(
           entry("country", "Belgium"),
-          entry("currency", "EUR"))))
-        .send();
+          entry("currency", "EUR")));
     });
   }
 
   @Test
   public void testTestRunnerAssertionFailure() {
-    commandExecutorService.execute(new SaveScriptVersionCommand()
+    new SaveScriptVersionCommand()
         .scriptName("The ScriptVersion.rs")
         .scriptText(
           "var http = system.import('rockscript.io/http'); \n" +
           "var country = http \n" +
           "  .get({url: 'http://localhost:4000/ole'}) \n" +
           "  .body.country;")
-        .activate());
+        .activate()
+        .execute(engine);
 
-    String testScriptId = commandExecutorService.execute(new SaveScriptVersionCommand()
+    String testScriptId = new SaveScriptVersionCommand()
         .scriptName("The ScriptVersion Test.rst")
         .scriptText(
           "var test = system.import('rockscript.io/test'); \n" +
@@ -74,12 +75,14 @@ public class TestRunnerHttpTest extends HttpTest {
           "  script: 'The ScriptVersion.rs', \n" +
           "  skipActivities: true}); \n" +
           "test.assertEquals(scriptExecution.variables.country, 'The Netherlands');")
-        .activate())
-      .getId();
+        .activate()
+        .execute(engine)
+        .getId();
 
-    TestResults testResults = commandExecutorService.execute(new RunTestsCommand());
+    TestResults testResults = new RunTestsCommand()
+      .execute(engine);
 
-    log.debug(getConfiguration().getGson().toJson(testResults));
+    log.debug(engine.getGson().toJson(testResults));
 
     TestResult testResult = testResults.get(0);
 
@@ -91,26 +94,27 @@ public class TestRunnerHttpTest extends HttpTest {
     List<Event> testEvents = testResult.getEvents();
     ActivityStartErrorEvent errorEvent = (ActivityStartErrorEvent) testEvents.get(testEvents.size() - 1);
 
-    assertContains("Expected The Netherlands, but was Belgium", errorEvent.getError());
+    Assert.assertContains("Expected The Netherlands, but was Belgium", errorEvent.getError());
     assertNull(errorEvent.getRetryTime()); // because there's no point in retrying assertion errors
 
     TestError testError = testResult.getErrors().get(0);
-    assertContains("Expected The Netherlands, but was Belgium", testError.getMessage());
+    Assert.assertContains("Expected The Netherlands, but was Belgium", testError.getMessage());
     assertEquals(testScriptId, testError.getScriptVersionId());
     assertEquals(5, testError.getLine());
   }
 
   @Test
   public void testTestRunnerScriptFailure() {
-    String targetScriptId = commandExecutorService.execute(new SaveScriptVersionCommand()
+    String targetScriptId = new SaveScriptVersionCommand()
         .scriptName("The ScriptVersion.rs")
         .scriptText(
           /* 1 */ "var http = system.import('rockscript.io/http'); \n" +
           /* 2 */ "unexistingvar.unexistingmethod();")
-        .activate())
-      .getId();
+        .activate()
+        .execute(engine)
+        .getId();
 
-    String testScriptId = commandExecutorService.execute(new SaveScriptVersionCommand()
+    String testScriptId = new SaveScriptVersionCommand()
         .scriptName("The ScriptVersion Test.rst")
         .scriptText(
           /* 1 */ "var test = system.import('rockscript.io/test'); \n" +
@@ -118,12 +122,14 @@ public class TestRunnerHttpTest extends HttpTest {
           /* 3 */ "var scriptExecution = test.start({ \n" +
           /* 4 */ "  script: 'The ScriptVersion.rs', \n" +
           /* 5 */ "  skipActivities: true}); ")
-        .activate())
-      .getId();
+        .activate()
+        .execute(engine)
+        .getId();
 
-    TestResults testResults = commandExecutorService.execute(new RunTestsCommand());
+    TestResults testResults = new RunTestsCommand()
+      .execute(engine);
 
-    log.debug(getConfiguration().getGson().toJson(testResults));
+    log.debug(engine.getGson().toJson(testResults));
 
     TestResult testResult = testResults.get(0);
 
@@ -134,24 +140,24 @@ public class TestRunnerHttpTest extends HttpTest {
 
     List<Event> testEvents = testResult.getEvents();
     ScriptExecutionErrorEvent targetScriptErrorEvent = (ScriptExecutionErrorEvent) testEvents.get(testEvents.size() - 2);
-    assertContains("ReferenceError: unexistingvar is not defined", targetScriptErrorEvent.getError());
-    assertContains(targetScriptId, targetScriptErrorEvent.getScriptId());
+    Assert.assertContains("ReferenceError: unexistingvar is not defined", targetScriptErrorEvent.getError());
+    Assert.assertContains(targetScriptId, targetScriptErrorEvent.getScriptId());
     assertNotNull(targetScriptErrorEvent.getLine());
 
     ActivityStartErrorEvent testScriptErrorEvent = (ActivityStartErrorEvent) testEvents.get(testEvents.size() - 1);
-    assertContains("ScriptVersion start failed: ReferenceError: unexistingvar is not defined", testScriptErrorEvent.getError());
-    assertContains(testScriptId, testScriptErrorEvent.getScriptId());
+    Assert.assertContains("ScriptVersion start failed: ReferenceError: unexistingvar is not defined", testScriptErrorEvent.getError());
+    Assert.assertContains(testScriptId, testScriptErrorEvent.getScriptId());
     assertNotNull(testScriptErrorEvent.getLine());
 
     List<TestError> testErrors = testResult.getErrors();
     TestError firstTestError = testErrors.get(0);
-    assertContains("ReferenceError: unexistingvar is not defined", firstTestError.getMessage());
-    assertContains(targetScriptId, firstTestError.getScriptVersionId());
+    Assert.assertContains("ReferenceError: unexistingvar is not defined", firstTestError.getMessage());
+    Assert.assertContains(targetScriptId, firstTestError.getScriptVersionId());
     assertNotNull(firstTestError.getLine());
 
     TestError secondTestError = testErrors.get(1);
-    assertContains("ScriptVersion start failed: ReferenceError: unexistingvar is not defined", secondTestError.getMessage());
-    assertContains(testScriptId, secondTestError.getScriptVersionId());
+    Assert.assertContains("ScriptVersion start failed: ReferenceError: unexistingvar is not defined", secondTestError.getMessage());
+    Assert.assertContains(testScriptId, secondTestError.getScriptVersionId());
     assertNotNull(secondTestError.getLine());
   }
 }

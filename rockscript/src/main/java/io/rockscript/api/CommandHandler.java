@@ -21,8 +21,8 @@ package io.rockscript.api;
 
 import com.google.gson.Gson;
 import io.rockscript.Engine;
-import io.rockscript.http.servlet.HttpRequest;
-import io.rockscript.http.servlet.HttpResponse;
+import io.rockscript.http.servlet.ServerRequest;
+import io.rockscript.http.servlet.ServerResponse;
 import io.rockscript.http.servlet.Post;
 
 @Post("/command")
@@ -33,11 +33,11 @@ public class CommandHandler extends AbstractRequestHandler {
   }
 
   @Override
-  public void handle(HttpRequest request, HttpResponse response) {
+  public void handle(ServerRequest request, ServerResponse response) {
     Command command = null;
     try {
       Gson gson = engine.getGson();
-      String jsonBodyString = request.getBodyStringUtf8();
+      String jsonBodyString = request.getBody();
       command = gson.fromJson(jsonBodyString, Command.class);
       Response commandResponse = command.execute(engine);
 

@@ -17,14 +17,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.http.client;
+package io.rockscript.test.engine;
 
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.api.model.ScriptExecution;
-import io.rockscript.test.HttpTest;
-import io.rockscript.test.HttpTestServer;
+import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.http.client.Http;
+import io.rockscript.http.servlet.RouterServlet;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,17 +37,17 @@ import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class SynchronousActivityHttpTest extends HttpTest {
+public class SynchronousActivityHttpTest extends AbstractHttpTest {
 
   protected static Logger log = LoggerFactory.getLogger(SynchronousActivityHttpTest.class);
 
   List<ActivityInput> activityInputs = new ArrayList<>();
 
   @Override
-  protected void configure(HttpTestServer httpTestServer) {
-    httpTestServer
-      .post("/approve", (request,response)-> {
-        ActivityInput activityInput = gson.fromJson(request.body(), ActivityInput.class);
+  protected void configure(RouterServlet routerServlet) {
+    routerServlet
+      .requestHandler(Http.Methods.POST, "/approve", (request, response)-> {
+        ActivityInput activityInput = request.getBodyAs(ActivityInput.class);
         activityInputs.add(activityInput);
         ActivityOutput activityOutput = ActivityOutput.endActivity(
           hashMap(
@@ -58,8 +58,7 @@ public class SynchronousActivityHttpTest extends HttpTest {
         response
             .status(200)
             .headerContentTypeApplicationJson()
-            .body(gson.toJson(activityOutput))
-            .send();
+            .bodyJson(activityOutput);
       });
   }
 

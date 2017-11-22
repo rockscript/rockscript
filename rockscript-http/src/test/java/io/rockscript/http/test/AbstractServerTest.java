@@ -21,7 +21,6 @@ package io.rockscript.http.test;
 
 import io.rockscript.http.client.ClientRequest;
 import io.rockscript.http.client.ClientResponse;
-import io.rockscript.http.client.ClientResponseBodyHandler;
 import io.rockscript.http.client.Http;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -29,10 +28,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 public abstract class AbstractServerTest {
 
   protected static Logger log = LoggerFactory.getLogger(AbstractServerTest.class);
+
+  protected static final int PORT = 9999;
 
   // http will be cached for all tests in one test class
   private static Http http;
@@ -48,16 +50,22 @@ public abstract class AbstractServerTest {
     initializeBaseUrl();
   }
 
-  private void initializeBaseUrl() {
-    if (baseUrl==null) {
-      this.baseUrl = createBaseUrl();
+  private void initializeServer() {
+    if (server==null) {
+      this.server = createServer();
     }
   }
 
-  /** override to customize the baseUrl */
-  protected String createBaseUrl() {
-    return "http://localhost:"+server.getPort()+"/";
+  /** override to customize the test server creation */
+  protected TestServer createServer() {
+    TestServer server = new TestServer(PORT);
+    server.startup();
+    configureServer(server);
+    return server;
   }
+
+  /** implementions can add servlets and filters to the test server */
+  protected abstract void configureServer(TestServer server);
 
   private void initializeHttp() {
     if (http==null) {
@@ -70,22 +78,16 @@ public abstract class AbstractServerTest {
     return new Http();
   }
 
-  private void initializeServer() {
-    if (server==null) {
-      this.server = createServer();
+  private void initializeBaseUrl() {
+    if (baseUrl==null) {
+      this.baseUrl = createBaseUrl();
     }
   }
 
-  /** override to customize the test server creation */
-  protected TestServer createServer() {
-    TestServer server = new TestServer(9999);
-    server.startup();
-    configureServer(server);
-    return server;
+  /** override to customize the baseUrl */
+  protected String createBaseUrl() {
+    return "http://localhost:"+server.getPort()+"/";
   }
-
-  /** implementions can add servlets and filters to the test server */
-  protected abstract void configureServer(TestServer server);
 
   @AfterClass
   public static void tearDownStatic() {
@@ -118,14 +120,14 @@ public abstract class AbstractServerTest {
       super(http, method, url);
     }
     @Override
-    protected ClientResponse createHttpResponse(ClientResponseBodyHandler responseBodyHandler) throws IOException {
-      return new TestClientResponse(this, responseBodyHandler);
+    protected ClientResponse createHttpResponse(Type type) throws IOException {
+      return new TestClientResponse(this, type);
     }
   }
 
   static class TestClientResponse extends ClientResponse {
-    public TestClientResponse(TestClientRequest testHttpRequest, ClientResponseBodyHandler responseBodyHandler) throws IOException {
-      super(testHttpRequest, responseBodyHandler);
+    public TestClientResponse(TestClientRequest testHttpRequest, Type type) throws IOException {
+      super(testHttpRequest, type);
     }
     @Override
     public ClientResponse assertStatus(int expectedStatus) {

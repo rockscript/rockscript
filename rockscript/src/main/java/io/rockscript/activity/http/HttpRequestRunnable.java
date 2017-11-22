@@ -22,11 +22,8 @@ import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.ScriptRunner;
 import io.rockscript.http.client.ClientRequest;
 import io.rockscript.http.client.ClientResponse;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 public class HttpRequestRunnable implements Runnable {
 
@@ -46,17 +43,7 @@ public class HttpRequestRunnable implements Runnable {
   public void run() {
     Gson gson = engine.getGson();
     ClientResponse response = request
-      .execute((httpEntity,httpResponse)->{
-        try {
-          Object body = EntityUtils.toString(httpEntity, "UTF-8");
-          if (httpResponse.isContentTypeApplicationJson()) {
-            body = gson.fromJson((String)body, Object.class);
-          }
-          return body;
-        } catch (IOException e) {
-          throw new RuntimeException("Couldn't ready body/entity from http request "+httpResponse.toString());
-        }
-      });
+      .execute(Object.class);
     ScriptRunner scriptRunner = engine.getScriptRunner();
     scriptRunner.endActivity(continuationReference, response);
   }

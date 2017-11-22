@@ -1,28 +1,31 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017 RockScript.io.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-package io.rockscript;
+package io.rockscript.test.engine;
 
+import io.rockscript.Engine;
+import io.rockscript.TestEngine;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.api.CommandExecutorService;
-import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.api.model.ScriptExecution;
+import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.ExecutionEvent;
-import io.rockscript.test.ScriptTest;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,14 +35,14 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class ActivityTest extends ScriptTest {
+public class ActivityTest extends AbstractEngineTest {
 
   protected static Logger log = LoggerFactory.getLogger(ActivityTest.class);
 
   List<ActivityInput> activityInputs = new ArrayList<>();
 
   @Override
-  protected CommandExecutorService initializeScriptService() {
+  protected Engine initializeEngine() {
     // This ensures that each test will get a new CommandExecutorService
     // so that the tests can customize the import resolver without
     // polluting any cached script services.
@@ -48,7 +51,7 @@ public class ActivityTest extends ScriptTest {
 
   @Test
   public void testAsynchronousActivity() {
-    getConfiguration().getImportResolver().createImport("approvalService")
+    engine.getImportResolver().createImport("approvalService")
       .put("approve", input -> {
         activityInputs.add(input);
         return ActivityOutput.waitForEndActivityCallback();
@@ -75,7 +78,7 @@ public class ActivityTest extends ScriptTest {
 
   @Test
   public void testEvents() {
-    getConfiguration().getImportResolver().createImport("approvalService")
+    engine.getImportResolver().createImport("approvalService")
       .put("getMessage", input -> {
         input.getScriptRunner().endActivity(input.getContinuationReference(), "hello");
         return ActivityOutput.waitForEndActivityCallback();
@@ -94,14 +97,14 @@ public class ActivityTest extends ScriptTest {
     ActivityInput activityInput = activityInputs.get(0);
     scriptExecution = endActivity(activityInput.getContinuationReference());
 
-    List<ExecutionEvent> events = getConfiguration().getEventStore()
+    List<ExecutionEvent> events = engine.getEventStore()
       .findEventsByScriptExecutionId(scriptExecution.getId());
     events.forEach(e->log.debug(e.toString()));
   }
 
   @Test
   public void testSynchronousActivityWithoutResult() {
-    getConfiguration().getImportResolver().createImport("approvalService")
+    engine.getImportResolver().createImport("approvalService")
       .put("approve", input -> {
         return ActivityOutput.endActivity();
       });
@@ -118,7 +121,7 @@ public class ActivityTest extends ScriptTest {
 
   @Test
   public void testSynchronousActivityWithResult() {
-    getConfiguration().getImportResolver().createImport("approvalService")
+    engine.getImportResolver().createImport("approvalService")
       .put("approve", input -> {
         return ActivityOutput.endActivity("approved");
       });

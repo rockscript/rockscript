@@ -16,9 +16,9 @@
 package io.rockscript.engine.impl;
 
 import com.google.gson.Gson;
+import io.rockscript.activity.AbstractActivity;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.activity.AbstractActivity;
 import io.rockscript.engine.EngineException;
 import io.rockscript.http.client.ClientRequest;
 import io.rockscript.http.client.ClientResponse;
@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static io.rockscript.engine.impl.GsonBodyParser.parseResponseBody;
 import static io.rockscript.http.client.Http.ContentTypes.APPLICATION_JSON;
 import static io.rockscript.http.client.Http.Headers.CONTENT_TYPE;
 
@@ -68,7 +67,7 @@ public class RemoteActivity extends AbstractActivity {
 
     log.debug(request.toString(logPrefix));
 
-    ClientResponse response = request.execute(parseResponseBody(gson,ActivityOutput.class));
+    ClientResponse response = request.execute(ActivityOutput.class);
 
     log.debug(response.toString(logPrefix));
 

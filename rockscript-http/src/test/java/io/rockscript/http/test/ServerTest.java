@@ -22,9 +22,6 @@ package io.rockscript.http.test;
 import io.rockscript.http.servlet.*;
 import org.junit.Test;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -32,22 +29,16 @@ public class ServerTest extends AbstractServerTest {
 
   @Override
   protected void configureServer(TestServer server) {
-    server.servlet(TestServlet.class);
-  }
-
-  public static class TestServlet extends RouterServlet {
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-      super.init(config);
-      requestHandler(new GreetingHandler());
-      requestHandler(new BangHandler());
-    }
+    RouterServlet servlet = new RouterServlet();
+    servlet.requestHandler(new GreetingHandler());
+    servlet.requestHandler(new BangHandler());
+    server.servlet(servlet);
   }
 
   @Get("/hello/{greeting}")
   public static class GreetingHandler implements RequestHandler {
     @Override
-    public void handle(HttpRequest request, HttpResponse response) {
+    public void handle(ServerRequest request, ServerResponse response) {
       response.bodyString("world");
       assertEquals("john", request.getPathParameter("greeting"));
       response.statusOk();
@@ -57,7 +48,7 @@ public class ServerTest extends AbstractServerTest {
   @Get("/bang")
   public static class BangHandler implements RequestHandler {
     @Override
-    public void handle(HttpRequest request, HttpResponse response) {
+    public void handle(ServerRequest request, ServerResponse response) {
       throw new RuntimeException("bang");
     }
   }

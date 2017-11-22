@@ -19,6 +19,7 @@
  */
 package io.rockscript.http.client;
 
+import com.google.gson.Gson;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
@@ -55,6 +56,19 @@ public class Http {
   protected static Logger log = LoggerFactory.getLogger(Http.class);
 
   protected CloseableHttpClient apacheHttpClient = HttpClients.createDefault();
+
+  protected Gson gson;
+
+  public Http() {
+  }
+
+  public Http(Gson gson) {
+    this.gson = gson;
+  }
+
+  public Gson getGson() {
+    return gson;
+  }
 
   public interface Methods {
     String GET = "GET";

@@ -19,20 +19,29 @@
  */
 package io.rockscript.http.servlet;
 
+import com.google.gson.Gson;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Scanner;
 
-public class HttpRequest {
+public class ServerRequest {
 
+  protected Gson gson;
   protected HttpServletRequest request;
   protected Map<String, String> pathParameters;
   protected String bodyStringUtf8;
   protected boolean bodyIsRead;
 
-  public HttpRequest(HttpServletRequest request) {
+  public ServerRequest(HttpServletRequest request) {
     this.request = request;
+  }
+
+  public ServerRequest(HttpServletRequest request, Gson gson) {
+    this.request = request;
+    this.gson = gson;
   }
 
   void setPathParameters(Map<String, String> pathParameters) {
@@ -47,20 +56,32 @@ public class HttpRequest {
     return request.getPathInfo();
   }
 
-  /** value is read from the input stream the first time
-   * and cached for subsequent invocations. */
-  public String getBodyStringUtf8() {
+  public String getBody() {
+    return getBody("UTF-8");
+  }
+
+    /** value is read from the input stream the first time
+     * and cached for subsequent invocations. */
+  public String getBody(String charset) {
     if (!bodyIsRead) {
       bodyIsRead = true;
       try {
         request.setCharacterEncoding("UTF-8");
-        Scanner scanner = new Scanner(request.getInputStream(), "UTF-8").useDelimiter("\\A");
+        Scanner scanner = new Scanner(request.getInputStream(), charset).useDelimiter("\\A");
         bodyStringUtf8 = scanner.hasNext() ? scanner.next() : null;
       } catch (IOException e) {
         throw new RuntimeException("Couldn't read request body string: "+e.getMessage(), e);
       }
     }
     return bodyStringUtf8;
+  }
+
+  public <T> T getBodyAs(Type type) {
+    return getBodyAs(type, "UTF-8");
+  }
+
+  public <T> T getBodyAs(Type type, String charset) {
+    return gson.fromJson(getBody(charset), type);
   }
 
   public String getPathParameter(String pathParameterName) {

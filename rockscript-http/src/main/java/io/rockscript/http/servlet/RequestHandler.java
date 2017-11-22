@@ -21,6 +21,6 @@ package io.rockscript.http.servlet;
 
 public interface RequestHandler {
 
-  void handle(HttpRequest request, HttpResponse response);
+  void handle(ServerRequest request, ServerResponse response);
 
 }

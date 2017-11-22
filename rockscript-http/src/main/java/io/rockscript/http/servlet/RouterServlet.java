@@ -38,8 +38,8 @@ public class RouterServlet extends HttpServlet {
 
   @Override
   protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
-    HttpRequest request = new HttpRequest(servletRequest);
-    HttpResponse response = new HttpResponse(servletResponse);
+    ServerRequest request = createRequest(servletRequest);
+    ServerResponse response = new ServerResponse(servletResponse);
     List<Path> requestPaths = pathsByMethod.get(request.getMethod());
     if (requestPaths==null) {
       response.statusNotFound();
@@ -60,6 +60,10 @@ public class RouterServlet extends HttpServlet {
         response.statusNotFound();
       }
     }
+  }
+
+  private ServerRequest createRequest(HttpServletRequest servletRequest) {
+    return new ServerRequest(servletRequest);
   }
 
   public RouterServlet requestHandler(RequestHandler requestHandler) {
@@ -119,7 +123,7 @@ public class RouterServlet extends HttpServlet {
     return defaultResponseHeaders;
   }
 
-  private void applyDefaultResponseHeaders(HttpResponse response) {
+  private void applyDefaultResponseHeaders(ServerResponse response) {
     if (defaultResponseHeaders!=null) {
       defaultResponseHeaders.forEach((name,values)->{
         if (values!=null) {

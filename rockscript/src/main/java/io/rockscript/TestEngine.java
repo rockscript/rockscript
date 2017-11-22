@@ -21,11 +21,8 @@ package io.rockscript;
 
 import java.util.concurrent.Executor;
 
-/** Engine used to build a ScriptEngine
- * for testing.
- *
- * No asynchronous execution of activities. *
- */
+/** Engine with predictable execution of async stuff because
+ * it's all executed directly in the thread of the client. */
 public class TestEngine extends Engine {
 
   public TestEngine() {

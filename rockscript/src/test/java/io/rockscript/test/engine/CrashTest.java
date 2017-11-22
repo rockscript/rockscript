@@ -1,30 +1,34 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017 RockScript.io.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
-package io.rockscript;
+package io.rockscript.test.engine;
 
+import io.rockscript.Engine;
+import io.rockscript.TestEngine;
 import io.rockscript.activity.ActivityOutput;
+import io.rockscript.api.commands.RecoverCrashedScriptExecutionsCommand;
+import io.rockscript.api.commands.RecoverCrashedScriptExecutionsResponse;
 import io.rockscript.api.commands.SaveScriptVersionCommand;
+import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.engine.impl.EventListener;
-import io.rockscript.api.CommandExecutorService;
-import io.rockscript.api.commands.StartScriptExecutionCommand;
-import io.rockscript.api.commands.RecoverCrashedScriptExecutionsCommand;
-import io.rockscript.api.commands.RecoverCrashedScriptExecutionsResponse;
 import io.rockscript.test.ScriptExecutionComparator;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -33,23 +37,26 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CrashTest {
+public class CrashTest extends AbstractEngineTest {
 
   static Logger log = LoggerFactory.getLogger(CrashTest.class);
 
   List<Object> synchronousCapturedData = new ArrayList<>();
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
-  public Engine createCrashTestConfiguration() {
-    Engine engine = new CrashEngine();
+  @Override
+  protected Engine initializeEngine() {
+    TestEngine engine = new TestEngine();
     addHelloService(engine);
+    engine.initialize();
     return engine;
   }
 
-  public CommandExecutorService createNormalTestEngine() {
-    TestEngine configuration = new TestEngine();
-    addHelloService(configuration);
-    return configuration.initialize();
+  protected CrashEngine createCrashEngine() {
+    CrashEngine crashEngine = new CrashEngine();
+    addHelloService(crashEngine);
+    crashEngine.initialize();
+    return crashEngine;
   }
 
   public static class CrashEngine extends TestEngine {
@@ -115,15 +122,16 @@ public class CrashTest {
 
     int eventsWithoutCrash = 1;
     boolean crashOccurred = false;
-    Engine engine = createCrashTestConfiguration();
-    CommandExecutorService commandExecutorService = engine.initialize();
-    CrashEventListener eventListener = (CrashEventListener) engine
-        .getEventListener();
 
-    String scriptId = commandExecutorService.execute(new SaveScriptVersionCommand()
+    CrashEngine crashEngine = createCrashEngine();
+    CrashEventListener eventListener = (CrashEventListener) crashEngine.getEventListener();
+
+    String scriptId = new SaveScriptVersionCommand()
         .scriptText(scriptText)
-        .activate())
-      .getId();
+        .activate()
+        .execute(engine)
+        .getId();
+
     do {
       try  {
         crashOccurred = false;
@@ -131,8 +139,9 @@ public class CrashTest {
         eventListener.throwAfterEventCount(eventsWithoutCrash);
 
         log.debug("\n\n----- Starting script execution and throwing after "+eventsWithoutCrash+" events ------");
-        commandExecutorService.execute(new StartScriptExecutionCommand()
-          .scriptVersionId(scriptId));
+        new StartScriptExecutionCommand()
+          .scriptVersionId(scriptId)
+          .execute(crashEngine);
 
       } catch (RuntimeException e) {
         log.debug("----- Recovering script execution and throwing after "+eventsWithoutCrash+" events ------");
@@ -140,7 +149,8 @@ public class CrashTest {
         eventsWithoutCrash++;
 
         eventListener.stopThrowing();
-        RecoverCrashedScriptExecutionsResponse recoverCrashedScriptExecutionsResponse = commandExecutorService.execute(new RecoverCrashedScriptExecutionsCommand());
+        RecoverCrashedScriptExecutionsResponse recoverCrashedScriptExecutionsResponse = new RecoverCrashedScriptExecutionsCommand()
+          .execute(crashEngine);
         List<ScriptExecution> recoverCrashedScriptExecutions = recoverCrashedScriptExecutionsResponse.getScriptExecutions();
         ScriptExecution recoveredScriptExecution = (ScriptExecution) recoverCrashedScriptExecutions.get(0);
 
@@ -155,14 +165,15 @@ public class CrashTest {
   }
 
   private ScriptExecution createExpectedScriptExecutionState(String scriptText) {
-    CommandExecutorService commandExecutorService = createNormalTestEngine();
-    String scriptVersionId = commandExecutorService.execute(new SaveScriptVersionCommand()
+    String scriptVersionId = new SaveScriptVersionCommand()
         .scriptText(scriptText)
-        .activate())
-      .getId();
-    return commandExecutorService.execute(new StartScriptExecutionCommand()
-        .scriptVersionId(scriptVersionId))
-      .getEngineScriptExecution()
-      .toScriptExecution();
+        .activate()
+        .execute(engine)
+        .getId();
+    return new StartScriptExecutionCommand()
+        .scriptVersionId(scriptVersionId)
+        .execute(engine)
+        .getEngineScriptExecution()
+        .toScriptExecution();
   }
 }

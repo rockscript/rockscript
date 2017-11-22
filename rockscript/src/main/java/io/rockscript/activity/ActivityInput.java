@@ -18,9 +18,9 @@ package io.rockscript.activity;
 import com.google.gson.Gson;
 import io.rockscript.Engine;
 import io.rockscript.engine.impl.ContinuationReference;
-import io.rockscript.engine.impl.ScriptRunner;
 import io.rockscript.engine.impl.Execution;
 import io.rockscript.engine.impl.Location;
+import io.rockscript.engine.impl.ScriptRunner;
 import io.rockscript.http.client.Http;
 
 import java.util.List;

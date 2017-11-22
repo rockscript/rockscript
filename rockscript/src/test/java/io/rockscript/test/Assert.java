@@ -17,35 +17,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.http.client;
+package io.rockscript.test;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.entity.ByteArrayEntity;
+public class Assert {
 
-import java.io.UnsupportedEncodingException;
-
-public class StringClientRequestBodyHandler implements ClientRequestBodyHandler {
-
-  String body;
-
-  public StringClientRequestBodyHandler(String body) {
-    this.body = body;
-  }
-
-  @Override
-  public HttpEntity getEntity() {
-    if (body==null) {
-      return null;
+  public static void assertContains(String expectedSubstring, String text) {
+    if (text==null || !text.contains(expectedSubstring)) {
+      throw new AssertionError("Expected substring '"+expectedSubstring+"', but was '"+text+"'");
     }
-    try {
-      return new ByteArrayEntity(body.getBytes("UTF-8"));
-    } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException("Couldn't get bytes from http request body string: "+e.getMessage(), e);
-    }
-  }
-
-  @Override
-  public String toString() {
-    return body;
   }
 }

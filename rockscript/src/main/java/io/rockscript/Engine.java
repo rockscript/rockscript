@@ -90,9 +90,7 @@ public abstract class Engine {
     if (this.gson==null) {
       this.gson = createGson();
     }
-    if (this.http==null) {
-      this.http = new Http();
-    }
+    this.http = new Http(gson);
     throwIfNotProperlyConfigured();
 
     ServiceLoader<EngineModule> engineModules = ServiceLoader.load(EngineModule.class);
