@@ -41,7 +41,7 @@ import io.rockscript.http.servlet.BadRequestException;
  *
  * SaveScriptVersionCommand's are serializable with Gson.
  */
-public class SaveScriptVersionCommand extends Command<SaveScriptVersionResponse> {
+public class SaveScriptVersionCommand implements Command<SaveScriptVersionResponse> {
 
   protected String scriptId;
   protected String scriptName;

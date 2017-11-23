@@ -15,48 +15,41 @@
  */
 package io.rockscript.api.queries;
 
-import io.rockscript.http.servlet.Get;
-import io.rockscript.http.servlet.ServerRequest;
-import io.rockscript.http.servlet.ServerResponse;
-import io.rockscript.http.servlet.RequestHandler;
+import io.rockscript.Engine;
+import io.rockscript.api.Query;
+import io.rockscript.engine.impl.Event;
+import io.rockscript.http.servlet.InternalServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+
 /** Query to fetch events */
-@Get("/events")
-public class EventsQuery implements RequestHandler {
+public class EventsQuery implements Query<List<Event>> {
 
   static Logger log = LoggerFactory.getLogger(EventsQuery.class);
 
-  @Override
-  public void handle(ServerRequest request, ServerResponse response) {
-    throw new UnsupportedOperationException("TODO");
-  }
+  String scriptExecutionId;
 
-  //  @Override
-//  public void handle(AsyncHttpRequest request, AsyncHttpResponse response, Context context) {
-//    Engine engine = context.get(Engine.class);
-//    String scriptExecutionId = request.getQueryParameter("scriptExecutionId");
-//    try {
-//      List<? extends Event> events = null;
-//      if (scriptExecutionId!=null) {
-//        events = engine
-//          .getEventStore()
-//          .findEventsByScriptExecutionId(scriptExecutionId);
-//      } else {
-//        events = engine
-//          .getEventStore()
-//          .getEvents();
-//      }
-//      response.bodyJson(events);
-//      response.status(200);
-//      response.send();
-//
-//    } catch (Exception e) {
-//      log.debug("Exception while querying events: " + e.getMessage(), e);
-//      response.bodyJson(hashMap(entry("message", "Error: " + e.getMessage())));
-//      response.status(500);
-//      response.send();
-//    }
-//  }
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<Event> execute(Engine engine) {
+    try {
+      List<Event> events = null;
+      if (scriptExecutionId!=null) {
+        events = (List) engine
+          .getEventStore()
+          .findEventsByScriptExecutionId(scriptExecutionId);
+      } else {
+        events = engine
+          .getEventStore()
+          .getEvents();
+      }
+      return events;
+
+    } catch (Exception e) {
+      log.debug("Couldn't perform events query", e);
+      throw new InternalServerException();
+    }
+  }
 }

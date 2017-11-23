@@ -46,7 +46,7 @@ public class ActivityTest extends AbstractEngineTest {
     // This ensures that each test will get a new CommandExecutorService
     // so that the tests can customize the import resolver without
     // polluting any cached script services.
-    return new TestEngine().initialize();
+    return new TestEngine().start();
   }
 
   @Test

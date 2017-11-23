@@ -19,6 +19,8 @@
  */
 package io.rockscript.http.servlet;
 
+import com.google.gson.Gson;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -35,11 +37,12 @@ public class RouterServlet extends HttpServlet {
   /** maps methods to list of request paths */
   private Map<String,List<Path>> pathsByMethod = new HashMap<>();
   private Map<String,List<String>> defaultResponseHeaders;
+  protected Gson gson;
 
   @Override
   protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
-    ServerRequest request = createRequest(servletRequest);
-    ServerResponse response = new ServerResponse(servletResponse);
+    ServerRequest request = new ServerRequest(servletRequest, gson);
+    ServerResponse response = new ServerResponse(servletResponse, gson);
     List<Path> requestPaths = pathsByMethod.get(request.getMethod());
     if (requestPaths==null) {
       response.statusNotFound();
@@ -60,10 +63,6 @@ public class RouterServlet extends HttpServlet {
         response.statusNotFound();
       }
     }
-  }
-
-  private ServerRequest createRequest(HttpServletRequest servletRequest) {
-    return new ServerRequest(servletRequest);
   }
 
   public RouterServlet requestHandler(RequestHandler requestHandler) {
@@ -110,11 +109,8 @@ public class RouterServlet extends HttpServlet {
     if (defaultResponseHeaders==null) {
       defaultResponseHeaders = new LinkedHashMap<>();
     }
-    List<String> values = defaultResponseHeaders.get(name);
-    if (value==null) {
-      values = new ArrayList<>();
-      defaultResponseHeaders.put(name, values);
-    }
+    List<String> values = defaultResponseHeaders
+      .computeIfAbsent(name, key->new ArrayList<String>());
     values.add(value);
     return this;
   }
@@ -133,5 +129,18 @@ public class RouterServlet extends HttpServlet {
         }
       });
     }
+  }
+
+  public Gson getGson() {
+    return gson;
+  }
+
+  public void setGson(Gson gson) {
+    this.gson = gson;
+  }
+
+  public RouterServlet gson(Gson gson) {
+    this.gson = gson;
+    return this;
   }
 }

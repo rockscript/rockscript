@@ -47,7 +47,7 @@ public class ObjectLiteralExpressionTest extends AbstractEngineTest {
       .put("assertLiteralValue", input -> {
         capturedValues.add(input.getArgs().get(0));
         return ActivityOutput.endActivity();});
-    return engine.initialize();
+    return engine.start();
   }
 
   @Test

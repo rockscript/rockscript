@@ -98,7 +98,7 @@ public class AbstractEngineTest {
     return new EngineProvider() {
       @Override
       public Engine createEngine() {
-        return new TestEngine().initialize();
+        return new TestEngine().start();
       }
     };
   }

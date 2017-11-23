@@ -21,12 +21,14 @@ package io.rockscript.api;
 
 import com.google.gson.Gson;
 import io.rockscript.Engine;
-import io.rockscript.http.servlet.ServerRequest;
-import io.rockscript.http.servlet.ServerResponse;
-import io.rockscript.http.servlet.Post;
+import io.rockscript.http.servlet.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Post("/command")
 public class CommandHandler extends AbstractRequestHandler {
+
+  static Logger log = LoggerFactory.getLogger(CommandHandler.class);
 
   public CommandHandler(Engine engine) {
     super(engine);
@@ -34,19 +36,19 @@ public class CommandHandler extends AbstractRequestHandler {
 
   @Override
   public void handle(ServerRequest request, ServerResponse response) {
-    Command command = null;
+    String jsonBodyString = request.getBody();
     try {
       Gson gson = engine.getGson();
-      String jsonBodyString = request.getBody();
-      command = gson.fromJson(jsonBodyString, Command.class);
-      Response commandResponse = command.execute(engine);
-
+      Command command = gson.fromJson(jsonBodyString, Command.class);
+      Object commandResponse = command.execute(engine);
       String responseBodyJson = gson.toJson(commandResponse);
       response.bodyString(responseBodyJson);
-      response.status(commandResponse.getStatus());
-
+      response.status(200);
+    } catch (HttpException e) {
+      throw e;
     } catch (Exception e) {
-      response.statusInternalServerError();
+      log.debug("Couldn't execute command "+jsonBodyString+": "+e.getMessage(), e);
+      throw new InternalServerException();
     }
   }
 }

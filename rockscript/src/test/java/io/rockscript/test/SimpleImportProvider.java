@@ -22,7 +22,7 @@ package io.rockscript.test;
 import io.rockscript.Engine;
 import io.rockscript.activity.*;
 import io.rockscript.api.commands.EndActivityCommand;
-import io.rockscript.api.commands.EngineEndActivityResponse;
+import io.rockscript.api.commands.ScriptExecutionResponse;
 import io.rockscript.engine.impl.ContinuationReference;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class SimpleImportProvider extends ImportObject implements ImportProvider
     waits = new HashMap<>();
   }
 
-  public static EngineEndActivityResponse endWait(String scriptExecutionId, Engine engine) {
+  public static ScriptExecutionResponse endWait(String scriptExecutionId, Engine engine) {
     ContinuationReference continuationReference = removeFirstContinuationReference(scriptExecutionId);
     return new EndActivityCommand()
       .scriptExecutionId(scriptExecutionId)

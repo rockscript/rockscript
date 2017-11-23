@@ -27,7 +27,7 @@ import java.util.Map;
 
 /** AsyncHttpRequest to start a new script execution.
  * StartScriptExecutionCommand's are serializable with Gson */
-public class StartScriptExecutionCommand extends Command<EngineStartScriptExecutionResponse> {
+public class StartScriptExecutionCommand implements Command<ScriptExecutionResponse> {
 
   protected String scriptId;
   protected String scriptName;
@@ -35,7 +35,7 @@ public class StartScriptExecutionCommand extends Command<EngineStartScriptExecut
   protected Object input;
 
   @Override
-  public EngineStartScriptExecutionResponse execute(Engine engine) {
+  public ScriptExecutionResponse execute(Engine engine) {
     if (scriptVersionId==null) {
       ScriptStore scriptStore = engine.getScriptStore();
       Script script = null;
@@ -55,7 +55,7 @@ public class StartScriptExecutionCommand extends Command<EngineStartScriptExecut
     EngineScriptExecution engineScriptExecution = engine
       .getScriptRunner()
       .startScriptExecution(scriptVersionId, input);
-    return new EngineStartScriptExecutionResponse(engineScriptExecution);
+    return new ScriptExecutionResponse(engineScriptExecution);
   }
 
   public String getScriptId() {

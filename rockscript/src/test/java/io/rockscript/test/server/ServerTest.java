@@ -20,10 +20,7 @@
 package io.rockscript.test.server;
 
 import com.google.gson.reflect.TypeToken;
-import io.rockscript.api.commands.EngineStartScriptExecutionResponse;
-import io.rockscript.api.commands.SaveScriptVersionCommand;
-import io.rockscript.api.commands.SaveScriptVersionResponse;
-import io.rockscript.api.commands.StartScriptExecutionCommand;
+import io.rockscript.api.commands.*;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.test.SimpleImportProvider;
 import org.junit.Test;
@@ -54,15 +51,15 @@ public class ServerTest extends AbstractServerTest {
 
     String scriptId = saveScriptVersionResponse.getId();
 
-    EngineStartScriptExecutionResponse startScriptResponse = newPost("command")
+    ScriptExecutionResponse startScriptResponse = newPost("command")
       .bodyJson(new StartScriptExecutionCommand()
         .scriptVersionId(scriptId))
-      .execute(EngineStartScriptExecutionResponse.class)
+      .execute(ScriptExecutionResponse.class)
       .assertStatusOk()
       .getBody();
 
     String scriptExecutionId = startScriptResponse.getScriptExecutionId();
-    List<Event> events = newGet("events?scriptExecutionId="+scriptExecutionId)
+    List<Event> events = newGet("query?q=events&scriptExecutionId="+scriptExecutionId)
       .execute(new TypeToken<List<Event>>(){}.getType())
       .assertStatusOk()
       .getBody();

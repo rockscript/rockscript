@@ -20,6 +20,7 @@
 package io.rockscript;
 
 import io.rockscript.api.CommandHandler;
+import io.rockscript.api.QueryHandler;
 import io.rockscript.engine.PingHandler;
 import io.rockscript.http.servlet.RouterServlet;
 import org.slf4j.Logger;
@@ -44,14 +45,16 @@ public class Servlet extends RouterServlet {
     log.debug("                                        |_|         ");
 
     Engine engine = createEngine();
+    setGson(engine.getGson());
 
-    requestHandler(new CommandHandler(engine));
     requestHandler(new PingHandler(engine));
+    requestHandler(new CommandHandler(engine));
+    requestHandler(new QueryHandler(engine));
 
     defaultResponseHeader("Access-Control-Allow-Origin", "*");
   }
 
   protected Engine createEngine() {
-    return new DevEngine().initialize();
+    return new DevEngine().start();
   }
 }

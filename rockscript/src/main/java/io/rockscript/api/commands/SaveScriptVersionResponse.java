@@ -15,13 +15,12 @@
  */
 package io.rockscript.api.commands;
 
-import io.rockscript.api.Response;
 import io.rockscript.api.model.ScriptVersion;
 
 /** AsyncHttpResponse from the SaveScriptVersionCommand.
  *
  * This class is serializable with Gson. */
-public class SaveScriptVersionResponse extends ScriptVersion implements Response {
+public class SaveScriptVersionResponse extends ScriptVersion {
 
   /** for gson serialization */
   SaveScriptVersionResponse() {
@@ -29,11 +28,6 @@ public class SaveScriptVersionResponse extends ScriptVersion implements Response
 
   public SaveScriptVersionResponse(ScriptVersion scriptVersion) {
     super(scriptVersion);
-  }
-
-  @Override
-  public int getStatus() {
-    return 200;
   }
 
   @Override

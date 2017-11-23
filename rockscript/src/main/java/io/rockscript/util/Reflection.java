@@ -28,7 +28,7 @@ public class Reflection {
     return findFieldInClass(target.getClass(), fieldName);
   }
 
-  private static Field findFieldInClass(Class<?> clazz, String fieldName) {
+  public static Field findFieldInClass(Class<?> clazz, String fieldName) {
     if (clazz==null || fieldName==null) {
       return null;
     }

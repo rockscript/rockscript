@@ -52,7 +52,6 @@ public class DeployServerTest extends AbstractServerTest {
   }
 
   @Test
-
   public void testDeploySyntaxError() {
     SaveScriptVersionResponse saveScriptVersionResponse = newPost("command")
       .bodyJson(new SaveScriptVersionCommand()

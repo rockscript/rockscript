@@ -22,20 +22,23 @@ package io.rockscript.test.server;
 import io.rockscript.Engine;
 import io.rockscript.Servlet;
 import io.rockscript.TestEngine;
+import io.rockscript.http.client.Http;
+import io.rockscript.http.test.AbstractHttpServerTest;
 import io.rockscript.http.test.TestServer;
 import org.junit.AfterClass;
 import org.junit.Before;
 
-public class AbstractServerTest extends io.rockscript.http.test.AbstractServerTest {
+public class AbstractServerTest extends AbstractHttpServerTest {
 
-  static Engine engine = new TestEngine().initialize();
-  static TestServlet testServlet = new TestServlet(engine);
+  static Engine engine = null;
+  static TestServlet testServlet = null;
 
   /** used to get the test-provided engine used in the {@link Servlet} */
   static class TestServlet extends Servlet {
     Engine engine;
     public TestServlet(Engine engine) {
       this.engine = engine;
+      this.gson = engine.getGson();
     }
     @Override
     protected Engine createEngine() {
@@ -46,23 +49,30 @@ public class AbstractServerTest extends io.rockscript.http.test.AbstractServerTe
   @Override
   @Before
   public void setUp() {
-    super.setUp();
     if (engine==null) {
-      engine = new TestEngine().initialize();
+      engine = new TestEngine().start();
       testServlet = new TestServlet(engine);
     }
+    // The super.setUp will invoke the configureServer below
+    super.setUp();
   }
 
-  /** {@link io.rockscript.http.test.AbstractServerTest#tearDownStatic()} will shut down the server */
-  @AfterClass
-  public static void tearDownStatic() {
-    // AbstractServerTest.tearDownStatic will shutdown the server
-    engine = null;
-    testServlet = null;
-  }
-
+  /** Invoked by super.setUp */
   @Override
   protected void configureServer(TestServer server) {
     server.servlet(testServlet);
+  }
+
+  @Override
+  protected Http createHttp() {
+    return new Http(engine.getGson());
+  }
+
+  /** {@link AbstractHttpServerTest#tearDownStatic()} will shut down the server */
+  @AfterClass
+  public static void tearDownStatic() {
+    // AbstractHttpServerTest.tearDownStatic will shutdown the server
+    engine = null;
+    testServlet = null;
   }
 }

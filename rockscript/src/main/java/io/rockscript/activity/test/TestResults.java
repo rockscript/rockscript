@@ -15,16 +15,9 @@
  */
 package io.rockscript.activity.test;
 
-import io.rockscript.api.Response;
-
 import java.util.ArrayList;
 
-public class TestResults extends ArrayList<TestResult> implements Response {
-
-  @Override
-  public int getStatus() {
-    return 200;
-  }
+public class TestResults extends ArrayList<TestResult> {
 
   public TestResult findTestResult(String testName) {
     return stream()

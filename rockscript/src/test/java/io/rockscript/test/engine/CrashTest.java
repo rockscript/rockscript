@@ -48,14 +48,14 @@ public class CrashTest extends AbstractEngineTest {
   protected Engine initializeEngine() {
     TestEngine engine = new TestEngine();
     addHelloService(engine);
-    engine.initialize();
+    engine.start();
     return engine;
   }
 
   protected CrashEngine createCrashEngine() {
     CrashEngine crashEngine = new CrashEngine();
     addHelloService(crashEngine);
-    crashEngine.initialize();
+    crashEngine.start();
     return crashEngine;
   }
 
@@ -90,11 +90,17 @@ public class CrashTest extends AbstractEngineTest {
     public void handle(Event event) {
       if (throwing) {
         if (eventCount>=eventsWithoutCrash) {
-          throw new RuntimeException("Exception after the "+eventCount+"th event");
+          throw new CrashException("Exception after the "+eventCount+"th event");
         }
         eventCount++;
       }
       target.handle(event);
+    }
+  }
+
+  public static class CrashException extends RuntimeException {
+    public CrashException(String message) {
+      super(message);
     }
   }
 
@@ -129,7 +135,7 @@ public class CrashTest extends AbstractEngineTest {
     String scriptId = new SaveScriptVersionCommand()
         .scriptText(scriptText)
         .activate()
-        .execute(engine)
+        .execute(crashEngine)
         .getId();
 
     do {
@@ -143,7 +149,7 @@ public class CrashTest extends AbstractEngineTest {
           .scriptVersionId(scriptId)
           .execute(crashEngine);
 
-      } catch (RuntimeException e) {
+      } catch (CrashException e) {
         log.debug("----- Recovering script execution and throwing after "+eventsWithoutCrash+" events ------");
         crashOccurred = true;
         eventsWithoutCrash++;

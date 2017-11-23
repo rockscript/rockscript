@@ -7,7 +7,7 @@ import io.rockscript.api.Command;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class RecoverCrashedScriptExecutionsCommand extends Command<RecoverCrashedScriptExecutionsResponse> {
+public class RecoverCrashedScriptExecutionsCommand implements Command<RecoverCrashedScriptExecutionsResponse> {
   @Override
   public RecoverCrashedScriptExecutionsResponse execute(Engine engine) {
     List<ScriptExecution> recoveredScriptExecutions = (List) engine

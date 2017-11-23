@@ -16,26 +16,35 @@
 package io.rockscript.api.commands;
 
 import io.rockscript.Engine;
+import io.rockscript.api.Command;
 import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.EngineScriptExecution;
-import io.rockscript.api.Command;
+import io.rockscript.http.servlet.BadRequestException;
+import io.rockscript.http.servlet.InternalServerException;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class EndActivityCommand extends Command<EngineEndActivityResponse> {
+public class EndActivityCommand implements Command<ScriptExecutionResponse> {
 
   protected String scriptExecutionId;
   protected String executionId;
   protected Object result;
 
   @Override
-  public EngineEndActivityResponse execute(Engine engine) {
-    ContinuationReference continuationReference = new ContinuationReference(scriptExecutionId, executionId);
-    EngineScriptExecution engineScriptExecution = engine
-        .getScriptRunner()
-        .endActivity(continuationReference, result);
-    return new EngineEndActivityResponse(engineScriptExecution);
+  public ScriptExecutionResponse execute(Engine engine) {
+    BadRequestException.throwIfNull(scriptExecutionId, "scriptExecutionId is a mandatory field");
+    BadRequestException.throwIfNull(scriptExecutionId, "executionId is a mandatory field");
+    try {
+      ContinuationReference continuationReference = new ContinuationReference(scriptExecutionId, executionId);
+      EngineScriptExecution engineScriptExecution = engine
+          .getScriptRunner()
+          .endActivity(continuationReference, result);
+      return new ScriptExecutionResponse(engineScriptExecution);
+
+    } catch (Exception e) {
+      throw new InternalServerException();
+    }
   }
 
   public EndActivityCommand continuationReference(ContinuationReference continuationReference) {

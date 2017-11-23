@@ -87,4 +87,34 @@ public class ServerRequest {
   public String getPathParameter(String pathParameterName) {
     return pathParameters.get(pathParameterName);
   }
+
+  /** Returns the value of a request parameter as a <code>String</code>,
+   * or <code>null</code> if the parameter does not exist. Request parameters
+   * are extra information sent with the request.  For HTTP servlets,
+   * parameters are contained in the query string or posted form data.
+   *
+   * <p>You should only use this method when you are sure the
+   * parameter has only one value. If the parameter might have
+   * more than one value, use {@link #getQueryParameterMap()}.
+   *
+   * <p>If you use this method with a multivalued
+   * parameter, the value returned is equal to the first value
+   * in the array returned by <code>getParameterValues</code>. */
+  public String getQueryParameter(String parameterName) {
+    return request.getParameter(parameterName);
+  }
+
+  /** Returns a java.util.Map of the parameters of this request.
+   *
+   * <p>Request parameters are extra information sent with the request.
+   * For HTTP servlets, parameters are contained in the query string or
+   * posted form data.
+   *
+   * @return an immutable java.util.Map containing parameter names as
+   * keys and parameter values as map values. The keys in the parameter
+   * map are of type String. The values in the parameter map are of type
+   * String array. */
+  public Map<String,String[]> getQueryParameterMap() {
+    return request.getParameterMap();
+  }
 }

@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class RunTestsCommand extends Command<TestResults> {
+public class RunTestsCommand implements Command<TestResults> {
 
   transient static Logger log = LoggerFactory.getLogger(RunTestsCommand.class);
 
@@ -50,11 +50,11 @@ public class RunTestsCommand extends Command<TestResults> {
     TestResult testResult = new TestResult(scriptVersion.getName());
     TestImportObject testImportObject = new TestImportObject(testResult);
     Engine testEngine = new TestRunEngine(engineEngine, testImportObject, testResult)
-      .initialize();
+      .start();
     testImportObject.setEngine(testEngine);
     try {
       String scriptVersionId = scriptVersion.getId();
-      EngineStartScriptExecutionResponse response = new StartScriptExecutionCommand()
+      ScriptExecutionResponse response = new StartScriptExecutionCommand()
         .scriptVersionId(scriptVersionId)
         .execute(testEngine);
       ScriptExecution scriptExecution = response.getScriptExecution();

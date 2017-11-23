@@ -28,18 +28,21 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import io.rockscript.activity.Activity;
 import io.rockscript.activity.ImportObject;
+import io.rockscript.activity.ImportProvider;
 import io.rockscript.activity.ImportResolver;
+import io.rockscript.activity.http.HttpImportProvider;
 import io.rockscript.api.Command;
-import io.rockscript.api.CommandsModule;
+import io.rockscript.api.Query;
 import io.rockscript.api.commands.EndActivityCommand;
 import io.rockscript.api.commands.RunTestsCommand;
 import io.rockscript.api.commands.SaveScriptVersionCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
+import io.rockscript.api.queries.EventsQuery;
 import io.rockscript.engine.ActivitySerializer;
 import io.rockscript.engine.EngineException;
-import io.rockscript.engine.EngineModule;
 import io.rockscript.engine.ImportObjectSerializer;
 import io.rockscript.engine.impl.*;
+import io.rockscript.engine.impl.EventListener;
 import io.rockscript.engine.job.JobService;
 import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.http.client.Http;
@@ -50,9 +53,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.concurrent.Executor;
 
 public abstract class Engine {
@@ -71,7 +72,11 @@ public abstract class Engine {
   protected Gson gson;
   protected Http http;
   protected JobService jobService;
+  protected Map<String,Class<? extends Query>> queryTypes = new HashMap<>();
+  @Deprecated // I think this can be deleted, but now is not a good time to check it
   protected Map<String,Object> objects = new HashMap<>();
+  protected Map<String,ImportProvider> importProviders = new HashMap<>();
+  protected List<EnginePlugin> plugins = new ArrayList<>();
 
   public Engine() {
     this.eventStore = new EventStore(this);
@@ -82,27 +87,43 @@ public abstract class Engine {
     this.scriptVersionIdGenerator = new TestIdGenerator(this, "sv");
     this.scriptExecutionIdGenerator = new TestIdGenerator(this, "se");
     this.scriptRunner = new LocalScriptRunner(this);
-    this.importResolver = new ImportResolver(this);
     this.jobService = new JobService(this);
+
+    this.importResolver = new ImportResolver(this);
+    importProvider(new HttpImportProvider());
+
+    this.queryTypes = new HashMap<>();
+    queryType(EventsQuery.class, "events");
+
+    ServiceLoader<EnginePlugin> pluginLoader = ServiceLoader.load(EnginePlugin.class);
+    for (EnginePlugin plugin : pluginLoader) {
+      plugins.add(plugin);
+    }
+
+    plugins.forEach(plugin->plugin.created(this));
   }
 
-  public Engine initialize() {
-    if (this.gson==null) {
-      this.gson = createGson();
-    }
-    this.http = new Http(gson);
-    throwIfNotProperlyConfigured();
-
-    ServiceLoader<EngineModule> engineModules = ServiceLoader.load(EngineModule.class);
-    for (EngineModule engineModule: engineModules) {
-      engineModule.configured(this);
-    }
+  public Engine importProvider(ImportProvider importProvider) {
+    importResolver.add(importProvider);
     return this;
   }
 
-  public static Gson createGson() {
+  public Engine start() {
+    this.gson = createGson();
+    this.http = new Http(gson);
+    throwIfNotProperlyConfigured();
+    plugins.forEach(plugin->plugin.start(this));
+    return this;
+  }
+
+  public void stop() {
+    plugins.forEach(plugin->plugin.stop(this));
+  }
+
+  protected Gson createGson() {
     return new GsonBuilder()
-      .registerTypeAdapterFactory(createCommandsTypeAdapterFactory())
+      .registerTypeAdapterFactory(createCommandTypeAdapterFactory())
+      .registerTypeAdapterFactory(createQueryTypeAdapterFactory())
       .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
       .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
       .registerTypeHierarchyAdapter(Activity.class, new ActivitySerializer())
@@ -110,12 +131,8 @@ public abstract class Engine {
       .create();
   }
 
-  public static PolymorphicTypeAdapterFactory createCommandsTypeAdapterFactory() {
+  protected PolymorphicTypeAdapterFactory createCommandTypeAdapterFactory() {
     PolymorphicTypeAdapterFactory polymorphicTypeAdapterFactory = new PolymorphicTypeAdapterFactory();
-    ServiceLoader<CommandsModule> commandModules = ServiceLoader.load(CommandsModule.class);
-    for (CommandsModule commandsModule : commandModules) {
-      commandsModule.registerCommands(polymorphicTypeAdapterFactory);
-    }
     return polymorphicTypeAdapterFactory
       .typeName(new TypeToken<Command>(){},        "command")
       .typeName(SaveScriptVersionCommand.class,    "saveScript")
@@ -125,7 +142,15 @@ public abstract class Engine {
       ;
   }
 
-  static PolymorphicTypeAdapterFactory createEventJsonTypeAdapterFactory() {
+  protected PolymorphicTypeAdapterFactory createQueryTypeAdapterFactory() {
+    PolymorphicTypeAdapterFactory polymorphicTypeAdapterFactory = new PolymorphicTypeAdapterFactory();
+    polymorphicTypeAdapterFactory.typeName(new TypeToken<Query>() {}, "query");
+    queryTypes.entrySet()
+      .forEach(entry->polymorphicTypeAdapterFactory.typeName(entry.getValue(),entry.getKey()));
+    return polymorphicTypeAdapterFactory;
+  }
+
+  protected static PolymorphicTypeAdapterFactory createEventJsonTypeAdapterFactory() {
     return new PolymorphicTypeAdapterFactory()
       .typeName(new TypeToken<Event>(){},                     "event") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
       .typeName(new TypeToken<ExecutionEvent>(){},            "executionEvent") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
@@ -160,7 +185,7 @@ public abstract class Engine {
     }
   }
 
-  public void throwIfNotProperlyConfigured() {
+  protected void throwIfNotProperlyConfigured() {
     for (Field field: getClass().getDeclaredFields()) {
       Object value = null;
       try {
@@ -202,6 +227,15 @@ public abstract class Engine {
 
   public <T> T getObject(Class<T> clazz) {
     return (T) objects.get(clazz.getName());
+  }
+
+  public Map<String,Class<? extends Query>> getQueryTypes() {
+    return this.queryTypes;
+  }
+
+  public Engine queryType(Class<? extends Query> queryClass, String queryName) {
+    this.queryTypes.put(queryName, queryClass);
+    return this;
   }
 
   public Engine gson(Gson gson) {

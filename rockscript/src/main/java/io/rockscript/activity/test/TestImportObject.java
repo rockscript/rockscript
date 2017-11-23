@@ -20,7 +20,7 @@ import io.rockscript.activity.ActivityInput;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.activity.ImportObject;
 import io.rockscript.activity.ImportProvider;
-import io.rockscript.api.commands.EngineStartScriptExecutionResponse;
+import io.rockscript.api.commands.ScriptExecutionResponse;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.Script;
 import io.rockscript.api.model.ScriptVersion;
@@ -40,7 +40,7 @@ public class TestImportObject extends ImportObject implements ImportProvider {
     put("start", activityInput -> {
       String scriptNamePattern = activityInput.getArgProperty("script");
       Object input = activityInput.getArgProperty("input");
-      EngineStartScriptExecutionResponse response = null;
+      ScriptExecutionResponse response = null;
       try {
         String scriptVersionId = findLatestScriptVersionIdByScriptNamePattern(scriptNamePattern, activityInput);
 

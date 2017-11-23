@@ -46,13 +46,14 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
 
   @Override
   protected void configure(RouterServlet routerServlet) {
-    routerServlet.requestHandler(Http.Methods.GET, "/ole", (request, response) -> {
-      response.status(200)
-        .headerContentTypeApplicationJson()
-        .bodyJson(hashMap(
-          entry("country", "Belgium"),
-          entry("currency", "EUR")));
-    });
+    routerServlet
+      .requestHandler(Http.Methods.GET, "/ole", (request, response) -> {
+          response.status(200)
+            .headerContentTypeApplicationJson()
+            .bodyJson(hashMap(
+              entry("country", "Belgium"),
+              entry("currency", "EUR")));
+        });
   }
 
   @Test

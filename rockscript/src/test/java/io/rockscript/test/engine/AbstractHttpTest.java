@@ -39,6 +39,7 @@ public abstract class AbstractHttpTest extends AbstractEngineTest {
     super.setUp();
     testServer = new TestServer(PORT);
     routerServlet = new RouterServlet();
+    routerServlet.setGson(engine.getGson());
     configure(routerServlet);
     testServer.servlet(routerServlet);
     testServer.startup();

@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.reflect.Type;
 
-public abstract class AbstractServerTest {
+public abstract class AbstractHttpServerTest {
 
-  protected static Logger log = LoggerFactory.getLogger(AbstractServerTest.class);
+  protected static Logger log = LoggerFactory.getLogger(AbstractHttpServerTest.class);
 
   protected static final int PORT = 9999;
 

@@ -16,12 +16,11 @@
 
 package io.rockscript.activity;
 
-import io.rockscript.engine.impl.RemoteActivityJsonObject;
 import io.rockscript.Engine;
+import io.rockscript.engine.impl.RemoteActivityJsonObject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ServiceLoader;
 
 public class ImportResolver {
 
@@ -29,19 +28,10 @@ public class ImportResolver {
   Map<String,ImportProvider> importProviders = new HashMap<>();
 
   public ImportResolver(Engine engine) {
-    loadAllAvailableOnClassPath();
   }
 
   public ImportResolver add(ImportProvider importProvider) {
     importProviders.put(importProvider.getImportObject().getServiceName(), importProvider);
-    return this;
-  }
-
-  public ImportResolver loadAllAvailableOnClassPath() {
-    ServiceLoader<ImportProvider> importProviderLoader = ServiceLoader.load(ImportProvider.class);
-    for (ImportProvider importProvider: importProviderLoader) {
-      add(importProvider);
-    }
     return this;
   }
 
