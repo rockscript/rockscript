@@ -47,11 +47,45 @@
   </style>
 
   <script src="js/jquery-3.2.1.min.js"></script>
+  <script src="js/showdown-1.8.2.min.js"></script>
 
   <script type="application/javascript">
+    var contents = {
+      introduction: [
+          '# RockScript API documentation',
+          'The RockScript API is a HTTP API that consists of ',
+          '* Commands',
+          '* Queries',
+          '* Events',
+          '### Commands',
+          'Commands are RPC style operations that change the state of the RockScript server.',
+          'Commands have the following form: ',
+          '```',
+          '{"commandName": { ...command data fields... }}',
+          '```',
+          'Here\'s an example of a command request/response:',
+          '```',
+          'lksjd flskdjf ',
+          '```',
+          '### Queries',
+          'Queries fetch data without changing the state of the server.'
+      ].join('\n'),
+
+      authentication: [
+          '#Authentication',
+          'At this time RockScript does not yet support any form of authentication.'
+      ].join('\n'),
+
+      help: [
+          '#Help',
+          'If this documention is insufficient, please contact us on [our forum](https://github.com/rockscript/rockscript/issues).'
+      ].join('\n')
+    };
+
     window.addEventListener('load', function() {
+      show('introduction');
       $.get('http://localhost:3652/docs', function(data) {
-        let docs = JSON.parse(data);
+        docs = JSON.parse(data);
         var html = '';
         docs.commands.forEach(function(commandDoc) {
           html += '<p>'+commandDoc.label+'</p>';
@@ -59,16 +93,144 @@
         $('#commands').html(html);
       });
     });
-  </script>
 
+    var converter = new showdown.Converter();
+
+    function show(id) {
+      let html = converter.makeHtml(contents[id]);
+      $('.content').html(html);
+    }
+  </script>
+  <style>
+    body {
+      font-family: "Open Sans";
+      letter-spacing: -.3px;
+      margin: 0;
+      height: 100%;
+    }
+
+    a:not([href]) {
+      cursor: pointer;
+    }
+
+    a, a:visited {
+      text-decoration: none;
+      font-weight: bold;
+      color: #1a90bf;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .titlebar {
+      background-color: #2B7191 !important;
+      color: white;
+      padding: 15px;
+    }
+
+    .titlebar > .brand {
+      font-family: "Roboto Slab";
+      display: inline-block;
+      opacity: .7;
+      margin-right: 30px;
+    }
+
+    .titlebar > .title {
+      font-size: 1.3em;
+      display: inline-block;
+    }
+
+    .toc {
+      width: 100%;
+      padding: 15px 0 0 15px;
+      border: solid 0 #ddd;
+      float: left;
+      border-width: 0 0 1px 0;
+    }
+
+    @media (min-width: 800px) {
+      .toc {
+        width: 200px;
+        border-width: 0 1px 0 0;
+        height: calc(100vh - 73px);
+      }
+    }
+
+    .section {
+      margin-bottom: 10px;
+    }
+
+    .section > .title {
+      font-size: 1.1em;
+      margin-bottom: 4px;
+    }
+
+    .section > .link {
+      display: block;
+      padding-left: 10px;
+    }
+
+    a.link:hover {
+      color: #275c7a;
+    }
+
+    .content {
+      padding: 15px;
+      width: calc(100% - 30px);
+      float: right;
+    }
+
+    @media (min-width: 800px) {
+      .content {
+        width: calc(100% - 247px);
+      }
+    }
+
+    .content h1 {
+      font-size: 1.5em;
+      margin-top: 0;
+    }
+
+    .content pre code {
+      background-color: #fffcf8;
+      border: 1px solid #ddd;
+      padding: 7px 10px 7px 10px;
+      display: block;
+    }
+  </style>
 </head>
 <body>
 
-<h1>RockScript API documentation</h1>
+<a onclick="show('home')">
+<div class="titlebar">
+  <div class="brand"><img alt="RockScript.io" src="img/hand-white.png" height="16">RockScript.io</div>
+  <div class="title">RockScript API documentation</div>
+</div>
+</a>
 
-<p>TODO: pimp the graphical design</p>
-
-<div id="commands">
+<div class="toc">
+  <div class="section">
+    <div class="title">General</div>
+    <a class="link" onclick="show('introduction')">Introduction</a>
+    <a class="link" onclick="show('authentication')">Authentication</a>
+    <a class="link" onclick="show('help')">Help</a>
+  </div>
+  <div class="section">
+    <div class="title">Commands</div>
+    <a class="link" onclick="show('commands')">Introduction</a>
+    <a class="link">Save script</a>
+  </div>
+  <div class="section">
+    <div class="title">Queries</div>
+    <a class="link">Introduction</a>
+  </div>
+  <div class="section">
+    <div class="title">Events</div>
+    <a class="link">Introduction</a>
+  </div>
+</div>
+<div class="content">
 </div>
 
 </body>
