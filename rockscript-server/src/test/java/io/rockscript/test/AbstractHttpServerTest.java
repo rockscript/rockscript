@@ -59,6 +59,11 @@ public abstract class AbstractHttpServerTest {
     server = null;
     http = null;
     baseUrl = null;
+    try {
+      Thread.sleep(5000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
   }
 
   /** override to customize the test server creation */
