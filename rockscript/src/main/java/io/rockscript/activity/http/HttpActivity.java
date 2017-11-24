@@ -74,6 +74,7 @@ public class HttpActivity extends AbstractActivity {
     return ActivityOutput.waitForEndActivityCallback();
   }
 
+  @SuppressWarnings("unchecked")
   private void wrapSingleHeadersInList(Object requestObject) {
     if (requestObject instanceof Map) {
       Object headersObject = ((Map<String,Object>)requestObject).get("headers");

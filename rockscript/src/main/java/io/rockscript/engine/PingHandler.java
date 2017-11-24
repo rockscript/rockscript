@@ -17,19 +17,17 @@ package io.rockscript.engine;
 
 import io.rockscript.Engine;
 import io.rockscript.api.AbstractRequestHandler;
-import io.rockscript.http.servlet.Get;
 import io.rockscript.http.servlet.ServerRequest;
 import io.rockscript.http.servlet.ServerResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Get("/ping")
 public class PingHandler extends AbstractRequestHandler {
 
   static Logger log = LoggerFactory.getLogger(PingHandler.class);
 
   public PingHandler(Engine engine) {
-    super(engine);
+    super(GET, "/ping", engine);
   }
 
   @Override

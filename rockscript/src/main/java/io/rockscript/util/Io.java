@@ -23,7 +23,11 @@ import java.util.Scanner;
 public class Io {
 
   public static String toString(InputStream inputStream) {
-    Scanner scanner = new Scanner(inputStream)
+    return toString(inputStream, "UTF-8");
+  }
+
+  public static String toString(InputStream inputStream, String charset) {
+    Scanner scanner = new Scanner(inputStream, charset)
       .useDelimiter("\\A");
     if (scanner.hasNext()) {
       return scanner.next();
@@ -33,16 +37,24 @@ public class Io {
   }
 
   public static String getResourceAsString(String resource) {
+    return getResourceAsString(resource, "UTF-8");
+  }
+
+  public static String getResourceAsString(String resource, String charset) {
     InputStream resourceAsStream = Io.class.getClassLoader().getResourceAsStream(resource);
     if (resourceAsStream==null) {
       throw new RuntimeException("Resource "+resource+" doesn't exist");
     }
     try {
-      return Io.toString(resourceAsStream);
+      return Io.toString(resourceAsStream, charset);
     } catch (Exception e) {
       e.printStackTrace();
       throw new RuntimeException("Couldn't get resource as string: "+e.getMessage(), e);
     }
+  }
+
+  public static boolean hasResource(String resource) {
+    return Io.class.getClassLoader().getResource(resource)!=null;
   }
 
   public static byte[] readBytesFromStream(InputStream is) {

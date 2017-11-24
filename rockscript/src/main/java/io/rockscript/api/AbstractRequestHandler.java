@@ -20,13 +20,14 @@
 package io.rockscript.api;
 
 import io.rockscript.Engine;
-import io.rockscript.http.servlet.RequestHandler;
+import io.rockscript.http.servlet.PathRequestHandler;
 
-public abstract class AbstractRequestHandler implements RequestHandler {
+public abstract class AbstractRequestHandler extends PathRequestHandler {
 
   protected Engine engine;
 
-  public AbstractRequestHandler(Engine engine) {
+  public AbstractRequestHandler(String method, String pathTemplate, Engine engine) {
+    super(method, pathTemplate);
     this.engine = engine;
   }
 }

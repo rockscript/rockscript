@@ -48,6 +48,7 @@ public class ScriptExecution {
     scan(engineScriptExecution.getChildren());
   }
 
+  @SuppressWarnings("unchecked")
   private void scan(List<Execution> children) {
     if (children!=null) {
       for (Execution child: children) {

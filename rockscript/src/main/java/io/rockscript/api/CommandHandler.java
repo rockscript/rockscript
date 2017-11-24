@@ -25,13 +25,12 @@ import io.rockscript.http.servlet.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Post("/command")
 public class CommandHandler extends AbstractRequestHandler {
 
   static Logger log = LoggerFactory.getLogger(CommandHandler.class);
 
   public CommandHandler(Engine engine) {
-    super(engine);
+    super(POST, "/command", engine);
   }
 
   @Override

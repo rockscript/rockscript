@@ -20,7 +20,10 @@
 package io.rockscript.api;
 
 import io.rockscript.Engine;
-import io.rockscript.http.servlet.*;
+import io.rockscript.http.servlet.HttpException;
+import io.rockscript.http.servlet.InternalServerException;
+import io.rockscript.http.servlet.ServerRequest;
+import io.rockscript.http.servlet.ServerResponse;
 import io.rockscript.util.Reflection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,13 +32,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-@Get("/query")
 public class QueryHandler extends AbstractRequestHandler {
 
   static Logger log = LoggerFactory.getLogger(QueryHandler.class);
 
   public QueryHandler(Engine engine) {
-    super(engine);
+    super(GET, "/query", engine);
   }
 
   @Override

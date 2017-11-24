@@ -29,6 +29,7 @@
         <module>rockscript-gson</module>
         <module>rockscript-http</module>
         <module>rockscript</module>
+        <module>rockscript-server</module>
     </modules>
 
     <dependencies>

@@ -53,6 +53,7 @@ public class SerializationTest extends AbstractEngineTest {
     return new TestEngine().start();
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void testSerialization() {
     engine.getImportResolver().createImport("helloService")

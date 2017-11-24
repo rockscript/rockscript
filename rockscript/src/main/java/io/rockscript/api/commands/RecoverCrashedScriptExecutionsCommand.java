@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class RecoverCrashedScriptExecutionsCommand implements Command<RecoverCrashedScriptExecutionsResponse> {
+
+  @SuppressWarnings("unchecked")
   @Override
   public RecoverCrashedScriptExecutionsResponse execute(Engine engine) {
     List<ScriptExecution> recoveredScriptExecutions = (List) engine

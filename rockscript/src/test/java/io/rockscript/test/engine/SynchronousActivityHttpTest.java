@@ -24,7 +24,10 @@ import io.rockscript.activity.ActivityOutput;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.http.client.Http;
+import io.rockscript.http.servlet.PathRequestHandler;
 import io.rockscript.http.servlet.RouterServlet;
+import io.rockscript.http.servlet.ServerRequest;
+import io.rockscript.http.servlet.ServerResponse;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,19 +49,23 @@ public class SynchronousActivityHttpTest extends AbstractHttpTest {
   @Override
   protected void configure(RouterServlet routerServlet) {
     routerServlet
-      .requestHandler(Http.Methods.POST, "/approve", (request, response)-> {
-        ActivityInput activityInput = request.getBodyAs(ActivityInput.class);
-        activityInputs.add(activityInput);
-        ActivityOutput activityOutput = ActivityOutput.endActivity(
-          hashMap(
-            entry("country", "Belgium"),
-            entry("currency", "EUR")
-          )
-        );
-        response
+      .requestHandler(new PathRequestHandler(Http.Methods.POST, "/approve") {
+        @SuppressWarnings("unchecked")
+        @Override
+        public void handle(ServerRequest request, ServerResponse response) {
+          ActivityInput activityInput = request.getBodyAs(ActivityInput.class);
+          activityInputs.add(activityInput);
+          ActivityOutput activityOutput = ActivityOutput.endActivity(
+            hashMap(
+              entry("country", "Belgium"),
+              entry("currency", "EUR")
+            )
+          );
+          response
             .status(200)
             .headerContentTypeApplicationJson()
             .bodyJson(activityOutput);
+        }
       });
   }
 

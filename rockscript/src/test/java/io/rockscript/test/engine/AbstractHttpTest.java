@@ -19,8 +19,8 @@
  */
 package io.rockscript.test.engine;
 
+import io.rockscript.http.server.HttpServer;
 import io.rockscript.http.servlet.RouterServlet;
-import io.rockscript.http.test.TestServer;
 import org.junit.After;
 import org.junit.Before;
 
@@ -30,24 +30,24 @@ import org.junit.Before;
 public abstract class AbstractHttpTest extends AbstractEngineTest {
 
   protected static final int PORT = 4000;
-  protected static TestServer testServer;
+  protected static HttpServer server;
   protected RouterServlet routerServlet;
 
   @Override
   @Before
   public void setUp() {
     super.setUp();
-    testServer = new TestServer(PORT);
+    server = new HttpServer(PORT);
     routerServlet = new RouterServlet();
     routerServlet.setGson(engine.getGson());
     configure(routerServlet);
-    testServer.servlet(routerServlet);
-    testServer.startup();
+    server.servlet(routerServlet);
+    server.startup();
   }
 
   @After
   public void tearDown() {
-    testServer.shutdown();
+    server.shutdown();
     super.tearDown();
   }
 

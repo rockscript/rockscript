@@ -22,8 +22,10 @@ package io.rockscript.test.engine;
 import io.rockscript.activity.ActivityInput;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.http.servlet.PathRequestHandler;
 import io.rockscript.http.servlet.RouterServlet;
-import io.rockscript.http.client.Http;
+import io.rockscript.http.servlet.ServerRequest;
+import io.rockscript.http.servlet.ServerResponse;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static io.rockscript.http.servlet.PathRequestHandler.POST;
 import static org.junit.Assert.assertTrue;
 
 public class AsynchronousActivityHttpTest extends AbstractHttpTest {
@@ -47,42 +50,48 @@ public class AsynchronousActivityHttpTest extends AbstractHttpTest {
   @Test
   public void testHttpActivityNoBodyResponse() {
     routerServlet
-      .requestHandler(Http.Methods.POST, "/approve", (request,response)-> {
+      .requestHandler(new PathRequestHandler(POST, "/approve") {
+        @Override
+        public void handle(ServerRequest request, ServerResponse response) {
           ActivityInput activityInput = parseBodyAs(request, ActivityInput.class);
           activityInputs.add(activityInput);
           response.status(200);
+        }
       });
-
     executeApprovalScript();
   }
 
   @Test
   public void testHttpActivityFullBodyResponse() {
     routerServlet
-      .requestHandler(Http.Methods.POST, "/approve", (request,response)-> {
+      .requestHandler(new PathRequestHandler(POST, "/approve") {
+        @Override
+        public void handle(ServerRequest request, ServerResponse response) {
           ActivityInput activityInput = parseBodyAs(request, ActivityInput.class);
           activityInputs.add(activityInput);
           response
-              .status(200)
-              .headerContentTypeApplicationJson()
-              .bodyString("{ \"ended\": \"false\" }");
+            .status(200)
+            .headerContentTypeApplicationJson()
+            .bodyString("{ \"ended\": \"false\" }");
+        }
       });
-
     executeApprovalScript();
   }
 
   @Test
   public void testHttpActivityEmptyBodyResponse() {
     routerServlet
-      .requestHandler(Http.Methods.POST, "/approve", (request,response)-> {
+      .requestHandler(new PathRequestHandler(POST, "/approve") {
+        @Override
+        public void handle(ServerRequest request, ServerResponse response) {
           ActivityInput activityInput = parseBodyAs(request, ActivityInput.class);
           activityInputs.add(activityInput);
           response
-              .status(200)
-              .headerContentTypeApplicationJson()
-              .bodyString("{}");
+            .status(200)
+            .headerContentTypeApplicationJson()
+            .bodyString("{}");
+        }
       });
-
     executeApprovalScript();
   }
 

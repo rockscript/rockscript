@@ -86,6 +86,7 @@ public class PolymorphicTypeAdapterFactory implements TypeAdapterFactory {
     return null;
   }
 
+  @SuppressWarnings("unchecked")
   public <T> Constructor<T> getAccessibleConstructor(Class<T> clazz) {
     Constructor<?> constructor = accessibleConstructors.get(clazz);
     if (constructor!=null) {

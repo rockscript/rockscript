@@ -48,6 +48,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
     initializeSystemVariable(engine);
   }
 
+  @SuppressWarnings("unchecked")
   public EngineScriptExecution(String scriptExecutionId, Engine engine, EngineScript engineScript, List<ExecutionEvent> storedEvents) {
     this(scriptExecutionId, engine, engineScript);
 

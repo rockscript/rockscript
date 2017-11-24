@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright (c) 2017 RockScript.io.
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RockScript API</title>
+  <style>
+    @font-face {
+      font-family: 'Roboto Slab';
+      font-style: normal;
+      font-weight: 300;
+      src: local('Roboto Slab'), local('RobotoSlab'), url(fonts/roboto-slab-300.woff2) format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+    }
+    @font-face {
+      font-family: 'Open Sans';
+      font-style: normal;
+      font-weight: 400;
+      src: local('Open Sans Regular'), local('OpenSans-Regular'), url(fonts/open-sans-400.woff2) format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+    }
+    @font-face {
+      font-family: 'Open Sans';
+      font-style: normal;
+      font-weight: 700;
+      src: local('Open Sans Bold'), local('OpenSans-Bold'), url(fonts/open-sans-700.woff2) format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+    }
+  </style>
+
+  <script src="js/jquery-3.2.1.min.js"></script>
+
+  <script type="application/javascript">
+    window.addEventListener('load', function() {
+      $.get('http://localhost:3652/docs', function(data) {
+        let docs = JSON.parse(data);
+        var html = '';
+        docs.commands.forEach(function(commandDoc) {
+          html += '<p>'+commandDoc.label+'</p>';
+        });
+        $('#commands').html(html);
+      });
+    });
+  </script>
+
+</head>
+<body>
+
+<h1>RockScript API documentation</h1>
+
+<p>TODO: pimp the graphical design</p>
+
+<div id="commands">
+</div>
+
+</body>
+</html>

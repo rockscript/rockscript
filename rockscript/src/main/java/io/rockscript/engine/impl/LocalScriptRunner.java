@@ -36,6 +36,7 @@ public class LocalScriptRunner implements ScriptRunner {
     this.engine = engine;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public EngineScriptExecution startScriptExecution(String scriptVersionId, Object input) {
     if (scriptVersionId==null) {
@@ -77,6 +78,7 @@ public class LocalScriptRunner implements ScriptRunner {
     return execution!=null ? execution : scriptExecution;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public EngineScriptExecution endActivity(ContinuationReference continuationReference, Object result) {
     Lock lock = acquireLockOrAddEndActivityRequestToBacklog(continuationReference, result);

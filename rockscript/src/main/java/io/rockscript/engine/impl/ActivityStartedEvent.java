@@ -33,6 +33,7 @@ public class ActivityStartedEvent extends ExecutableEvent<ArgumentsExpressionExe
   ActivityStartedEvent() {
   }
 
+  @SuppressWarnings("unchecked")
   public ActivityStartedEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
     super(argumentsExpressionExecution);
     if (argumentsExpressionExecution.activity==null) {

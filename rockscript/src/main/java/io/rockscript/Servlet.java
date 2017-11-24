@@ -20,6 +20,7 @@
 package io.rockscript;
 
 import io.rockscript.api.CommandHandler;
+import io.rockscript.api.DocsHandler;
 import io.rockscript.api.QueryHandler;
 import io.rockscript.engine.PingHandler;
 import io.rockscript.http.servlet.RouterServlet;
@@ -30,6 +31,18 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
 public class Servlet extends RouterServlet {
+
+  private Engine engine;
+
+  public Servlet() {
+  }
+
+  /** Optionally pass a **non-started** Engine,
+   * If no engine is passed, a default one will be created
+   * in the {@link #init(ServletConfig)}. */
+  public Servlet(Engine engine) {
+    this.engine = engine;
+  }
 
   static Logger log = LoggerFactory.getLogger(Servlet.class);
 
@@ -44,17 +57,18 @@ public class Servlet extends RouterServlet {
     log.debug("|_| \\_\\___/ \\___|_|\\_\\|____/ \\___|_|  |_| .__/ \\__| ");
     log.debug("                                        |_|         ");
 
-    Engine engine = createEngine();
+    if (engine==null) {
+      engine = new DevEngine().start();
+    }
+
     setGson(engine.getGson());
 
-    requestHandler(new PingHandler(engine));
+    requestHandler(new FileHandler(engine));
     requestHandler(new CommandHandler(engine));
     requestHandler(new QueryHandler(engine));
+    requestHandler(new DocsHandler(engine));
+    requestHandler(new PingHandler(engine));
 
     defaultResponseHeader("Access-Control-Allow-Origin", "*");
-  }
-
-  protected Engine createEngine() {
-    return new DevEngine().start();
   }
 }

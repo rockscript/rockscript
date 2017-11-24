@@ -31,6 +31,7 @@ public class ActivityEndRequestRunnable implements Runnable {
     this.localEngine = localEngine;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void run() {
     try {

@@ -56,6 +56,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Executor;
 
+@SuppressWarnings("unchecked")
 public abstract class Engine {
 
   protected IdGenerator scriptIdGenerator;

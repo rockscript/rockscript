@@ -27,8 +27,10 @@ import io.rockscript.api.commands.SaveScriptVersionCommand;
 import io.rockscript.engine.impl.ActivityStartErrorEvent;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
-import io.rockscript.http.client.Http;
+import io.rockscript.http.servlet.PathRequestHandler;
 import io.rockscript.http.servlet.RouterServlet;
+import io.rockscript.http.servlet.ServerRequest;
+import io.rockscript.http.servlet.ServerResponse;
 import io.rockscript.test.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+import static io.rockscript.http.servlet.PathRequestHandler.GET;
 import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.*;
@@ -47,13 +50,17 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
   @Override
   protected void configure(RouterServlet routerServlet) {
     routerServlet
-      .requestHandler(Http.Methods.GET, "/ole", (request, response) -> {
+      .requestHandler(new PathRequestHandler(GET, "/ole") {
+        @SuppressWarnings("unchecked")
+        @Override
+        public void handle(ServerRequest request, ServerResponse response) {
           response.status(200)
             .headerContentTypeApplicationJson()
             .bodyJson(hashMap(
               entry("country", "Belgium"),
               entry("currency", "EUR")));
-        });
+        }
+      });
   }
 
   @Test
