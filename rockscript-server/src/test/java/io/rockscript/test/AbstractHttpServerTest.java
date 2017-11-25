@@ -23,6 +23,7 @@ import io.rockscript.http.client.ClientRequest;
 import io.rockscript.http.client.ClientResponse;
 import io.rockscript.http.client.Http;
 import io.rockscript.http.server.HttpServer;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.slf4j.Logger;
@@ -47,6 +48,7 @@ public abstract class AbstractHttpServerTest {
   @Before
   public void setUp() {
     if (server==null) {
+      log.debug("CREATING server for "+getClass());
       this.server = createServer();
       log.debug("CREATED server "+System.identityHashCode(server)+" for "+getClass());
       this.http = createHttp();
@@ -54,8 +56,8 @@ public abstract class AbstractHttpServerTest {
     }
   }
 
-  @AfterClass
-  public static void tearDownStatic() {
+  @After
+  public void tearDown() {
     log.debug("SHUTTING DOWN server "+System.identityHashCode(server));
     server.shutdown();
     server = null;
