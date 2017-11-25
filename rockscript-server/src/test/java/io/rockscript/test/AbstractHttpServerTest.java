@@ -48,6 +48,7 @@ public abstract class AbstractHttpServerTest {
   public void setUp() {
     if (server==null) {
       this.server = createServer();
+      log.debug("CREATED server "+System.identityHashCode(server)+" for "+getClass());
       this.http = createHttp();
       this.baseUrl = createBaseUrl();
     }
@@ -55,15 +56,11 @@ public abstract class AbstractHttpServerTest {
 
   @AfterClass
   public static void tearDownStatic() {
+    log.debug("SHUTTING DOWN server "+System.identityHashCode(server));
     server.shutdown();
     server = null;
     http = null;
     baseUrl = null;
-    try {
-      Thread.sleep(5000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
   }
 
   /** override to customize the test server creation */
