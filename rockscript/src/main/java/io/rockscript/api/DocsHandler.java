@@ -42,7 +42,17 @@ public class DocsHandler extends AbstractRequestHandler {
   public void handle(ServerRequest request, ServerResponse response) {
     response.bodyJson(hashMap(
       entry("commands", Lists.of(
-        hashMap(entry("label", "TODO"))
+        hashMap(
+          entry("id", "saveScript"),
+          entry("label", "Save script"),
+          entry("content",
+            "# Save script \n" +
+            "Here's the `explaination` on how to \n" +
+            "```\n" +
+            "save.script();\n" +
+            "```"
+          )
+        )
       ))
     ));
     response.headerContentTypeApplicationJson();

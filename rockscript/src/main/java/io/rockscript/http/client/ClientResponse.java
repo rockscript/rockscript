@@ -50,6 +50,8 @@ public class ClientResponse {
   transient ClientRequest request;
   /** transient because this field should not be serialized by gson */
   transient CloseableHttpResponse apacheResponse;
+  /** transient because this field should not be serialized by gson */
+  transient String bodyLog;
 
   protected int status;
   protected Map<String,List<String>> headers;
@@ -70,14 +72,29 @@ public class ClientResponse {
             InputStream content = entity.getContent();
             InputStreamReader reader = new InputStreamReader(content, charset);
             this.body = request.getHttp().getGson().fromJson(reader, type);
+
+            if (Http.log.isDebugEnabled()) {
+              // IDEA: Even better would be if we wrapped
+              // the content input stream and copying the json
+              // as it is read by Gson.   That way, it would be the
+              // *exact* contents instead of the reserialized object
+              bodyLog = request.getHttp().getGson().toJson(this.body);
+            }
+
           } else {
             this.body = EntityUtils.toString(entity, "UTF-8");
+            bodyLog = (String) this.body;
           }
         } catch (Exception e) {
           throw new RuntimeException("Couldn't ready body/entity from http request " + toString());
         }
       }
+
     } finally {
+      if (Http.log.isDebugEnabled()) {
+        Http.log.debug("\n"+this.toString());
+      }
+
       apacheResponse.close();
     }
   }
@@ -141,7 +158,9 @@ public class ClientResponse {
         bodyString = bodyString.substring(0, maxBodyLength)+"...";
       }
 
-      text.append(bodyString);
+      if (bodyLog!=null) {
+        text.append(bodyLog);
+      }
     }
     return text.toString();
   }

@@ -50,55 +50,31 @@
   <script src="js/showdown-1.8.2.min.js"></script>
 
   <script type="application/javascript">
-    var contents = {
-      introduction: [
-          '# RockScript API documentation',
-          'The RockScript API is a HTTP API that consists of ',
-          '* Commands',
-          '* Queries',
-          '* Events',
-          '### Commands',
-          'Commands are RPC style operations that change the state of the RockScript server.',
-          'Commands have the following form: ',
-          '```',
-          '{"commandName": { ...command data fields... }}',
-          '```',
-          'Here\'s an example of a command request/response:',
-          '```',
-          'lksjd flskdjf ',
-          '```',
-          '### Queries',
-          'Queries fetch data without changing the state of the server.'
-      ].join('\n'),
-
-      authentication: [
-          '#Authentication',
-          'At this time RockScript does not yet support any form of authentication.'
-      ].join('\n'),
-
-      help: [
-          '#Help',
-          'If this documention is insufficient, please contact us on [our forum](https://github.com/rockscript/rockscript/issues).'
-      ].join('\n')
-    };
+    var converter = new showdown.Converter();
 
     window.addEventListener('load', function() {
       show('introduction');
       $.get('http://localhost:3652/docs', function(data) {
         docs = JSON.parse(data);
-        var html = '';
-        docs.commands.forEach(function(commandDoc) {
-          html += '<p>'+commandDoc.label+'</p>';
-        });
-        $('#commands').html(html);
+        let tocHtml =
+            '<div class="title">Commands</div>' +
+            docs.commands.map(function(command) {
+              return '<a class="link" onclick="show(\''+command.id+'\')">'+command.label+'</a>';
+            }).join();
+        $('#commands').html(tocHtml);
+
+        var contentHtml = docs.commands.map(function(command) {
+          return '<div id="'+command.id+'" class="hidden">' +
+              '  '+converter.makeHtml(command.content)+
+              '</div>';
+        }).join();
+        $('.content').append(contentHtml);
       });
     });
 
-    var converter = new showdown.Converter();
-
     function show(id) {
-      let html = converter.makeHtml(contents[id]);
-      $('.content').html(html);
+      $('.content').children().addClass("hidden");
+      $('#'+id).removeClass("hidden");
     }
   </script>
   <style>
@@ -121,6 +97,11 @@
 
     a:hover {
       text-decoration: underline;
+    }
+
+    code {
+      font-weight: bold;
+      color: #444;
     }
 
     .titlebar {
@@ -198,11 +179,15 @@
       padding: 7px 10px 7px 10px;
       display: block;
     }
+
+    .hidden {
+      display: none;
+    }
   </style>
 </head>
 <body>
 
-<a onclick="show('home')">
+<a onclick="show('introduction')">
 <div class="titlebar">
   <div class="brand"><img alt="RockScript.io" src="img/hand-white.png" height="16">RockScript.io</div>
   <div class="title">RockScript API documentation</div>
@@ -216,21 +201,57 @@
     <a class="link" onclick="show('authentication')">Authentication</a>
     <a class="link" onclick="show('help')">Help</a>
   </div>
-  <div class="section">
-    <div class="title">Commands</div>
-    <a class="link" onclick="show('commands')">Introduction</a>
-    <a class="link">Save script</a>
+  <div id="commands" class="section">
   </div>
   <div class="section">
     <div class="title">Queries</div>
     <a class="link">Introduction</a>
   </div>
-  <div class="section">
-    <div class="title">Events</div>
-    <a class="link">Introduction</a>
-  </div>
 </div>
 <div class="content">
+
+  <div id="introduction">
+    <h1 id="rockscriptapidocumentation">RockScript API documentation</h1>
+    <p>The RockScript API is a HTTP API that consists of </p>
+    <ul>
+      <li>Commands</li>
+      <li>Queries</li>
+    </ul>
+    <h3 id="commands">Commands</h3>
+    <p>Commands are RPC style operations that change the state of the RockScript server.
+      Commands are invoked by a HTTP POST to <code>http://localhost:3652/command</code> with the command
+      JSON as the body.  We hope to add message based API later.
+      Commands have a the following JSON serialization form
+      (aka <a href="https://fasterxml.github.io/jackson-annotations/javadoc/2.9/com/fasterxml/jackson/annotation/JsonTypeInfo.As.html#WRAPPER_OBJECT">wrapper object</a>):</p>
+    <pre><code>{"commandName": { ...command data fields... }}</code></pre>
+    <p>Example of a command request/response:</p>
+    <pre><code>&gt; POST http://localhost:3652/command
+&gt; { "saveScript": {
+&gt;     "scriptName": "My first script",
+&gt;     "scriptText": "var v = 42;"
+&gt; }}
+
+&lt; HTTP/1.1 200 OK
+&lt; Access-Control-Allow-Origin: *
+&lt; { "id":"sv1",
+&lt;   "scriptId":"s1",
+&lt;   "name":"My first script",
+&lt;   "version":1,
+&lt;   "text":"var v = 42;"}</code></pre>
+    <h3 id="queries">Queries</h3>
+    <p>Queries fetch data without changing the state of the server.</p>
+  </div>
+
+  <div id="authentication" class="hidden">
+    <h1>Authentication</h1>
+    <p>At this time RockScript does not yet support any form of authentication.</p>
+  </div>
+
+  <div id="help" class="hidden">
+    <h1>Help</h1>
+    <p>If this documention is insufficient, please contact us on <a href="https://github.com/rockscript/rockscript/issues">our forum.</a></p>
+  </div>
+
 </div>
 
 </body>

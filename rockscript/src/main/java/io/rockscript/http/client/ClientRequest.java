@@ -46,6 +46,8 @@ public class ClientRequest {
   transient Http http;
   /** transient because this field should not be serialized by gson */
   transient HttpRequestBase apacheRequest;
+  /** transient because this field should not be serialized by gson */
+  transient String bodyLog;
 
   protected String method;
   protected String url;
@@ -89,6 +91,10 @@ public class ClientRequest {
 
       if (body!=null) {
         ((HttpEntityEnclosingRequestBase)apacheRequest).setEntity(body);
+      }
+
+      if (Http.log.isDebugEnabled()) {
+        Http.log.debug("\n"+this.toString());
       }
 
       return createHttpResponse(type);
@@ -135,12 +141,12 @@ public class ClientRequest {
         text.append(headerValue);
       }
     }
-    if (body!=null && !"".equals(body)) {
+    if (bodyLog!=null) {
       text.append(NEWLINE);
       text.append(prefix);
       text.append("  ");
 
-      String bodyString = body.toString();
+      String bodyString = bodyLog;
       if (maxBodyLength!=null && bodyString!=null && bodyString.length()>maxBodyLength) {
         bodyString = bodyString.substring(0, maxBodyLength)+"...";
       }
@@ -210,10 +216,6 @@ public class ClientRequest {
     return body;
   }
 
-  public void setBody(HttpEntity body) {
-    this.body = body;
-  }
-
   /** Sets a String as the body for the request
    * with encoding UTF-8 */
   public ClientRequest body(String body) {
@@ -223,6 +225,7 @@ public class ClientRequest {
   /** Sets a String as the body for the request */
   public ClientRequest body(String body, String charset) {
     try {
+      this.bodyLog = body;
       this.body = new ByteArrayEntity(body.getBytes(charset));
     } catch (UnsupportedEncodingException e) {
       throw new RuntimeException("Couldn't get bytes from http request body string: "+e.getMessage(), e);
