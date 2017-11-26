@@ -39,7 +39,7 @@ public class ServerTest extends AbstractServerTest {
 
   @Test
   public void testEvents() {
-    SaveScriptVersionResponse saveScriptVersionResponse = newPost("command")
+    SaveScriptVersionResponse saveScriptVersionResponse = newPost("/command")
       .bodyJson(new SaveScriptVersionCommand()
         .scriptText("var simple = system.import('rockscript.io/simple'); \n" +
                     "simple.wait();" +
@@ -51,7 +51,7 @@ public class ServerTest extends AbstractServerTest {
 
     String scriptId = saveScriptVersionResponse.getId();
 
-    ScriptExecutionResponse startScriptResponse = newPost("command")
+    ScriptExecutionResponse startScriptResponse = newPost("/command")
       .bodyJson(new StartScriptExecutionCommand()
         .scriptVersionId(scriptId))
       .execute(ScriptExecutionResponse.class)
@@ -59,7 +59,7 @@ public class ServerTest extends AbstractServerTest {
       .getBody();
 
     String scriptExecutionId = startScriptResponse.getScriptExecutionId();
-    List<Event> events = newGet("query?q=events&scriptExecutionId="+scriptExecutionId)
+    List<Event> events = newGet("/query?q=events&scriptExecutionId="+scriptExecutionId)
       .execute(new TypeToken<List<Event>>(){}.getType())
       .assertStatusOk()
       .getBody();

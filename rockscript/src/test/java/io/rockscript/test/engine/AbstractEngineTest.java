@@ -55,7 +55,7 @@ public class AbstractEngineTest {
   }
 
   public <T> T parseBodyAs(ServerRequest request, Type type) {
-    return gson.fromJson(request.getBody(), type);
+    return gson.fromJson(request.getBodyAsString(), type);
   }
 
   @SuppressWarnings("deprecation")

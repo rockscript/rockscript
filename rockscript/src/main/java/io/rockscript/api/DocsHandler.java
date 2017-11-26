@@ -55,6 +55,5 @@ public class DocsHandler extends AbstractRequestHandler {
         )
       ))
     ));
-    response.headerContentTypeApplicationJson();
   }
 }

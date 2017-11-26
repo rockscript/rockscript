@@ -23,8 +23,9 @@ import io.rockscript.Engine;
 import io.rockscript.Servlet;
 import io.rockscript.TestEngine;
 import io.rockscript.http.client.Http;
-import io.rockscript.test.AbstractHttpServerTest;
 import io.rockscript.http.server.HttpServer;
+import io.rockscript.test.AbstractHttpServerTest;
+import io.rockscript.test.HttpServerTest;
 import org.junit.AfterClass;
 import org.junit.Before;
 
@@ -53,6 +54,14 @@ public class AbstractServerTest extends AbstractHttpServerTest {
     Servlet servlet = new Servlet(engine);
     servlet.gson(engine.getGson());
     server.servlet(servlet);
+  }
+
+  /** All tests in subclasses of AbstractServerTest that are executed
+   * subsequent, will use the same server as configured in
+   * {@link #configureServer(HttpServer)}*/
+  @Override
+  protected String getServerName() {
+    return AbstractServerTest.class.getName();
   }
 
   @Override

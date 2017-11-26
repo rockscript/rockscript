@@ -55,7 +55,6 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
         @Override
         public void handle(ServerRequest request, ServerResponse response) {
           response.status(200)
-            .headerContentTypeApplicationJson()
             .bodyJson(hashMap(
               entry("country", "Belgium"),
               entry("currency", "EUR")));

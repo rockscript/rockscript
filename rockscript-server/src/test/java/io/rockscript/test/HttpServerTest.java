@@ -39,6 +39,14 @@ public class HttpServerTest extends AbstractHttpServerTest {
     server.servlet(servlet);
   }
 
+  /** All tests in this class that are executed
+   * subsequent, will use the same server as configured in
+   * {@link #configureServer(HttpServer)}*/
+  @Override
+  protected String getServerName() {
+    return HttpServerTest.class.getName();
+  }
+
   public static class GreetingHandler extends PathRequestHandler {
     protected GreetingHandler() {
       super(GET, "/hello/{greeting}");

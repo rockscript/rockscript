@@ -26,19 +26,19 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.stream.Collectors;
 
 public class ServerResponse {
 
   HttpServletResponse response;
   Gson gson;
+  String logProtocol;
+  String logBody;
 
-  public ServerResponse(HttpServletResponse response) {
-    this.response = response;
-  }
-
-  public ServerResponse(HttpServletResponse response, Gson gson) {
+  public ServerResponse(HttpServletResponse response, Gson gson, String logProtocol) {
     this.response = response;
     this.gson = gson;
+    this.logProtocol = logProtocol;
   }
 
   public ServerResponse statusOk() {
@@ -60,6 +60,7 @@ public class ServerResponse {
 
   public ServerResponse bodyString(String responseBody) {
     try {
+      logBody = responseBody;
       ServletOutputStream out = response.getOutputStream();
       byte[] bytes = responseBody.getBytes(Charset.forName("UTF-8"));
       out.write(bytes);
@@ -70,8 +71,14 @@ public class ServerResponse {
     return this;
   }
 
+  public ServerResponse bodyJsonString(String responseBody) {
+    bodyString(responseBody);
+    headerContentTypeApplicationJson();
+    return this;
+  }
+
   public ServerResponse bodyJson(Object object) {
-    return bodyString(gson.toJson(object));
+    return bodyJsonString(gson.toJson(object));
   }
 
   public ServerResponse header(String name, String value) {
@@ -95,5 +102,26 @@ public class ServerResponse {
 
   public ServerResponse headerContentTypeTextHtml() {
     return header(Http.Headers.CONTENT_TYPE, Http.ContentTypes.TEXT_HTML);
+  }
+
+  public String toString() {
+    String prefix = "  ";
+    return "\n< " + logProtocol + " " + response.getStatus() + " " + Http.ResponseCodes.getText(response.getStatus()) +
+           getLogHeaders(prefix) +
+           ServerRequest.getLogBody(prefix, logBody);
+  }
+
+  private String getLogHeaders(String prefix) {
+    if (response.getHeaderNames()!=null && !response.getHeaderNames().isEmpty()) {
+      return "\n"+response.getHeaderNames().stream()
+        .map(headerName->{
+          return response.getHeaders(headerName).stream()
+            .map(headerValue->{
+              return prefix+headerName+": "+headerValue;
+            }).collect(Collectors.joining("\n"));
+        }).collect(Collectors.joining("\n"));
+    } else {
+      return "";
+    }
   }
 }

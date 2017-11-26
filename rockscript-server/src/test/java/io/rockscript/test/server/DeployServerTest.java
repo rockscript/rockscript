@@ -36,7 +36,7 @@ public class DeployServerTest extends AbstractServerTest {
 
   @Test
   public void testDeployOk() {
-    SaveScriptVersionResponse saveScriptVersionResponse = newPost("command")
+    SaveScriptVersionResponse saveScriptVersionResponse = newPost("/command")
       .bodyJson(new SaveScriptVersionCommand()
           .scriptName("Test script")
           .scriptText("var a=0;")
@@ -53,7 +53,7 @@ public class DeployServerTest extends AbstractServerTest {
 
   @Test
   public void testDeploySyntaxError() {
-    SaveScriptVersionResponse saveScriptVersionResponse = newPost("command")
+    SaveScriptVersionResponse saveScriptVersionResponse = newPost("/command")
       .bodyJson(new SaveScriptVersionCommand()
         .scriptText("\n\ninvalid script")
         .activate())
@@ -71,7 +71,7 @@ public class DeployServerTest extends AbstractServerTest {
 
   @Test
   public void testDeployParseError() {
-    SaveScriptVersionResponse saveScriptVersionResponse = newPost("command")
+    SaveScriptVersionResponse saveScriptVersionResponse = newPost("/command")
       .bodyJson(new SaveScriptVersionCommand()
         .scriptText("\n\nvar a = new Object();")
         .activate())

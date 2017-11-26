@@ -91,10 +91,6 @@ public class ClientResponse {
       }
 
     } finally {
-      if (Http.log.isDebugEnabled()) {
-        Http.log.debug("\n"+this.toString());
-      }
-
       apacheResponse.close();
     }
   }

@@ -24,7 +24,6 @@ import io.rockscript.http.client.ClientResponse;
 import io.rockscript.http.client.Http;
 import io.rockscript.http.server.HttpServer;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,44 +37,46 @@ public abstract class AbstractHttpServerTest {
 
   protected static final int PORT = 9999;
 
-  // http will be cached for all tests in one test class
   private static Http http;
-  // server will be cached for all tests in one test class
   private static HttpServer server;
-  // baseUrl will be cached for all tests in one test class
+  /** @see #getServerName() */
+  private static String serverName;
   private static String baseUrl;
+
+  /** implementions can add servlets and filters to the test server */
+  protected abstract void configureServer(HttpServer server);
+  /** tests with the same serverName can use the cached server */
+  protected abstract String getServerName();
 
   @Before
   public void setUp() {
+    if (server!=null) {
+      if (!serverName.equals(getServerName())) {
+        log.debug("Shutting down server "+serverName);
+        server.shutdown();
+        server = null;
+        serverName = null;
+        http = null;
+        baseUrl = null;
+      }
+    }
     if (server==null) {
-      log.debug("CREATING server for "+getClass());
-      this.server = createServer();
-      log.debug("CREATED server "+System.identityHashCode(server)+" for "+getClass());
+      this.server = startServer();
+      this.serverName = getServerName();
+      log.debug("Started server "+serverName);
       this.http = createHttp();
       this.baseUrl = createBaseUrl();
     }
   }
 
-  @After
-  public void tearDown() {
-    log.debug("SHUTTING DOWN server "+System.identityHashCode(server));
-    server.shutdown();
-    server = null;
-    http = null;
-    baseUrl = null;
-  }
-
   /** override to customize the test server creation */
-  protected HttpServer createServer() {
+  protected HttpServer startServer() {
     HttpServer server = new HttpServer(PORT)
       .filter(new TestExceptionFilter());
     configureServer(server);
     server.startup();
     return server;
   }
-
-  /** implementions can add servlets and filters to the test server */
-  protected abstract void configureServer(HttpServer server);
 
   /** override to customize the http client */
   protected Http createHttp() {
@@ -84,7 +85,7 @@ public abstract class AbstractHttpServerTest {
 
   /** override to customize the baseUrl */
   protected String createBaseUrl() {
-    return "http://localhost:"+server.getPort()+"/";
+    return "http://localhost:"+server.getPort();
   }
 
   public String createUri(final String path) {

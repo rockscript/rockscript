@@ -93,10 +93,6 @@ public class ClientRequest {
         ((HttpEntityEnclosingRequestBase)apacheRequest).setEntity(body);
       }
 
-      if (Http.log.isDebugEnabled()) {
-        Http.log.debug("\n"+this.toString());
-      }
-
       return createHttpResponse(type);
 
     } catch (IOException e) {

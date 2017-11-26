@@ -24,16 +24,16 @@ import com.google.gson.Gson;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ServerRequest {
 
   protected Gson gson;
   protected HttpServletRequest request;
   protected Map<String, String> pathParameters;
-  protected String bodyStringUtf8;
-  protected boolean bodyIsRead;
+  protected String bodyString;
+  protected boolean bodyIsReadAsString;
 
   public ServerRequest(HttpServletRequest request) {
     this.request = request;
@@ -56,32 +56,41 @@ public class ServerRequest {
     return request.getPathInfo();
   }
 
-  public String getBody() {
-    return getBody("UTF-8");
+  public String getBodyAsString() {
+    return getBodyAsString(getCharset());
   }
 
-    /** value is read from the input stream the first time
-     * and cached for subsequent invocations. */
-  public String getBody(String charset) {
-    if (!bodyIsRead) {
-      bodyIsRead = true;
+  private String getCharset() {
+    String charset = request.getCharacterEncoding();
+    if (charset==null) {
+      charset = "UTF-8";
+    }
+    return charset;
+  }
+
+  /** value is read from the input stream the first time
+   * and cached for subsequent invocations,
+   * Returns null if there is no body. */
+  public String getBodyAsString(String charset) {
+    if (!bodyIsReadAsString) {
+      bodyIsReadAsString = true;
       try {
-        request.setCharacterEncoding("UTF-8");
+        request.setCharacterEncoding(charset);
         Scanner scanner = new Scanner(request.getInputStream(), charset).useDelimiter("\\A");
-        bodyStringUtf8 = scanner.hasNext() ? scanner.next() : null;
+        bodyString = scanner.hasNext() ? scanner.next() : null;
       } catch (IOException e) {
         throw new RuntimeException("Couldn't read request body string: "+e.getMessage(), e);
       }
     }
-    return bodyStringUtf8;
+    return bodyString;
   }
 
   public <T> T getBodyAs(Type type) {
-    return getBodyAs(type, "UTF-8");
+    return getBodyAs(type, getCharset());
   }
 
   public <T> T getBodyAs(Type type, String charset) {
-    return gson.fromJson(getBody(charset), type);
+    return gson.fromJson(getBodyAsString(charset), type);
   }
 
   public String getPathParameter(String pathParameterName) {
@@ -116,5 +125,48 @@ public class ServerRequest {
    * String array. */
   public Map<String,String[]> getQueryParameterMap() {
     return request.getParameterMap();
+  }
+
+  public String toString() {
+    return toString(null);
+  }
+
+  public String toString(RequestHandler requestHandler) {
+    String prefix = "  ";
+    return "\n> " + request.getMethod() + " " + request.getPathInfo() +
+           getLogHeaders(prefix) +
+           getLogBody(requestHandler, prefix);
+  }
+
+  private String getLogHeaders(String prefix) {
+    if (request.getHeaderNames().hasMoreElements()) {
+      return "\n"+ Collections.list(request.getHeaderNames()).stream()
+        .map(headerName -> {
+          return Collections.list(request.getHeaders(headerName)).stream()
+            .map(headerValue -> {
+              return prefix + headerName + ": " + headerValue;
+            }).collect(Collectors.joining("\n"));
+        }).collect(Collectors.joining("\n"));
+    } else {
+      return "";
+    }
+  }
+
+  private String getLogBody(RequestHandler requestHandler, String prefix) {
+    String logBodyText = null;
+    if (requestHandler!=null) {
+      logBodyText = requestHandler.getLogBodyText(this);
+    } else {
+      logBodyText = getBodyAsString();
+    }
+    return getLogBody(prefix, logBodyText);
+  }
+
+  static String getLogBody(String prefix, String logBodyText) {
+    if (logBodyText!=null) {
+      return "\n"+prefix+logBodyText;
+    } else {
+      return "";
+    }
   }
 }

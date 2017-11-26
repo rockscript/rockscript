@@ -45,8 +45,7 @@ public class RouterServlet extends HttpServlet {
   @Override
   protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
     ServerRequest request = new ServerRequest(servletRequest, gson);
-    ServerResponse response = new ServerResponse(servletResponse, gson);
-    log.debug("Received request "+servletRequest.getPathInfo());
+    ServerResponse response = new ServerResponse(servletResponse, gson, servletRequest.getProtocol());
 
     Optional<RequestHandler> matchingRequestHandler = requestHandlers.stream()
       .filter(requestHandler -> requestHandler.matches(request))
@@ -54,15 +53,20 @@ public class RouterServlet extends HttpServlet {
     if (matchingRequestHandler.isPresent()) {
       RequestHandler requestHandler = matchingRequestHandler.get();
       try {
+        if (log.isDebugEnabled()) log.debug(request.toString(requestHandler));
         applyDefaultResponseHeaders(response);
         requestHandler.handle(request, response);
       } catch (HttpException e) {
         response.status(e.getStatusCode());
+        if (log.isDebugEnabled()) log.debug(response.toString());
         throw e;
       }
     } else {
       log.debug("No handler found for "+request.getPathInfo());
       response.statusNotFound();
+    }
+    if (log.isDebugEnabled()) {
+      log.debug(response.toString());
     }
   }
 

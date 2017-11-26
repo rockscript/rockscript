@@ -25,6 +25,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+
 /** Fluent, synchronous HTTP client based on Apache Http Components.
  *
  * To obtain a Http object, just use the constructor new Http();
@@ -122,6 +126,27 @@ public class Http {
     int BAD_GATEWAY_502 = 502;
     int SERVICE_UNAVAILABLE_503 = 503;
     int GATEWAY_TIMEOUT_504 = 504;
+
+    static String getText(int status) {
+      return STATUS_TEXTS.get(status);
+    }
+  }
+
+  private static final Map<Integer,String> STATUS_TEXTS = createStatusTexts();
+
+  private static Map<Integer, String> createStatusTexts() {
+    Map<Integer,String> statusTexts = new HashMap<>();
+    for (Field field: ResponseCodes.class.getDeclaredFields()) {
+      try {
+        Integer statusCode = (Integer) field.get(null);
+        String fieldName = field.getName();
+        String statusText = fieldName.substring(0, fieldName.length()-4).replace('_',' ');
+        statusTexts.put(statusCode, statusText);
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException("Couldn't get status value with reflection from constant "+field);
+      }
+    }
+    return statusTexts;
   }
 
   public ClientRequest newGet(String url) {

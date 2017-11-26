@@ -63,7 +63,6 @@ public class SynchronousActivityHttpTest extends AbstractHttpTest {
           );
           response
             .status(200)
-            .headerContentTypeApplicationJson()
             .bodyJson(activityOutput);
         }
       });

@@ -35,7 +35,7 @@ public class CommandHandler extends AbstractRequestHandler {
 
   @Override
   public void handle(ServerRequest request, ServerResponse response) {
-    String jsonBodyString = request.getBody();
+    String jsonBodyString = request.getBodyAsString();
     try {
       Gson gson = engine.getGson();
       Command command = gson.fromJson(jsonBodyString, Command.class);

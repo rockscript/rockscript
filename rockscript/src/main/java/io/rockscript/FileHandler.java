@@ -46,6 +46,11 @@ public class FileHandler implements RequestHandler {
   }
 
   @Override
+  public String getLogBodyText(ServerRequest request) {
+    return null;
+  }
+
+  @Override
   public boolean matches(ServerRequest request) {
     return Io.hasResource(getResource(request));
   }
