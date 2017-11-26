@@ -1,6 +1,7 @@
 package io.rockscript.api.commands;
 
 import io.rockscript.Engine;
+import io.rockscript.api.Doc;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.Command;
 
@@ -19,5 +20,13 @@ public class RecoverCrashedScriptExecutionsCommand implements Command<RecoverCra
       .map(ese->ese.toScriptExecution())
       .collect(Collectors.toList());
     return new RecoverCrashedScriptExecutionsResponse(recoveredScriptExecutions);
+  }
+
+  @Override
+  public Doc getDoc() {
+    return new Doc()
+      .type("recoverExecutions")
+      .label("Recover executions")
+      .content("TODO");
   }
 }

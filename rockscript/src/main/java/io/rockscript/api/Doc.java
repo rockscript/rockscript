@@ -19,32 +19,42 @@
  */
 package io.rockscript.api;
 
-import io.rockscript.Engine;
-import io.rockscript.http.servlet.ServerRequest;
-import io.rockscript.http.servlet.ServerResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+public class Doc {
 
-import java.util.List;
-import java.util.stream.Collectors;
+  protected String type;
+  protected String label;
+  protected String content;
 
-import static io.rockscript.util.Maps.entry;
-import static io.rockscript.util.Maps.hashMap;
-
-public class DocsHandler extends AbstractRequestHandler {
-
-  static Logger log = LoggerFactory.getLogger(DocsHandler.class);
-
-  Engine engine;
-
-  public DocsHandler(Engine engine) {
-    super(GET, "/docs", engine);
-    this.engine = engine;
+  public String getType() {
+    return this.type;
+  }
+  public void setType(String type) {
+    this.type = type;
+  }
+  public Doc type(String type) {
+    this.type = type;
+    return this;
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public void handle(ServerRequest request, ServerResponse response) {
-    response.bodyJson(engine.getDocs());
+  public String getLabel() {
+    return this.label;
+  }
+  public void setLabel(String label) {
+    this.label = label;
+  }
+  public Doc label(String label) {
+    this.label = label;
+    return this;
+  }
+
+  public String getContent() {
+    return this.content;
+  }
+  public void setContent(String content) {
+    this.content = content;
+  }
+  public Doc content(String content) {
+    this.content = content;
+    return this;
   }
 }

@@ -16,6 +16,7 @@
 package io.rockscript.api.queries;
 
 import io.rockscript.Engine;
+import io.rockscript.api.Doc;
 import io.rockscript.api.Query;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.http.servlet.InternalServerException;
@@ -51,5 +52,13 @@ public class EventsQuery implements Query<List<Event>> {
       log.debug("Couldn't perform events query", e);
       throw new InternalServerException();
     }
+  }
+
+  @Override
+  public Doc getDoc() {
+    return new Doc()
+      .type("events")
+      .label("Events")
+      .content("TODO");
   }
 }

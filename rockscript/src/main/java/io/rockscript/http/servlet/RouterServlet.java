@@ -20,6 +20,7 @@
 package io.rockscript.http.servlet;
 
 import com.google.gson.Gson;
+import io.rockscript.http.client.Http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

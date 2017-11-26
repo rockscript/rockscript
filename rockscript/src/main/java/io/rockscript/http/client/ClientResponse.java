@@ -86,7 +86,7 @@ public class ClientResponse {
             bodyLog = (String) this.body;
           }
         } catch (Exception e) {
-          throw new RuntimeException("Couldn't ready body/entity from http request " + toString());
+          throw new RuntimeException("Couldn't ready body/entity from http request " + toString(), e);
         }
       }
 

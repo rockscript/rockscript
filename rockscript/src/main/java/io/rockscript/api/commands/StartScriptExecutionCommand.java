@@ -15,6 +15,7 @@
  */
 package io.rockscript.api.commands;
 
+import io.rockscript.api.Doc;
 import io.rockscript.api.model.Script;
 import io.rockscript.Engine;
 import io.rockscript.engine.impl.EngineScriptExecution;
@@ -56,6 +57,14 @@ public class StartScriptExecutionCommand implements Command<ScriptExecutionRespo
       .getScriptRunner()
       .startScriptExecution(scriptVersionId, input);
     return new ScriptExecutionResponse(engineScriptExecution);
+  }
+
+  @Override
+  public Doc getDoc() {
+    return new Doc()
+      .type("startScript")
+      .label("Start script")
+      .content("TODO");
   }
 
   public String getScriptId() {

@@ -23,4 +23,5 @@ public interface Command<R> {
 
   R execute(Engine engine);
 
+  Doc getDoc();
 }

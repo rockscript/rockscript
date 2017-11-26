@@ -57,6 +57,11 @@ public class Io {
     return Io.class.getClassLoader().getResource(resource)!=null;
   }
 
+  public static byte[] getBytesFromResource(String resource) {
+    InputStream resourceStream = Io.class.getClassLoader().getResourceAsStream(resource);
+    return readBytesFromStream(resourceStream);
+  }
+
   public static byte[] readBytesFromStream(InputStream is) {
     try {
       ByteArrayOutputStream buffer = new ByteArrayOutputStream();

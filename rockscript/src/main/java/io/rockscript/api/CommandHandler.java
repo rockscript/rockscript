@@ -40,8 +40,7 @@ public class CommandHandler extends AbstractRequestHandler {
       Gson gson = engine.getGson();
       Command command = gson.fromJson(jsonBodyString, Command.class);
       Object commandResponse = command.execute(engine);
-      String responseBodyJson = gson.toJson(commandResponse);
-      response.bodyString(responseBodyJson);
+      response.bodyJson(commandResponse);
       response.status(200);
     } catch (HttpException e) {
       throw e;

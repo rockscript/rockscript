@@ -39,7 +39,8 @@ public class FileHandler implements RequestHandler {
     entry(".css",   "text/css"),
     entry(".map",   "application/json"),
     entry(".woff2", "font/woff2"),
-    entry(".ico",   "image/x-icon")
+    entry(".ico",   "image/x-icon"),
+    entry(".png",   "image/png")
   );
 
   public FileHandler(Engine engine) {
@@ -58,9 +59,18 @@ public class FileHandler implements RequestHandler {
   @Override
   public void handle(ServerRequest request, ServerResponse response) {
     String resource = getResource(request);
-    String indexHtml = Io.getResourceAsString(resource);
-    response.bodyString(indexHtml);
-    response.headerContentType(getContentTypeFromPath(resource));
+    String contentType = getContentType(resource);
+    response.headerContentType(contentType);
+
+    if (contentType.startsWith("text")
+        || contentType.startsWith("application/json")) {
+      String fileContent = Io.getResourceAsString(resource);
+      response.bodyString(fileContent);
+    } else if (contentType.startsWith("image")
+               || contentType.startsWith("font")) {
+      byte[] bytes = Io.getBytesFromResource(resource);
+      response.bodyBytes(bytes);
+    }
     response.statusOk();
   }
 
@@ -72,7 +82,7 @@ public class FileHandler implements RequestHandler {
     return "webfiles"+path;
   }
 
-  private String getContentTypeFromPath(String path) {
+  private String getContentType(String path) {
     int lastDotIndex = path.lastIndexOf('.');
     if (lastDotIndex!=-1) {
       String extension = path.substring(lastDotIndex);

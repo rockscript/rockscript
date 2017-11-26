@@ -134,7 +134,7 @@ public class ServerRequest {
   public String toString(RequestHandler requestHandler) {
     String prefix = "  ";
     return "\n> " + request.getMethod() + " " + request.getPathInfo() +
-           getLogHeaders(prefix) +
+           // getLogHeaders(prefix) +
            getLogBody(requestHandler, prefix);
   }
 

@@ -46,37 +46,6 @@
     }
   </style>
 
-  <script src="js/jquery-3.2.1.min.js"></script>
-  <script src="js/showdown-1.8.2.min.js"></script>
-
-  <script type="application/javascript">
-    var converter = new showdown.Converter();
-
-    window.addEventListener('load', function() {
-      show('introduction');
-      $.get('http://localhost:3652/docs', function(data) {
-        docs = JSON.parse(data);
-        let tocHtml =
-            '<div class="title">Commands</div>' +
-            docs.commands.map(function(command) {
-              return '<a class="link" onclick="show(\''+command.id+'\')">'+command.label+'</a>';
-            }).join();
-        $('#commands').html(tocHtml);
-
-        var contentHtml = docs.commands.map(function(command) {
-          return '<div id="'+command.id+'" class="hidden">' +
-              '  '+converter.makeHtml(command.content)+
-              '</div>';
-        }).join();
-        $('.content').append(contentHtml);
-      });
-    });
-
-    function show(id) {
-      $('.content').children().addClass("hidden");
-      $('#'+id).removeClass("hidden");
-    }
-  </script>
   <style>
     body {
       font-family: "Open Sans";
@@ -184,6 +153,51 @@
       display: none;
     }
   </style>
+
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script src="js/showdown-1.8.2.min.js"></script>
+
+  <script type="application/javascript">
+    var converter = new showdown.Converter();
+
+    window.addEventListener('load', function() {
+      show('introduction');
+      $.get('http://localhost:3652/docs', function(docs) {
+        let commandsTocHtml =
+            '<div class="title">Commands</div>' +
+            docs.commands.map(function(command) {
+              return '<a class="link" onclick="show(\'command-'+command.type+'\')">'+command.label+'</a>';
+            }).join('');
+        $('#commands').html(commandsTocHtml);
+        let queriesTocHtml =
+            '<div class="title">Queries</div>' +
+            docs.queries.map(function(query) {
+              return '<a class="link" onclick="show(\'query-'+query.type+'\')">'+query.label+'</a>';
+            }).join('');
+        $('#queries').html(queriesTocHtml);
+
+        var contentHtml =
+            docs.commands.map(function(command) {
+              return '<div id="command-'+command.type+'" class="hidden"> \n' +
+                '<h1>'+command.label+'</h1> \n'+
+                converter.makeHtml(command.content)+'\n'+
+                '</div>';
+              }).join('\n')+
+            docs.queries.map(function(query) {
+              return '<div id="query-'+query.type+'" class="hidden"> \n' +
+                '<h1>'+query.label+'</h1> \n'+
+                converter.makeHtml(query.content)+'\n'+
+                '</div>';
+            }).join();
+        $('.content').append(contentHtml);
+      });
+    });
+
+    function show(id) {
+      $('.content').children().addClass("hidden");
+      $('#'+id).removeClass("hidden");
+    }
+  </script>
 </head>
 <body>
 
@@ -203,9 +217,7 @@
   </div>
   <div id="commands" class="section">
   </div>
-  <div class="section">
-    <div class="title">Queries</div>
-    <a class="link">Introduction</a>
+  <div id="queries" class="section">
   </div>
 </div>
 <div class="content">
@@ -217,7 +229,7 @@
       <li>Commands</li>
       <li>Queries</li>
     </ul>
-    <h3 id="commands">Commands</h3>
+    <h3>Commands</h3>
     <p>Commands are RPC style operations that change the state of the RockScript server.
       Commands are invoked by a HTTP POST to <code>http://localhost:3652/command</code> with the command
       JSON as the body.  We hope to add message based API later.
@@ -226,19 +238,23 @@
     <pre><code>{"commandName": { ...command data fields... }}</code></pre>
     <p>Example of a command request/response:</p>
     <pre><code>&gt; POST http://localhost:3652/command
-&gt; { "saveScript": {
-&gt;     "scriptName": "My first script",
-&gt;     "scriptText": "var v = 42;"
-&gt; }}
+  { "saveScript":
+    {
+      "scriptName": "My first script",
+      "scriptText": "var v = 42;"
+    }
+  }
 
 &lt; HTTP/1.1 200 OK
-&lt; Access-Control-Allow-Origin: *
-&lt; { "id":"sv1",
-&lt;   "scriptId":"s1",
-&lt;   "name":"My first script",
-&lt;   "version":1,
-&lt;   "text":"var v = 42;"}</code></pre>
-    <h3 id="queries">Queries</h3>
+  Access-Control-Allow-Origin: *
+  Content-Type: application/json
+  { "id":"sv1",
+    "scriptId":"s1",
+    "name":"My first script",
+    "version":1,
+    "text":"var v = 42;"
+  }</code></pre>
+    <h3>Queries</h3>
     <p>Queries fetch data without changing the state of the server.</p>
   </div>
 
@@ -249,7 +265,12 @@
 
   <div id="help" class="hidden">
     <h1>Help</h1>
-    <p>If this documention is insufficient, please contact us on <a href="https://github.com/rockscript/rockscript/issues">our forum.</a></p>
+    <p>Please use <a href="https://github.com/rockscript/rockscript/issues">GitHub issues as our forum.</a>
+    </p>
+    <p>Don't hesitate to ask your questions.
+      And if you're advanced, don't be shy and help out answering other
+      people's questions.
+    </p>
   </div>
 
 </div>

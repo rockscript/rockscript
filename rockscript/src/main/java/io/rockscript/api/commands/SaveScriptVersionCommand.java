@@ -15,13 +15,18 @@
  */
 package io.rockscript.api.commands;
 
+import io.rockscript.Engine;
 import io.rockscript.api.Command;
+import io.rockscript.api.Doc;
 import io.rockscript.api.model.Script;
 import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.Engine;
 import io.rockscript.engine.impl.Parse;
 import io.rockscript.engine.impl.ScriptStore;
 import io.rockscript.http.servlet.BadRequestException;
+import io.rockscript.util.Lists;
+
+import static io.rockscript.util.Maps.entry;
+import static io.rockscript.util.Maps.hashMap;
 
 /** Saves a new script version.
  *
@@ -77,6 +82,24 @@ public class SaveScriptVersionCommand implements Command<SaveScriptVersionRespon
     scriptStore.addParsedScriptAstToCache(parse, scriptVersion);
 
     return new SaveScriptVersionResponse(scriptVersion);
+  }
+
+  @Override
+  public Doc getDoc() {
+    return new Doc()
+      .type("saveScript")
+      .label("Save script")
+      .content(
+            "### Example\n" +
+            "Here's the `explaination` on how to \n" +
+            "```\n" +
+            "> POST /command\n" +
+            "  {\"saveScript\":{\"scriptName\":\"Test script\",\"scriptText\":\"var a\\u003d0;\",\"activate\":true}}\n" +
+            "< HTTP/1.1 200 OK\n" +
+            "  Access-Control-Allow-Origin: *\n" +
+            "  {\"id\":\"sv1\",\"scriptId\":\"s1\",\"name\":\"Test script\",\"version\":1,\"text\":\"var a\\u003d0;\",\"active\":true}\n" +
+            "```"
+      );
   }
 
   public String getScriptName() {

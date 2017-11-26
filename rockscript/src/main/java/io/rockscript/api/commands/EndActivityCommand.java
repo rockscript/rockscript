@@ -17,6 +17,7 @@ package io.rockscript.api.commands;
 
 import io.rockscript.Engine;
 import io.rockscript.api.Command;
+import io.rockscript.api.Doc;
 import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.http.servlet.BadRequestException;
@@ -45,6 +46,14 @@ public class EndActivityCommand implements Command<ScriptExecutionResponse> {
     } catch (Exception e) {
       throw new InternalServerException();
     }
+  }
+
+  @Override
+  public Doc getDoc() {
+    return new Doc()
+      .type("endActivity")
+      .label("End activity")
+      .content("TODO");
   }
 
   public EndActivityCommand continuationReference(ContinuationReference continuationReference) {

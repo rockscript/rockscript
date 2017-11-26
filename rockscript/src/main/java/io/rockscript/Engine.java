@@ -32,6 +32,7 @@ import io.rockscript.activity.ImportProvider;
 import io.rockscript.activity.ImportResolver;
 import io.rockscript.activity.http.HttpImportProvider;
 import io.rockscript.api.Command;
+import io.rockscript.api.Doc;
 import io.rockscript.api.Query;
 import io.rockscript.api.commands.EndActivityCommand;
 import io.rockscript.api.commands.RunTestsCommand;
@@ -73,11 +74,13 @@ public abstract class Engine {
   protected Gson gson;
   protected Http http;
   protected JobService jobService;
+  protected Map<String,Class<? extends Command>> commandTypes = new HashMap<>();
   protected Map<String,Class<? extends Query>> queryTypes = new HashMap<>();
   @Deprecated // I think this can be deleted, but now is not a good time to check it
   protected Map<String,Object> objects = new HashMap<>();
   protected Map<String,ImportProvider> importProviders = new HashMap<>();
   protected List<EnginePlugin> plugins = new ArrayList<>();
+  protected Map<String,List<Doc>> docs = new HashMap<>();
 
   public Engine() {
     this.eventStore = new EventStore(this);
@@ -94,7 +97,13 @@ public abstract class Engine {
     importProvider(new HttpImportProvider());
 
     this.queryTypes = new HashMap<>();
-    queryType(EventsQuery.class, "events");
+    queryType(new EventsQuery());
+
+    this.commandTypes = new HashMap<>();
+    commandType(new SaveScriptVersionCommand());
+    commandType(new StartScriptExecutionCommand());
+    commandType(new EndActivityCommand());
+    commandType(new RunTestsCommand());
 
     ServiceLoader<EnginePlugin> pluginLoader = ServiceLoader.load(EnginePlugin.class);
     for (EnginePlugin plugin : pluginLoader) {
@@ -134,13 +143,10 @@ public abstract class Engine {
 
   protected PolymorphicTypeAdapterFactory createCommandTypeAdapterFactory() {
     PolymorphicTypeAdapterFactory polymorphicTypeAdapterFactory = new PolymorphicTypeAdapterFactory();
-    return polymorphicTypeAdapterFactory
-      .typeName(new TypeToken<Command>(){},        "command")
-      .typeName(SaveScriptVersionCommand.class,    "saveScript")
-      .typeName(StartScriptExecutionCommand.class, "startScript")
-      .typeName(EndActivityCommand.class,          "endActivity")
-      .typeName(RunTestsCommand.class,             "runTests")
-      ;
+    polymorphicTypeAdapterFactory.typeName(new TypeToken<Command>(){}, "command");
+    commandTypes.entrySet()
+      .forEach(entry->polymorphicTypeAdapterFactory.typeName(entry.getValue(),entry.getKey()));
+    return polymorphicTypeAdapterFactory;
   }
 
   protected PolymorphicTypeAdapterFactory createQueryTypeAdapterFactory() {
@@ -234,8 +240,23 @@ public abstract class Engine {
     return this.queryTypes;
   }
 
-  public Engine queryType(Class<? extends Query> queryClass, String queryName) {
-    this.queryTypes.put(queryName, queryClass);
+  public Engine queryType(Query query) {
+    this.queryTypes.put(query.getDoc().getType(), query.getClass());
+    docs
+      .computeIfAbsent("queries", entry->new ArrayList<Doc>())
+      .add(query.getDoc());
+    return this;
+  }
+
+  public Map<String, Class<? extends Command>> getCommandTypes() {
+    return commandTypes;
+  }
+
+  public Engine commandType(Command command) {
+    this.commandTypes.put(command.getDoc().getType(), command.getClass());
+    docs
+      .computeIfAbsent("commands", entry->new ArrayList<Doc>())
+      .add(command.getDoc());
     return this;
   }
 
@@ -294,5 +315,9 @@ public abstract class Engine {
 
   public IdGenerator getScriptVersionIdGenerator() {
     return scriptVersionIdGenerator;
+  }
+
+  public Map<String, List<Doc>> getDocs() {
+    return docs;
   }
 }

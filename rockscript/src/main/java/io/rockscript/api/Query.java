@@ -24,4 +24,6 @@ import io.rockscript.Engine;
 public interface Query<R> {
 
   R execute(Engine engine);
+
+  Doc getDoc();
 }
