@@ -19,6 +19,11 @@
  */
 package io.rockscript.api;
 
+import io.rockscript.api.commands.SaveScriptVersionCommand;
+import io.rockscript.util.Io;
+
+import java.io.InputStream;
+
 public class Doc {
 
   protected String type;
@@ -55,6 +60,13 @@ public class Doc {
   }
   public Doc content(String content) {
     this.content = content;
+    return this;
+  }
+
+  public Doc contentMarkDownResource(Object commandOrQuery) {
+    String resource = commandOrQuery.getClass().getName()
+        .replace('.', '/') + ".md";
+    this.content = Io.getResourceAsString(resource);
     return this;
   }
 }

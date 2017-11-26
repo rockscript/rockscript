@@ -46,6 +46,11 @@ public class ExampleTest extends AbstractEngineTest {
   protected static Logger log = LoggerFactory.getLogger(ExampleTest.class);
 
   @Test
+  public void testDoc() {
+    System.out.println(new SaveScriptVersionCommand().getDoc().getContent());
+  }
+
+  @Test
   public void testApproval() throws Exception {
     String scriptId = deployScriptResource("../docs/examples/approvals/create-approval.rs")
       .getId();

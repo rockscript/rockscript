@@ -89,17 +89,7 @@ public class SaveScriptVersionCommand implements Command<SaveScriptVersionRespon
     return new Doc()
       .type("saveScript")
       .label("Save script")
-      .content(
-            "### Example\n" +
-            "Here's the `explaination` on how to \n" +
-            "```\n" +
-            "> POST /command\n" +
-            "  {\"saveScript\":{\"scriptName\":\"Test script\",\"scriptText\":\"var a\\u003d0;\",\"activate\":true}}\n" +
-            "< HTTP/1.1 200 OK\n" +
-            "  Access-Control-Allow-Origin: *\n" +
-            "  {\"id\":\"sv1\",\"scriptId\":\"s1\",\"name\":\"Test script\",\"version\":1,\"text\":\"var a\\u003d0;\",\"active\":true}\n" +
-            "```"
-      );
+      .contentMarkDownResource(this);
   }
 
   public String getScriptName() {

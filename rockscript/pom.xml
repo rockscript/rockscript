@@ -81,7 +81,17 @@
     </dependencies>
 
     <build>
-      <plugins>
+
+        <resources>
+            <!-- This copies the markdown files, which are next to the java source files as resources -->
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.md</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
           <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-jar-plugin</artifactId>

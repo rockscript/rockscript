@@ -253,10 +253,11 @@ public abstract class Engine {
   }
 
   public Engine commandType(Command command) {
-    this.commandTypes.put(command.getDoc().getType(), command.getClass());
+    Doc doc = command.getDoc();
+    this.commandTypes.put(doc.getType(), command.getClass());
     docs
       .computeIfAbsent("commands", entry->new ArrayList<Doc>())
-      .add(command.getDoc());
+      .add(doc);
     return this;
   }
 
