@@ -2,8 +2,8 @@ RockScript is a subset of JavaScript (ECMAScript 5.1)  This page documents
 which subset of JavaScript is supported. At the moment, only a very limited 
 subset is supported.  We are working hard to expand our coverage.  
 
-If you wonder why RockScript doesn't just use Node.js, see 
-[RockScript vs Node.js](#rockscriptvsnodejs) below.  
+If you wonder why RockScript doesn't just use Node.js,  
+<a onclick="scrollOnSamePage('rockscriptvsnodejs')">see below</a>.  
 
 The main reason for us to choose 
 JavaScript as the syntax is that it's familiar for most developers and has a low 

@@ -46,14 +46,18 @@
     }
   </style>
 
+  <link rel="stylesheet" type="text/css" href="css/highlight-arduino-light-9.12.0.css">
+
   <link rel="stylesheet" type="text/css" href="css/rockscript-docs.css">
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
 
-  <script src="js/jquery-3.2.1.min.js"></script>
+  <script src="js/highlight-9.12.0.js"></script>
   <script src="js/showdown-1.8.2.min.js"></script>
+  <script src="js/jquery-3.2.1.min.js"></script>
 
   <script type="application/javascript">
-    var converter = new showdown.Converter({tables: 'true' /*, extensions: ['codehighlight'] */});
+
+    var converter = new showdown.Converter({tables: 'true'});
     var currentView = 'introduction';
 
     window.addEventListener('load', function() {
@@ -108,6 +112,11 @@
           } else {
             showContent('introduction');
           }
+          $(document).ready(function() {
+            $('pre code').each(function(i, block) {
+              hljs.highlightBlock(block);
+            });
+          });
         }
       });
     }
@@ -115,6 +124,10 @@
     function show(id) {
       showContent(id);
       history.pushState(id, 'Back title '+id, '#'+id);
+    }
+
+    function scrollOnSamePage(id) {
+      $('#'+id)[0].scrollIntoView();
     }
 
     function showContent(id) {
@@ -144,7 +157,7 @@
 </div>
 
 <div class="content">
-</div> <!-- end of content ->
+</div>
 
 </body>
 </html>
