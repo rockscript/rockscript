@@ -83,6 +83,9 @@
     <build>
 
         <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
             <!-- This copies the markdown files, which are next to the java source files as resources -->
             <resource>
                 <directory>src/main/java</directory>

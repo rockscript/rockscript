@@ -23,6 +23,8 @@ import io.rockscript.http.servlet.RequestHandler;
 import io.rockscript.http.servlet.ServerRequest;
 import io.rockscript.http.servlet.ServerResponse;
 import io.rockscript.util.Io;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URLConnection;
 import java.util.Map;
@@ -31,6 +33,8 @@ import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
 
 public class FileHandler implements RequestHandler {
+
+  static Logger log = LoggerFactory.getLogger(FileHandler.class);
 
   @SuppressWarnings("unchecked")
   private final static Map<String,String> contentTypesByExtension = hashMap(
@@ -48,7 +52,7 @@ public class FileHandler implements RequestHandler {
 
   @Override
   public String getLogBodyText(ServerRequest request) {
-    return null;
+    return "...content of resource "+getResource(request)+"...";
   }
 
   @Override
