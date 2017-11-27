@@ -20,7 +20,6 @@
 package io.rockscript.http.servlet;
 
 import com.google.gson.Gson;
-import io.rockscript.http.client.Http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +58,11 @@ public class RouterServlet extends HttpServlet {
         requestHandler.handle(request, response);
       } catch (HttpException e) {
         response.status(e.getStatusCode());
+        response.bodyString("{\"message\":\"" + e.getMessage() + "\"}");
         if (log.isDebugEnabled()) log.debug(response.toString());
-        throw e;
+      } catch (Throwable e) {
+        response.statusInternalServerError();
+        response.bodyString("{\"message\":\"See the server logs for more details\"}");
       }
     } else {
       log.debug("No handler found for "+request.getPathInfo());

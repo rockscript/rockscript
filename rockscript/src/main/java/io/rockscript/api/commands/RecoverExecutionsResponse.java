@@ -4,14 +4,14 @@ import io.rockscript.api.model.ScriptExecution;
 
 import java.util.List;
 
-public class RecoverCrashedScriptExecutionsResponse {
+public class RecoverExecutionsResponse {
 
   public List<ScriptExecution> scriptExecutions;
 
-  public RecoverCrashedScriptExecutionsResponse() {
+  public RecoverExecutionsResponse() {
   }
 
-  public RecoverCrashedScriptExecutionsResponse(List<ScriptExecution> scriptExecutions) {
+  public RecoverExecutionsResponse(List<ScriptExecution> scriptExecutions) {
     this.scriptExecutions = scriptExecutions;
   }
 

@@ -32,7 +32,6 @@ import io.rockscript.activity.ImportProvider;
 import io.rockscript.activity.ImportResolver;
 import io.rockscript.activity.http.HttpImportProvider;
 import io.rockscript.api.Command;
-import io.rockscript.api.Doc;
 import io.rockscript.api.Query;
 import io.rockscript.api.commands.EndActivityCommand;
 import io.rockscript.api.commands.RunTestsCommand;
@@ -80,7 +79,6 @@ public abstract class Engine {
   protected Map<String,Object> objects = new HashMap<>();
   protected Map<String,ImportProvider> importProviders = new HashMap<>();
   protected List<EnginePlugin> plugins = new ArrayList<>();
-  protected Map<String,List<Doc>> docs = new HashMap<>();
 
   public Engine() {
     this.eventStore = new EventStore(this);
@@ -241,10 +239,7 @@ public abstract class Engine {
   }
 
   public Engine queryType(Query query) {
-    this.queryTypes.put(query.getDoc().getType(), query.getClass());
-    docs
-      .computeIfAbsent("queries", entry->new ArrayList<Doc>())
-      .add(query.getDoc());
+    this.queryTypes.put(query.getType(), query.getClass());
     return this;
   }
 
@@ -253,11 +248,7 @@ public abstract class Engine {
   }
 
   public Engine commandType(Command command) {
-    Doc doc = command.getDoc();
-    this.commandTypes.put(doc.getType(), command.getClass());
-    docs
-      .computeIfAbsent("commands", entry->new ArrayList<Doc>())
-      .add(doc);
+    this.commandTypes.put(command.getType(), command.getClass());
     return this;
   }
 
@@ -316,9 +307,5 @@ public abstract class Engine {
 
   public IdGenerator getScriptVersionIdGenerator() {
     return scriptVersionIdGenerator;
-  }
-
-  public Map<String, List<Doc>> getDocs() {
-    return docs;
   }
 }

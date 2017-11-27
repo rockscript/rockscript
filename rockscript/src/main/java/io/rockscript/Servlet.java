@@ -20,7 +20,6 @@
 package io.rockscript;
 
 import io.rockscript.api.CommandHandler;
-import io.rockscript.api.DocsHandler;
 import io.rockscript.api.QueryHandler;
 import io.rockscript.engine.PingHandler;
 import io.rockscript.http.servlet.RouterServlet;
@@ -63,10 +62,9 @@ public class Servlet extends RouterServlet {
 
     setGson(engine.getGson());
 
-    requestHandler(new FileHandler(engine));
     requestHandler(new CommandHandler(engine));
     requestHandler(new QueryHandler(engine));
-    requestHandler(new DocsHandler(engine));
+    requestHandler(new FileHandler(engine));
     requestHandler(new PingHandler(engine));
 
     defaultResponseHeader("Access-Control-Allow-Origin", "*");

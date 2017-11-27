@@ -47,8 +47,9 @@ public class QueryHandler extends AbstractRequestHandler {
       Object queryResponse = query.execute(engine);
 
       String responseBodyJson = engine.getGson().toJson(queryResponse);
-      response.bodyString(responseBodyJson);
-      response.status(200);
+      response
+        .bodyString(responseBodyJson)
+        .status(200);
 
     } catch (HttpException e) {
       throw e;

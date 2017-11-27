@@ -22,8 +22,8 @@ package io.rockscript.test.engine;
 import io.rockscript.Engine;
 import io.rockscript.TestEngine;
 import io.rockscript.activity.ActivityOutput;
-import io.rockscript.api.commands.RecoverCrashedScriptExecutionsCommand;
-import io.rockscript.api.commands.RecoverCrashedScriptExecutionsResponse;
+import io.rockscript.api.commands.RecoverExecutionsCommand;
+import io.rockscript.api.commands.RecoverExecutionsResponse;
 import io.rockscript.api.commands.SaveScriptVersionCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptExecution;
@@ -155,9 +155,9 @@ public class CrashTest extends AbstractEngineTest {
         eventsWithoutCrash++;
 
         eventListener.stopThrowing();
-        RecoverCrashedScriptExecutionsResponse recoverCrashedScriptExecutionsResponse = new RecoverCrashedScriptExecutionsCommand()
+        RecoverExecutionsResponse recoverExecutionsResponse = new RecoverExecutionsCommand()
           .execute(crashEngine);
-        List<ScriptExecution> recoverCrashedScriptExecutions = recoverCrashedScriptExecutionsResponse.getScriptExecutions();
+        List<ScriptExecution> recoverCrashedScriptExecutions = recoverExecutionsResponse.getScriptExecutions();
         ScriptExecution recoveredScriptExecution = (ScriptExecution) recoverCrashedScriptExecutions.get(0);
 
         new ScriptExecutionComparator()

@@ -26,7 +26,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class ServerResponse {
@@ -61,20 +60,23 @@ public class ServerResponse {
   }
 
   public ServerResponse bodyBytes(byte[] bytes) {
-    logBody = "..."+bytes.length+" bytes...";
-    writeBodyBytes(bytes);
+    if (bytes!=null) {
+      bodyBytesLog(bytes, "..." + bytes.length + " bytes...");
+    }
     return this;
   }
 
-  public ServerResponse bodyString(String responseBody) {
-    logBody = responseBody;
-    byte[] bytes = responseBody.getBytes(Charset.forName("UTF-8"));
-    writeBodyBytes(bytes);
+  public ServerResponse bodyBytesLog(byte[] bytes, String bodyLog) {
+    if (bytes!=null) {
+      writeBodyBytes(bytes);
+    }
+    this.logBody = bodyLog;
     return this;
   }
 
   private void writeBodyBytes(byte[] bytes) {
     try {
+      headerContentLength(bytes.length);
       isBodyStarted = true;
       ServletOutputStream out = response.getOutputStream();
       out.write(bytes);
@@ -82,6 +84,17 @@ public class ServerResponse {
     } catch (IOException e) {
       throw new RuntimeException("Couldn't send body: "+e.getMessage(), e);
     }
+  }
+
+  public ServerResponse bodyString(String responseBody) {
+    return bodyStringLog(responseBody, responseBody);
+  }
+
+  public ServerResponse bodyStringLog(String responseBody, String bodyLog) {
+    this.logBody = bodyLog;
+    byte[] bytes = responseBody.getBytes(Charset.forName("UTF-8"));
+    writeBodyBytes(bytes);
+    return this;
   }
 
   public ServerResponse bodyJsonString(String responseBody) {
@@ -102,6 +115,10 @@ public class ServerResponse {
       response.addHeader(name, value);
     }
     return this;
+  }
+
+  public ServerResponse headerContentLength(Number value) {
+    return header(Http.Headers.CONTENT_LENGTH, value!=null ? value.toString() : null);
   }
 
   public ServerResponse headerContentType(String value) {
@@ -139,6 +156,14 @@ public class ServerResponse {
           }).collect(Collectors.joining("\n"));
     } else {
       return "";
+    }
+  }
+
+  public void sendRedirect(String location) {
+    try {
+      response.sendRedirect(location);
+    } catch (IOException e) {
+      throw new InternalServerException();
     }
   }
 }

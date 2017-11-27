@@ -21,7 +21,7 @@ import io.rockscript.Engine;
  * All commands are serializable with Gson. */
 public interface Command<R> {
 
-  R execute(Engine engine);
+  String getType();
 
-  Doc getDoc();
+  R execute(Engine engine);
 }

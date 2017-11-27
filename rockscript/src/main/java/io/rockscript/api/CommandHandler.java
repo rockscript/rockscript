@@ -36,9 +36,11 @@ public class CommandHandler extends AbstractRequestHandler {
   @Override
   public void handle(ServerRequest request, ServerResponse response) {
     String jsonBodyString = request.getBodyAsString();
+    BadRequestException.throwIfNull(jsonBodyString, "No command was provided in the body");
     try {
       Gson gson = engine.getGson();
       Command command = gson.fromJson(jsonBodyString, Command.class);
+      BadRequestException.throwIfNull(command, "No valid command was provided in the body: "+jsonBodyString);
       Object commandResponse = command.execute(engine);
       response.bodyJson(commandResponse);
       response.status(200);

@@ -6,7 +6,4 @@ then
     JAVA_OPTS=${JAVA_OPTS}-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=3333
 fi
 
-if mvn -DskipTests clean install;
-then
-    java $JAVA_OPTS -jar rockscript-server/target/rockscript.jar
-fi
+( mvn -DskipTests clean install && java $JAVA_OPTS -jar rockscript-server/target/rockscript.jar )

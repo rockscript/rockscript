@@ -17,16 +17,11 @@ package io.rockscript.api.commands;
 
 import io.rockscript.Engine;
 import io.rockscript.api.Command;
-import io.rockscript.api.Doc;
 import io.rockscript.api.model.Script;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.Parse;
 import io.rockscript.engine.impl.ScriptStore;
 import io.rockscript.http.servlet.BadRequestException;
-import io.rockscript.util.Lists;
-
-import static io.rockscript.util.Maps.entry;
-import static io.rockscript.util.Maps.hashMap;
 
 /** Saves a new script version.
  *
@@ -52,6 +47,11 @@ public class SaveScriptVersionCommand implements Command<SaveScriptVersionRespon
   protected String scriptName;
   protected String scriptText;
   protected Boolean activate;
+
+  @Override
+  public String getType() {
+    return "saveScript";
+  }
 
   @Override
   public SaveScriptVersionResponse execute(Engine engine) {
@@ -82,14 +82,6 @@ public class SaveScriptVersionCommand implements Command<SaveScriptVersionRespon
     scriptStore.addParsedScriptAstToCache(parse, scriptVersion);
 
     return new SaveScriptVersionResponse(scriptVersion);
-  }
-
-  @Override
-  public Doc getDoc() {
-    return new Doc()
-      .type("saveScript")
-      .label("Save script")
-      .contentMarkDownResource(this);
   }
 
   public String getScriptName() {

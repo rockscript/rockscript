@@ -83,6 +83,7 @@ public class Http {
 
   public interface Headers {
     String CONTENT_TYPE = "Content-Type";
+    String CONTENT_LENGTH = "Content-Length";
   }
 
   public interface ContentTypes {

@@ -18,7 +18,6 @@ package io.rockscript.api.commands;
 import io.rockscript.Engine;
 import io.rockscript.activity.test.*;
 import io.rockscript.api.Command;
-import io.rockscript.api.Doc;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.EngineScriptExecution;
@@ -35,6 +34,11 @@ public class RunTestsCommand implements Command<TestResults> {
   protected String tests = ".*\\.rst";
 
   @Override
+  public String getType() {
+    return "runTests";
+  }
+
+  @Override
   public TestResults execute(Engine engine) {
     TestResults testResults = new TestResults();
 
@@ -45,14 +49,6 @@ public class RunTestsCommand implements Command<TestResults> {
       testResults.add(testResult);
     }
     return testResults;
-  }
-
-  @Override
-  public Doc getDoc() {
-    return new Doc()
-      .type("runTests")
-      .label("Run tests")
-      .content("TODO");
   }
 
   private TestResult runTest(Engine engineEngine, ScriptVersion scriptVersion) {

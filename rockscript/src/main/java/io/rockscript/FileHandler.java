@@ -41,6 +41,7 @@ public class FileHandler implements RequestHandler {
     entry(".html",  "text/html"),
     entry(".js",    "text/javascript"),
     entry(".css",   "text/css"),
+    entry(".md",    "text/markdown"),
     entry(".map",   "application/json"),
     entry(".woff2", "font/woff2"),
     entry(".ico",   "image/x-icon"),
@@ -57,36 +58,51 @@ public class FileHandler implements RequestHandler {
 
   @Override
   public boolean matches(ServerRequest request) {
-    return Io.hasResource(getResource(request));
+    return request.getPathInfo().equals("/")
+      || Io.hasResource(getResource(request));
   }
 
   @Override
   public void handle(ServerRequest request, ServerResponse response) {
-    String resource = getResource(request);
-    String contentType = getContentType(resource);
-    response.headerContentType(contentType);
+    if (!redirect(request, response)) {
+      String resource = getResource(request);
 
-    if (contentType.startsWith("text")
-        || contentType.startsWith("application/json")) {
-      String fileContent = Io.getResourceAsString(resource);
-      response.bodyString(fileContent);
-    } else if (contentType.startsWith("image")
-               || contentType.startsWith("font")) {
-      byte[] bytes = Io.getBytesFromResource(resource);
-      response.bodyBytes(bytes);
+      String contentType = getContentType(resource);
+      response.headerContentType(contentType);
+
+      if (contentType.startsWith("text")
+          || contentType.startsWith("application/json")) {
+        String fileContent = Io.getResourceAsString(resource);
+        response
+          .bodyStringLog(fileContent, "...contents of "+resource+"...");
+
+      } else if (contentType.startsWith("image")
+                 || contentType.startsWith("font")) {
+        byte[] bytes = Io.getBytesFromResource(resource);
+        response
+          .bodyBytesLog(bytes, "..."+bytes.length+" bytes...");
+      }
+      response.statusOk();
     }
-    response.statusOk();
   }
 
-  private String getResource(ServerRequest request) {
+  protected boolean redirect(ServerRequest request, ServerResponse response) {
+    if (request.getPathInfo().equals("/")) {
+      response.sendRedirect("/docs/");
+      return true;
+    }
+    return false;
+  }
+
+  protected String getResource(ServerRequest request) {
     String path = request.getPathInfo();
-    if ("/".equals(path)) {
-      path = "/index.html";
+    if (path.endsWith("/")) {
+      path += "index.html";
     }
     return "webfiles"+path;
   }
 
-  private String getContentType(String path) {
+  protected String getContentType(String path) {
     int lastDotIndex = path.lastIndexOf('.');
     if (lastDotIndex!=-1) {
       String extension = path.substring(lastDotIndex);

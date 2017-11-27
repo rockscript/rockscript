@@ -17,34 +17,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.api;
+package io.rockscript.test.server;
 
-import io.rockscript.Engine;
-import io.rockscript.http.servlet.ServerRequest;
-import io.rockscript.http.servlet.ServerResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.rockscript.test.Assert;
+import org.junit.Test;
 
-import java.util.List;
-import java.util.stream.Collectors;
+public class DocsTest extends AbstractServerTest {
 
-import static io.rockscript.util.Maps.entry;
-import static io.rockscript.util.Maps.hashMap;
-
-public class DocsHandler extends AbstractRequestHandler {
-
-  static Logger log = LoggerFactory.getLogger(DocsHandler.class);
-
-  Engine engine;
-
-  public DocsHandler(Engine engine) {
-    super(GET, "/docs", engine);
-    this.engine = engine;
+  @Test
+  public void testIndex() {
+    String response = get("/");
+    Assert.assertContains("<title>RockScript Documentation</title>", response);
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  public void handle(ServerRequest request, ServerResponse response) {
-    response.bodyJson(engine.getDocs());
+  @Test
+  public void testPing() {
+    String response = get("/ping");
+    Assert.assertContains("pong", response);
+  }
+
+  private String get(String path) {
+    return newGet(path)
+      .execute()
+      .assertStatusOk()
+      .getBody();
   }
 }
