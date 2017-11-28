@@ -1,3 +1,8 @@
+If you just want to get your first script running asap, feel free to skip this 
+background information and jump straight to the 
+<a onclick="show('getting-started')">geting started</a> and 
+<a onclick="show('tutorial')">the tutorial</a>.
+
 #### Resilient script execution 
 
 Most system interactions these days are done over HTTP and are non 
@@ -41,13 +46,13 @@ connect the code-pieces with message queues, configuration and infrastructure.
 It can be a real challenge to read or debug code like that.
 
 Activities package an interaction with an external system as a simple function 
-invocation. Activity invocations look like normal function invocations.  They are 
+invocation. Service function invocations look like normal function invocations.  They are 
 familiar and simple to read.  But unlike other programming languages, the RockScript 
-engine can execute those activity invocations non-blocking.
+engine can execute those service function invocations non-blocking.
 
 With RockScript, it's much easier to keep the overview.  The script contains the 
 essence of the business logic.  All the communication details are 
-handled by the activity workers.  Because those details are extracted from the 
+handled by the service bridges.  Because those details are extracted from the 
 script, it's orders of magnitude easier to read, write and maintain compared to 
 messages and message handlers.  
 
@@ -60,7 +65,7 @@ The most used alternative is message queues.  This is a lower level solution tha
 you to cut your code into pieces and tie your code-pieces together with with message 
 queues and configuration of that infrastructure.  It gets really hard to distill the 
 business logic from all those fragments and configurations.  RockScript let's you 
-write scripts at a higher business logic level and activity workers are a more elegant 
+write scripts at a higher business logic level and service bridges are a more elegant 
 approach to breaking down the lower level communication details. 
 
 Other solutions on the same level as RockScript are  
@@ -68,20 +73,20 @@ Other solutions on the same level as RockScript are
 * [Uber Cadence](https://github.com/uber/cadence)
 * [Netflix conductor](https://github.com/Netflix/conductor)
 
-All these alternatives are based on tasks, which are similar to our activities. But there 
+All these alternatives are based on activities, which are similar to our service functions. But there 
 is an important difference related to coding the execution flow between these activities.  
 In RockScript, the control flow is defined in the script itself.  This means constructs 
 like `if (condition) {...} else {...}`, `for (loop) {...}` and blocks implying sequential 
-execution.  The script, written in JavaScript syntax contains the activity invocations as 
-well as the control flow logic between the activities.
+execution.  The script, written in JavaScript syntax contains the service function 
+invocations as well as the control flow logic between the functions.
 
 In AWS Step Functions and Uber Cadence the logic between the activities has to be 
-implemented in the form of callbacks.  Each time an activity is finished, those engines will 
-call out to a workflow callback that has to calculate the next activity.  So in these 
+implemented in the form of callbacks.  Each time an activity is finished, 
+those engines will call out to a workflow callback that has to calculate the next activity.  So in these 
 solutions you don't have an overview.  While you can code that logic in any language as well,
 you have to cut up your code in pieces.  This way it's harder to see the overview of 
 how tasks are connected and what transformation logic is done inbetween.
-
+``
 Other similar alternative technologies are 
 [Microsoft logic apps](https://azure.microsoft.com/en-us/services/logic-apps/), 
 BPM and workflow.

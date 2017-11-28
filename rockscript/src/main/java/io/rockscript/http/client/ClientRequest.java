@@ -27,15 +27,16 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.ByteArrayEntity;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static io.rockscript.http.client.ClientResponse.getString;
 
 /** AsyncHttpRequest builder */
 public class ClientRequest {
@@ -110,14 +111,14 @@ public class ClientRequest {
   }
 
   public String toString(String prefix) {
-    return toString(prefix, null);
+    return toString(prefix, Integer.MAX_VALUE);
   }
 
-  public String toString(String prefix, Integer maxBodyLength) {
-    StringBuilder text = new StringBuilder();
+  public String toString(String prefix, int maxBodyLength) {
     if (prefix==null) {
       prefix = "";
     }
+    StringBuilder text = new StringBuilder();
     text.append(prefix);
     text.append("> ");
     text.append(method);
@@ -141,12 +142,8 @@ public class ClientRequest {
       text.append(NEWLINE);
       text.append(prefix);
       text.append("  ");
-
-      String bodyString = bodyLog;
-      if (maxBodyLength!=null && bodyString!=null && bodyString.length()>maxBodyLength) {
-        bodyString = bodyString.substring(0, maxBodyLength)+"...";
-      }
-      text.append(bodyString);
+      String bodyCustomized = getString(bodyLog, prefix, maxBodyLength);
+      text.append(bodyCustomized);
     }
     return text.toString();
   }

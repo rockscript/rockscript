@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-if test "$1" == "debug"
-then
-    echo Enabling debug
-    JAVA_OPTS=${JAVA_OPTS}-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=3333
-fi
+mvn -Pizza clean install
 
-( mvn -DskipTests clean install && java $JAVA_OPTS -jar rockscript-server/target/rockscript.jar )
+if [ $? -eq 0 ]; then
+    THISDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    $THISDIR/run-server.sh
+fi

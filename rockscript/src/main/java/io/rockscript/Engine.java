@@ -136,6 +136,7 @@ public abstract class Engine {
       .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
       .registerTypeHierarchyAdapter(Activity.class, new ActivitySerializer())
       .registerTypeHierarchyAdapter(ImportObject.class, new ImportObjectSerializer())
+      .setPrettyPrinting()
       .create();
   }
 

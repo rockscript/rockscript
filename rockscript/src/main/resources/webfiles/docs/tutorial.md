@@ -1,9 +1,9 @@
-### Prerequisites
+## Prerequisites
 
  * A running RockScript server.  See <a onclick="show('getting-started')">Getting started</a> 
  * NodeJS 7.7.1+
 
-### Your first script
+## Your first script
 
 ```javascript
 var http = system.import('rockscript.io/http');
@@ -33,14 +33,52 @@ the response object looks like this:
 }
 ```
 
-### Deploying the script
+## Deploying the script
+
+#### Deploy using the rock command
+
+Type
+
+```bash
+rock deploy docs/examples/chuck/
+```
+
+You should get output like 
+
+```bash
+$  rock deploy docs/examples/chuck/
+  Scanning directory /Code/rockscript/docs/examples/chuck (not recursive) for files matching .*\.rs(t)?
+  Deploying docs/examples/chuck/get-joke.rs to http://localhost:3652 ...
+  > POST http://localhost:3652/command
+    Content-Type: application/json
+    {
+      "saveScript": {
+        "scriptName": "docs/examples/chuck/get-joke.rs",
+        "scriptText": "var http \u003d system.import(\u0027rockscript.io/http\u0027);\n\nvar response \u003d http.get({url:\...
+        "activate": true
+      }
+    }
+  < HTTP/1.1 200 OK
+    Content-Type: application/json
+    {
+      "id": "sv1",
+      "scriptId": "s1",
+      "name": "docs/examples/chuck/get-joke.rs",
+      "version": 1,
+      "text": "var http \u003d system.import(\u0027rockscript.io/http\u0027);\n\nvar response \u003d http.get({url:\u0027htt...
+      "active": true
+    }
+  1 scripts successful deployed
+```
+
+#### Deploy using only bash 
 
 Paste this into the command line to save your first script version
  
 ```bash
 $ curl -v -H "Content-Type: application/json" \
   -d "{\"saveScript\":{ \
-    \"scriptName\": \"Get joke\", \
+    \"scriptName\": \"get-joke.rs\", \
     \"scriptText\": \"var http = system.import('rockscript.io\/http');\r\n\r\nvar response = http.get({url:'http:\/\/api.icndb.com\/jokes\/random'});\r\n\r\nvar joke = response.body.value.joke;\", \
     \"activate\": true \
   }}" \
@@ -50,13 +88,13 @@ $ curl -v -H "Content-Type: application/json" \
 You should see a response like this:
 
 ```bash
-{"id":"sv2","scriptId":"s1","name":"Get joke","version":1,"text":"var http..."}
+{"id":"sv2","scriptId":"s1","name":"get-joke.rs","version":1,"text":"var http..."}
 ```
 
 ### Starting the script 
 
 ```bash
-curl -v -H "Content-Type:application/json" -d "{\"startScript\":{\"scriptName\":\"Get joke\"}}" localhost:3652/command
+curl -v -H "Content-Type:application/json" -d "{\"startScript\":{\"scriptName\":\"get-joke.rs\"}}" localhost:3652/command
 ```
 
 If you see something like this as the output...

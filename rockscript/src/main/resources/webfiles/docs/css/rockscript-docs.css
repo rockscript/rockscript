@@ -40,6 +40,12 @@ h6 { font-size: 1.10em; margin: .3em 0 .10em  0; color: #717171;}
 p {
   margin-top: .2em;
 }
+
+i, cite, em, var, address, dfn {
+  color: #a5552d;
+  letter-spacing: .3px;
+}
+
 a:not([href]) {
   cursor: pointer;
 }
@@ -93,7 +99,7 @@ th, td {
 }
 
 .titlebar {
-  background-color: #2B7191 !important;
+  background-color: #1A7CB1 !important;
   color: white;
   padding: 21px;
 }
@@ -141,6 +147,9 @@ th, td {
 .toc a.title {
   font-size: 1.1em;
   margin-top: 7px;
+  border: 0px solid #eee;
+  border-top-width: 1px;
+  padding-top: 10px;
 }
 
 .toc a.sublink {
@@ -189,20 +198,20 @@ th, td {
   font-family: 'Roboto Slab';
   font-style: normal;
   font-weight: 100;
-  src: local('Roboto Slab Thin'), local('RobotoSlab-Thin'), url(https://fonts.gstatic.com/s/robotoslab/v7/MEz38VLIFL-t46JUtkIEgNKT0E3VAiFQm6Fsw40EoXw.woff2) format('woff2');
+  src: local('Roboto Slab Thin'), local('RobotoSlab-Thin'), url(../roboto-slab-100.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
 @font-face {
   font-family: 'Open Sans';
   font-style: normal;
   font-weight: 400;
-  src: local('Open Sans Regular'), local('OpenSans-Regular'), url(fonts/open-sans-400.woff2) format('woff2');
+  src: local('Open Sans Regular'), local('OpenSans-Regular'), url(../fonts/open-sans-400.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
 @font-face {
   font-family: 'Open Sans';
   font-style: normal;
   font-weight: 700;
-  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(fonts/open-sans-700.woff2) format('woff2');
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(fonts/../open-sans-700.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }

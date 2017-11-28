@@ -28,9 +28,7 @@ import org.apache.http.message.BasicHeaderValueParser;
 import org.apache.http.message.HeaderValueParser;
 import org.apache.http.util.EntityUtils;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -73,13 +71,11 @@ public class ClientResponse {
             InputStreamReader reader = new InputStreamReader(content, charset);
             this.body = request.getHttp().getGson().fromJson(reader, type);
 
-            if (Http.log.isDebugEnabled()) {
-              // IDEA: Even better would be if we wrapped
-              // the content input stream and copying the json
-              // as it is read by Gson.   That way, it would be the
-              // *exact* contents instead of the reserialized object
-              bodyLog = request.getHttp().getGson().toJson(this.body);
-            }
+            // IDEA: Even better would be if we wrapped
+            // the content input stream and copying the json
+            // as it is read by Gson.   That way, it would be the
+            // *exact* contents instead of the reserialized object
+            bodyLog = request.getHttp().getGson().toJson(this.body);
 
           } else {
             this.body = EntityUtils.toString(entity, "UTF-8");
@@ -114,14 +110,15 @@ public class ClientResponse {
   }
 
   public String toString(String prefix) {
-    return toString(prefix, null);
+    return toString(prefix, Integer.MAX_VALUE);
   }
 
-  public String toString(String prefix, Integer maxBodyLength) {
-    StringBuilder text = new StringBuilder();
+  public String toString(String prefix, int maxBodyLength) {
     if (prefix==null) {
       prefix = "";
     }
+
+    StringBuilder text = new StringBuilder();
     text.append(prefix);
     text.append("< ");
     text.append(apacheResponse.getStatusLine());
@@ -144,21 +141,21 @@ public class ClientResponse {
       text.append("< ");
       text.append(status);
     }
-    if (body!=null) {
+    if (bodyLog!=null) {
       text.append(NEWLINE);
       text.append(prefix);
       text.append("  ");
-
-      String bodyString = body.toString();
-      if (maxBodyLength!=null && bodyString!=null && bodyString.length()>maxBodyLength) {
-        bodyString = bodyString.substring(0, maxBodyLength)+"...";
-      }
-
-      if (bodyLog!=null) {
-        text.append(bodyLog);
-      }
+      String bodyCustomized = getString(bodyLog, prefix, maxBodyLength);
+      text.append(bodyCustomized);
     }
+
     return text.toString();
+  }
+
+  static String getString(String bodyText, String prefix, int maxBodyLength) {
+    return new BufferedReader(new StringReader(bodyText)).lines()
+            .map(line->(line.length()>maxBodyLength ? line.substring(0, maxBodyLength)+"..." : line))
+            .collect(Collectors.joining("\n" + (prefix!=null ? prefix + "  " : "  ")));
   }
 
   public static String headerListToString(List<String> headerListValue) {

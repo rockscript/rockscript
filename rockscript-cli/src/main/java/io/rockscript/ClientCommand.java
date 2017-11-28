@@ -71,10 +71,10 @@ public abstract class ClientCommand extends CliCommand {
   }
 
   protected void log(ClientResponse response) {
-    if (!quiet) Rock.log(response.toString("  "));
+    if (!quiet) Rock.log(response.toString(null, 120));
   }
 
   protected void log(ClientRequest request) {
-    if (!quiet) Rock.log(request.toString("  ", MAX_LOG_LENGTH));
+    if (!quiet) Rock.log(request.toString(null, 120));
   }
 }

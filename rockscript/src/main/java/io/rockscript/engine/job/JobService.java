@@ -27,11 +27,11 @@ public class JobService {
 
   public JobService(Engine engine) {
     this.engine = engine;
-    timer = new Timer();
     idGenerator = engine.getJobIdGenerator();
   }
 
   public void startup() {
+    timer = new Timer();
   }
 
   public void shutdown() {

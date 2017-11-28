@@ -86,17 +86,17 @@ public class Deploy extends ClientCommand {
     String fileOrDirectory = args[args.length-1];
     File file = new File(fileOrDirectory);
     if (file.isFile()) {
-      deployFile(file);
+      deployFile(null, file);
     } else if (file.isDirectory()) {
-      String fileName = null;
+      String dirName = null;
       try {
-        fileName = file.getCanonicalPath();
+        dirName = file.getCanonicalPath();
       } catch (Exception e) {
-        fileName = file.toString();
+        dirName = file.toString();
       }
-      log("Scanning directory " + fileName + (recursive?" recursive":" (not recursive)") + " for files matching " + namePattern);
+      log("Scanning directory " + dirName + (recursive?" recursive":" (not recursive)") + " for files matching " + namePattern);
       this.compiledNamePattern = Pattern.compile(namePattern);
-      scanDirectory(file);
+      scanDirectory(dirName, file);
       if (deployCountSuccessful>0) {
         log(Integer.toString(deployCountSuccessful)+" scripts successful deployed");
       }
@@ -112,16 +112,21 @@ public class Deploy extends ClientCommand {
     }
   }
 
-  private void deployFile(File file) {
+  private void deployFile(String dirName, File file) {
     log("Deploying " + file.getPath() + " to " + server + " ...");
     try {
       String scriptText = Io.toString(new FileInputStream(file));
 
-       ClientRequest request = createHttp()
+      String scriptName = file.getPath();
+      if (dirName!=null && scriptName.startsWith(dirName)) {
+        scriptName = scriptName.substring(dirName.length());
+      }
+
+      ClientRequest request = createHttp()
         .newPost(server + "/command")
         .headerContentTypeApplicationJson()
         .bodyJson(new SaveScriptVersionCommand()
-          .scriptName(file.getPath())
+          .scriptName(scriptName)
           .scriptText(scriptText)
           .activate()
         );
@@ -149,7 +154,7 @@ public class Deploy extends ClientCommand {
     }
   }
 
-  private void scanDirectory(File file) {
+  private void scanDirectory(String dirName, File file) {
     File[] nestedFiles = file.listFiles();
     if (nestedFiles!=null) {
       for (File nestedFile: nestedFiles) {
@@ -157,10 +162,10 @@ public class Deploy extends ClientCommand {
           if (namePattern==null || compiledNamePattern
                 .matcher(nestedFile.getPath())
                 .matches()){
-            deployFile(nestedFile);
+            deployFile(dirName, nestedFile);
           }
         } else if (file.isDirectory() && recursive) {
-          scanDirectory(nestedFile);
+          scanDirectory(dirName, nestedFile);
         }
       }
     }

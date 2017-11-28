@@ -2,16 +2,18 @@ RockScript is a subset of JavaScript (ECMAScript 5.1)  This page documents
 which subset of JavaScript is supported. At the moment, only a very limited 
 subset is supported.  We are working hard to expand our coverage.  
 
-If you wonder why RockScript doesn't just use Node.js,  
-<a onclick="scrollOnSamePage('rockscriptvsnodejs')">see below</a>.  
+If you wonder why RockScript doesn't just use Node.js, <a onclick="scrollOnSamePage('rockscriptvsnodejs')">see 
+below</a>.  
 
-The main reason for us to choose 
-JavaScript as the syntax is that it's familiar for most developers and has a low 
-threshold to get started.  It's also ideal for the data transformations between 
-service functions as most services nowadays are based on JSON. 
+The main reason for us to choose JavaScript as the syntax is that it's familiar 
+for most developers and has a low threshold to get started.  It's also ideal for 
+the data transformations between service functions as most services nowadays are 
+based on JSON. 
 
 ### System variable
-The `system` variable is made available to every script.  It provides a mechanism to import activities, access the script input and (over time) other interactions with the runtime server environment.
+The `system` variable is made available to every script.  It provides a mechanism 
+to import activities, access the script input and (over time) other interactions 
+with the runtime server environment.
 
 #### `system.import`
 E.g.
@@ -78,7 +80,7 @@ Or a combination of the above like eg
 ```
 variableName.propertyName(arg0, arg1)['field'].anotherPropertyName;
 ```
-Note that for function/activity invocations, any number of args is allowed.
+Note that for service function invocations, any number of args is allowed.
 
 #### Literal expressions
 
