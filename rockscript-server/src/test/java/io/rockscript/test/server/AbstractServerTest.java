@@ -25,7 +25,7 @@ import io.rockscript.TestEngine;
 import io.rockscript.http.client.Http;
 import io.rockscript.http.server.HttpServer;
 import io.rockscript.test.AbstractHttpServerTest;
-import io.rockscript.test.HttpServerTest;
+import io.rockscript.test.LatestServerExceptionListener;
 import org.junit.AfterClass;
 import org.junit.Before;
 
@@ -52,6 +52,7 @@ public class AbstractServerTest extends AbstractHttpServerTest {
     // Now, the engine is already initialized.  See #setUp()
     assertNotNull(engine);
     Servlet servlet = new Servlet(engine);
+    servlet.exceptionListener(new LatestServerExceptionListener());
     servlet.gson(engine.getGson());
     server.servlet(servlet);
   }

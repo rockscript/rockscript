@@ -17,7 +17,7 @@ var joke = response.body.value.joke;
 a HTTP response object available in the script.  For this particular URL,
 the response object looks like this:
 
-```json
+```
 { "status": 200,
   "headers": { 
     "Transfer-Encoding": ["chunked"],

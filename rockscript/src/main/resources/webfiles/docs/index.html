@@ -22,127 +22,36 @@
 <head>
   <meta charset="UTF-8">
   <title>RockScript Documentation</title>
-  <style>
-    @font-face {
-      font-family: 'Roboto Slab';
-      font-style: normal;
-      font-weight: 100;
-      src: local('Roboto Slab Thin'), local('RobotoSlab-Thin'), url(https://fonts.gstatic.com/s/robotoslab/v7/MEz38VLIFL-t46JUtkIEgNKT0E3VAiFQm6Fsw40EoXw.woff2) format('woff2');
-      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-    }
-    @font-face {
-      font-family: 'Open Sans';
-      font-style: normal;
-      font-weight: 400;
-      src: local('Open Sans Regular'), local('OpenSans-Regular'), url(fonts/open-sans-400.woff2) format('woff2');
-      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-    }
-    @font-face {
-      font-family: 'Open Sans';
-      font-style: normal;
-      font-weight: 700;
-      src: local('Open Sans Bold'), local('OpenSans-Bold'), url(fonts/open-sans-700.woff2) format('woff2');
-      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-    }
-  </style>
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
 
   <link rel="stylesheet" type="text/css" href="css/highlight-arduino-light-9.12.0.css">
-
   <link rel="stylesheet" type="text/css" href="css/rockscript-docs.css">
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
 
   <script src="js/highlight-9.12.0.js"></script>
   <script src="js/showdown-1.8.2.min.js"></script>
   <script src="js/jquery-3.2.1.min.js"></script>
+  <script src="js/rockscript.js"></script>
 
   <script type="application/javascript">
-
-    var converter = new showdown.Converter({tables: 'true'});
-    var currentView = 'introduction';
-
     window.addEventListener('load', function() {
       load('introduction.md',      'Introduction');
       load('why-and-when.md',      'Why and when');
       load('getting-started.md',   'Getting started');
+      load('cli.md',               'Command line interface');
       load('tutorial.md',          'Tutorial');
       load('language.md',          'Language');
+      load('services.md',          'Services');
       load('script-versioning.md', 'Script versioning');
       load('help.md',              'Help');
-      load('api.md',               'API', 'title');
-
-      load('commands.md',    'Commands');
-      load('save-script.md', 'Save script', 'sublink');
-
-      load('queries.md',     'Queries');
-      load('save-script.md', 'Scripts query', 'sublink');
+      load('api.md',               'API',            'title');
+      load('commands.md',          'Commands');
+      load('save-script.md',       'Save script',    'sublink');
+      load('queries.md',           'Queries');
+      load('save-script.md',       'Scripts query',  'sublink');
     });
-
-    // counters to know when the last page was loaded
-    var markdownPagesToLoad = 0;
-    var markdownPagesLoaded = 0;
-
-    function load(fileName, label, classes) {
-      markdownPagesToLoad++;
-      let baseUrl = window.location.pathname;
-      if (baseUrl.endsWith("index.html")) {
-        baseUrl = baseUrl.substring(0, baseUrl.length-10);
-      }
-      if (!baseUrl.endsWith('/')) {
-        baseUrl += '/';
-      }
-
-      let id = fileName.substring(0, fileName.length-3);
-      let linkHtml = '<a '+
-          (classes ? 'class="'+classes+'"' : '')+
-          ' onclick="show(\''+id+'\')">'+label+'</a>'
-      $('.toc').append(linkHtml);
-
-      $.get(baseUrl+fileName, function(md) {
-        let html = '<div id="'+id+'" class="hidden"> \n' +
-          '<h1>'+label+'</h1> \n'+
-          converter.makeHtml(md)+'\n'+
-          '</div>';
-        $('.content').append(html);
-
-        // If this was the last page to be loaded
-        markdownPagesLoaded++;
-        if (markdownPagesToLoad==markdownPagesLoaded) {
-          if (window.location.hash && window.location.hash.startsWith('#')) {
-            showContent(window.location.hash.substring(1));
-          } else {
-            showContent('introduction');
-          }
-          $(document).ready(function() {
-            $('pre code').each(function(i, block) {
-              hljs.highlightBlock(block);
-            });
-          });
-        }
-      });
-    }
-
-    function show(id) {
-      showContent(id);
-      history.pushState(id, 'Back title '+id, '#'+id);
-    }
-
-    function scrollOnSamePage(id) {
-      $('#'+id)[0].scrollIntoView();
-    }
-
-    function showContent(id) {
-      $('.content').children().addClass('hidden');
-      $('#'+id).removeClass('hidden');
-    }
-
-    window.onpopstate = function(data) {
-      console.log("Document location"+document.location);
-      console.log("State"+JSON.stringify(event.state));
-      showContent(event.state);
-      return true;
-    };
-
   </script>
+
 </head>
 <body>
 

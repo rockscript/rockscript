@@ -41,6 +41,7 @@ public class RouterServlet extends HttpServlet {
   private List<RequestHandler> requestHandlers = new ArrayList<>();
   private Map<String,List<String>> defaultResponseHeaders;
   protected Gson gson;
+  protected ExceptionListener exceptionListener;
 
   @Override
   protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
@@ -59,10 +60,12 @@ public class RouterServlet extends HttpServlet {
       } catch (HttpException e) {
         response.status(e.getStatusCode());
         response.bodyString("{\"message\":\"" + e.getMessage() + "\"}");
+        if (exceptionListener!=null) exceptionListener.exception(request, response, e);
         if (log.isDebugEnabled()) log.debug(response.toString());
       } catch (Throwable e) {
         response.statusInternalServerError();
         response.bodyString("{\"message\":\"See the server logs for more details\"}");
+        if (exceptionListener!=null) exceptionListener.exception(request, response, e);
       }
     } else {
       log.debug("No handler found for "+request.getPathInfo());
@@ -116,6 +119,17 @@ public class RouterServlet extends HttpServlet {
 
   public RouterServlet gson(Gson gson) {
     this.gson = gson;
+    return this;
+  }
+
+  public ExceptionListener getExceptionListener() {
+    return this.exceptionListener;
+  }
+  public void setExceptionListener(ExceptionListener exceptionListener) {
+    this.exceptionListener = exceptionListener;
+  }
+  public RouterServlet exceptionListener(ExceptionListener exceptionListener) {
+    this.exceptionListener = exceptionListener;
     return this;
   }
 }

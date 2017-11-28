@@ -71,8 +71,7 @@ public abstract class AbstractHttpServerTest {
 
   /** override to customize the test server creation */
   protected HttpServer startServer() {
-    HttpServer server = new HttpServer(PORT)
-      .filter(new TestExceptionFilter());
+    HttpServer server = new HttpServer(PORT);
     configureServer(server);
     server.startup();
     return server;
@@ -125,7 +124,7 @@ public abstract class AbstractHttpServerTest {
     @Override
     public ClientResponse assertStatus(int expectedStatus) {
       if (status!=expectedStatus) {
-        Throwable serverCause = TestExceptionFilter.serverException;
+        Throwable serverCause = LatestServerExceptionListener.serverException;
         throw new RuntimeException("Status was " + status + ", expected " + expectedStatus, serverCause);
       }
       return this;

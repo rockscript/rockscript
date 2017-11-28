@@ -56,6 +56,7 @@ a:hover {
 code {
   font-weight: bold;
   color: #444;
+  font-size: 1.2em;
 }
 
 table {
@@ -97,7 +98,7 @@ th, td {
   padding: 21px;
 }
 
-.titlebar > .brand {
+.titlebar .brand {
   font-family: "Roboto Slab";
   display: inline-block;
   opacity: .7;
@@ -107,7 +108,7 @@ th, td {
   font-size: 1.1em;
 }
 
-.titlebar > .title {
+.titlebar .title {
   font-size: 1.1em;
   font-weight: normal;
   display: inline-block;
@@ -118,6 +119,7 @@ th, td {
   padding: 20px 0 0 20px;
   float: left;
   line-height: 1.7em;
+  margin-bottom: 20px;
 }
 
 @media (min-width: 800px) {
@@ -166,8 +168,41 @@ th, td {
   border: 1px solid #ddd;
   padding: 7px 10px 7px 10px;
   display: block;
+  font-size: 1.1em;
+  font-weight: normal;
+  overflow-x: auto;
 }
 
 .hidden {
   display: none;
+}
+
+.hljs-comment {
+  color: rgba(39, 107, 169, 0.8);
+}
+
+.hljs, .hljs-subst {
+  color: #a05216;
+}
+
+@font-face {
+  font-family: 'Roboto Slab';
+  font-style: normal;
+  font-weight: 100;
+  src: local('Roboto Slab Thin'), local('RobotoSlab-Thin'), url(https://fonts.gstatic.com/s/robotoslab/v7/MEz38VLIFL-t46JUtkIEgNKT0E3VAiFQm6Fsw40EoXw.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans Regular'), local('OpenSans-Regular'), url(fonts/open-sans-400.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(fonts/open-sans-700.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }

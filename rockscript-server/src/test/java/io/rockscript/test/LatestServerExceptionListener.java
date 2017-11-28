@@ -20,36 +20,25 @@
 package io.rockscript.test;
 
 import io.rockscript.http.server.HttpServer;
+import io.rockscript.http.servlet.ExceptionListener;
+import io.rockscript.http.servlet.ServerRequest;
+import io.rockscript.http.servlet.ServerResponse;
 
 import javax.servlet.*;
-import java.io.IOException;
 
 /** The {@link #serverException} member field will contain the latest
- * server side exception typically used by HttpServer.
- * If a test request fails or if it does not get the expected response
- * status, this Http client uses this serverException as the cause.
- * A {@link TestExceptionFilter} is added to {@link HttpServer}
- * in it's constructor with {@link HttpServer#filter(Filter)} */
-public class TestExceptionFilter implements Filter {
+ * server side exception.
+ * If a test client request fails or if it does not get the expected response
+ * status, the {@link io.rockscript.test.AbstractHttpServerTest.TestClientResponse}
+ * uses this serverException as the cause.
+ * A {@link LatestServerExceptionListener} is added
+ * with {@link io.rockscript.http.servlet.RouterServlet#exceptionListener(ExceptionListener)} */
+public class LatestServerExceptionListener implements ExceptionListener {
 
-  public static Exception serverException = null;
-
-  @Override
-  public void init(FilterConfig filterConfig) throws ServletException {
-  }
+  public static Throwable serverException = null;
 
   @Override
-  public void destroy() {
-  }
-
-  @Override
-  public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-    try {
-      serverException = null;
-      filterChain.doFilter(servletRequest, servletResponse);
-    } catch (IOException | ServletException | RuntimeException e) {
-      serverException = e;
-      throw e;
-    }
+  public void exception(ServerRequest request, ServerResponse response, Throwable exception) {
+    serverException = exception;
   }
 }

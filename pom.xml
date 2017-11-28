@@ -30,6 +30,7 @@
         <module>rockscript-http</module>
         <module>rockscript</module>
         <module>rockscript-server</module>
+        <module>rockscript-cli</module>
     </modules>
 
     <dependencies>
@@ -90,5 +91,13 @@
         </plugins>
     </build>
 
+    <profiles>
+      <profile>
+        <id>izza</id>
+          <properties>
+              <property>skipTests</property>
+          </properties>
+      </profile>
+    </profiles>
 
 </project>

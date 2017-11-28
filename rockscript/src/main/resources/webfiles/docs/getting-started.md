@@ -12,7 +12,7 @@ To build RockScript
 Open a terminal in the root folder and run
 
 ```
-mvn -DskipTests clean install
+mvn -Pizza clean install
 ```
 
 You eventually should see output like 
@@ -27,7 +27,9 @@ You eventually should see output like
 [INFO] BUILD SUCCESS
 ```
  
-That means you have successfully created `rockscript-server/target/rockscript.jar`
+That means you have successfully created 
+ * `rockscript-server/target/rockscript.jar`
+ * `rockscript-cli/target/rockscript-cli.jar` (see <a onclick="show('cli')">Command line interface</a>)
  
 ### Starting the RockScript server
 

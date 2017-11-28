@@ -20,10 +20,7 @@
 package io.rockscript.test;
 
 import io.rockscript.http.server.HttpServer;
-import io.rockscript.http.servlet.PathRequestHandler;
-import io.rockscript.http.servlet.RouterServlet;
-import io.rockscript.http.servlet.ServerRequest;
-import io.rockscript.http.servlet.ServerResponse;
+import io.rockscript.http.servlet.*;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +32,9 @@ public class HttpServerTest extends AbstractHttpServerTest {
   protected void configureServer(HttpServer server) {
     RouterServlet servlet = new RouterServlet();
     servlet.requestHandler(new GreetingHandler());
-    servlet.requestHandler(new BangHandler());
+    servlet.requestHandler(new RuntimeHandler());
+    servlet.requestHandler(new BadRequestHandler());
+    servlet.exceptionListener(new LatestServerExceptionListener());
     server.servlet(servlet);
   }
 
@@ -59,13 +58,23 @@ public class HttpServerTest extends AbstractHttpServerTest {
     }
   }
 
-  public static class BangHandler extends PathRequestHandler {
-    protected BangHandler() {
-      super(GET, "/bang");
+  public static class RuntimeHandler extends PathRequestHandler {
+    protected RuntimeHandler() {
+      super(GET, "/runtime");
     }
     @Override
     public void handle(ServerRequest request, ServerResponse response) {
-      throw new RuntimeException("bang");
+      throw new RuntimeException("runtime");
+    }
+  }
+
+  public static class BadRequestHandler extends PathRequestHandler {
+    protected BadRequestHandler() {
+      super(GET, "/badrequest");
+    }
+    @Override
+    public void handle(ServerRequest request, ServerResponse response) {
+      throw new BadRequestException("badrequest");
     }
   }
 
@@ -78,14 +87,32 @@ public class HttpServerTest extends AbstractHttpServerTest {
   }
 
   @Test
-  public void testHttpInternalServerException() {
+  public void testServerExceptionCause() {
     try {
-      newGet("/bang")
+      newGet("/badrequest")
         .execute()
         .assertStatusOk();
       fail("Expected exception");
     } catch (RuntimeException e) {
-      assertEquals("bang", e.getCause().getMessage());
+      assertEquals("badrequest", e.getCause().getMessage());
     }
+  }
+
+  @Test
+  public void testRuntimeException() {
+    String body = newGet("/runtime")
+      .execute()
+      .assertStatusInternalServerException()
+      .getBody();
+    assertEquals("{\"message\":\"See the server logs for more details\"}", body);
+  }
+
+  @Test
+  public void testBadRequestException() {
+    String body = newGet("/badrequest")
+      .execute()
+      .assertStatusBadRequest()
+      .getBody();
+    assertEquals("{\"message\":\"badrequest\"}", body);
   }
 }

@@ -187,6 +187,10 @@ public class ClientResponse {
     return assertStatus(Http.ResponseCodes.NOT_FOUND_404);
   }
 
+  public ClientResponse assertStatusInternalServerException() {
+    return assertStatus(Http.ResponseCodes.INTERNAL_SERVER_ERROR_500);
+  }
+
   public ClientResponse assertStatus(int expectedStatus) {
     if (status!=expectedStatus) {
       throw new RuntimeException("Status was "+status+", expected "+expectedStatus);
