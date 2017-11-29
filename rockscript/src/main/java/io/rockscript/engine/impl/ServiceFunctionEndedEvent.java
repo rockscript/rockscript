@@ -31,7 +31,7 @@ public class ServiceFunctionEndedEvent extends ExecutableEvent<ArgumentsExpressi
 
   @Override
   public void execute(ArgumentsExpressionExecution execution) {
-    execution.endActivityExecute(result);
+    execution.endFunctionExecute(result);
   }
 
   @Override

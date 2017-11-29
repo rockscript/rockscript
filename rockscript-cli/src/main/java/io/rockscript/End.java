@@ -19,7 +19,7 @@
  */
 package io.rockscript;
 
-import io.rockscript.api.commands.EndActivityCommand;
+import io.rockscript.api.commands.EndServiceFunctionCommand;
 import io.rockscript.api.commands.ScriptExecutionResponse;
 import io.rockscript.http.client.ClientRequest;
 import io.rockscript.http.client.ClientResponse;
@@ -37,13 +37,13 @@ public class End extends ClientCommand {
 
   @Override
   protected void logCommandUsage() {
-    log("rock end : Ends a waiting activity");
+    log("rock end : Ends a waiting service function invocation");
     log();
     logCommandUsage("rock end [end options]");
     log();
     log("Example:");
     log("  rock end se234 e8");
-    log("Ends activity execution e8 inside script execution se234");
+    log("Ends service function invocation e8 inside script execution se234");
   }
 
   @Override
@@ -56,16 +56,16 @@ public class End extends ClientCommand {
       .hasArg()
       .build());
     options.addOption(Option.builder("eid")
-      .desc("Execution id. This identifies the position of the activity " +
-            "execution that will be ended inside the script execution. " +
+      .desc("Execution id. This identifies the position inside the script " +
+            "execution that corresponds to the service function invocation. " +
             "Required.")
       .required()
       .hasArg()
       .build());
     options.addOption(Option.builder("r")
       .desc("Result property <propertyName>:<propertyValue>. " +
-            "The property will be added to the JSON activity result object." +
-            "The result object will be the return value from the activity.")
+            "The property will be added as a field to the service function's " +
+            "return value.")
       .numberOfArgs(2)
       .valueSeparator(':')
       .build());
@@ -94,7 +94,7 @@ public class End extends ClientCommand {
      ClientRequest request = createHttp()
       .newPost(server + "/command")
       .headerContentTypeApplicationJson()
-      .bodyJson(new EndActivityCommand()
+      .bodyJson(new EndServiceFunctionCommand()
         .scriptExecutionId(scriptExecutionId)
         .executionId(executionId)
         .result(resultProperties)
@@ -109,7 +109,7 @@ public class End extends ClientCommand {
     ScriptExecutionResponse endResponse = response.getBody();
 
     if (response.getStatus()==200) {
-      log("Activity "+executionId+" in script execution "+scriptExecutionId+" ended.");
+      log("ServiceFunction "+executionId+" in script execution "+scriptExecutionId+" ended.");
     } else {
       log("Error starting script execution: "+endResponse.getErrorEvent());
     }

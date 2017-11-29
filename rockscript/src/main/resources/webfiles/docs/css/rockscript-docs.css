@@ -26,7 +26,7 @@ body {
 
 h1 {
   font-size: 2em;
-  font-family: Roboto Slab;
+  font-family: "Roboto Slab";
   font-weight: 100;
   color: black;
   margin: 0 0 .4em 0;
@@ -106,6 +106,7 @@ th, td {
 
 .titlebar .brand {
   font-family: "Roboto Slab";
+  font-weight: 100;
   display: inline-block;
   opacity: .7;
   margin-right: 30px;
@@ -198,9 +199,10 @@ th, td {
   font-family: 'Roboto Slab';
   font-style: normal;
   font-weight: 100;
-  src: local('Roboto Slab Thin'), local('RobotoSlab-Thin'), url(../roboto-slab-100.woff2) format('woff2');
+  src: local('Roboto Slab Thin'), local('RobotoSlab-Thin'), url(../fonts/roboto-slab-100.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
+
 @font-face {
   font-family: 'Open Sans';
   font-style: normal;
@@ -208,10 +210,11 @@ th, td {
   src: local('Open Sans Regular'), local('OpenSans-Regular'), url(../fonts/open-sans-400.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
+
 @font-face {
   font-family: 'Open Sans';
   font-style: normal;
   font-weight: 700;
-  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(fonts/../open-sans-700.woff2) format('woff2');
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(../fonts/open-sans-700.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }

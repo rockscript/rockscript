@@ -21,7 +21,7 @@ package io.rockscript.test.engine;
 
 import io.rockscript.Engine;
 import io.rockscript.TestEngine;
-import io.rockscript.activity.ActivityOutput;
+import io.rockscript.service.ServiceFunctionOutput;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class ObjectLiteralExpressionTest extends AbstractEngineTest {
     engine.getImportResolver().createImport("example.com/assert")
       .put("assertLiteralValue", input -> {
         capturedValues.add(input.getArgs().get(0));
-        return ActivityOutput.endActivity();});
+        return ServiceFunctionOutput.endFunction();});
     return engine.start();
   }
 

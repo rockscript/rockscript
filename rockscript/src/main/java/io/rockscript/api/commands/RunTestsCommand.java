@@ -16,7 +16,7 @@
 package io.rockscript.api.commands;
 
 import io.rockscript.Engine;
-import io.rockscript.activity.test.*;
+import io.rockscript.service.test.*;
 import io.rockscript.api.Command;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;

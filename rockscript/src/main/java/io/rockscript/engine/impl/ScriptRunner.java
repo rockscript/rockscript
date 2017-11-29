@@ -25,7 +25,7 @@ public interface ScriptRunner {
 
   EngineScriptExecution startScriptExecution(String scriptVersionId, Object input);
 
-  EngineScriptExecution endActivity(ContinuationReference continuationReference, Object result);
+  EngineScriptExecution endFunction(ContinuationReference continuationReference, Object result);
 
-  void endActivity(EngineScriptExecution lockedScriptExecution, ContinuationReference continuationReference, Object result);
+  void endFunction(EngineScriptExecution lockedScriptExecution, ContinuationReference continuationReference, Object result);
 }

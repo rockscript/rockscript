@@ -21,7 +21,7 @@ package io.rockscript.test.engine;
 
 import io.rockscript.Engine;
 import io.rockscript.TestEngine;
-import io.rockscript.activity.ActivityOutput;
+import io.rockscript.service.ServiceFunctionOutput;
 import io.rockscript.api.commands.RecoverExecutionsCommand;
 import io.rockscript.api.commands.RecoverExecutionsResponse;
 import io.rockscript.api.commands.DeployScriptVersionCommand;
@@ -109,10 +109,10 @@ public class CrashTest extends AbstractEngineTest {
       .put("aSyncFunction", input -> {
         synchronousCapturedData.add("Execution was here");
         synchronousCapturedData.add(input.getArgs().get(0));
-        return ActivityOutput.endActivity();})
+        return ServiceFunctionOutput.endFunction();})
       .put("anAsyncFunction", input -> {
         waitingAsyncFunctionInvocationIds.add(input.getExecutionId());
-        return ActivityOutput.waitForEndActivityCallback();});
+        return ServiceFunctionOutput.waitForFunctionEndCallback();});
   }
 
   @Test

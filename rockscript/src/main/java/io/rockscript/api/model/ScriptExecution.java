@@ -15,7 +15,7 @@
  */
 package io.rockscript.api.model;
 
-import io.rockscript.engine.ActivityContinuation;
+import io.rockscript.engine.ServiceFunctionContinuation;
 import io.rockscript.engine.impl.ArgumentsExpressionExecution;
 import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.engine.impl.Execution;
@@ -32,7 +32,7 @@ public class ScriptExecution {
   String id;
 //  ScriptVersion script;
   Map<String,Object> variables;
-  List<ActivityContinuation> activityContinuations;
+  List<ServiceFunctionContinuation> serviceFunctionContinuations;
   Instant start;
   Instant end;
 
@@ -53,12 +53,12 @@ public class ScriptExecution {
     if (children!=null) {
       for (Execution child: children) {
         if (child instanceof ArgumentsExpressionExecution) {
-          ActivityContinuation activityContinuation = ((ArgumentsExpressionExecution)child).getActivityContinuation();
-          if (activityContinuation!=null) {
-            if (activityContinuations==null) {
-              activityContinuations = new ArrayList<>();
+          ServiceFunctionContinuation serviceFunctionContinuation = ((ArgumentsExpressionExecution)child).getServiceFunctionContinuation();
+          if (serviceFunctionContinuation!=null) {
+            if (serviceFunctionContinuations==null) {
+              serviceFunctionContinuations = new ArrayList<>();
             }
-            activityContinuations.add(activityContinuation);
+            serviceFunctionContinuations.add(serviceFunctionContinuation);
           }
         }
         scan(child.getChildren());
@@ -81,8 +81,8 @@ public class ScriptExecution {
 //    return script;
 //  }
 
-  public List<ActivityContinuation> getActivityContinuations() {
-    return activityContinuations;
+  public List<ServiceFunctionContinuation> getServiceFunctionContinuations() {
+    return serviceFunctionContinuations;
   }
 
   public boolean isEnded() {
@@ -115,8 +115,8 @@ public class ScriptExecution {
     this.variables = variables;
   }
 
-  public void setActivityContinuations(List<ActivityContinuation> activityContinuations) {
-    this.activityContinuations = activityContinuations;
+  public void setServiceFunctionContinuations(List<ServiceFunctionContinuation> serviceFunctionContinuations) {
+    this.serviceFunctionContinuations = serviceFunctionContinuations;
   }
 
   public Instant getStart() {

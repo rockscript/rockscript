@@ -28,6 +28,6 @@ public class ServiceFunctionStartErrorEvent extends ScriptExecutionErrorEvent<Ar
   @Override
   public String toString() {
     return "[" + scriptExecutionId + "|" + executionId + "] " +
-           "Activity error [script:"+scriptId+",line:"+line+"] "+error+(retryTime!=null ? ", retry scheduled for "+retryTime.toString() : "");
+           "ServiceFunction error [script:"+scriptId+",line:"+line+"] "+error+(retryTime!=null ? ", retry scheduled for "+retryTime.toString() : "");
   }
 }

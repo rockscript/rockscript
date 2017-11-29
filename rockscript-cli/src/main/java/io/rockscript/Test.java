@@ -21,9 +21,9 @@ package io.rockscript;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import io.rockscript.activity.test.TestError;
-import io.rockscript.activity.test.TestResult;
-import io.rockscript.activity.test.TestResults;
+import io.rockscript.service.test.TestError;
+import io.rockscript.service.test.TestResult;
+import io.rockscript.service.test.TestResults;
 import io.rockscript.api.commands.RunTestsCommand;
 import io.rockscript.http.client.ClientRequest;
 import io.rockscript.http.client.ClientResponse;

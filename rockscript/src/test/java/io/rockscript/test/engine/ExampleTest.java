@@ -19,8 +19,8 @@
  */
 package io.rockscript.test.engine;
 
-import io.rockscript.activity.test.TestResult;
-import io.rockscript.activity.test.TestResults;
+import io.rockscript.service.test.TestResult;
+import io.rockscript.service.test.TestResults;
 import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.RunTestsCommand;
 import io.rockscript.api.model.ScriptExecution;

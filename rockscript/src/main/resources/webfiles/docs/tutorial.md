@@ -45,7 +45,9 @@ When we deploy the script to the server, we
 * Create a script named `get-joke.rs`, if no script with that name exists yet
 * Create a new script version with the given text
 * Mark the new script version as the active script version.  The active script version is the version that is started 
-  when a new execution is started.   
+  when a new execution is started.
+  
+For more about deployment and versioning, see <a onclick="show('script-versioning')">Script versioning</a>    
 
 #### Deploy using the rock command
 

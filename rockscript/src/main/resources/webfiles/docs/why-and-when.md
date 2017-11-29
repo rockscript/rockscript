@@ -81,8 +81,8 @@ execution.  The script, written in JavaScript syntax contains the service functi
 invocations as well as the control flow logic between the functions.
 
 In AWS Step Functions and Uber Cadence the logic between the activities has to be 
-implemented in the form of callbacks.  Each time an activity is finished, 
-those engines will call out to a workflow callback that has to calculate the next activity.  So in these 
+implemented in the form of callbacks.  Each time an serviceFunction is finished, 
+those engines will call out to a workflow callback that has to calculate the next serviceFunction.  So in these 
 solutions you don't have an overview.  While you can code that logic in any language as well,
 you have to cut up your code in pieces.  This way it's harder to see the overview of 
 how tasks are connected and what transformation logic is done inbetween.

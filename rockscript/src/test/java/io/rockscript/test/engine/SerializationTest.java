@@ -21,9 +21,9 @@ package io.rockscript.test.engine;
 
 import io.rockscript.Engine;
 import io.rockscript.TestEngine;
-import io.rockscript.activity.ActivityInput;
-import io.rockscript.activity.ActivityOutput;
-import io.rockscript.api.commands.EndActivityCommand;
+import io.rockscript.service.ServiceFunctionInput;
+import io.rockscript.service.ServiceFunctionOutput;
+import io.rockscript.api.commands.EndServiceFunctionCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.EngineScriptExecution;
@@ -43,7 +43,7 @@ public class SerializationTest extends AbstractEngineTest {
 
   protected static Logger log = LoggerFactory.getLogger(SerializationTest.class);
 
-  List<ActivityInput> activityInputs = new ArrayList<>();
+  List<ServiceFunctionInput> serviceFunctionInputs = new ArrayList<>();
 
   @Override
   protected Engine initializeEngine() {
@@ -58,11 +58,11 @@ public class SerializationTest extends AbstractEngineTest {
   public void testSerialization() {
     engine.getImportResolver().createImport("helloService")
       .put("hi", input -> {
-        return ActivityOutput.endActivity(input.getArg(0) + " world");
+        return ServiceFunctionOutput.endFunction(input.getArg(0) + " world");
       })
       .put("world", input -> {
-        activityInputs.add(input);
-        return ActivityOutput.waitForEndActivityCallback();
+        serviceFunctionInputs.add(input);
+        return ServiceFunctionOutput.waitForFunctionEndCallback();
       });
 
     ScriptVersion scriptVersion = deployScript(
@@ -83,12 +83,12 @@ public class SerializationTest extends AbstractEngineTest {
     new ScriptExecutionComparator()
       .assertEquals(engineScriptExecution, reloadScriptExecution(scriptExecutionId));
 
-    ActivityInput activityInput = activityInputs.get(0);
+    ServiceFunctionInput input = serviceFunctionInputs.get(0);
 
-    assertEquals("hello world", activityInput.getArg(0));
+    assertEquals("hello world", input.getArg(0));
 
-    engineScriptExecution = new EndActivityCommand()
-          .continuationReference(activityInput.getContinuationReference())
+    engineScriptExecution = new EndServiceFunctionCommand()
+          .continuationReference(input.getContinuationReference())
           .result(null)
           .execute(engine)
           .getEngineScriptExecution();

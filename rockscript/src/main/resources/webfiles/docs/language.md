@@ -23,10 +23,7 @@ var http = system.import('rockscript.io/http');
 
 `system.import(url)` returns a script object that exposes activities as functions.
 
-To learn about how to add activities to the engine, see
-
- * [[Activities over HTTP]]
- * [[Activities in Java]]
+To learn about how to add activities to the engine, see <a onclick="show('services')">Services</a>
 
 #### system.input
 

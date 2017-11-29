@@ -16,7 +16,7 @@
 
 package io.rockscript.engine.impl;
 
-import io.rockscript.activity.Activity;
+import io.rockscript.service.ServiceFunction;
 import io.rockscript.engine.EngineException;
 
 import java.util.LinkedHashMap;
@@ -26,7 +26,7 @@ import java.util.Map;
 public class ServiceFunctionStartedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
 
   String serviceName;
-  String activityName;
+  String functionName;
   Object args;
 
   /** constructor for gson serialization */
@@ -36,15 +36,15 @@ public class ServiceFunctionStartedEvent extends ExecutableEvent<ArgumentsExpres
   @SuppressWarnings("unchecked")
   public ServiceFunctionStartedEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
     super(argumentsExpressionExecution);
-    if (argumentsExpressionExecution.activity==null) {
-      throw new EngineException("Activity doesn't exist: "+argumentsExpressionExecution.element.getText());
+    if (argumentsExpressionExecution.serviceFunction==null) {
+      throw new EngineException("ServiceFunction doesn't exist: "+argumentsExpressionExecution.element.getText());
     }
 
-    Activity activity = argumentsExpressionExecution.activity;
-    this.serviceName = activity.getServiceName();
-    this.activityName = activity.getActivityName();
+    ServiceFunction serviceFunction = argumentsExpressionExecution.serviceFunction;
+    this.serviceName = serviceFunction.getServiceName();
+    this.functionName = serviceFunction.getFunctionName();
 
-    List<String> argNames = activity.getArgNames();
+    List<String> argNames = serviceFunction.getArgNames();
     if (argNames==null
       && argumentsExpressionExecution.args!=null
       && argumentsExpressionExecution.args.size()==1
@@ -73,14 +73,14 @@ public class ServiceFunctionStartedEvent extends ExecutableEvent<ArgumentsExpres
 
   @Override
   public void execute(ArgumentsExpressionExecution execution) {
-    execution.startActivityExecute();
+    execution.startFunctionExecute();
   }
 
   @Override
   public String toString() {
     return "[" + scriptExecutionId + "|" + executionId + "] " +
         "Started [" +
-        activityName +
+           functionName +
         "]"+
         (args!=null ? " with args "+args.toString() : " without args");
   }

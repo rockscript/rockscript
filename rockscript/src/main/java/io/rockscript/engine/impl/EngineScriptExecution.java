@@ -65,7 +65,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
       log.info("Reexecuting event: "+executableEvent.toString());
 
       if (executableEvent instanceof ServiceFunctionStartedEvent
-          && !isNextUnreplayedEventActivityWaitOrActivityEnd()) {
+          && !isNextUnreplayedOrWaitOrEnd()) {
         this.executionMode = ExecutionMode.RECOVERING;
       }
 
@@ -78,7 +78,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
 
   private void initializeSystemVariable(Engine engine) {
     JsonObject systemJsonObject = new JsonObject();
-    systemJsonObject.put("import", new SystemImportActivity(engine));
+    systemJsonObject.put("import", new SystemImportServiceFunction(engine));
     createVariable("system")
       .setValue(systemJsonObject);
   }
@@ -176,7 +176,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
   public void endFunctionInvocationExecution(String executionId, Object result) {
     ArgumentsExpressionExecution argumentsExpressionExecution = (ArgumentsExpressionExecution) findExecutionRecursive(executionId);
     EngineException.throwIfNull(argumentsExpressionExecution, "Couldn't find function invocation execution %s in engineScript execution %s", executionId, id);
-    argumentsExpressionExecution.endActivityExecute(result);
+    argumentsExpressionExecution.endFunctionExecute(result);
   }
 
   public EventListener getEventListener() {
@@ -227,7 +227,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
     return start;
   }
 
-  public boolean isNextUnreplayedEventActivityWaitOrActivityEnd() {
+  public boolean isNextUnreplayedOrWaitOrEnd() {
     ExecutionEvent nextExecutionEvent = !unreplayedEvents.isEmpty() ? unreplayedEvents.peek() : null;
     return (nextExecutionEvent instanceof ServiceFunctionWaitingEvent
             || nextExecutionEvent instanceof ServiceFunctionEndedEvent);

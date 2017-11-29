@@ -20,8 +20,8 @@
 package io.rockscript.test;
 
 import io.rockscript.Engine;
-import io.rockscript.activity.*;
-import io.rockscript.api.commands.EndActivityCommand;
+import io.rockscript.service.*;
+import io.rockscript.api.commands.EndServiceFunctionCommand;
 import io.rockscript.api.commands.ScriptExecutionResponse;
 import io.rockscript.engine.impl.ContinuationReference;
 
@@ -40,7 +40,7 @@ public class SimpleImportProvider extends ImportObject implements ImportProvider
 
   public static ScriptExecutionResponse endWait(String scriptExecutionId, Engine engine) {
     ContinuationReference continuationReference = removeFirstContinuationReference(scriptExecutionId);
-    return new EndActivityCommand()
+    return new EndServiceFunctionCommand()
       .scriptExecutionId(scriptExecutionId)
       .continuationReference(continuationReference)
       .execute(engine);
@@ -55,20 +55,20 @@ public class SimpleImportProvider extends ImportObject implements ImportProvider
 
   public SimpleImportProvider() {
     super("rockscript.io/simple");
-    put(new AbstractActivity("wait", new String[]{}) {
+    put(new AbstractServiceFunction("wait", new String[]{}) {
       @Override
-      public ActivityOutput invoke(ActivityInput input) {
+      public ServiceFunctionOutput invoke(ServiceFunctionInput input) {
         checkWaitsInitialized();
         waits
           .computeIfAbsent(input.getScriptExecutionId(), seid->new ArrayList<>())
           .add(input.getContinuationReference());
-        return ActivityOutput.waitForEndActivityCallback();
+        return ServiceFunctionOutput.waitForFunctionEndCallback();
       }
     });
-    put(new AbstractActivity("noop", new String[]{}) {
+    put(new AbstractServiceFunction("noop", new String[]{}) {
       @Override
-      public ActivityOutput invoke(ActivityInput input) {
-        return ActivityOutput.endActivity("noop");
+      public ServiceFunctionOutput invoke(ServiceFunctionInput input) {
+        return ServiceFunctionOutput.endFunction("noop");
       }
     });
   }

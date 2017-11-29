@@ -26,16 +26,16 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import io.rockscript.activity.Activity;
-import io.rockscript.activity.ImportObject;
-import io.rockscript.activity.ImportProvider;
-import io.rockscript.activity.ImportResolver;
-import io.rockscript.activity.http.HttpImportProvider;
+import io.rockscript.service.ServiceFunction;
+import io.rockscript.service.ImportObject;
+import io.rockscript.service.ImportProvider;
+import io.rockscript.service.ImportResolver;
+import io.rockscript.service.http.HttpImportProvider;
 import io.rockscript.api.Command;
 import io.rockscript.api.Query;
 import io.rockscript.api.commands.*;
 import io.rockscript.api.queries.ScriptExecutionQuery;
-import io.rockscript.engine.ActivitySerializer;
+import io.rockscript.engine.ServiceFunctionSerializer;
 import io.rockscript.engine.EngineException;
 import io.rockscript.engine.ImportObjectSerializer;
 import io.rockscript.engine.impl.*;
@@ -98,7 +98,7 @@ public abstract class Engine {
     commandType(new SaveScriptVersionCommand());
     commandType(new DeployScriptVersionCommand());
     commandType(new StartScriptExecutionCommand());
-    commandType(new EndActivityCommand());
+    commandType(new EndServiceFunctionCommand());
     commandType(new RunTestsCommand());
 
     ServiceLoader<EnginePlugin> pluginLoader = ServiceLoader.load(EnginePlugin.class);
@@ -132,7 +132,7 @@ public abstract class Engine {
       .registerTypeAdapterFactory(createQueryTypeAdapterFactory())
       .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
       .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
-      .registerTypeHierarchyAdapter(Activity.class, new ActivitySerializer())
+      .registerTypeHierarchyAdapter(ServiceFunction.class, new ServiceFunctionSerializer())
       .registerTypeHierarchyAdapter(ImportObject.class, new ImportObjectSerializer())
       .setPrettyPrinting()
       .create();

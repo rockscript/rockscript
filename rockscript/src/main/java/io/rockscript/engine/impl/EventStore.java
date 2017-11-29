@@ -18,7 +18,7 @@ package io.rockscript.engine.impl;
 
 import io.rockscript.Engine;
 import io.rockscript.engine.EngineException;
-import io.rockscript.activity.Activity;
+import io.rockscript.service.ServiceFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,7 +139,7 @@ public class EventStore implements EventListener {
     if (value==null) {
       return "null";
     }
-    if (value instanceof Activity) {
+    if (value instanceof ServiceFunction) {
       return value.toString();
     }
     if (value instanceof Map) {

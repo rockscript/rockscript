@@ -35,7 +35,7 @@ public class ServiceFunctionEndRequestRunnable implements Runnable {
   @Override
   public void run() {
     try {
-      localEngine.endActivity(
+      localEngine.endFunction(
           lockedScriptExecution,
           serviceFunctionEndRequest.getContinuationReference(),
           serviceFunctionEndRequest.getResult());

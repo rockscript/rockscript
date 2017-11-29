@@ -30,7 +30,7 @@ public class LocalScriptRunner implements ScriptRunner {
 
   Engine engine;
   Map<String, Lock> locks = Collections.synchronizedMap(new HashMap<>());
-  Map<String, List<ServiceFunctionEndRequest>> activityEndBacklog = Collections.synchronizedMap(new HashMap<>());
+  Map<String, List<ServiceFunctionEndRequest>> endBacklog = Collections.synchronizedMap(new HashMap<>());
 
   public LocalScriptRunner(Engine engine) {
     this.engine = engine;
@@ -80,8 +80,8 @@ public class LocalScriptRunner implements ScriptRunner {
 
   @SuppressWarnings("unchecked")
   @Override
-  public EngineScriptExecution endActivity(ContinuationReference continuationReference, Object result) {
-    Lock lock = acquireLockOrAddEndActivityRequestToBacklog(continuationReference, result);
+  public EngineScriptExecution endFunction(ContinuationReference continuationReference, Object result) {
+    Lock lock = acquireLockOrFunctionEndRequestToBacklog(continuationReference, result);
     EngineScriptExecution scriptExecution = null;
     if (lock!=null) {
       try {
@@ -93,7 +93,7 @@ public class LocalScriptRunner implements ScriptRunner {
           throw new EngineException("ScriptVersion execution "+scriptExecutionId+" doesn't exist");
         }
 
-        endActivity(scriptExecution, continuationReference, result);
+        endFunction(scriptExecution, continuationReference, result);
         releaseLock(lock, scriptExecution);
       } catch(Throwable e) {
         log.debug("Exception while executing script: "+e.getMessage(), e);;
@@ -105,20 +105,20 @@ public class LocalScriptRunner implements ScriptRunner {
   }
 
   @Override
-  public void endActivity(EngineScriptExecution lockedScriptExecution, ContinuationReference continuationReference, Object result) {
+  public void endFunction(EngineScriptExecution lockedScriptExecution, ContinuationReference continuationReference, Object result) {
     String executionId = continuationReference.getExecutionId();
     ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) lockedScriptExecution
         .findExecutionRecursive(executionId);
     EngineException.throwIfNull(execution, "Execution %s not found in script execution %s", executionId, lockedScriptExecution.getId());
-    execution.endActivity(result);
+    execution.endFunction(result);
     lockedScriptExecution.doWork();
   }
 
-  private synchronized Lock acquireLockOrAddEndActivityRequestToBacklog(ContinuationReference continuationReference, Object result) {
+  private synchronized Lock acquireLockOrFunctionEndRequestToBacklog(ContinuationReference continuationReference, Object result) {
     Lock lock = acquireLock(continuationReference.getScriptExecutionId());
     if (lock==null) {
       // TODO consider a timer to check that the listening didn't mismatch with releasing the lock
-      addToActivityEndBacklog(new ServiceFunctionEndRequest(continuationReference, result));
+      addToEndBacklog(new ServiceFunctionEndRequest(continuationReference, result));
     }
     return lock;
   }
@@ -136,7 +136,7 @@ public class LocalScriptRunner implements ScriptRunner {
   public synchronized void releaseLock(Lock lock, EngineScriptExecution lockedScriptExecution) {
     EngineException.throwIfNull(lock, "Bug: lock is not supposed to be null");
     String scriptExecutionId = lock.getScriptExecutionId();
-    ServiceFunctionEndRequest nextServiceFunctionEndRequest = removeNextActivityEndRequest(scriptExecutionId);
+    ServiceFunctionEndRequest nextServiceFunctionEndRequest = removeNextFunctionEndRequest(scriptExecutionId);
     if (nextServiceFunctionEndRequest!=null) {
       engine
           .getExecutor()
@@ -147,25 +147,25 @@ public class LocalScriptRunner implements ScriptRunner {
     }
   }
 
-  private ServiceFunctionEndRequest removeNextActivityEndRequest(String scriptExecutionId) {
+  private ServiceFunctionEndRequest removeNextFunctionEndRequest(String scriptExecutionId) {
     ServiceFunctionEndRequest nextServiceFunctionEndRequest = null;
-        List<ServiceFunctionEndRequest> serviceFunctionEndRequests = activityEndBacklog
+        List<ServiceFunctionEndRequest> serviceFunctionEndRequests = endBacklog
       .get(scriptExecutionId);
     if (serviceFunctionEndRequests!=null && !serviceFunctionEndRequests.isEmpty()) {
       nextServiceFunctionEndRequest = serviceFunctionEndRequests.remove(0);
       if (serviceFunctionEndRequests.isEmpty()) {
-        activityEndBacklog.remove(scriptExecutionId);
+        endBacklog.remove(scriptExecutionId);
       }
     }
     return nextServiceFunctionEndRequest;
   }
 
-  public synchronized void addToActivityEndBacklog(ServiceFunctionEndRequest serviceFunctionEndRequest) {
+  public synchronized void addToEndBacklog(ServiceFunctionEndRequest serviceFunctionEndRequest) {
     String scriptExecutionId = serviceFunctionEndRequest.getContinuationReference().getScriptExecutionId();
-    List<ServiceFunctionEndRequest> scriptExecutionLockListeners = activityEndBacklog.get(scriptExecutionId);
+    List<ServiceFunctionEndRequest> scriptExecutionLockListeners = endBacklog.get(scriptExecutionId);
     if (scriptExecutionLockListeners==null) {
       scriptExecutionLockListeners = new ArrayList<>();
-      activityEndBacklog.put(scriptExecutionId, scriptExecutionLockListeners);
+      endBacklog.put(scriptExecutionId, scriptExecutionLockListeners);
     }
     scriptExecutionLockListeners.add(serviceFunctionEndRequest);
   }

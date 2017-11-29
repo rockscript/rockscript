@@ -16,7 +16,7 @@
 package io.rockscript.engine.impl;
 
 /** A pointer to a position in the script execution
- * where it is waiting for an activity to complete.  */
+ * where it is waiting for a service function to complete.  */
 public class ContinuationReference {
 
   String scriptExecutionId;

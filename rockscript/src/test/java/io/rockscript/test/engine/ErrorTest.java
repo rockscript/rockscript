@@ -40,7 +40,7 @@ public class ErrorTest extends AbstractEngineTest {
   }
 
   @Test
-  public void testAsynchronousActivity() {
+  public void testAsynchronousServiceFunctino() {
     engine.getImportResolver().createImport("problematicService")
       .put("buzzz", input -> {
         throw new RuntimeException("buzzz");

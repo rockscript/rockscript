@@ -23,7 +23,7 @@ import com.google.gson.Gson;
 import io.rockscript.Engine;
 import io.rockscript.TestEngine;
 import io.rockscript.api.commands.DeployScriptVersionCommand;
-import io.rockscript.api.commands.EndActivityCommand;
+import io.rockscript.api.commands.EndServiceFunctionCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
@@ -130,12 +130,12 @@ public class AbstractEngineTest {
         .getScriptExecution();
   }
 
-  public ScriptExecution endActivity(ContinuationReference continuationReference) {
-    return endActivity(continuationReference, null);
+  public ScriptExecution endFunction(ContinuationReference continuationReference) {
+    return endFunction(continuationReference, null);
   }
 
-  public ScriptExecution endActivity(ContinuationReference continuationReference, Object result) {
-    return new EndActivityCommand()
+  public ScriptExecution endFunction(ContinuationReference continuationReference, Object result) {
+    return new EndServiceFunctionCommand()
         .continuationReference(continuationReference)
         .result(result)
         .execute(engine)
