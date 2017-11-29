@@ -55,3 +55,12 @@ can be invoked in the script like a normal function.
 
 A *service object*, like eg `http` and `approvalService` in the example above, is 
 the script object that exposes the service functions in the script.
+
+## Thanks
+
+Thanks to [GitHub](https://github.com) for hosting the code, community and website.
+
+Thanks to JetBrains for their support to open source and the 
+free [Intellij IDEA Ultimate](https://www.jetbrains.com/idea/) license.
+
+Thanks to [Travis CI](https://travis-ci.org/) for their continuous integration
