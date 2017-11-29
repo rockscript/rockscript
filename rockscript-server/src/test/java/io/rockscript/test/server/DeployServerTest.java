@@ -19,9 +19,9 @@
  */
 package io.rockscript.test.server;
 
-import io.rockscript.api.commands.SaveScriptVersionCommand;
-import io.rockscript.api.commands.SaveScriptVersionResponse;
+import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.model.ParseError;
+import io.rockscript.api.model.ScriptVersion;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +36,11 @@ public class DeployServerTest extends AbstractServerTest {
 
   @Test
   public void testDeployOk() {
-    SaveScriptVersionResponse saveScriptVersionResponse = newPost("/command")
-      .bodyJson(new SaveScriptVersionCommand()
+    ScriptVersion saveScriptVersionResponse = newPost("/command")
+      .bodyJson(new DeployScriptVersionCommand()
           .scriptName("Test script")
-          .scriptText("var a=0;")
-          .activate())
-      .execute(SaveScriptVersionResponse.class)
+          .scriptText("var a=0;"))
+      .execute(ScriptVersion.class)
       .assertStatusOk()
       .getBody();
 
@@ -53,11 +52,10 @@ public class DeployServerTest extends AbstractServerTest {
 
   @Test
   public void testDeploySyntaxError() {
-    SaveScriptVersionResponse saveScriptVersionResponse = newPost("/command")
-      .bodyJson(new SaveScriptVersionCommand()
-        .scriptText("\n\ninvalid script")
-        .activate())
-      .execute(SaveScriptVersionResponse.class)
+    ScriptVersion saveScriptVersionResponse = newPost("/command")
+      .bodyJson(new DeployScriptVersionCommand()
+        .scriptText("\n\ninvalid script"))
+      .execute(ScriptVersion.class)
       .assertStatusOk()
       .getBody();
 
@@ -71,11 +69,10 @@ public class DeployServerTest extends AbstractServerTest {
 
   @Test
   public void testDeployParseError() {
-    SaveScriptVersionResponse saveScriptVersionResponse = newPost("/command")
-      .bodyJson(new SaveScriptVersionCommand()
-        .scriptText("\n\nvar a = new Object();")
-        .activate())
-      .execute(SaveScriptVersionResponse.class)
+    ScriptVersion saveScriptVersionResponse = newPost("/command")
+      .bodyJson(new DeployScriptVersionCommand()
+        .scriptText("\n\nvar a = new Object();"))
+      .execute(ScriptVersion.class)
       .assertStatusOk()
       .getBody();
 

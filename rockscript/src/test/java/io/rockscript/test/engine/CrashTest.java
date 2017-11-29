@@ -24,7 +24,7 @@ import io.rockscript.TestEngine;
 import io.rockscript.activity.ActivityOutput;
 import io.rockscript.api.commands.RecoverExecutionsCommand;
 import io.rockscript.api.commands.RecoverExecutionsResponse;
-import io.rockscript.api.commands.SaveScriptVersionCommand;
+import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.engine.impl.Event;
@@ -132,9 +132,8 @@ public class CrashTest extends AbstractEngineTest {
     CrashEngine crashEngine = createCrashEngine();
     CrashEventListener eventListener = (CrashEventListener) crashEngine.getEventListener();
 
-    String scriptId = new SaveScriptVersionCommand()
+    String scriptId = new DeployScriptVersionCommand()
         .scriptText(scriptText)
-        .activate()
         .execute(crashEngine)
         .getId();
 
@@ -171,9 +170,8 @@ public class CrashTest extends AbstractEngineTest {
   }
 
   private ScriptExecution createExpectedScriptExecutionState(String scriptText) {
-    String scriptVersionId = new SaveScriptVersionCommand()
+    String scriptVersionId = new DeployScriptVersionCommand()
         .scriptText(scriptText)
-        .activate()
         .execute(engine)
         .getId();
     return new StartScriptExecutionCommand()

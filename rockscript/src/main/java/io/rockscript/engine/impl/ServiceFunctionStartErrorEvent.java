@@ -2,16 +2,16 @@ package io.rockscript.engine.impl;
 
 import java.time.Instant;
 
-public class ActivityStartErrorEvent extends ScriptExecutionErrorEvent<ArgumentsExpressionExecution> {
+public class ServiceFunctionStartErrorEvent extends ScriptExecutionErrorEvent<ArgumentsExpressionExecution> {
 
   Instant retryTime;
 
   /** constructor for gson deserialization
    * */
-  ActivityStartErrorEvent() {
+  ServiceFunctionStartErrorEvent() {
   }
 
-  public ActivityStartErrorEvent(ArgumentsExpressionExecution execution, String error, Instant retryTime) {
+  public ServiceFunctionStartErrorEvent(ArgumentsExpressionExecution execution, String error, Instant retryTime) {
     super(execution, error);
     this.retryTime = retryTime;
   }

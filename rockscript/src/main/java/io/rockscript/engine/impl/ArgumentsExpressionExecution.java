@@ -76,7 +76,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   }
 
   private void startActivity() {
-    dispatchAndExecute(new ActivityStartedEvent(this));
+    dispatchAndExecute(new ServiceFunctionStartedEvent(this));
   }
 
   public void startActivityExecute() {
@@ -99,7 +99,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
           handleActivityError(errorMessage, scriptExecution, retryPolicy);
 
         } else {
-          dispatch(new ActivityWaitingEvent(this));
+          dispatch(new ServiceFunctionWaitingEvent(this));
         }
       }
     }
@@ -108,7 +108,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   private void handleActivityError(String errorMessage, EngineScriptExecution scriptExecution, RetryPolicy retryPolicy) {
     TemporalAmount retryDelay = retryPolicy!=null ? retryPolicy.get(failedAttemptsCount) : null;
     Instant retryTime = retryDelay!=null ? Instant.now().plus(retryDelay) : null;
-    scriptExecution.errorEvent = new ActivityStartErrorEvent(this, errorMessage, retryTime);
+    scriptExecution.errorEvent = new ServiceFunctionStartErrorEvent(this, errorMessage, retryTime);
     dispatchAndExecute(scriptExecution.errorEvent);
     if (retryTime!=null) {
       getConfiguration().getJobService().schedule(
@@ -120,11 +120,11 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   }
 
   public void endActivity(Object result) {
-    dispatchAndExecute(new ActivityEndedEvent(this, result));
+    dispatchAndExecute(new ServiceFunctionEndedEvent(this, result));
     // Continues at this.endActivityExecute()
   }
 
-  // Continuation from endActivity -> ActivityEndedEvent
+  // Continuation from endActivity -> ServiceFunctionEndedEvent
   void endActivityExecute(Object result) {
     setResult(result);
     ended = true;

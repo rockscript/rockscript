@@ -17,15 +17,15 @@ package io.rockscript.engine.impl;
 
 import io.rockscript.util.Exceptions;
 
-public class ActivityEndRequestRunnable implements Runnable {
+public class ServiceFunctionEndRequestRunnable implements Runnable {
 
-  ActivityEndRequest activityEndRequest;
+  ServiceFunctionEndRequest serviceFunctionEndRequest;
   Lock lock;
   EngineScriptExecution lockedScriptExecution;
   LocalScriptRunner localEngine;
 
-  public ActivityEndRequestRunnable(ActivityEndRequest activityEndRequest, Lock lock, EngineScriptExecution lockedScriptExecution, LocalScriptRunner localEngine) {
-    this.activityEndRequest = activityEndRequest;
+  public ServiceFunctionEndRequestRunnable(ServiceFunctionEndRequest serviceFunctionEndRequest, Lock lock, EngineScriptExecution lockedScriptExecution, LocalScriptRunner localEngine) {
+    this.serviceFunctionEndRequest = serviceFunctionEndRequest;
     this.lock = lock;
     this.lockedScriptExecution = lockedScriptExecution;
     this.localEngine = localEngine;
@@ -37,8 +37,8 @@ public class ActivityEndRequestRunnable implements Runnable {
     try {
       localEngine.endActivity(
           lockedScriptExecution,
-          activityEndRequest.getContinuationReference(),
-          activityEndRequest.getResult());
+          serviceFunctionEndRequest.getContinuationReference(),
+          serviceFunctionEndRequest.getResult());
       localEngine.releaseLock(lock, lockedScriptExecution);
     } catch(Throwable e) {
       lockedScriptExecution.dispatch(new ScriptExecutionErrorEvent(lockedScriptExecution, Exceptions.getStackTraceString(e)));

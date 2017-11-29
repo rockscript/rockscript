@@ -23,18 +23,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ActivityStartedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
+public class ServiceFunctionStartedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
 
   String serviceName;
   String activityName;
   Object args;
 
   /** constructor for gson serialization */
-  ActivityStartedEvent() {
+  ServiceFunctionStartedEvent() {
   }
 
   @SuppressWarnings("unchecked")
-  public ActivityStartedEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
+  public ServiceFunctionStartedEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
     super(argumentsExpressionExecution);
     if (argumentsExpressionExecution.activity==null) {
       throw new EngineException("Activity doesn't exist: "+argumentsExpressionExecution.element.getText());

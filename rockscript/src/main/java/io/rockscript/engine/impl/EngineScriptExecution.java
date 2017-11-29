@@ -64,7 +64,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
       Execution execution = executableEvent.executionId!=null ? findExecutionRecursive(executableEvent.executionId) : this;
       log.info("Reexecuting event: "+executableEvent.toString());
 
-      if (executableEvent instanceof ActivityStartedEvent
+      if (executableEvent instanceof ServiceFunctionStartedEvent
           && !isNextUnreplayedEventActivityWaitOrActivityEnd()) {
         this.executionMode = ExecutionMode.RECOVERING;
       }
@@ -229,8 +229,8 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
 
   public boolean isNextUnreplayedEventActivityWaitOrActivityEnd() {
     ExecutionEvent nextExecutionEvent = !unreplayedEvents.isEmpty() ? unreplayedEvents.peek() : null;
-    return (nextExecutionEvent instanceof ActivityWaitingEvent
-            || nextExecutionEvent instanceof ActivityEndedEvent);
+    return (nextExecutionEvent instanceof ServiceFunctionWaitingEvent
+            || nextExecutionEvent instanceof ServiceFunctionEndedEvent);
   }
 
   public ScriptExecutionErrorEvent getErrorEvent() {

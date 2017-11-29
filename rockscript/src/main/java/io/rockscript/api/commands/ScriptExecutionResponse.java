@@ -16,8 +16,12 @@
 package io.rockscript.api.commands;
 
 import io.rockscript.api.model.ScriptExecution;
+import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.EngineScriptExecution;
+import io.rockscript.engine.impl.ExecutionEvent;
 import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
+
+import java.util.List;
 
 public class ScriptExecutionResponse {
 

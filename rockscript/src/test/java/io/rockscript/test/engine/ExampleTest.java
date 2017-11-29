@@ -21,10 +21,10 @@ package io.rockscript.test.engine;
 
 import io.rockscript.activity.test.TestResult;
 import io.rockscript.activity.test.TestResults;
-import io.rockscript.api.commands.SaveScriptVersionCommand;
-import io.rockscript.api.commands.SaveScriptVersionResponse;
+import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.RunTestsCommand;
 import io.rockscript.api.model.ScriptExecution;
+import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.util.Io;
 import org.junit.Ignore;
@@ -36,9 +36,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 @Ignore // Because requires internet access
 public class ExampleTest extends AbstractEngineTest {
@@ -79,13 +77,12 @@ public class ExampleTest extends AbstractEngineTest {
     assertEquals(2, testResults.get(0).getErrors().size());
   }
 
-  private SaveScriptVersionResponse deployScriptResource(String fileName) throws FileNotFoundException {
+  private ScriptVersion deployScriptResource(String fileName) throws FileNotFoundException {
     File file = new File(fileName);
     String scriptText = Io.toString(new FileInputStream(file));
-    return new SaveScriptVersionCommand()
+    return new DeployScriptVersionCommand()
         .scriptName(fileName)
         .scriptText(scriptText)
-        .activate()
         .execute(engine)
         .throwIfErrors();
   }

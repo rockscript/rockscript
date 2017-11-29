@@ -22,9 +22,9 @@ package io.rockscript.test.engine;
 import io.rockscript.activity.test.TestError;
 import io.rockscript.activity.test.TestResult;
 import io.rockscript.activity.test.TestResults;
+import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.RunTestsCommand;
-import io.rockscript.api.commands.SaveScriptVersionCommand;
-import io.rockscript.engine.impl.ActivityStartErrorEvent;
+import io.rockscript.engine.impl.ServiceFunctionStartErrorEvent;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
 import io.rockscript.http.servlet.PathRequestHandler;
@@ -64,17 +64,16 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
 
   @Test
   public void testTestRunnerAssertionFailure() {
-    new SaveScriptVersionCommand()
+    new DeployScriptVersionCommand()
         .scriptName("The ScriptVersion.rs")
         .scriptText(
           "var http = system.import('rockscript.io/http'); \n" +
           "var country = http \n" +
           "  .get({url: 'http://localhost:4000/ole'}) \n" +
           "  .body.country;")
-        .activate()
         .execute(engine);
 
-    String testScriptId = new SaveScriptVersionCommand()
+    String testScriptId = new DeployScriptVersionCommand()
         .scriptName("The ScriptVersion Test.rst")
         .scriptText(
           "var test = system.import('rockscript.io/test'); \n" +
@@ -82,7 +81,6 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
           "  script: 'The ScriptVersion.rs', \n" +
           "  skipActivities: true}); \n" +
           "test.assertEquals(scriptExecution.variables.country, 'The Netherlands');")
-        .activate()
         .execute(engine)
         .getId();
 
@@ -99,7 +97,7 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
     testResult.getErrors().forEach(e->log.debug(e.toString()));
 
     List<Event> testEvents = testResult.getEvents();
-    ActivityStartErrorEvent errorEvent = (ActivityStartErrorEvent) testEvents.get(testEvents.size() - 1);
+    ServiceFunctionStartErrorEvent errorEvent = (ServiceFunctionStartErrorEvent) testEvents.get(testEvents.size() - 1);
 
     Assert.assertContains("Expected The Netherlands, but was Belgium", errorEvent.getError());
     assertNull(errorEvent.getRetryTime()); // because there's no point in retrying assertion errors
@@ -112,16 +110,15 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
 
   @Test
   public void testTestRunnerScriptFailure() {
-    String targetScriptId = new SaveScriptVersionCommand()
+    String targetScriptId = new DeployScriptVersionCommand()
         .scriptName("The ScriptVersion.rs")
         .scriptText(
           /* 1 */ "var http = system.import('rockscript.io/http'); \n" +
           /* 2 */ "unexistingvar.unexistingmethod();")
-        .activate()
         .execute(engine)
         .getId();
 
-    String testScriptId = new SaveScriptVersionCommand()
+    String testScriptId = new DeployScriptVersionCommand()
         .scriptName("The ScriptVersion Test.rst")
         .scriptText(
           /* 1 */ "var test = system.import('rockscript.io/test'); \n" +
@@ -129,7 +126,6 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
           /* 3 */ "var scriptExecution = test.start({ \n" +
           /* 4 */ "  script: 'The ScriptVersion.rs', \n" +
           /* 5 */ "  skipActivities: true}); ")
-        .activate()
         .execute(engine)
         .getId();
 
@@ -151,7 +147,7 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
     Assert.assertContains(targetScriptId, targetScriptErrorEvent.getScriptId());
     assertNotNull(targetScriptErrorEvent.getLine());
 
-    ActivityStartErrorEvent testScriptErrorEvent = (ActivityStartErrorEvent) testEvents.get(testEvents.size() - 1);
+    ServiceFunctionStartErrorEvent testScriptErrorEvent = (ServiceFunctionStartErrorEvent) testEvents.get(testEvents.size() - 1);
     Assert.assertContains("ScriptVersion start failed: ReferenceError: unexistingvar is not defined", testScriptErrorEvent.getError());
     Assert.assertContains(testScriptId, testScriptErrorEvent.getScriptId());
     assertNotNull(testScriptErrorEvent.getLine());

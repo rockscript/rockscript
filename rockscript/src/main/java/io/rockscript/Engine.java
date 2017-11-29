@@ -33,11 +33,8 @@ import io.rockscript.activity.ImportResolver;
 import io.rockscript.activity.http.HttpImportProvider;
 import io.rockscript.api.Command;
 import io.rockscript.api.Query;
-import io.rockscript.api.commands.EndActivityCommand;
-import io.rockscript.api.commands.RunTestsCommand;
-import io.rockscript.api.commands.SaveScriptVersionCommand;
-import io.rockscript.api.commands.StartScriptExecutionCommand;
-import io.rockscript.api.queries.EventsQuery;
+import io.rockscript.api.commands.*;
+import io.rockscript.api.queries.ScriptExecutionQuery;
 import io.rockscript.engine.ActivitySerializer;
 import io.rockscript.engine.EngineException;
 import io.rockscript.engine.ImportObjectSerializer;
@@ -95,10 +92,11 @@ public abstract class Engine {
     importProvider(new HttpImportProvider());
 
     this.queryTypes = new HashMap<>();
-    queryType(new EventsQuery());
+    queryType(new ScriptExecutionQuery());
 
     this.commandTypes = new HashMap<>();
     commandType(new SaveScriptVersionCommand());
+    commandType(new DeployScriptVersionCommand());
     commandType(new StartScriptExecutionCommand());
     commandType(new EndActivityCommand());
     commandType(new RunTestsCommand());
@@ -158,16 +156,16 @@ public abstract class Engine {
 
   protected static PolymorphicTypeAdapterFactory createEventJsonTypeAdapterFactory() {
     return new PolymorphicTypeAdapterFactory()
-      .typeName(new TypeToken<Event>(){},                     "event") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
-      .typeName(new TypeToken<ExecutionEvent>(){},            "executionEvent") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
-      .typeName(new TypeToken<ActivityEndedEvent>(){},        "activityEnd")
-      .typeName(new TypeToken<ActivityStartedEvent>(){},      "activityStarted")
-      .typeName(new TypeToken<ActivityWaitingEvent>(){},      "activityWaiting")
-      .typeName(new TypeToken<ScriptEndedEvent>(){},          "scriptEnded")
-      .typeName(new TypeToken<ScriptStartedEvent>(){},        "scriptStarted")
-      .typeName(new TypeToken<VariableCreatedEvent>(){},      "variableCreated")
-      .typeName(new TypeToken<ActivityStartErrorEvent>(){},   "activityError")
-      .typeName(new TypeToken<ScriptExecutionErrorEvent>(){}, "scriptExecutionError")
+      .typeName(new TypeToken<Event>(){},                      "event") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
+      .typeName(new TypeToken<ExecutionEvent>(){},             "executionEvent") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
+      .typeName(new TypeToken<ServiceFunctionEndedEvent>(){},  "serviceFunctionEnd")
+      .typeName(new TypeToken<ServiceFunctionStartedEvent>(){},"serviceFunctionStarted")
+      .typeName(new TypeToken<ServiceFunctionWaitingEvent>(){},"serviceFunctionWaiting")
+      .typeName(new TypeToken<ScriptEndedEvent>(){},           "scriptEnded")
+      .typeName(new TypeToken<ScriptStartedEvent>(){},         "scriptStarted")
+      .typeName(new TypeToken<VariableCreatedEvent>(){},       "variableCreated")
+      .typeName(new TypeToken<ServiceFunctionStartErrorEvent>(){}, "serviceFunctionError")
+      .typeName(new TypeToken<ScriptExecutionErrorEvent>(){},  "scriptExecutionError")
       ;
   }
 

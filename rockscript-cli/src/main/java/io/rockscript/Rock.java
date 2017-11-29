@@ -75,8 +75,6 @@ public abstract class Rock {
     log("rock end [end options]       | Ends a waiting service function invocation");
     log("rock test [test options]     | Runs tests");
     log("rock                         | Shows this help message");
-    log();
-    log("More details at https://rockscript.io/docs");
   }
 
   protected static void log() {

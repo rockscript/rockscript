@@ -22,8 +22,8 @@ package io.rockscript.test.engine;
 import com.google.gson.Gson;
 import io.rockscript.Engine;
 import io.rockscript.TestEngine;
+import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.EndActivityCommand;
-import io.rockscript.api.commands.SaveScriptVersionCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
@@ -104,9 +104,8 @@ public class AbstractEngineTest {
   }
 
   public ScriptVersion deployScript(String scriptText) {
-    return new SaveScriptVersionCommand()
+    return new DeployScriptVersionCommand()
         .scriptText(scriptText)
-        .activate()
         .execute(engine)
         .throwIfErrors();
   }

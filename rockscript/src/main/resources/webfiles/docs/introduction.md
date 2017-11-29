@@ -44,24 +44,14 @@ The *RockScript server* is the server that manages scripts and script executions
 
 ![RockScript Overview](img/overview.png)
 
-A *script* on the server has multiple *script version*s of one can be the active 
-script version.  The *active script version* is the version that is used when a 
-script is started.  A script is identified by its name.
+A *script* on the server can be identified by its name and has multiple *script version*s. 
 
-*Deploying* a script means saving a script version (with the <a onclick="show('save-script')">saveScript</a>)
-command with `activate:true` so that this new version becomes will be used for 
-subsequent script executions.
-
-A *script execution* is one execution of a script version.  
-
-Scripts and script executions are sufficient to <a onclick="show('getting-started')">get started</a>
-and <a onclick="show('tutorial')">get your first script running</a> using the built-in 
-services. Read on if you want to know the terminology to make your own services 
-available as functions in RockScript.   
+*Deploying* a script means saving the script on the server so that script executions 
+can be started for that script.  A *script execution* is one execution of a script version.  
 
 A *service* makes external API, system, service or functionality available as functions 
 in the RockScript engine. A *service function* is a single RCP style operation that 
 can be invoked in the script like a normal function.
 
 A *service object*, like eg `http` and `approvalService` in the example above, is 
-the script object that exposes the service functions to the script.
+the script object that exposes the service functions in the script.

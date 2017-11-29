@@ -19,6 +19,7 @@
  */
 package io.rockscript.test.engine;
 
+import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.SaveScriptVersionCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptVersion;
@@ -28,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class DeployTest extends AbstractEngineTest {
 
@@ -40,9 +42,10 @@ public class DeployTest extends AbstractEngineTest {
         .execute(engine)
         .throwIfErrors();
 
-    scriptVersion = new SaveScriptVersionCommand()
+    assertNull(scriptVersion.getActive());
+
+    scriptVersion = new DeployScriptVersionCommand()
         .scriptText("var a = 2;")
-        .activate()
         .execute(engine)
         .throwIfErrors();
 
@@ -52,6 +55,8 @@ public class DeployTest extends AbstractEngineTest {
         .scriptText("var a = 3;")
         .execute(engine)
         .throwIfErrors();
+
+    assertNull(scriptVersion.getActive());
 
     EngineScriptExecution scriptExecution = new StartScriptExecutionCommand()
       .scriptId(scriptVersion.getScriptId())

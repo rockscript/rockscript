@@ -54,12 +54,12 @@ public class Start extends ClientCommand {
       .desc("ScriptVersion name. The latest version of the script with the " +
             "given name will be started.  The name has to identify one " +
             "script by matching the last part so you don't have to type " +
-            "the full name. It's required to provide either sn or sid.")
+            "the full name. It's required to provide either n or sid.")
       .hasArg()
       .build());
     options.addOption(Option.builder("sid")
-      .desc("ScriptVersion id. This identifies the specific version of a script" +
-            "to start. It's required to provide either sn or sid.")
+      .desc("ScriptVersion id. This identifies the specific version of a script " +
+            "to start. It's required to provide either n or sid.")
       .hasArg()
       .build());
     options.addOption(Option.builder("p")

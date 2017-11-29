@@ -44,23 +44,22 @@ java -jar rockscript-cli/target/rockscript-cli.jar %*
 To get an overview of all the commands, just type `rock <Enter>` 
 
 ```
-> rock
+$ rock 
 Usage: rock [command] [command options]
 
 rock help [command]          | Shows help on a particular command
 rock ping [ping options]     | Test the connection with the server
 rock deploy [deploy options] | Deploy script files to the server
 rock start [start options]   | Starts a new script execution
-rock end [end options]       | Ends a waiting activity
+rock end [end options]       | Ends a waiting service function invocation
+rock test [test options]     | Runs tests
 rock                         | Shows this help message
-
-More details at https://github.com/rockscript/rockscript/wiki/RockScript-API
 ```
 
 To get help on a specific command, type `rock help <command>`  Eg
 
 ```
-> rock help deploy
+$ rock help deploy
 rock deploy : Deploys script files to the server
 
 usage: rock deploy [deploy options] [file or directory]

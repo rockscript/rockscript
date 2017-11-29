@@ -20,16 +20,17 @@
 package io.rockscript.test.server;
 
 import com.google.gson.reflect.TypeToken;
-import io.rockscript.api.commands.*;
-import io.rockscript.engine.impl.Event;
+import io.rockscript.api.commands.DeployScriptVersionCommand;
+import io.rockscript.api.commands.ScriptExecutionResponse;
+import io.rockscript.api.commands.StartScriptExecutionCommand;
+import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.api.queries.ScriptExecutionQuery;
 import io.rockscript.test.SimpleImportProvider;
 import org.junit.Test;
 
-import java.util.List;
-
 import static org.junit.Assert.assertTrue;
 
-public class ServerTest extends AbstractServerTest {
+public class ServerScenarioTest extends AbstractServerTest {
 
   @Override
   public void setUp() {
@@ -38,14 +39,14 @@ public class ServerTest extends AbstractServerTest {
   }
 
   @Test
-  public void testEvents() {
-    SaveScriptVersionResponse saveScriptVersionResponse = newPost("/command")
-      .bodyJson(new SaveScriptVersionCommand()
-        .scriptText("var simple = system.import('rockscript.io/simple'); \n" +
-                    "simple.wait();" +
-                    "var msg = {hello: 'world'};")
-        .activate())
-      .execute(SaveScriptVersionResponse.class)
+  public void testScenario() {
+    ScriptVersion saveScriptVersionResponse = newPost("/command")
+      .bodyJson(new DeployScriptVersionCommand()
+        .scriptText(
+          "var simple = system.import('rockscript.io/simple'); \n" +
+          "simple.wait();" +
+          "var msg = {hello: 'world'};"))
+      .execute(ScriptVersion.class)
       .assertStatusOk()
       .getBody();
 
@@ -59,11 +60,11 @@ public class ServerTest extends AbstractServerTest {
       .getBody();
 
     String scriptExecutionId = startScriptResponse.getScriptExecutionId();
-    List<Event> events = newGet("/query?q=events&scriptExecutionId="+scriptExecutionId)
-      .execute(new TypeToken<List<Event>>(){}.getType())
+    ScriptExecutionQuery.ScriptExecutionDetails scriptExecutionDetails = newGet("/query?q=execution&id=" + scriptExecutionId)
+      .execute(new TypeToken<ScriptExecutionQuery.ScriptExecutionDetails>(){}.getType())
       .assertStatusOk()
       .getBody();
 
-    assertTrue(events.size()>2);
+    assertTrue(scriptExecutionDetails.getEvents().size()>2);
   }
 }

@@ -16,15 +16,15 @@
 
 package io.rockscript.engine.impl;
 
-public class ActivityEndedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
+public class ServiceFunctionEndedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
 
   Object result;
 
   /** constructor for gson serialization */
-  ActivityEndedEvent() {
+  ServiceFunctionEndedEvent() {
   }
 
-  public ActivityEndedEvent(ArgumentsExpressionExecution argumentsExpressionExecution, Object result) {
+  public ServiceFunctionEndedEvent(ArgumentsExpressionExecution argumentsExpressionExecution, Object result) {
     super(argumentsExpressionExecution);
     this.result = result;
   }

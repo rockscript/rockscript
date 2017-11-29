@@ -19,9 +19,9 @@
  */
 package io.rockscript;
 
-import io.rockscript.api.commands.SaveScriptVersionCommand;
-import io.rockscript.api.commands.SaveScriptVersionResponse;
+import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.model.ParseError;
+import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.http.client.ClientRequest;
 import io.rockscript.http.client.ClientResponse;
 import io.rockscript.util.Io;
@@ -88,15 +88,10 @@ public class Deploy extends ClientCommand {
     if (file.isFile()) {
       deployFile(null, file);
     } else if (file.isDirectory()) {
-      String dirName = null;
-      try {
-        dirName = file.getCanonicalPath();
-      } catch (Exception e) {
-        dirName = file.toString();
-      }
-      log("Scanning directory " + dirName + (recursive?" recursive":" (not recursive)") + " for files matching " + namePattern);
+      String dirPath = getPath(file)+"/";
+      log("Scanning directory " + dirPath + (recursive?" recursive":" (not recursive)") + " for files matching " + namePattern);
       this.compiledNamePattern = Pattern.compile(namePattern);
-      scanDirectory(dirName, file);
+      scanDirectory(dirPath, file);
       if (deployCountSuccessful>0) {
         log(Integer.toString(deployCountSuccessful)+" scripts successful deployed");
       }
@@ -112,36 +107,44 @@ public class Deploy extends ClientCommand {
     }
   }
 
-  private void deployFile(String dirName, File file) {
-    log("Deploying " + file.getPath() + " to " + server + " ...");
+  private String getPath(File file) {
+    try {
+      return file.getCanonicalPath();
+    } catch (Exception e) {
+      return file.toString();
+    }
+  }
+
+  private void deployFile(String dirPath, File file) {
+    String scriptPath = getPath(file);
+    log("Deploying " + scriptPath + " to " + server + " ...");
     try {
       String scriptText = Io.toString(new FileInputStream(file));
+      String scriptName = scriptPath;
 
-      String scriptName = file.getPath();
-      if (dirName!=null && scriptName.startsWith(dirName)) {
-        scriptName = scriptName.substring(dirName.length());
+      if (dirPath!=null && scriptPath.startsWith(dirPath)) {
+        scriptName = scriptPath.substring(dirPath.length());
       }
 
       ClientRequest request = createHttp()
         .newPost(server + "/command")
         .headerContentTypeApplicationJson()
-        .bodyJson(new SaveScriptVersionCommand()
+        .bodyJson(new DeployScriptVersionCommand()
           .scriptName(scriptName)
           .scriptText(scriptText)
-          .activate()
         );
 
       log(request);
 
-      ClientResponse response = request.execute(SaveScriptVersionResponse.class);
+      ClientResponse response = request.execute(ScriptVersion.class);
 
       log(response);
 
-      SaveScriptVersionResponse saveScriptVersionResponse = response.getBody();
+      ScriptVersion scriptVersion = response.getBody();
 
-      if (saveScriptVersionResponse!=null && saveScriptVersionResponse.hasErrors()) {
+      if (scriptVersion!=null && scriptVersion.hasErrors()) {
         log("  Errors in readable form:");
-        for (ParseError parseError: saveScriptVersionResponse.getErrors()) {
+        for (ParseError parseError: scriptVersion.getErrors()) {
           log("  " + parseError);
         }
         deployCountFailed++;

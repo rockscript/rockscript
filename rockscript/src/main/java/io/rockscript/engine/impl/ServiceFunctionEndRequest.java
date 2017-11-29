@@ -15,12 +15,12 @@
  */
 package io.rockscript.engine.impl;
 
-public class ActivityEndRequest {
+public class ServiceFunctionEndRequest {
 
   ContinuationReference continuationReference;
   Object result;
 
-  public ActivityEndRequest(ContinuationReference continuationReference, Object result) {
+  public ServiceFunctionEndRequest(ContinuationReference continuationReference, Object result) {
     this.continuationReference = continuationReference;
     this.result = result;
   }

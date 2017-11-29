@@ -131,7 +131,7 @@ public class EventStore implements EventListener {
 
   private boolean isUnlocking(ExecutionEvent lastEvent) {
     return lastEvent!=null
-      && ( lastEvent instanceof ActivityWaitingEvent
+      && ( lastEvent instanceof ServiceFunctionWaitingEvent
            || lastEvent instanceof ScriptEndedEvent);
   }
 

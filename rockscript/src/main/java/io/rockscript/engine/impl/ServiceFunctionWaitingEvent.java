@@ -16,13 +16,13 @@
 
 package io.rockscript.engine.impl;
 
-public class ActivityWaitingEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
+public class ServiceFunctionWaitingEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
 
   /** constructor for gson serialization */
-  ActivityWaitingEvent() {
+  ServiceFunctionWaitingEvent() {
   }
 
-  public ActivityWaitingEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
+  public ServiceFunctionWaitingEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
     super(argumentsExpressionExecution);
   }
 
