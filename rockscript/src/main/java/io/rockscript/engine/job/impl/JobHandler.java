@@ -1,9 +1,9 @@
 package io.rockscript.engine.job.impl;
 
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 
 public interface JobHandler {
 
-  void execute(Configuration configuration);
+  void execute(Engine engine);
 
 }

@@ -13,13 +13,13 @@ app.get('/approvals', function (req, res) {
 });
 
 app.post('/approve', function (req, res) {
-  var activityInput = req.body;
+  var input = req.body;
   var approval = {
     id: shortid.generate(),
-    title: activityInput.args[0],
-    activityPosition: {
-      scriptExecutionId: activityInput.scriptExecutionId,
-      executionId: activityInput.executionId
+    title: input.args[0],
+    continuation: {
+      scriptExecutionId: input.scriptExecutionId,
+      executionId: input.executionId
     }
   }
   approvals.push(approval);
@@ -27,7 +27,7 @@ app.post('/approve', function (req, res) {
   console.log('New approval created with incoming request: ');
   console.log('  POST http://localhost:3000/approval');
   console.log('  Content-Type: application/json');
-  console.log('  '+JSON.stringify(activityInput, null, 2));
+  console.log('  '+JSON.stringify(input, null, 2));
 
   res.send({ ended: false });
 });
@@ -43,19 +43,19 @@ app.delete('/approvals/:approvalId', function (req, res) {
   });
   res.sendStatus(200);
 
-  var endActivityCommand = {
+  var endFunctionCommand = {
     endActivity: {
-      scriptExecutionId: approval.activityPosition.scriptExecutionId,
-      executionId: approval.activityPosition.executionId
+      scriptExecutionId: approval.continuation.scriptExecutionId,
+      executionId: approval.continuation.executionId
     }
   };
 
   console.log('Approval received and notifying rockscript server with outgoing request: ');
-  console.log('  POST http://localhost:3652/endActivity');
+  console.log('  POST http://localhost:3652/command');
   console.log('  Content-Type: application/json');
-  console.log('  '+JSON.stringify(endActivityCommand, null, 2));
+  console.log('  '+JSON.stringify(endFunctionCommand, null, 2));
 
-  var endActivityRequest = http.request({
+  var endFunctionRequest = http.request({
       method: 'POST',
       hostname: 'localhost',
       port: 3652,
@@ -71,11 +71,11 @@ app.delete('/approvals/:approvalId', function (req, res) {
       });
     }
   );
-  endActivityRequest.on('error', (e) => {
+  endFunctionRequest.on('error', (e) => {
     console.error(`Got error: ${e.message}`);
   });
-  endActivityRequest.write(JSON.stringify(endActivityCommand));
-  endActivityRequest.end();
+  endFunctionRequest.write(JSON.stringify(endFunctionCommand));
+  endFunctionRequest.end();
 
 });
 

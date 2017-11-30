@@ -15,14 +15,14 @@
  */
 package io.rockscript.engine.impl;
 
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 
 public class TestIdGenerator implements IdGenerator {
 
   int nextId = 1;
   String prefix;
 
-  public TestIdGenerator(Configuration configuration, String prefix) {
+  public TestIdGenerator(Engine engine, String prefix) {
     this.prefix = prefix;
   }
 

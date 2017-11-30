@@ -16,7 +16,7 @@
 
 package io.rockscript.engine.impl;
 
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.engine.EngineException;
 
 import java.util.ArrayList;
@@ -176,7 +176,7 @@ public abstract class Execution<T extends ScriptElement> {
     return variables;
   }
 
-  public Configuration getConfiguration() {
+  public Engine getConfiguration() {
     return getScriptExecution().getConfiguration();
   }
 }

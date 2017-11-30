@@ -15,12 +15,11 @@
  */
 package io.rockscript.api.commands;
 
-import io.rockscript.activity.test.*;
+import io.rockscript.Engine;
+import io.rockscript.service.test.*;
 import io.rockscript.api.Command;
-import io.rockscript.api.CommandExecutorService;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.engine.Configuration;
 import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.engine.impl.ScriptStore;
 import org.slf4j.Logger;
@@ -28,35 +27,41 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class RunTestsCommand extends Command<TestResults> {
+public class RunTestsCommand implements Command<TestResults> {
 
   transient static Logger log = LoggerFactory.getLogger(RunTestsCommand.class);
 
   protected String tests = ".*\\.rst";
 
   @Override
-  public TestResults execute(Configuration configuration) {
+  public String getType() {
+    return "runTests";
+  }
+
+  @Override
+  public TestResults execute(Engine engine) {
     TestResults testResults = new TestResults();
 
-    ScriptStore scriptStore = configuration.getScriptStore();
+    ScriptStore scriptStore = engine.getScriptStore();
     List<ScriptVersion> scriptVersions = scriptStore.findLatestScriptVersionsByNamePattern(tests);
     for (ScriptVersion scriptVersion: scriptVersions) {
-      TestResult testResult = runTest(configuration, scriptVersion);
+      TestResult testResult = runTest(engine, scriptVersion);
       testResults.add(testResult);
     }
     return testResults;
   }
 
-  private TestResult runTest(Configuration engineConfiguration, ScriptVersion scriptVersion) {
+  private TestResult runTest(Engine engineEngine, ScriptVersion scriptVersion) {
     TestResult testResult = new TestResult(scriptVersion.getName());
     TestImportObject testImportObject = new TestImportObject(testResult);
-    Configuration testConfiguration = new TestRunConfiguration(engineConfiguration, testImportObject, testResult);
-    CommandExecutorService testCommandExecutorService = testConfiguration.build();
-    testImportObject.setCommandExecutorService(testCommandExecutorService);
+    Engine testEngine = new TestRunEngine(engineEngine, testImportObject, testResult)
+      .start();
+    testImportObject.setEngine(testEngine);
     try {
       String scriptVersionId = scriptVersion.getId();
-      EngineStartScriptExecutionResponse response = testCommandExecutorService.execute(new StartScriptExecutionCommand()
-        .scriptVersionId(scriptVersionId));
+      ScriptExecutionResponse response = new StartScriptExecutionCommand()
+        .scriptVersionId(scriptVersionId)
+        .execute(testEngine);
       ScriptExecution scriptExecution = response.getScriptExecution();
       EngineScriptExecution engineScriptExecution = response.getEngineScriptExecution();
 

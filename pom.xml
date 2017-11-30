@@ -26,10 +26,11 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <modules>
-        <module>rockscript-gson-poly</module>
-        <module>rockscript-netty-router</module>
-        <module>rockscript-http-client</module>
+        <module>rockscript-gson</module>
+        <module>rockscript-http</module>
         <module>rockscript</module>
+        <module>rockscript-server</module>
+        <module>rockscript-cli</module>
     </modules>
 
     <dependencies>
@@ -58,15 +59,6 @@
 
     </dependencies>
 
-    <profiles>
-        <profile>
-            <id>izza</id>
-            <properties>
-                <skipTests>true</skipTests>
-            </properties>
-        </profile>
-    </profiles>
-
     <build>
         <plugins>
             <plugin>
@@ -77,7 +69,7 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
-                    <compilerArgument>-Xlint:unchecked</compilerArgument>
+                    <!--<compilerArgument>-Xlint:unchecked</compilerArgument>-->
                 </configuration>
             </plugin>
             <plugin>
@@ -98,5 +90,14 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+      <profile>
+        <id>izza</id>
+          <properties>
+              <property>skipTests</property>
+          </properties>
+      </profile>
+    </profiles>
 
 </project>

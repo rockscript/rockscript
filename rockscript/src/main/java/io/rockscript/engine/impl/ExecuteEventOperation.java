@@ -25,6 +25,7 @@ public class ExecuteEventOperation implements Operation {
     this.execution = execution;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void execute(EngineScriptExecution engineScriptExecution) {
     event.execute(execution);

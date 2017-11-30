@@ -15,12 +15,13 @@
  */
 package io.rockscript.api;
 
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 
 /** Abstract base class for all commands and queries.
  * All commands are serializable with Gson. */
-public abstract class Command<R extends Response> {
+public interface Command<R> {
 
-  public abstract R execute(Configuration configuration);
+  String getType();
 
+  R execute(Engine engine);
 }

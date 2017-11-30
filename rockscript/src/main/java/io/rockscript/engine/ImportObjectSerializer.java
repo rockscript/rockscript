@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import io.rockscript.activity.ImportObject;
+import io.rockscript.service.ImportObject;
 
 import java.lang.reflect.Type;
 

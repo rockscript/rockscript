@@ -16,7 +16,7 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +29,7 @@ public class EngineScript extends SourceElements {
   static Logger log = LoggerFactory.getLogger(EngineScript.class);
 
   ScriptVersion scriptVersion;
-  Configuration configuration;
+  Engine engine;
   List<ScriptElement> elements;
 
   public EngineScript(Integer index, Location location) {
@@ -41,12 +41,12 @@ public class EngineScript extends SourceElements {
     throw new RuntimeException("Use EngineScript.start(...) instead");
   }
 
-  public Configuration getConfiguration() {
-    return configuration;
+  public Engine getEngine() {
+    return engine;
   }
 
-  public void setConfiguration(Configuration configuration) {
-    this.configuration = configuration;
+  public void setEngine(Engine engine) {
+    this.engine = engine;
   }
 
   public ScriptElement findScriptElement(int executableIndex) {

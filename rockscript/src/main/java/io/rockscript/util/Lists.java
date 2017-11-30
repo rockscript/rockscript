@@ -21,6 +21,7 @@ import java.util.List;
 
 public class Lists {
 
+  @SafeVarargs
   public static <T> List<T> of(T... elements) {
     return Arrays.asList(elements);
   }

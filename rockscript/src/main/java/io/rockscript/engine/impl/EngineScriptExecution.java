@@ -15,7 +15,7 @@
  */
 package io.rockscript.engine.impl;
 
-import io.rockscript.engine.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.engine.EngineException;
 import io.rockscript.api.model.ScriptExecution;
 import org.slf4j.Logger;
@@ -41,15 +41,16 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
 
   LinkedList<ExecutionEvent> unreplayedEvents;
 
-  public EngineScriptExecution(String scriptExecutionId, Configuration configuration, EngineScript engineScript) {
+  public EngineScriptExecution(String scriptExecutionId, Engine engine, EngineScript engineScript) {
     super(scriptExecutionId, engineScript, null);
-    this.eventListener = configuration.getEventListener();
+    this.eventListener = engine.getEventListener();
     this.executionMode = ExecutionMode.EXECUTING;
-    initializeSystemVariable(configuration);
+    initializeSystemVariable(engine);
   }
 
-  public EngineScriptExecution(String scriptExecutionId, Configuration configuration, EngineScript engineScript, List<ExecutionEvent> storedEvents) {
-    this(scriptExecutionId, configuration, engineScript);
+  @SuppressWarnings("unchecked")
+  public EngineScriptExecution(String scriptExecutionId, Engine engine, EngineScript engineScript, List<ExecutionEvent> storedEvents) {
+    this(scriptExecutionId, engine, engineScript);
 
     this.executionMode = ExecutionMode.REBUILDING;
     this.unreplayedEvents = new LinkedList<>(storedEvents);
@@ -63,8 +64,8 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
       Execution execution = executableEvent.executionId!=null ? findExecutionRecursive(executableEvent.executionId) : this;
       log.info("Reexecuting event: "+executableEvent.toString());
 
-      if (executableEvent instanceof ActivityStartedEvent
-          && !isNextUnreplayedEventActivityWaitOrActivityEnd()) {
+      if (executableEvent instanceof ServiceFunctionStartedEvent
+          && !isNextUnreplayedOrWaitOrEnd()) {
         this.executionMode = ExecutionMode.RECOVERING;
       }
 
@@ -75,9 +76,9 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
     this.unreplayedEvents = null;
   }
 
-  private void initializeSystemVariable(Configuration configuration) {
+  private void initializeSystemVariable(Engine engine) {
     JsonObject systemJsonObject = new JsonObject();
-    systemJsonObject.put("import", new SystemImportActivity(configuration));
+    systemJsonObject.put("import", new SystemImportServiceFunction(engine));
     createVariable("system")
       .setValue(systemJsonObject);
   }
@@ -175,7 +176,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
   public void endFunctionInvocationExecution(String executionId, Object result) {
     ArgumentsExpressionExecution argumentsExpressionExecution = (ArgumentsExpressionExecution) findExecutionRecursive(executionId);
     EngineException.throwIfNull(argumentsExpressionExecution, "Couldn't find function invocation execution %s in engineScript execution %s", executionId, id);
-    argumentsExpressionExecution.endActivityExecute(result);
+    argumentsExpressionExecution.endFunctionExecute(result);
   }
 
   public EventListener getEventListener() {
@@ -226,10 +227,10 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
     return start;
   }
 
-  public boolean isNextUnreplayedEventActivityWaitOrActivityEnd() {
+  public boolean isNextUnreplayedOrWaitOrEnd() {
     ExecutionEvent nextExecutionEvent = !unreplayedEvents.isEmpty() ? unreplayedEvents.peek() : null;
-    return (nextExecutionEvent instanceof ActivityWaitingEvent
-            || nextExecutionEvent instanceof ActivityEndedEvent);
+    return (nextExecutionEvent instanceof ServiceFunctionWaitingEvent
+            || nextExecutionEvent instanceof ServiceFunctionEndedEvent);
   }
 
   public ScriptExecutionErrorEvent getErrorEvent() {

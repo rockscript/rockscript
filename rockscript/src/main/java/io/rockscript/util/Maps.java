@@ -34,14 +34,17 @@ public class Maps {
     }
   }
 
+  @SafeVarargs
   public static <K,V> HashMap<K,V> hashMap(Entry<K,V>... entries) {
     return buildMap(new HashMap<K,V>(), entries);
   }
 
+  @SafeVarargs
   public static <K,V> LinkedHashMap<K,V> linkedHashMap(Entry<K,V>... entries) {
     return buildMap(new LinkedHashMap<K,V>(), entries);
   }
 
+  @SafeVarargs
   static <K, V, M extends Map<K,V>> M buildMap(M map, Entry<K,V>... entries) {
     if (entries!=null) {
       for (Entry<K,V> entry: entries) {

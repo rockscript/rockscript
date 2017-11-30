@@ -1,0 +1,220 @@
+/*
+ * Copyright (c) 2017 RockScript.io.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+body {
+  font-family: "Open Sans";
+  letter-spacing: -.3px;
+  margin: 0;
+  height: 100%;
+}
+
+h1 {
+  font-size: 2em;
+  font-family: "Roboto Slab";
+  font-weight: 100;
+  color: black;
+  margin: 0 0 .4em 0;
+}
+h2 { font-size: 1.4em;  margin: .7em 0 .35em 0; color: #717171;}
+h3 { font-size: 1.3em;  margin: .6em 0 .25em 0; color: #717171;}
+h4 { font-size: 1.2em;  margin: .5em 0 .20em  0; color: #717171;}
+h5 { font-size: 1.15em; margin: .4em 0 .15em  0; color: #717171;}
+h6 { font-size: 1.10em; margin: .3em 0 .10em  0; color: #717171;}
+
+p {
+  margin-top: .2em;
+}
+
+i, cite, em, var, address, dfn {
+  color: #a5552d;
+  letter-spacing: .3px;
+}
+
+a:not([href]) {
+  cursor: pointer;
+}
+
+a, a:visited {
+  text-decoration: none;
+  color: #1a90bf;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+code {
+  font-weight: bold;
+  color: #666;
+  font-size: 1.2em;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+tr {
+  border: solid;
+  border-width: 1px 0;
+  border-color: #cacaca;
+}
+
+tr:first-child {
+  border-top: none;
+}
+
+tr:last-child {
+  border-bottom: none;
+}
+
+thead {
+  border-bottom: 1px solid #cacaca;
+}
+
+th {
+  white-space: nowrap;
+  text-align: left;
+  color: #777;
+}
+
+th, td {
+  padding: 7px 20px 7px 0px;
+  vertical-align: top;
+}
+
+.titlebar {
+  background-color: #1A7CB1 !important;
+  color: white;
+  padding: 21px;
+}
+
+.titlebar .brand {
+  font-family: "Roboto Slab";
+  font-weight: 100;
+  display: inline-block;
+  opacity: .7;
+  margin-right: 30px;
+  font-weight: 100;
+  letter-spacing: 0.4px;
+  font-size: 1.1em;
+}
+
+.titlebar .title {
+  font-size: 1.1em;
+  font-weight: normal;
+  display: inline-block;
+}
+
+.toc {
+  width: 100%;
+  padding: 20px 0 0 20px;
+  float: left;
+  line-height: 1.7em;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 800px) {
+  .toc {
+    width: 200px;
+    border-width: 0 1px 0 0;
+  }
+}
+
+.toc a {
+  display: block;
+  font-size: .95em;
+}
+
+.toc a:hover {
+  color: #275c7a;
+}
+
+.toc a.title {
+  font-size: 1.1em;
+  margin-top: 7px;
+  border: 0px solid #eee;
+  border-top-width: 1px;
+  padding-top: 10px;
+}
+
+.toc a.sublink {
+  padding-left: 15px;
+}
+
+.content {
+  padding: 20px;
+  width: calc(100% - 40px);
+  float: right;
+  border: solid 0 #ddd;
+  border-width: 1px 0 0 0;
+}
+
+@media (min-width: 800px) {
+  .content {
+    width: calc(100% - 272px);
+    border-width: 0 0 0 1px;
+    min-height: calc(100vh - 107px);
+  }
+}
+
+.content pre code {
+  background-color: #fffcf8;
+  border: 1px solid #ddd;
+  padding: 7px 10px 7px 10px;
+  display: block;
+  font-size: 1.1em;
+  font-weight: normal;
+  overflow-x: auto;
+}
+
+.hidden {
+  display: none;
+}
+
+.hljs-comment {
+  color: rgba(39, 107, 169, 0.8);
+}
+
+.hljs, .hljs-subst {
+  color: #a05216;
+}
+
+@font-face {
+  font-family: 'Roboto Slab';
+  font-style: normal;
+  font-weight: 100;
+  src: local('Roboto Slab Thin'), local('RobotoSlab-Thin'), url(../fonts/roboto-slab-100.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans Regular'), local('OpenSans-Regular'), url(../fonts/open-sans-400.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url(../fonts/open-sans-700.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}

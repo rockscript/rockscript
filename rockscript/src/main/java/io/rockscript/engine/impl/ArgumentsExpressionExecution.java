@@ -15,12 +15,12 @@
  */
 package io.rockscript.engine.impl;
 
-import io.rockscript.activity.Activity;
-import io.rockscript.activity.ActivityInput;
-import io.rockscript.activity.ActivityOutput;
-import io.rockscript.engine.ActivityContinuation;
+import io.rockscript.engine.ServiceFunctionContinuation;
+import io.rockscript.service.ServiceFunction;
+import io.rockscript.service.ServiceFunctionInput;
+import io.rockscript.service.ServiceFunctionOutput;
 import io.rockscript.engine.job.RetryPolicy;
-import io.rockscript.engine.job.impl.ActivityRetryAfterError;
+import io.rockscript.engine.job.impl.ServiceFunctionRetryAfterError;
 
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
@@ -28,7 +28,7 @@ import java.util.List;
 
 public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression> {
 
-  Activity activity = null;
+  ServiceFunction serviceFunction = null;
   List<Object> args = null;
   boolean ended = false;
   int failedAttemptsCount = 0;
@@ -55,13 +55,13 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
       startChild(piece);
     } else {
       Execution functionExpressionExecution = children.get(0);
-      this.activity = (Activity) functionExpressionExecution.getResult();
+      this.serviceFunction = (ServiceFunction) functionExpressionExecution.getResult();
       this.args = collectResultsFromChildren().subList(1, children.size());
 
-      if (activity instanceof SystemImportActivity) {
+      if (serviceFunction instanceof SystemImportServiceFunction) {
         invokeSystemImportFunction();
       } else {
-        startActivity();
+        startFunction();
       }
     }
   }
@@ -69,78 +69,78 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   private void invokeSystemImportFunction() {
     // import functions have to be re-executed when the events
     // are applied because they can return functions
-    ActivityOutput output = startActivityInvoke();
+    ServiceFunctionOutput output = startFunctionInvoke();
     Object importedObject = output.getResult();
     // dispatch(new ObjectImportedEvent(this, importedObject));
-    endActivityExecute(importedObject);
+    endFunctionExecute(importedObject);
   }
 
-  private void startActivity() {
-    dispatchAndExecute(new ActivityStartedEvent(this));
+  private void startFunction() {
+    dispatchAndExecute(new ServiceFunctionStartedEvent(this));
   }
 
-  public void startActivityExecute() {
+  public void startFunctionExecute() {
     EngineScriptExecution scriptExecution = getScriptExecution();
     ExecutionMode executionMode = scriptExecution.getExecutionMode();
     if (executionMode!=ExecutionMode.REBUILDING) {
-      ActivityOutput activityOutput = null;
+      ServiceFunctionOutput serviceFunctionOutput = null;
       try {
-        activityOutput = startActivityInvoke();
+        serviceFunctionOutput = startFunctionInvoke();
       } catch (Exception e) {
-        handleActivityError(e.getMessage(), scriptExecution, null);
+        handleServiceFunctionError(e.getMessage(), scriptExecution, null);
       }
-      if (activityOutput!=null) {
-        if (activityOutput.isEnded()) {
-          endActivity(activityOutput.getResult());
+      if (serviceFunctionOutput!=null) {
+        if (serviceFunctionOutput.isEnded()) {
+          endFunction(serviceFunctionOutput.getResult());
 
-        } else if (activityOutput.isError()) {
-          RetryPolicy retryPolicy = activityOutput.getRetryPolicy();
-          String errorMessage = activityOutput.getError();
-          handleActivityError(errorMessage, scriptExecution, retryPolicy);
+        } else if (serviceFunctionOutput.isError()) {
+          RetryPolicy retryPolicy = serviceFunctionOutput.getRetryPolicy();
+          String errorMessage = serviceFunctionOutput.getError();
+          handleServiceFunctionError(errorMessage, scriptExecution, retryPolicy);
 
         } else {
-          dispatch(new ActivityWaitingEvent(this));
+          dispatch(new ServiceFunctionWaitingEvent(this));
         }
       }
     }
   }
 
-  private void handleActivityError(String errorMessage, EngineScriptExecution scriptExecution, RetryPolicy retryPolicy) {
+  private void handleServiceFunctionError(String errorMessage, EngineScriptExecution scriptExecution, RetryPolicy retryPolicy) {
     TemporalAmount retryDelay = retryPolicy!=null ? retryPolicy.get(failedAttemptsCount) : null;
     Instant retryTime = retryDelay!=null ? Instant.now().plus(retryDelay) : null;
-    scriptExecution.errorEvent = new ActivityStartErrorEvent(this, errorMessage, retryTime);
+    scriptExecution.errorEvent = new ServiceFunctionStartErrorEvent(this, errorMessage, retryTime);
     dispatchAndExecute(scriptExecution.errorEvent);
     if (retryTime!=null) {
       getConfiguration().getJobService().schedule(
-        new ActivityRetryAfterError(this),
+        new ServiceFunctionRetryAfterError(this),
         retryTime,
         retryPolicy
       );
     }
   }
 
-  public void endActivity(Object result) {
-    dispatchAndExecute(new ActivityEndedEvent(this, result));
-    // Continues at this.endActivityExecute()
+  public void endFunction(Object result) {
+    dispatchAndExecute(new ServiceFunctionEndedEvent(this, result));
+    // Continues at this.endFunctionExecute()
   }
 
-  // Continuation from endActivity -> ActivityEndedEvent
-  void endActivityExecute(Object result) {
+  // Continuation from endFunction -> ServiceFunctionEndedEvent
+  void endFunctionExecute(Object result) {
     setResult(result);
     ended = true;
     end();
   }
 
-  public ActivityOutput startActivityInvoke() {
-    ActivityInput activityInput = new ActivityInput(this, args);
+  public ServiceFunctionOutput startFunctionInvoke() {
+    ServiceFunctionInput input = new ServiceFunctionInput(this, args);
     try {
-      return activity.invoke(activityInput);
+      return serviceFunction.invoke(input);
     } catch (Exception e) {
-      return ActivityOutput.error(e.getMessage());
+      return ServiceFunctionOutput.error(e.getMessage());
     }
   }
 
-  public ActivityContinuation getActivityContinuation() {
-    return !ended ? new ActivityContinuation(id, activity.toString(), args) : null;
+  public ServiceFunctionContinuation getServiceFunctionContinuation() {
+    return !ended ? new ServiceFunctionContinuation(id, serviceFunction.toString(), args) : null;
   }
 }
