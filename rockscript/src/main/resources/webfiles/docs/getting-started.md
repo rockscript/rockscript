@@ -1,15 +1,23 @@
 #### Prerequisites
 
 To run the server and the command line interface (CLI)
- * Java 8 SE JRE
+ * Java 8 SE JRE+
 
 To build RockScript
- * Java 8 JDK
- * Maven 3.3.9
+ * Java 8 JDK+
+ * Maven 3.3.9+
 
-### Build rockscript.jar 
+### Clone the rockscript repo
 
-Open a terminal in the root folder and run
+```
+git clone git@github.com:rockscript/rockscript.git
+```
+
+Will create a folder called `rockscript`. 
+
+### Build rockscript.jar and rockscript-cli.jar 
+
+Open a terminal in the `rockscript` root folder and run
 
 ```
 mvn -Pizza clean install
