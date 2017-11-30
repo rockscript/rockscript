@@ -17,10 +17,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.test.engine;
+package io.rockscript.test.engine.http;
 
 import io.rockscript.http.server.HttpServer;
 import io.rockscript.http.servlet.RouterServlet;
+import io.rockscript.test.engine.AbstractEngineTest;
 import org.junit.After;
 import org.junit.Before;
 
@@ -29,28 +30,28 @@ import org.junit.Before;
  * Configure the external web server by implementing {@link #configure(RouterServlet)} */
 public abstract class AbstractHttpTest extends AbstractEngineTest {
 
-  protected static final int PORT = 4000;
-  protected static HttpServer server;
-  protected RouterServlet routerServlet;
+  protected static final int SERVICE_PORT = 4000;
+  protected static HttpServer serviceServer;
+  protected RouterServlet serviceServlet;
 
   @Override
   @Before
   public void setUp() {
     super.setUp();
-    server = new HttpServer(PORT);
-    routerServlet = new RouterServlet();
-    routerServlet.setGson(engine.getGson());
-    configure(routerServlet);
-    server.servlet(routerServlet);
-    server.startup();
+    serviceServer = new HttpServer(SERVICE_PORT);
+    serviceServlet = new RouterServlet();
+    serviceServlet.setGson(engine.getGson());
+    configure(serviceServlet);
+    serviceServer.servlet(serviceServlet);
+    serviceServer.startup();
   }
 
   @After
   public void tearDown() {
-    server.shutdown();
+    serviceServer.shutdown();
     super.tearDown();
   }
 
-  protected abstract void configure(RouterServlet routerServlet);
+  protected abstract void configure(RouterServlet serviceServlet);
 
 }

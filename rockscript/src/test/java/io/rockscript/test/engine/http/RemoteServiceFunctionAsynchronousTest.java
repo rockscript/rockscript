@@ -17,7 +17,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.test.engine;
+package io.rockscript.test.engine.http;
 
 import io.rockscript.service.ServiceFunctionInput;
 import io.rockscript.api.model.ScriptExecution;
@@ -36,9 +36,9 @@ import java.util.List;
 import static io.rockscript.http.servlet.PathRequestHandler.POST;
 import static org.junit.Assert.assertTrue;
 
-public class AsynchronousServiceFunctionHttpTest extends AbstractHttpTest {
+public class RemoteServiceFunctionAsynchronousTest extends AbstractHttpTest {
 
-  protected static Logger log = LoggerFactory.getLogger(AsynchronousServiceFunctionHttpTest.class);
+  protected static Logger log = LoggerFactory.getLogger(RemoteServiceFunctionAsynchronousTest.class);
 
   List<ServiceFunctionInput> inputs = new ArrayList<>();
 
@@ -49,7 +49,7 @@ public class AsynchronousServiceFunctionHttpTest extends AbstractHttpTest {
 
   @Test
   public void testHttpRemoteServiceFunctionNoBodyResponse() {
-    routerServlet
+    serviceServlet
       .requestHandler(new PathRequestHandler(POST, "/approve") {
         @Override
         public void handle(ServerRequest request, ServerResponse response) {
@@ -63,7 +63,7 @@ public class AsynchronousServiceFunctionHttpTest extends AbstractHttpTest {
 
   @Test
   public void testHttpRemoteServiceFunctionFullBodyResponse() {
-    routerServlet
+    serviceServlet
       .requestHandler(new PathRequestHandler(POST, "/approve") {
         @Override
         public void handle(ServerRequest request, ServerResponse response) {
@@ -80,7 +80,7 @@ public class AsynchronousServiceFunctionHttpTest extends AbstractHttpTest {
 
   @Test
   public void testHttpRemoteServiceFunctionEmptyBodyResponse() {
-    routerServlet
+    serviceServlet
       .requestHandler(new PathRequestHandler(POST, "/approve") {
         @Override
         public void handle(ServerRequest request, ServerResponse response) {
@@ -97,8 +97,8 @@ public class AsynchronousServiceFunctionHttpTest extends AbstractHttpTest {
 
   private void executeApprovalScript() {
     ScriptVersion scriptVersion = deployScript(
-        "var approvals = system.import('localhost:"+PORT+"'); \n" +
-        "approvals.approve('oo',7); ");
+      "var approvals = system.import('localhost:" + SERVICE_PORT + "'); \n" +
+      "approvals.approve('oo',7); ");
 
     startScriptExecution(scriptVersion);
 

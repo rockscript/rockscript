@@ -17,7 +17,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.test.engine;
+package io.rockscript.test.engine.http;
 
 import io.rockscript.service.ServiceFunctionInput;
 import io.rockscript.service.ServiceFunctionOutput;
@@ -40,9 +40,9 @@ import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class SynchronousServiceFunctionHttpTest extends AbstractHttpTest {
+public class RemoteServiceFunctionSynchronousTest extends AbstractHttpTest {
 
-  protected static Logger log = LoggerFactory.getLogger(SynchronousServiceFunctionHttpTest.class);
+  protected static Logger log = LoggerFactory.getLogger(RemoteServiceFunctionSynchronousTest.class);
 
   List<ServiceFunctionInput> inputs = new ArrayList<>();
 
@@ -71,8 +71,8 @@ public class SynchronousServiceFunctionHttpTest extends AbstractHttpTest {
   @Test
   public void testRemoteServiceFunction() {
     ScriptVersion scriptVersion = deployScript(
-        "var approvals = system.import('localhost:"+PORT+"'); \n" +
-            "var currency = approvals.approve('oo',7).currency; ");
+      "var approvals = system.import('localhost:" + SERVICE_PORT + "'); \n" +
+      "var currency = approvals.approve('oo',7).currency; ");
 
     ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
 

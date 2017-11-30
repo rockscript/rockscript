@@ -17,7 +17,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.test.engine;
+package io.rockscript.test.engine.http;
 
 import io.rockscript.service.test.TestError;
 import io.rockscript.service.test.TestResult;
