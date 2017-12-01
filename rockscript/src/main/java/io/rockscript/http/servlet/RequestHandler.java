@@ -21,7 +21,7 @@ package io.rockscript.http.servlet;
 
 public interface RequestHandler {
 
-  String getLogBodyText(ServerRequest request);
+  String getBodyLogText(ServerRequest request);
 
   boolean matches(ServerRequest request);
 

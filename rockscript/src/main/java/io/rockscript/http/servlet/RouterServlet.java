@@ -53,16 +53,20 @@ public class RouterServlet extends HttpServlet {
       .findFirst();
     if (matchingRequestHandler.isPresent()) {
       RequestHandler requestHandler = matchingRequestHandler.get();
+      request.setRequestHandler(requestHandler);
       try {
-        if (log.isDebugEnabled()) log.debug(request.toString(requestHandler));
+        if (log.isDebugEnabled()) request.logTo(log);
         applyDefaultResponseHeaders(response);
         requestHandler.handle(request, response);
       } catch (HttpException e) {
         response.status(e.getStatusCode());
         response.bodyString("{\"message\":\"" + e.getMessage() + "\"}");
-        if (exceptionListener!=null) exceptionListener.exception(request, response, e);
+        if (exceptionListener!=null) {
+          exceptionListener.exception(request, response, e);
+        }
         if (log.isDebugEnabled()) log.debug(response.toString());
       } catch (Throwable e) {
+        log.debug("Problem by "+requestHandler.getClass().getSimpleName()+" for request "+request.getPathInfo(), e);
         response.statusInternalServerError();
         response.bodyString("{\"message\":\"See the server logs for more details\"}");
         if (exceptionListener!=null) exceptionListener.exception(request, response, e);
@@ -71,9 +75,7 @@ public class RouterServlet extends HttpServlet {
       log.debug("No handler found for "+request.getPathInfo());
       response.statusNotFound();
     }
-    if (log.isDebugEnabled()) {
-      log.debug(response.toString());
-    }
+    if (log.isDebugEnabled()) response.logTo(log);
   }
 
   public RouterServlet requestHandler(RequestHandler requestHandler) {

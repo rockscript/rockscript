@@ -48,7 +48,7 @@ public abstract class PathRequestHandler implements RequestHandler {
   }
 
   @Override
-  public String getLogBodyText(ServerRequest request) {
+  public String getBodyLogText(ServerRequest request) {
     return request.getBodyAsString();
   }
 }

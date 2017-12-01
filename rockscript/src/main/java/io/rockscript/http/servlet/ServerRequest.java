@@ -20,12 +20,16 @@
 package io.rockscript.http.servlet;
 
 import com.google.gson.Gson;
+import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.reflect.Type;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Scanner;
 
 public class ServerRequest {
 
@@ -34,6 +38,7 @@ public class ServerRequest {
   protected Map<String, String> pathParameters;
   protected String bodyString;
   protected boolean bodyIsReadAsString;
+  protected RequestHandler requestHandler;
 
   public ServerRequest(HttpServletRequest request) {
     this.request = request;
@@ -60,12 +65,24 @@ public class ServerRequest {
     return getBodyAsString(getCharset());
   }
 
+  public RequestHandler getRequestHandler() {
+    return requestHandler;
+  }
+
+  public void setRequestHandler(RequestHandler requestHandler) {
+    this.requestHandler = requestHandler;
+  }
+
   private String getCharset() {
     String charset = request.getCharacterEncoding();
     if (charset==null) {
       charset = "UTF-8";
     }
     return charset;
+  }
+
+  public String getHeader(String headerName) {
+    return request.getHeader(headerName);
   }
 
   /** value is read from the input stream the first time
@@ -127,46 +144,33 @@ public class ServerRequest {
     return request.getParameterMap();
   }
 
-  public String toString() {
-    return toString(null);
-  }
 
-  public String toString(RequestHandler requestHandler) {
-    String prefix = "  ";
-    return "\n> " + request.getMethod() + " " + request.getPathInfo() +
-           // getLogHeaders(prefix) +
-           getLogBody(requestHandler, prefix);
-  }
+  public void logTo(Logger log) {
+    // Log request url line
+    String queryString = request.getQueryString() != null ? "?"+request.getQueryString() : "";
+    log.debug("> " + request.getMethod() + " " + request.getRequestURI()+queryString);
 
-  private String getLogHeaders(String prefix) {
+    // Log headers
     if (request.getHeaderNames().hasMoreElements()) {
-      return "\n"+ Collections.list(request.getHeaderNames()).stream()
-        .map(headerName -> {
-          return Collections.list(request.getHeaders(headerName)).stream()
-            .map(headerValue -> {
-              return prefix + headerName + ": " + headerValue;
-            }).collect(Collectors.joining("\n"));
-        }).collect(Collectors.joining("\n"));
-    } else {
-      return "";
+      Collections.list(request.getHeaderNames()).stream()
+        .forEach(headerName -> {
+          Collections.list(request.getHeaders(headerName)).stream()
+            .forEach(headerValue -> {
+              log.debug("  " + headerName + ": " + headerValue);
+            });
+        });
     }
-  }
 
-  private String getLogBody(RequestHandler requestHandler, String prefix) {
-    String logBodyText = null;
-    if (requestHandler!=null) {
-      logBodyText = requestHandler.getLogBodyText(this);
-    } else {
-      logBodyText = getBodyAsString();
-    }
-    return getLogBody(prefix, logBodyText);
-  }
-
-  static String getLogBody(String prefix, String logBodyText) {
-    if (logBodyText!=null) {
-      return "\n"+prefix+logBodyText;
-    } else {
-      return "";
+    // Log body
+    if (bodyString!=null) {
+      String bodyText = null;
+      if (requestHandler!=null) {
+        bodyText = requestHandler.getBodyLogText(this);
+      } else {
+        bodyText = getBodyAsString();
+      }
+      BufferedReader reader = new BufferedReader(new StringReader(bodyText));
+      reader.lines().forEach(line->log.debug("  "+line));
     }
   }
 }

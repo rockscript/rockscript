@@ -52,7 +52,7 @@ public class FileHandler implements RequestHandler {
   }
 
   @Override
-  public String getLogBodyText(ServerRequest request) {
+  public String getBodyLogText(ServerRequest request) {
     return "...content of resource "+getResource(request)+"...";
   }
 

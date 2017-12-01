@@ -21,12 +21,14 @@ package io.rockscript.http.servlet;
 
 import com.google.gson.Gson;
 import io.rockscript.http.client.Http;
+import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.charset.Charset;
-import java.util.stream.Collectors;
 
 public class ServerResponse {
 
@@ -137,26 +139,25 @@ public class ServerResponse {
     return header(Http.Headers.CONTENT_TYPE, Http.ContentTypes.TEXT_HTML);
   }
 
-  public String toString() {
-    String prefix = "  ";
-    return "\n< " + logProtocol + " " + response.getStatus() + " " + Http.ResponseCodes.getText(response.getStatus()) +
-           // getLogHeaders(prefix) +
-           ServerRequest.getLogBody(prefix, logBody);
-  }
+  public void logTo(Logger log) {
+    // Log status line
+    log.debug("< "+logProtocol + " " + response.getStatus() + " " + Http.ResponseCodes.getText(response.getStatus()));
 
-  private String getLogHeaders(String prefix) {
+    // Log response headers
     if (response.getHeaderNames()!=null && !response.getHeaderNames().isEmpty()) {
-      return "\n" +
-        response.getHeaderNames().stream()
-          .map(headerName->{
-            return response.getHeaders(headerName).stream()
-              .map(headerValue->{
-                return prefix+headerName+": "+headerValue;
-              }).collect(Collectors.joining("\n"));
-          }).collect(Collectors.joining("\n"));
-    } else {
-      return "";
+      // Log headers
+      response.getHeaderNames().stream()
+        .forEach(headerName->{
+          response.getHeaders(headerName).stream()
+            .forEach(headerValue->{
+              log.debug("  "+headerName+": "+headerValue);
+            });
+        });
     }
+
+    // Log body
+    BufferedReader reader = new BufferedReader(new StringReader(logBody));
+    reader.lines().forEach(line->log.debug("  "+line));
   }
 
   public void sendRedirect(String location) {
