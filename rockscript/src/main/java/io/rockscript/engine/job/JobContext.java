@@ -19,19 +19,32 @@
  */
 package io.rockscript.engine.job;
 
-import java.time.Duration;
+import io.rockscript.Engine;
+
+import java.time.Instant;
 import java.time.temporal.TemporalAmount;
-import java.util.LinkedList;
 
-public class RetryPolicy extends LinkedList<TemporalAmount> {
+public class JobContext extends Engine {
 
-  public static RetryPolicy createDefaultRetryPolicy() {
-    RetryPolicy retryPolicy = new RetryPolicy();
-    retryPolicy.add(Duration.ofSeconds(5));
-    retryPolicy.add(Duration.ofMinutes(10));
-    retryPolicy.add(Duration.ofHours(4));
-    return retryPolicy;
+  Engine engine;
+  Job job;
+  JobRun jobRun;
+  JobService jobService;
+
+  public JobContext(Engine engine, Job job, JobRun jobRun, JobService jobService) {
+    this.engine = engine;
+    this.job = job;
+    this.jobRun = jobRun;
+    this.jobService = jobService;
   }
 
+  public void handleError(String error) {
+    jobService.handleError(job, jobRun, error);
+  }
+
+  public void reschedule(TemporalAmount retryDuration) {
+    job.setExecutionTime(Instant.now().plus(retryDuration));
+    jobService.schedule(job);
+  }
 
 }

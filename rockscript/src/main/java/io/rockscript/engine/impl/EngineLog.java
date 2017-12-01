@@ -17,21 +17,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.engine.job;
+package io.rockscript.engine.impl;
 
-import java.time.Duration;
-import java.time.temporal.TemporalAmount;
-import java.util.LinkedList;
+import java.time.Instant;
 
-public class RetryPolicy extends LinkedList<TemporalAmount> {
+public class EngineLog {
 
-  public static RetryPolicy createDefaultRetryPolicy() {
-    RetryPolicy retryPolicy = new RetryPolicy();
-    retryPolicy.add(Duration.ofSeconds(5));
-    retryPolicy.add(Duration.ofMinutes(10));
-    retryPolicy.add(Duration.ofHours(4));
-    return retryPolicy;
+  Instant time;
+  String level;
+  String message;
+
+  public EngineLog() {
   }
 
+  public EngineLog(Instant time, String level, String message) {
+    this.time = time;
+    this.level = level;
+    this.message = message;
+  }
 
+  public String toString() {
+    return (time!=null ? time.toString()+" " : "")+
+           (level!=null ? level+" " : "")+
+           message;
+  }
+
+  public Instant getTime() {
+    return time;
+  }
+
+  public String getLevel() {
+    return level;
+  }
+
+  public String getMessage() {
+    return message;
+  }
 }

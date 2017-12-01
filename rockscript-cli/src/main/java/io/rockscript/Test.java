@@ -77,7 +77,7 @@ public class Test extends ClientCommand {
 
     log(request);
 
-    ClientResponse response = request.execute(TestResults.class);
+    ClientResponse response = request.execute();
 
     log(response);
     log();
@@ -85,7 +85,7 @@ public class Test extends ClientCommand {
     if (response.getStatus()!=200) {
       log("Running the tests failed: "+response.getBody());
     } else {
-      TestResults testResults = response.getBody();
+      TestResults testResults = response.getBodyAs(TestResults.class);
 
       if (testResults!=null && !testResults.isEmpty()) {
         int errorCount = 0;

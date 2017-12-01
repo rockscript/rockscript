@@ -23,7 +23,6 @@ import io.rockscript.http.client.ClientRequest;
 import io.rockscript.http.client.ClientResponse;
 import io.rockscript.http.client.Http;
 import io.rockscript.http.server.HttpServer;
-import org.junit.After;
 import org.junit.Before;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,14 +111,14 @@ public abstract class AbstractHttpServerTest {
       super(http, method, url);
     }
     @Override
-    protected ClientResponse createHttpResponse(Type type) throws IOException {
-      return new TestClientResponse(this, type);
+    protected ClientResponse createHttpResponse() throws IOException {
+      return new TestClientResponse(this);
     }
   }
 
   static class TestClientResponse extends ClientResponse {
-    public TestClientResponse(TestClientRequest testHttpRequest, Type type) throws IOException {
-      super(testHttpRequest, type);
+    public TestClientResponse(TestClientRequest testHttpRequest) throws IOException {
+      super(testHttpRequest);
     }
     @Override
     public ClientResponse assertStatus(int expectedStatus) {

@@ -40,9 +40,9 @@ public class DeployServerTest extends AbstractServerTest {
       .bodyJson(new DeployScriptVersionCommand()
           .scriptName("Test script")
           .scriptText("var a=0;"))
-      .execute(ScriptVersion.class)
+      .execute()
       .assertStatusOk()
-      .getBody();
+      .getBodyAs(ScriptVersion.class);
 
     assertNotNull(saveScriptVersionResponse.getId());
     assertEquals((Integer) 1, saveScriptVersionResponse.getVersion());
@@ -55,9 +55,9 @@ public class DeployServerTest extends AbstractServerTest {
     ScriptVersion saveScriptVersionResponse = newPost("/command")
       .bodyJson(new DeployScriptVersionCommand()
         .scriptText("\n\ninvalid script"))
-      .execute(ScriptVersion.class)
+      .execute()
       .assertStatusOk()
-      .getBody();
+      .getBodyAs(ScriptVersion.class);
 
     List<ParseError> errors = saveScriptVersionResponse.getErrors();
     assertEquals(1, errors.size());
@@ -72,9 +72,9 @@ public class DeployServerTest extends AbstractServerTest {
     ScriptVersion saveScriptVersionResponse = newPost("/command")
       .bodyJson(new DeployScriptVersionCommand()
         .scriptText("\n\nvar a = new Object();"))
-      .execute(ScriptVersion.class)
+      .execute()
       .assertStatusOk()
-      .getBody();
+      .getBodyAs(ScriptVersion.class);
 
     List<ParseError> errors = saveScriptVersionResponse.getErrors();
     assertEquals(1, errors.size());

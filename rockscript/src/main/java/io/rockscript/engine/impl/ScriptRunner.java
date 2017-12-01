@@ -27,5 +27,5 @@ public interface ScriptRunner {
 
   EngineScriptExecution endFunction(ContinuationReference continuationReference, Object result);
 
-  void endFunction(EngineScriptExecution lockedScriptExecution, ContinuationReference continuationReference, Object result);
+  EngineScriptExecution retryFunction(ContinuationReference continuationReference);
 }

@@ -17,21 +17,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.engine.job;
+package io.rockscript.engine.impl;
 
-import java.time.Duration;
-import java.time.temporal.TemporalAmount;
-import java.util.LinkedList;
+import io.rockscript.Engine;
 
-public class RetryPolicy extends LinkedList<TemporalAmount> {
+public interface UnlockListener {
 
-  public static RetryPolicy createDefaultRetryPolicy() {
-    RetryPolicy retryPolicy = new RetryPolicy();
-    retryPolicy.add(Duration.ofSeconds(5));
-    retryPolicy.add(Duration.ofMinutes(10));
-    retryPolicy.add(Duration.ofHours(4));
-    return retryPolicy;
-  }
-
-
+  void releasingLock(Engine engine, Lock lock, EngineScriptExecution lockedScriptExecution);
 }

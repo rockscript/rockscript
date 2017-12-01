@@ -136,11 +136,11 @@ public class Deploy extends ClientCommand {
 
       log(request);
 
-      ClientResponse response = request.execute(ScriptVersion.class);
+      ClientResponse response = request.execute();
 
       log(response);
 
-      ScriptVersion scriptVersion = response.getBody();
+      ScriptVersion scriptVersion = response.getBodyAs(ScriptVersion.class);
 
       if (scriptVersion!=null && scriptVersion.hasErrors()) {
         log("  Errors in readable form:");

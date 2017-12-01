@@ -46,24 +46,24 @@ public class ServerScenarioTest extends AbstractServerTest {
           "var simple = system.import('rockscript.io/simple'); \n" +
           "simple.wait();" +
           "var msg = {hello: 'world'};"))
-      .execute(ScriptVersion.class)
+      .execute()
       .assertStatusOk()
-      .getBody();
+      .getBodyAs(ScriptVersion.class);
 
     String scriptId = saveScriptVersionResponse.getId();
 
     ScriptExecutionResponse startScriptResponse = newPost("/command")
       .bodyJson(new StartScriptExecutionCommand()
         .scriptVersionId(scriptId))
-      .execute(ScriptExecutionResponse.class)
+      .execute()
       .assertStatusOk()
-      .getBody();
+      .getBodyAs(ScriptExecutionResponse.class);
 
     String scriptExecutionId = startScriptResponse.getScriptExecutionId();
     ScriptExecutionQuery.ScriptExecutionDetails scriptExecutionDetails = newGet("/query?q=execution&id=" + scriptExecutionId)
-      .execute(new TypeToken<ScriptExecutionQuery.ScriptExecutionDetails>(){}.getType())
+      .execute()
       .assertStatusOk()
-      .getBody();
+      .getBodyAs(new TypeToken<ScriptExecutionQuery.ScriptExecutionDetails>(){}.getType());
 
     assertTrue(scriptExecutionDetails.getEvents().size()>2);
   }

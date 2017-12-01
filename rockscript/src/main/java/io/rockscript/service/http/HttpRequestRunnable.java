@@ -17,9 +17,12 @@
 package io.rockscript.service.http;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import io.rockscript.Engine;
+import io.rockscript.api.commands.ServiceFunctionUpdateCommand;
 import io.rockscript.engine.impl.ContinuationReference;
-import io.rockscript.engine.impl.ScriptRunner;
 import io.rockscript.http.client.ClientRequest;
 import io.rockscript.http.client.ClientResponse;
 import org.slf4j.Logger;
@@ -29,22 +32,57 @@ public class HttpRequestRunnable implements Runnable {
 
   static Logger log = LoggerFactory.getLogger(HttpRequestRunnable.class);
 
+  Engine engine;
+  HttpService httpService;
   ContinuationReference continuationReference;
   ClientRequest request;
-  Engine engine;
 
-  public HttpRequestRunnable(ContinuationReference continuationReference, ClientRequest request, Engine engine) {
+  public HttpRequestRunnable(Engine engine, HttpService httpService, ContinuationReference continuationReference, ClientRequest request) {
+    this.engine = engine;
+    this.httpService = httpService;
     this.continuationReference = continuationReference;
     this.request = request;
-    this.engine = engine;
   }
 
   @Override
   public void run() {
+    ClientResponse response = null;
+    try {
+      response = request.execute();
+
+      Object responseObject = null;
+      if (response.isContentTypeApplicationJson()) {
+        responseObject = getResponseObjectWithParsedJsonBody(response);
+      } else {
+        responseObject = getResponseObjectWithOtherBody(response);
+      }
+
+      engine
+        .getScriptRunner()
+        .endFunction(continuationReference, responseObject);
+    } catch (Exception e) {
+      new ServiceFunctionUpdateCommand()
+        .continuationReference(continuationReference)
+        .levelError()
+        .retry(null) // TODO
+        .execute(engine);
+    }
+  }
+
+  private Object getResponseObjectWithParsedJsonBody(ClientResponse response) {
     Gson gson = engine.getGson();
-    ClientResponse response = request
-      .execute(Object.class);
-    ScriptRunner scriptRunner = engine.getScriptRunner();
-    scriptRunner.endFunction(continuationReference, response);
+    String bodyString = response.getBody();
+    JsonParser parser = new JsonParser();
+    JsonElement bodyObject = parser.parse(bodyString).getAsJsonObject();
+    response.setBody(null);
+    JsonObject responseJsonObject = gson.toJsonTree(response).getAsJsonObject();
+    responseJsonObject.add("body", bodyObject);
+    return gson.fromJson(responseJsonObject, Object.class);
+  }
+
+  private Object getResponseObjectWithOtherBody(ClientResponse response) {
+    Gson gson = engine.getGson();
+    JsonObject responseJsonObject = gson.toJsonTree(response).getAsJsonObject();
+    return gson.fromJson(responseJsonObject, Object.class);
   }
 }

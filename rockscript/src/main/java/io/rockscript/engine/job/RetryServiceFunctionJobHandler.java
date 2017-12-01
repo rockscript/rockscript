@@ -19,19 +19,17 @@
  */
 package io.rockscript.engine.job;
 
-import java.time.Duration;
-import java.time.temporal.TemporalAmount;
-import java.util.LinkedList;
+import io.rockscript.Engine;
+import io.rockscript.engine.impl.ArgumentsExpressionExecution;
 
-public class RetryPolicy extends LinkedList<TemporalAmount> {
+public class RetryServiceFunctionJobHandler extends Job implements JobHandler {
 
-  public static RetryPolicy createDefaultRetryPolicy() {
-    RetryPolicy retryPolicy = new RetryPolicy();
-    retryPolicy.add(Duration.ofSeconds(5));
-    retryPolicy.add(Duration.ofMinutes(10));
-    retryPolicy.add(Duration.ofHours(4));
-    return retryPolicy;
+  public RetryServiceFunctionJobHandler(ArgumentsExpressionExecution argumentsExpressionExecution) {
+    super();
   }
 
+  @Override
+  public void execute(Engine engine) {
 
+  }
 }

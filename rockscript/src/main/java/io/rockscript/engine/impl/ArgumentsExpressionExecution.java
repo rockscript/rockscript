@@ -20,7 +20,7 @@ import io.rockscript.service.ServiceFunction;
 import io.rockscript.service.ServiceFunctionInput;
 import io.rockscript.service.ServiceFunctionOutput;
 import io.rockscript.engine.job.RetryPolicy;
-import io.rockscript.engine.job.impl.ServiceFunctionRetryAfterError;
+import io.rockscript.engine.job.RetryServiceFunctionJobHandler;
 
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
@@ -112,7 +112,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     dispatchAndExecute(scriptExecution.errorEvent);
     if (retryTime!=null) {
       getConfiguration().getJobService().schedule(
-        new ServiceFunctionRetryAfterError(this),
+        new RetryServiceFunctionJobHandler(this),
         retryTime,
         retryPolicy
       );

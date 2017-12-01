@@ -22,7 +22,6 @@ import io.rockscript.service.AbstractServiceFunction;
 import io.rockscript.service.ServiceFunctionInput;
 import io.rockscript.service.ServiceFunctionOutput;
 import io.rockscript.http.client.ClientRequest;
-import io.rockscript.http.client.Http;
 import io.rockscript.util.Lists;
 
 import java.util.Collection;
@@ -31,18 +30,16 @@ import java.util.Map;
 
 public class HttpServiceFunction extends AbstractServiceFunction {
 
-  public static final HttpServiceFunction GET = new HttpServiceFunction(Http.Methods.GET);
-  public static final HttpServiceFunction POST = new HttpServiceFunction(Http.Methods.POST);
-  public static final HttpServiceFunction PUT = new HttpServiceFunction(Http.Methods.PUT);
-  public static final HttpServiceFunction DELETE = new HttpServiceFunction(Http.Methods.DELETE);
-
+  HttpService httpService;
   String method;
 
-  public HttpServiceFunction(String method) {
+  public HttpServiceFunction(HttpService httpService, String method) {
     super(method.toLowerCase());
+    this.httpService = httpService;
     this.method = method;
   }
 
+  /** one json object is expected as argument */
   @Override
   public List<String> getArgNames() {
     return null;
@@ -64,12 +61,11 @@ public class HttpServiceFunction extends AbstractServiceFunction {
 
     // Create the HttpRequestRunnable command
     Engine engine = input.getEngine();
-    HttpRequestRunnable command = new HttpRequestRunnable(input.getContinuationReference(), clientRequest, engine);
 
     // Schedule the HttpRequestRunnable command for execution asynchronously
     input
       .getExecutor()
-      .execute(command);
+      .execute(new HttpRequestRunnable(engine, httpService, input.getContinuationReference(), clientRequest));
 
     return ServiceFunctionOutput.waitForFunctionEndCallback();
   }

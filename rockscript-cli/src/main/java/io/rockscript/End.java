@@ -102,11 +102,11 @@ public class End extends ClientCommand {
 
     log(request);
 
-    ClientResponse response = request.execute(ScriptExecutionResponse.class);
+    ClientResponse response = request.execute();
 
     log(response);
 
-    ScriptExecutionResponse endResponse = response.getBody();
+    ScriptExecutionResponse endResponse = response.getBodyAs(ScriptExecutionResponse.class);
 
     if (response.getStatus()==200) {
       log("ServiceFunction "+executionId+" in script execution "+scriptExecutionId+" ended.");

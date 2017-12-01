@@ -15,12 +15,17 @@
  */
 package io.rockscript.engine.impl;
 
-public class ServiceFunctionEndRequest {
+import io.rockscript.Engine;
+import io.rockscript.util.Exceptions;
 
+public class ServiceFunctionEndRequest implements UnlockListener {
+
+  LocalScriptRunner localScriptRunner;
   ContinuationReference continuationReference;
   Object result;
 
-  public ServiceFunctionEndRequest(ContinuationReference continuationReference, Object result) {
+  public ServiceFunctionEndRequest(LocalScriptRunner localScriptRunner, ContinuationReference continuationReference, Object result) {
+    this.localScriptRunner = localScriptRunner;
     this.continuationReference = continuationReference;
     this.result = result;
   }
@@ -31,5 +36,10 @@ public class ServiceFunctionEndRequest {
 
   public Object getResult() {
     return result;
+  }
+
+  @Override
+  public void releasingLock(Engine engine, Lock lock, EngineScriptExecution lockedScriptExecution) {
+    localScriptRunner.endFunctionLocked(lockedScriptExecution, lock, continuationReference, result);
   }
 }

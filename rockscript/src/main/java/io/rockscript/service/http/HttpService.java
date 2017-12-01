@@ -15,14 +15,18 @@
  */
 package io.rockscript.service.http;
 
+import io.rockscript.http.client.Http;
 import io.rockscript.service.ImportObject;
 import io.rockscript.service.ImportProvider;
 
-public class HttpImportProvider extends ImportObject implements ImportProvider {
+public class HttpService extends ImportObject implements ImportProvider {
 
-  public HttpImportProvider() {
+  public HttpService() {
     super("rockscript.io/http");
-    put(HttpServiceFunction.GET);
+    put(new HttpServiceFunction(this, Http.Methods.GET));
+    put(new HttpServiceFunction(this, Http.Methods.POST));
+    put(new HttpServiceFunction(this, Http.Methods.PUT));
+    put(new HttpServiceFunction(this, Http.Methods.DELETE));
   }
 
   @Override

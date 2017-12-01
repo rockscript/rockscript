@@ -67,7 +67,7 @@ public class RemoteServiceFunction extends AbstractServiceFunction {
 
     log.debug(request.toString(logPrefix));
 
-    ClientResponse response = request.execute(ServiceFunctionOutput.class);
+    ClientResponse response = request.execute();
 
     log.debug(response.toString(logPrefix));
 
@@ -78,7 +78,7 @@ public class RemoteServiceFunction extends AbstractServiceFunction {
 
     ServiceFunctionOutput output = null;
     try {
-      output = response.getBody();
+      output = response.getBodyAs(ServiceFunctionOutput.class);
     } catch (Exception e) {
       throw new EngineException("Couldn't parse remote HTTP serviceFunction response as ServiceFunctionOutput: " + e.getMessage(), e);
     }

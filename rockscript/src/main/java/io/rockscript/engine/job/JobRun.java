@@ -19,19 +19,49 @@
  */
 package io.rockscript.engine.job;
 
-import java.time.Duration;
-import java.time.temporal.TemporalAmount;
-import java.util.LinkedList;
+import java.time.Instant;
 
-public class RetryPolicy extends LinkedList<TemporalAmount> {
+public class JobRun {
 
-  public static RetryPolicy createDefaultRetryPolicy() {
-    RetryPolicy retryPolicy = new RetryPolicy();
-    retryPolicy.add(Duration.ofSeconds(5));
-    retryPolicy.add(Duration.ofMinutes(10));
-    retryPolicy.add(Duration.ofHours(4));
-    return retryPolicy;
+  protected Instant start;
+  protected Instant end;
+  protected String error;
+
+  public Instant getStart() {
+    return start;
   }
 
+  public void setStart(Instant start) {
+    this.start = start;
+  }
+
+  public Instant getEnd() {
+    return end;
+  }
+
+  public void setEnd(Instant end) {
+    this.end = end;
+  }
+
+  public String getError() {
+    return error;
+  }
+
+  public void setError(String error) {
+    this.error = error;
+  }
+
+  public boolean hasError() {
+    return error!=null;
+  }
+
+  public void endOk() {
+    this.end = Instant.now();
+  }
+
+  public void endError(String error) {
+    this.end = Instant.now();
+    this.error = error;
+  }
 
 }

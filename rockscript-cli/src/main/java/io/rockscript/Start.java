@@ -104,11 +104,11 @@ public class Start extends ClientCommand {
 
     log(request);
 
-    ClientResponse response = request.execute(ScriptExecutionResponse.class);
+    ClientResponse response = request.execute();
 
     log(response);
 
-    ScriptExecutionResponse startResponse = response.getBody();
+    ScriptExecutionResponse startResponse = response.getBodyAs(ScriptExecutionResponse.class);
 
     if (response.getStatus()==200) {
       log("Started script execution "+startResponse

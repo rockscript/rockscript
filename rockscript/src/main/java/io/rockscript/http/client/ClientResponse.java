@@ -19,6 +19,7 @@
  */
 package io.rockscript.http.client;
 
+import io.rockscript.util.Io;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
@@ -26,7 +27,6 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.message.BasicHeaderValueParser;
 import org.apache.http.message.HeaderValueParser;
-import org.apache.http.util.EntityUtils;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -48,14 +48,12 @@ public class ClientResponse {
   transient ClientRequest request;
   /** transient because this field should not be serialized by gson */
   transient CloseableHttpResponse apacheResponse;
-  /** transient because this field should not be serialized by gson */
-  transient String bodyLog;
 
   protected int status;
   protected Map<String,List<String>> headers;
-  protected Object body;
+  protected String body;
 
-  protected ClientResponse(ClientRequest request, Type type) throws IOException {
+  protected ClientResponse(ClientRequest request) throws IOException {
     this.request = request;
     this.apacheResponse = request.http.apacheHttpClient.execute(request.apacheRequest);
     try {
@@ -65,27 +63,13 @@ public class ClientResponse {
       HttpEntity entity = apacheResponse.getEntity();
       if (entity != null) {
         try {
-          if (type!=null) {
-            String charset = getContentTypeCharset("UTF-8");
-            InputStream content = entity.getContent();
-            InputStreamReader reader = new InputStreamReader(content, charset);
-            this.body = request.getHttp().getGson().fromJson(reader, type);
-
-            // IDEA: Even better would be if we wrapped
-            // the content input stream and copying the json
-            // as it is read by Gson.   That way, it would be the
-            // *exact* contents instead of the reserialized object
-            bodyLog = request.getHttp().getGson().toJson(this.body);
-
-          } else {
-            this.body = EntityUtils.toString(entity, "UTF-8");
-            bodyLog = (String) this.body;
-          }
+          String charset = getContentTypeCharset("UTF-8");
+          InputStream content = entity.getContent();
+          this.body = Io.toString(content, charset);
         } catch (Exception e) {
           throw new RuntimeException("Couldn't ready body/entity from http request " + toString(), e);
         }
       }
-
     } finally {
       apacheResponse.close();
     }
@@ -141,11 +125,11 @@ public class ClientResponse {
       text.append("< ");
       text.append(status);
     }
-    if (bodyLog!=null) {
+    if (body!=null) {
       text.append(NEWLINE);
       text.append(prefix);
       text.append("  ");
-      String bodyCustomized = getString(bodyLog, prefix, maxBodyLength);
+      String bodyCustomized = getString(body, prefix, maxBodyLength);
       text.append(bodyCustomized);
     }
 
@@ -195,9 +179,13 @@ public class ClientResponse {
     return this;
   }
 
+  public String getBody() {
+    return body;
+  }
+
   @SuppressWarnings("unchecked")
-  public <T> T getBody() {
-    return (T) body;
+  public <T> T getBodyAs(Type type) {
+    return (T) request.getHttp().getGson().fromJson(body, type);
   }
 
   public void setHeaders(Map<String, List<String>> headers) {
@@ -258,5 +246,9 @@ public class ClientResponse {
       }
     }
     return defaultCharset;
+  }
+
+  public void setBody(String body) {
+    this.body = body;
   }
 }

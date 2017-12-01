@@ -30,7 +30,7 @@ import io.rockscript.service.ServiceFunction;
 import io.rockscript.service.ImportObject;
 import io.rockscript.service.ImportProvider;
 import io.rockscript.service.ImportResolver;
-import io.rockscript.service.http.HttpImportProvider;
+import io.rockscript.service.http.HttpService;
 import io.rockscript.api.Command;
 import io.rockscript.api.Query;
 import io.rockscript.api.commands.*;
@@ -52,9 +52,10 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @SuppressWarnings("unchecked")
-public abstract class Engine {
+public class Engine {
 
   protected IdGenerator scriptIdGenerator;
   protected IdGenerator scriptVersionIdGenerator;
@@ -63,6 +64,7 @@ public abstract class Engine {
 
   protected EventStore eventStore;
   protected ScriptStore scriptStore;
+  protected EngineLogStore engineLogStore;
   protected EventListener eventListener;
   protected ScriptRunner scriptRunner;
   protected ImportResolver importResolver;
@@ -80,6 +82,7 @@ public abstract class Engine {
   public Engine() {
     this.eventStore = new EventStore(this);
     this.scriptStore = new ScriptStore(this);
+    this.engineLogStore = new EngineLogStore(this);
     this.eventListener = new EventLogger(this, eventStore);
     this.jobIdGenerator = new TestIdGenerator(this, "j");
     this.scriptIdGenerator = new TestIdGenerator(this, "s");
@@ -89,7 +92,7 @@ public abstract class Engine {
     this.jobService = new JobService(this);
 
     this.importResolver = new ImportResolver(this);
-    importProvider(new HttpImportProvider());
+    importProvider(new HttpService());
 
     this.queryTypes = new HashMap<>();
     queryType(new ScriptExecutionQuery());
@@ -116,6 +119,7 @@ public abstract class Engine {
 
   public Engine start() {
     this.gson = createGson();
+    this.executor = new LoggingExecutor(engineLogStore, createExecutor());
     this.http = new Http(gson);
     throwIfNotProperlyConfigured();
     plugins.forEach(plugin->plugin.start(this));
@@ -187,6 +191,10 @@ public abstract class Engine {
         .parse(isoText, ISO_FORMATTER)
         .toInstant();
     }
+  }
+
+  protected Executor createExecutor() {
+    return Executors.newWorkStealingPool();
   }
 
   protected void throwIfNotProperlyConfigured() {
@@ -306,5 +314,9 @@ public abstract class Engine {
 
   public IdGenerator getScriptVersionIdGenerator() {
     return scriptVersionIdGenerator;
+  }
+
+  public EngineLogStore getEngineLogStore() {
+    return engineLogStore;
   }
 }
