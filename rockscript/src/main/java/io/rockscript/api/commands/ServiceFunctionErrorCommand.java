@@ -21,41 +21,42 @@ package io.rockscript.api.commands;
 
 import io.rockscript.Engine;
 import io.rockscript.api.Command;
-import io.rockscript.engine.impl.ContinuationReference;
-import io.rockscript.engine.impl.EngineScriptExecution;
+import io.rockscript.engine.impl.*;
 import io.rockscript.http.servlet.BadRequestException;
 import io.rockscript.http.servlet.InternalServerException;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.time.Instant;
 
-public class RetryServiceFunctionCommand implements Command<ScriptExecutionResponse> {
+public class ServiceFunctionErrorCommand implements Command<Void> {
 
   protected String scriptExecutionId;
   protected String executionId;
+  protected String error;
+  protected Instant retryTime;
+
 
   @Override
   public String getType() {
-    return "retryFunction";
+    return "updateFunction";
   }
 
   @Override
-  public ScriptExecutionResponse execute(Engine engine) {
+  public Void execute(Engine engine) {
     BadRequestException.throwIfNull(scriptExecutionId, "scriptExecutionId is a mandatory field");
     BadRequestException.throwIfNull(scriptExecutionId, "executionId is a mandatory field");
     try {
       ContinuationReference continuationReference = new ContinuationReference(scriptExecutionId, executionId);
-      EngineScriptExecution engineScriptExecution = engine
-          .getScriptRunner()
-          .retryFunction(continuationReference);
-      return new ScriptExecutionResponse(engineScriptExecution);
+
+      engine.getScriptRunner().serviceFunctionError(continuationReference, error, retryTime);
+
+      return null;
 
     } catch (Exception e) {
       throw new InternalServerException();
     }
   }
 
-  public RetryServiceFunctionCommand continuationReference(ContinuationReference continuationReference) {
+  public ServiceFunctionErrorCommand continuationReference(ContinuationReference continuationReference) {
     this.scriptExecutionId = continuationReference.getScriptExecutionId();
     this.executionId = continuationReference.getExecutionId();
     return this;
@@ -67,7 +68,7 @@ public class RetryServiceFunctionCommand implements Command<ScriptExecutionRespo
   public void setScriptExecutionId(String scriptExecutionId) {
     this.scriptExecutionId = scriptExecutionId;
   }
-  public RetryServiceFunctionCommand scriptExecutionId(String scriptExecutionId) {
+  public ServiceFunctionErrorCommand scriptExecutionId(String scriptExecutionId) {
     this.scriptExecutionId = scriptExecutionId;
     return this;
   }
@@ -78,8 +79,30 @@ public class RetryServiceFunctionCommand implements Command<ScriptExecutionRespo
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
   }
-  public RetryServiceFunctionCommand executionId(String executionId) {
+  public ServiceFunctionErrorCommand executionId(String executionId) {
     this.executionId = executionId;
+    return this;
+  }
+
+  public String getError() {
+    return this.error;
+  }
+  public void setError(String error) {
+    this.error = error;
+  }
+  public ServiceFunctionErrorCommand message(String message) {
+    this.error = message;
+    return this;
+  }
+
+  public Instant getRetryTime() {
+    return this.retryTime;
+  }
+  public void setRetryTime(Instant retryTime) {
+    this.retryTime = retryTime;
+  }
+  public ServiceFunctionErrorCommand retry(Instant retry) {
+    this.retryTime = retry;
     return this;
   }
 }

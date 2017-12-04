@@ -18,10 +18,10 @@ package io.rockscript.service.http;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import io.rockscript.Engine;
+import io.rockscript.engine.job.RetryPolicy;
 import io.rockscript.service.AbstractServiceFunction;
 import io.rockscript.service.ServiceFunctionInput;
 import io.rockscript.service.ServiceFunctionOutput;
-import io.rockscript.http.client.ClientRequest;
 import io.rockscript.util.Lists;
 
 import java.util.Collection;
@@ -55,17 +55,24 @@ public class HttpServiceFunction extends AbstractServiceFunction {
     Gson gson = input.getGson();
     JsonElement requestElement = gson.toJsonTree(requestObject);
 
-    ClientRequest clientRequest = gson.fromJson(requestElement, ClientRequest.class);
+    HttpServiceClientRequest clientRequest = gson.fromJson(requestElement, HttpServiceClientRequest.class);
     clientRequest.setHttp(input.getHttp());
     clientRequest.setMethod(this.method);
 
+    // Maybe this should be optional and configurable with a property in the requestObject?
+    Integer failedAttemptsCount = input.getFailedAttemptsCount();
+    if (failedAttemptsCount!=null) {
+      clientRequest.header("Failed-Attempts-Count", failedAttemptsCount.toString());
+    }
+
     // Create the HttpRequestRunnable command
     Engine engine = input.getEngine();
+    RetryPolicy retryPolicy = getRetryPolicy(clientRequest);
 
     // Schedule the HttpRequestRunnable command for execution asynchronously
     input
       .getExecutor()
-      .execute(new HttpRequestRunnable(engine, httpService, input.getContinuationReference(), clientRequest));
+      .execute(new HttpRequestRunnable(engine, input.getContinuationReference(), clientRequest, input.getFailedAttemptsCount(), retryPolicy));
 
     return ServiceFunctionOutput.waitForFunctionEndCallback();
   }
@@ -86,5 +93,11 @@ public class HttpServiceFunction extends AbstractServiceFunction {
         }
       }
     }
+  }
+
+  /** if the configured client request has a retry policy, take that one.
+   * Otherwise take the default retry policy from the HttpService */
+  public RetryPolicy getRetryPolicy(HttpServiceClientRequest clientRequest) {
+    return clientRequest.getRetryPolicy()!=null ? clientRequest.getRetryPolicy() : httpService.getDefaultRetryPolicy();
   }
 }

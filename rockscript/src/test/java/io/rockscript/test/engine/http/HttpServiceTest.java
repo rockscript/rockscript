@@ -23,6 +23,8 @@ import io.rockscript.api.commands.ScriptExecutionResponse;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.EngineScriptExecution;
+import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
+import io.rockscript.engine.job.JobService;
 import io.rockscript.http.servlet.PathRequestHandler;
 import io.rockscript.http.servlet.RouterServlet;
 import io.rockscript.http.servlet.ServerRequest;
@@ -31,6 +33,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.Map;
+
+import static io.rockscript.http.servlet.PathRequestHandler.GET;
 import static io.rockscript.http.servlet.PathRequestHandler.POST;
 import static org.junit.Assert.assertEquals;
 
@@ -49,7 +55,7 @@ public class HttpServiceTest extends AbstractHttpTest {
   protected void configure(RouterServlet serviceServlet) {
     // The routerServlet is configured at the beginning of each test
     serviceServlet
-      .requestHandler(new PathRequestHandler(POST, "/") {
+      .requestHandler(new PathRequestHandler(GET, "/") {
         @Override
         public void handle(ServerRequest request, ServerResponse response) {
           testRequestHandler.handle(request, response);
@@ -59,30 +65,57 @@ public class HttpServiceTest extends AbstractHttpTest {
 
   @Test
   public void testHttpGet() {
-//    testRequestHandler = new TestRequestHandler() {
-//      public void handle(ServerRequest request, ServerResponse response) {
-//        response.bodyString("thread was here");
-//        response.status(200);
-//      }
-//    };
-//
-//    ScriptVersion scriptVersion = deployScript(
-//      "var http = system.import('rockscript.io/http'); \n" +
-//      "var result = http.get({" +
-//      "  url: 'http://localhost:" + SERVICE_PORT + "?p1=v1&p2=v2'," +
-//      "  headers: {" +
-//      "    Single: 'singlevalue'" +
-////      "    Double: ['double', 'value']" +
-//      "  }," +
-//      "  body: 'input string body'" +
-//      "}); ");
-//
-//    EngineScriptExecution engineScriptExecution = new StartScriptExecutionCommand()
-//      .scriptVersionId(scriptVersion.getId())
-//      .execute(engine)
-//      .getEngineScriptExecution();
-//
-//    Object result = engineScriptExecution.getVariable("result").getValue();
-//    assertEquals("thread was here", result);
+    testRequestHandler = new TestRequestHandler() {
+      public void handle(ServerRequest request, ServerResponse response) {
+        assertEquals("singlevalue", request.getHeader("Single"));
+        response.headerContentTypeTextPlain();
+        response.status(200);
+        response.bodyString("thread was here");
+        response.status(200);
+      }
+    };
+
+    ScriptVersion scriptVersion = deployScript(
+      "var http = system.import('rockscript.io/http'); \n" +
+      "var response = http.get({" +
+      "  url: 'http://localhost:" + SERVICE_PORT + "?p1=v1&p2=v2'," +
+      "  headers: {" +
+      "    Single: 'singlevalue'" +
+//      "    Double: ['double', 'value']" +
+      "  }" +
+      "}); ");
+
+    EngineScriptExecution engineScriptExecution = new StartScriptExecutionCommand()
+      .scriptVersionId(scriptVersion.getId())
+      .execute(engine)
+      .getEngineScriptExecution();
+
+    Map<String,Object> response = (Map<String, Object>) engineScriptExecution.getVariable("response").getValue();
+    assertEquals("thread was here", response.get("body"));
+
+    Map<String,List<String>> headers = (Map<String, List<String>>) response.get("headers");
+    assertEquals("text/plain", ((List)headers.get("Content-Type")).get(0));
   }
+
+  @SuppressWarnings("unchecked")
+  @Test
+  public void testHttpGetError() {
+    int wrongPort = 7236;
+    ScriptVersion scriptVersion = deployScript(
+      "var http = system.import('rockscript.io/http'); \n" +
+      "var response = http.get({" +
+      "  url: 'http://localhost:" + wrongPort+ "'," +
+      "}); ");
+
+    EngineScriptExecution engineScriptExecution = new StartScriptExecutionCommand()
+      .scriptVersionId(scriptVersion.getId())
+      .execute(engine)
+      .getEngineScriptExecution();
+
+    ScriptExecutionErrorEvent errorEvent = engineScriptExecution.getErrorEvent();
+
+    JobService jobService = engine.getJobService();
+    jobService.toString();
+  }
+
 }

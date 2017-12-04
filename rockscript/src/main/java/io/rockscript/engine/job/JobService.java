@@ -39,6 +39,7 @@ public class JobService {
   IdGenerator idGenerator;
   /** jobs that are stuck */
   List<Job> errorJobs = new ArrayList<>();
+  RetryPolicy defaultJobRetryPolicy; // TODO initialize this
 
   public JobService(Engine engine) {
     this.engine = engine;
@@ -62,6 +63,16 @@ public class JobService {
 //  public Job schedule(JobHandler jobHandler, Instant executionTime) {
 //  }
 //
+
+  /**
+   * The job handler executed at the specified event, if an exception occurs,
+   * the job is first retried according to the retry policy and if that doesn't
+   * help, the job is put in the errorJobs.
+   */
+  public Job schedule(JobHandler jobHandler, Instant executionTime) {
+    return schedule(jobHandler, executionTime, getDefaultJobRetryPolicy());
+  }
+
   /** The job handler executed at the specified event, if an exception occurs,
    * the job is first retried according to the retry policy and if that doesn't
    * help, the job is put in the errorJobs. */
@@ -108,5 +119,9 @@ public class JobService {
       jobs.remove(job);
       errorJobs.add(job);
     }
+  }
+
+  public RetryPolicy getDefaultJobRetryPolicy() {
+    return defaultJobRetryPolicy;
   }
 }

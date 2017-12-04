@@ -16,14 +16,12 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.engine.ServiceFunctionContinuation;
+import io.rockscript.engine.job.RetryServiceFunctionJobHandler;
 import io.rockscript.service.ServiceFunction;
 import io.rockscript.service.ServiceFunctionInput;
 import io.rockscript.service.ServiceFunctionOutput;
-import io.rockscript.engine.job.RetryPolicy;
-import io.rockscript.engine.job.RetryServiceFunctionJobHandler;
 
 import java.time.Instant;
-import java.time.temporal.TemporalAmount;
 import java.util.List;
 
 public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression> {
@@ -48,9 +46,9 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   }
 
   private void startNextParameter() {
-    int parameterIndex = children.size()-1; // -1 because the first one is the function expression
+    int parameterIndex = children.size() - 1; // -1 because the first one is the function expression
     List<SingleExpression> parameters = element.getArgumentExpressions();
-    if (parameters!=null && parameterIndex < parameters.size()) {
+    if (parameters!=null && parameterIndex<parameters.size()) {
       ScriptElement piece = parameters.get(parameterIndex);
       startChild(piece);
     } else {
@@ -87,16 +85,19 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
       try {
         serviceFunctionOutput = startFunctionInvoke();
       } catch (Exception e) {
-        handleServiceFunctionError(e.getMessage(), scriptExecution, null);
+        // TODO transform this to an Engine.engineLogStore notification because it
+        // should be considered a bug if a service function throws an error.
+        // ServiceFunction's should use serviceFunctionOutput.isError() to indicate errors.
+        handleServiceFunctionError(e.getMessage(), null);
       }
       if (serviceFunctionOutput!=null) {
         if (serviceFunctionOutput.isEnded()) {
           endFunction(serviceFunctionOutput.getResult());
 
         } else if (serviceFunctionOutput.isError()) {
-          RetryPolicy retryPolicy = serviceFunctionOutput.getRetryPolicy();
+          Instant retryTime = serviceFunctionOutput.getRetryTime();
           String errorMessage = serviceFunctionOutput.getError();
-          handleServiceFunctionError(errorMessage, scriptExecution, retryPolicy);
+          handleServiceFunctionError(errorMessage, retryTime);
 
         } else {
           dispatch(new ServiceFunctionWaitingEvent(this));
@@ -105,18 +106,20 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     }
   }
 
-  private void handleServiceFunctionError(String errorMessage, EngineScriptExecution scriptExecution, RetryPolicy retryPolicy) {
-    TemporalAmount retryDelay = retryPolicy!=null ? retryPolicy.get(failedAttemptsCount) : null;
-    Instant retryTime = retryDelay!=null ? Instant.now().plus(retryDelay) : null;
-    scriptExecution.errorEvent = new ServiceFunctionStartErrorEvent(this, errorMessage, retryTime);
+  public void handleServiceFunctionError(String errorMessage, Instant retryTime) {
+    EngineScriptExecution scriptExecution = getScriptExecution();
+    scriptExecution.errorEvent = new ServiceFunctionErrorEvent(this, errorMessage, retryTime);
     dispatchAndExecute(scriptExecution.errorEvent);
     if (retryTime!=null) {
-      getConfiguration().getJobService().schedule(
+      getEngine().getJobService().schedule(
         new RetryServiceFunctionJobHandler(this),
-        retryTime,
-        retryPolicy
-      );
+        retryTime);
     }
+  }
+
+  public void retry() {
+    dispatchAndExecute(new ServiceFunctionStartedEvent(this));
+    startFunctionInvoke();
   }
 
   public void endFunction(Object result) {
@@ -143,4 +146,16 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   public ServiceFunctionContinuation getServiceFunctionContinuation() {
     return !ended ? new ServiceFunctionContinuation(id, serviceFunction.toString(), args) : null;
   }
+
+  public int getFailedAttemptsCount() {
+    return this.failedAttemptsCount;
+  }
+  public void setFailedAttemptsCount(int failedAttemptsCount) {
+    this.failedAttemptsCount = failedAttemptsCount;
+  }
+
+  public void incrementFailedAttemptsCount() {
+    failedAttemptsCount++;
+  }
 }
+

@@ -21,27 +21,32 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.rockscript.Engine;
-import io.rockscript.api.commands.ServiceFunctionUpdateCommand;
+import io.rockscript.api.commands.ServiceFunctionErrorCommand;
 import io.rockscript.engine.impl.ContinuationReference;
-import io.rockscript.http.client.ClientRequest;
+import io.rockscript.engine.job.RetryPolicy;
 import io.rockscript.http.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.time.Instant;
+import java.time.temporal.TemporalAmount;
 
 public class HttpRequestRunnable implements Runnable {
 
   static Logger log = LoggerFactory.getLogger(HttpRequestRunnable.class);
 
   Engine engine;
-  HttpService httpService;
   ContinuationReference continuationReference;
-  ClientRequest request;
+  HttpServiceClientRequest request;
+  Integer failedAttemptsCount;
+  RetryPolicy retryPolicy;
 
-  public HttpRequestRunnable(Engine engine, HttpService httpService, ContinuationReference continuationReference, ClientRequest request) {
+  public HttpRequestRunnable(Engine engine, ContinuationReference continuationReference, HttpServiceClientRequest request, Integer failedAttemptsCount, RetryPolicy retryPolicy) {
     this.engine = engine;
-    this.httpService = httpService;
     this.continuationReference = continuationReference;
     this.request = request;
+    this.failedAttemptsCount = failedAttemptsCount;
+    this.retryPolicy = retryPolicy;
   }
 
   @Override
@@ -60,11 +65,22 @@ public class HttpRequestRunnable implements Runnable {
       engine
         .getScriptRunner()
         .endFunction(continuationReference, responseObject);
+
     } catch (Exception e) {
-      new ServiceFunctionUpdateCommand()
+      log.debug("Exception while executing HTTP "+request.getMethod()+" "+request.getUrl()+": "+e.getMessage(), e);
+
+      Instant retry = null;
+      if (retryPolicy!=null) {
+        failedAttemptsCount = failedAttemptsCount!=null ? failedAttemptsCount++ : 1;
+        if (retryPolicy.size()>failedAttemptsCount) {
+          TemporalAmount timeBeforeRetry = retryPolicy.get(failedAttemptsCount);
+          retry = Instant.now().plus(timeBeforeRetry);
+        }
+      }
+
+      new ServiceFunctionErrorCommand()
         .continuationReference(continuationReference)
-        .levelError()
-        .retry(null) // TODO
+        .retry(retry)
         .execute(engine);
     }
   }

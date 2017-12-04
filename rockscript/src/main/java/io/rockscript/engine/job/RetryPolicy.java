@@ -32,6 +32,4 @@ public class RetryPolicy extends LinkedList<TemporalAmount> {
     retryPolicy.add(Duration.ofHours(4));
     return retryPolicy;
   }
-
-
 }

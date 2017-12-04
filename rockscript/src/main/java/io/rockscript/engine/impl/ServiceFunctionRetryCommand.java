@@ -17,25 +17,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.engine.job;
+package io.rockscript.engine.impl;
 
 import io.rockscript.Engine;
-import io.rockscript.engine.impl.ArgumentsExpressionExecution;
-import io.rockscript.engine.impl.ContinuationReference;
-import io.rockscript.engine.impl.ServiceFunctionRetryCommand;
+import io.rockscript.api.Command;
 
-public class RetryServiceFunctionJobHandler implements JobHandler {
+public class ServiceFunctionRetryCommand implements Command<Void> {
 
-  ContinuationReference continuationReference;
+  protected ContinuationReference continuationReference;
 
-  public RetryServiceFunctionJobHandler(ArgumentsExpressionExecution argumentsExpressionExecution) {
-    this.continuationReference = new ContinuationReference(argumentsExpressionExecution);
+  @Override
+  public String getType() {
+    return null;
   }
 
   @Override
-  public void execute(Engine engine) {
-    new ServiceFunctionRetryCommand()
-      .continuationReference(continuationReference)
-      .execute(engine);
+  public Void execute(Engine engine) {
+    engine.getScriptRunner().retryFunction(continuationReference);
+    return null;
+  }
+
+  public ContinuationReference getContinuationReference() {
+    return this.continuationReference;
+  }
+  public void setContinuationReference(ContinuationReference continuationReference) {
+    this.continuationReference = continuationReference;
+  }
+  public ServiceFunctionRetryCommand continuationReference(ContinuationReference continuationReference) {
+    this.continuationReference = continuationReference;
+    return this;
   }
 }

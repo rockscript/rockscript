@@ -17,10 +17,7 @@ package io.rockscript.service;
 
 import com.google.gson.Gson;
 import io.rockscript.Engine;
-import io.rockscript.engine.impl.ContinuationReference;
-import io.rockscript.engine.impl.Execution;
-import io.rockscript.engine.impl.Location;
-import io.rockscript.engine.impl.ScriptRunner;
+import io.rockscript.engine.impl.*;
 import io.rockscript.http.client.Http;
 
 import java.util.List;
@@ -34,10 +31,12 @@ public class ServiceFunctionInput {
   String scriptExecutionId;
   String executionId;
   List<Object> args;
+  Integer failedAttemptsCount;
 
+  /** used to supply {@link #getEngine()} to internal service functions */
   transient Execution<?> execution;
 
-  public ServiceFunctionInput(Execution<?> execution, List<Object> args) {
+  public ServiceFunctionInput(ArgumentsExpressionExecution execution, List<Object> args) {
     this.scriptExecutionId = execution.getScriptExecution().getId();
     this.executionId = execution.getId();
     this.continuationReference = new ContinuationReference(
@@ -45,6 +44,7 @@ public class ServiceFunctionInput {
         execution.getId()
     );
     this.args = args;
+    this.failedAttemptsCount = execution.getFailedAttemptsCount() > 0 ? execution.getFailedAttemptsCount() : null;
     this.execution = execution;
   }
 
@@ -105,5 +105,12 @@ public class ServiceFunctionInput {
 
   public Http getHttp() {
     return getEngine().getHttp();
+  }
+
+  public Integer getFailedAttemptsCount() {
+    return this.failedAttemptsCount;
+  }
+  public void setFailedAttemptsCount(Integer failedAttemptsCount) {
+    this.failedAttemptsCount = failedAttemptsCount;
   }
 }

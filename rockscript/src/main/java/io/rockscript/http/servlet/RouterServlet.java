@@ -48,11 +48,8 @@ public class RouterServlet extends HttpServlet {
     ServerRequest request = new ServerRequest(servletRequest, gson);
     ServerResponse response = new ServerResponse(servletResponse, gson, servletRequest.getProtocol());
 
-    Optional<RequestHandler> matchingRequestHandler = requestHandlers.stream()
-      .filter(requestHandler -> requestHandler.matches(request))
-      .findFirst();
-    if (matchingRequestHandler.isPresent()) {
-      RequestHandler requestHandler = matchingRequestHandler.get();
+    RequestHandler requestHandler = findMatchingRequestHandler(request);
+    if (requestHandler!=null) {
       request.setRequestHandler(requestHandler);
       try {
         if (log.isDebugEnabled()) request.logTo(log);
@@ -76,6 +73,17 @@ public class RouterServlet extends HttpServlet {
       response.statusNotFound();
     }
     if (log.isDebugEnabled()) response.logTo(log);
+  }
+
+  private RequestHandler findMatchingRequestHandler(ServerRequest request) {
+    if (requestHandlers!=null) {
+      for (RequestHandler requestHandler: requestHandlers) {
+        if (requestHandler.matches(request)) {
+          return requestHandler;
+        }
+      }
+    }
+    return null;
   }
 
   public RouterServlet requestHandler(RequestHandler requestHandler) {

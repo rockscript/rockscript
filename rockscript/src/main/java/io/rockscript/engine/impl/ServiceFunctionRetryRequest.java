@@ -17,25 +17,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.engine.job;
+package io.rockscript.engine.impl;
 
 import io.rockscript.Engine;
-import io.rockscript.engine.impl.ArgumentsExpressionExecution;
-import io.rockscript.engine.impl.ContinuationReference;
-import io.rockscript.engine.impl.ServiceFunctionRetryCommand;
 
-public class RetryServiceFunctionJobHandler implements JobHandler {
+import java.time.Instant;
 
+public class ServiceFunctionRetryRequest implements UnlockListener {
+
+  LocalScriptRunner localScriptRunner;
   ContinuationReference continuationReference;
 
-  public RetryServiceFunctionJobHandler(ArgumentsExpressionExecution argumentsExpressionExecution) {
-    this.continuationReference = new ContinuationReference(argumentsExpressionExecution);
+  public ServiceFunctionRetryRequest(LocalScriptRunner localScriptRunner, ContinuationReference continuationReference) {
+    this.localScriptRunner = localScriptRunner;
+    this.continuationReference = continuationReference;
   }
 
   @Override
-  public void execute(Engine engine) {
-    new ServiceFunctionRetryCommand()
-      .continuationReference(continuationReference)
-      .execute(engine);
+  public void releasingLock(Engine engine, Lock lock, EngineScriptExecution lockedScriptExecution) {
+    localScriptRunner.retryFunctionLocked(lockedScriptExecution, lock, continuationReference);
   }
 }

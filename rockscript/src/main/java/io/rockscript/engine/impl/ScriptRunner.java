@@ -16,6 +16,8 @@
 
 package io.rockscript.engine.impl;
 
+import java.time.Instant;
+
 /** Performs engineScript execution and ensures that only 1 scriptService
  * is executing a EngineScriptExecution at any given time.
  * The goal is to also have an in-memory
@@ -26,6 +28,8 @@ public interface ScriptRunner {
   EngineScriptExecution startScriptExecution(String scriptVersionId, Object input);
 
   EngineScriptExecution endFunction(ContinuationReference continuationReference, Object result);
+
+  EngineScriptExecution serviceFunctionError(ContinuationReference continuationReference, String error, Instant retryTime);
 
   EngineScriptExecution retryFunction(ContinuationReference continuationReference);
 }

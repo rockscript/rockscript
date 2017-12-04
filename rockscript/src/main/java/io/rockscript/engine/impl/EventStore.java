@@ -41,21 +41,18 @@ public class EventStore implements EventListener {
     events.add(event);
   }
 
+  public EngineScriptExecution findScriptExecutionById(String scriptExecutionId) {
+    List<ExecutionEvent> executionEvents = findEventsByScriptExecutionId(scriptExecutionId);
+    return recreateScriptExecution(executionEvents, scriptExecutionId);
+  }
+
+
   public List<ExecutionEvent> findEventsByScriptExecutionId(String scriptExecutionId) {
     return events.stream()
       .filter(event-> event instanceof ExecutionEvent)
       .map(event->((ExecutionEvent)event))
       .filter(executionEvent->scriptExecutionId.equals(executionEvent.getScriptExecutionId()))
       .collect(Collectors.toList());
-  }
-
-  public EngineScriptExecution findScriptExecutionById(String scriptExecutionId) {
-    List<ExecutionEvent> executionEvents = findEventsByScriptExecutionId(scriptExecutionId);
-    return recreateScriptExecution(executionEvents, scriptExecutionId);
-  }
-
-  public List<Event> getEvents() {
-    return events;
   }
 
   private EngineScriptExecution recreateScriptExecution(List<ExecutionEvent> executionEvents, String scriptExecutionId) {
@@ -166,5 +163,9 @@ public class EventStore implements EventListener {
       .filter(executionEvent->scriptExecutionId.equals(executionEvent.getScriptExecutionId()))
       .findFirst()
       .isPresent();
+  }
+
+  public List<Event> getEvents() {
+    return events;
   }
 }

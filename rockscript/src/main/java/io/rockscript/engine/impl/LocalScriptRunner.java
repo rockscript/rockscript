@@ -20,6 +20,7 @@ import io.rockscript.engine.EngineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.*;
 
 
@@ -83,22 +84,22 @@ public class LocalScriptRunner implements ScriptRunner {
   @Override
   public EngineScriptExecution endFunction(ContinuationReference continuationReference, Object result) {
     Lock lock = acquireLock(continuationReference.getScriptExecutionId());
-    EngineScriptExecution scriptExecution = null;
+    EngineScriptExecution lockedScriptExecution = null;
     if (lock!=null) {
       String scriptExecutionId = continuationReference.getScriptExecutionId();
-      scriptExecution = engine
+      lockedScriptExecution = engine
         .getEventStore()
         .findScriptExecutionById(scriptExecutionId);
-      if (scriptExecution==null) {
+      if (lockedScriptExecution==null) {
         throw new EngineException("ScriptVersion execution "+scriptExecutionId+" doesn't exist");
       }
-      endFunctionLocked(scriptExecution, lock, continuationReference, result);
+      endFunctionLocked(lockedScriptExecution, lock, continuationReference, result);
     } else {
       // TODO add a check that the continuation ref actually exists
       // TODO consider a timer to check that the listening didn't mismatch with releasing the lock
       addUnlockListener(continuationReference.getScriptExecutionId(), new ServiceFunctionEndRequest(this, continuationReference, result));
     }
-    return scriptExecution;
+    return lockedScriptExecution;
   }
 
   public void endFunctionLocked(EngineScriptExecution lockedScriptExecution, Lock lock, ContinuationReference continuationReference, Object result) {
@@ -111,16 +112,95 @@ public class LocalScriptRunner implements ScriptRunner {
       lockedScriptExecution.doWork();
       releaseLock(lock, lockedScriptExecution);
     } catch(Throwable e) {
-      log.debug("Exception while executing script: "+e.getMessage(), e);;
-      lockedScriptExecution.errorEvent = new ScriptExecutionErrorEvent(lockedScriptExecution, e.getMessage());
-      lockedScriptExecution.dispatch(lockedScriptExecution.errorEvent);
+      handleScriptExecutionExceptionLocked(lockedScriptExecution, e);
+    }
+  }
+
+  void handleScriptExecutionExceptionLocked(EngineScriptExecution lockedScriptExecution, Throwable exception) {
+    log.debug("Exception while executing script: " + exception.getMessage(), exception);
+    lockedScriptExecution.errorEvent = new ScriptExecutionErrorEvent(lockedScriptExecution, exception.getMessage());
+    lockedScriptExecution.dispatch(lockedScriptExecution.errorEvent);
+  }
+
+  /** Potentially recording the service function error should not be in a locked
+   * block because it does not trigger script execution.  It only adds an event
+   * and optionally schedules a job. */
+  @Override
+  public EngineScriptExecution serviceFunctionError(ContinuationReference continuationReference, String error, Instant retryTime) {
+    Lock lock = acquireLock(continuationReference.getScriptExecutionId());
+    EngineScriptExecution lockedScriptExecution = null;
+    if (lock!=null) {
+      String scriptExecutionId = continuationReference.getScriptExecutionId();
+      lockedScriptExecution = engine
+        .getEventStore()
+        .findScriptExecutionById(scriptExecutionId);
+      if (lockedScriptExecution==null) {
+        throw new EngineException("ScriptVersion execution "+scriptExecutionId+" doesn't exist");
+      }
+      serviceFunctionErrorLocked(lockedScriptExecution, lock, continuationReference, error, retryTime);
+    } else {
+      // TODO add a check that the continuation ref actually exists
+      // TODO consider a timer to check that the listening didn't mismatch with releasing the lock
+      addUnlockListener(continuationReference.getScriptExecutionId(), new ServiceFunctionErrorRequest(this, continuationReference, error, retryTime));
+    }
+    return lockedScriptExecution;
+  }
+
+  void serviceFunctionErrorLocked(EngineScriptExecution lockedScriptExecution, Lock lock, ContinuationReference continuationReference, String error, Instant retryTime) {
+    try {
+      String executionId = continuationReference.getExecutionId();
+      ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) lockedScriptExecution
+        .findExecutionRecursive(executionId);
+      EngineException.throwIfNull(execution, "Execution %s not found in script execution %s", executionId, lockedScriptExecution.getId());
+
+      execution.handleServiceFunctionError(error, retryTime);
+
+      lockedScriptExecution.doWork();
+      releaseLock(lock, lockedScriptExecution);
+
+    } catch(Throwable e) {
+      handleScriptExecutionExceptionLocked(lockedScriptExecution, e);
     }
   }
 
   @Override
   public EngineScriptExecution retryFunction(ContinuationReference continuationReference) {
-    throw new RuntimeException("TODO");
+    Lock lock = acquireLock(continuationReference.getScriptExecutionId());
+    EngineScriptExecution lockedScriptExecution = null;
+    if (lock!=null) {
+      String scriptExecutionId = continuationReference.getScriptExecutionId();
+      lockedScriptExecution = engine
+        .getEventStore()
+        .findScriptExecutionById(scriptExecutionId);
+      if (lockedScriptExecution==null) {
+        throw new EngineException("ScriptVersion execution "+scriptExecutionId+" doesn't exist");
+      }
+      retryFunctionLocked(lockedScriptExecution, lock, continuationReference);
+    } else {
+      // TODO add a check that the continuation ref actually exists
+      // TODO consider a timer to check that the listening didn't mismatch with releasing the lock
+      addUnlockListener(continuationReference.getScriptExecutionId(), new ServiceFunctionRetryRequest(this, continuationReference));
+    }
+    return lockedScriptExecution;
   }
+
+  void retryFunctionLocked(EngineScriptExecution lockedScriptExecution, Lock lock, ContinuationReference continuationReference) {
+    try {
+      String executionId = continuationReference.getExecutionId();
+      ArgumentsExpressionExecution execution = (ArgumentsExpressionExecution) lockedScriptExecution
+        .findExecutionRecursive(executionId);
+      EngineException.throwIfNull(execution, "Execution %s not found in script execution %s", executionId, lockedScriptExecution.getId());
+
+      execution.retry();
+
+      lockedScriptExecution.doWork();
+      releaseLock(lock, lockedScriptExecution);
+
+    } catch(Throwable e) {
+      handleScriptExecutionExceptionLocked(lockedScriptExecution, e);
+    }
+  }
+
 
   public synchronized Lock acquireLock(String scriptExecutionId) {
     Lock lock = locks.get(scriptExecutionId);

@@ -30,6 +30,11 @@ public class ContinuationReference {
     this.executionId = executionId;
   }
 
+  public ContinuationReference(Execution execution) {
+    this.scriptExecutionId = execution.getScriptExecution().getId();
+    this.executionId = execution.getId();
+  }
+
   public String getScriptExecutionId() {
     return scriptExecutionId;
   }

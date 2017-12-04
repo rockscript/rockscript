@@ -24,7 +24,7 @@ import io.rockscript.service.test.TestResult;
 import io.rockscript.service.test.TestResults;
 import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.RunTestsCommand;
-import io.rockscript.engine.impl.ServiceFunctionStartErrorEvent;
+import io.rockscript.engine.impl.ServiceFunctionErrorEvent;
 import io.rockscript.engine.impl.Event;
 import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
 import io.rockscript.http.servlet.PathRequestHandler;
@@ -97,7 +97,7 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
     testResult.getErrors().forEach(e->log.debug(e.toString()));
 
     List<Event> testEvents = testResult.getEvents();
-    ServiceFunctionStartErrorEvent errorEvent = (ServiceFunctionStartErrorEvent) testEvents.get(testEvents.size() - 1);
+    ServiceFunctionErrorEvent errorEvent = (ServiceFunctionErrorEvent) testEvents.get(testEvents.size() - 1);
 
     Assert.assertContains("Expected The Netherlands, but was Belgium", errorEvent.getError());
     assertNull(errorEvent.getRetryTime()); // because there's no point in retrying assertion errors
@@ -147,7 +147,7 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
     Assert.assertContains(targetScriptId, targetScriptErrorEvent.getScriptId());
     assertNotNull(targetScriptErrorEvent.getLine());
 
-    ServiceFunctionStartErrorEvent testScriptErrorEvent = (ServiceFunctionStartErrorEvent) testEvents.get(testEvents.size() - 1);
+    ServiceFunctionErrorEvent testScriptErrorEvent = (ServiceFunctionErrorEvent) testEvents.get(testEvents.size() - 1);
     Assert.assertContains("ScriptVersion start failed: ReferenceError: unexistingvar is not defined", testScriptErrorEvent.getError());
     Assert.assertContains(testScriptId, testScriptErrorEvent.getScriptId());
     assertNotNull(testScriptErrorEvent.getLine());

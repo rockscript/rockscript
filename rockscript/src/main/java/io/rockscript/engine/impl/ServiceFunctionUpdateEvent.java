@@ -23,16 +23,10 @@ package io.rockscript.engine.impl;
 import io.rockscript.engine.EngineException;
 import io.rockscript.service.ServiceFunction;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 public class ServiceFunctionUpdateEvent extends ExecutionEvent<ArgumentsExpressionExecution> {
 
   String serviceName;
   String functionName;
-
-  /** contains constants from {@link io.rockscript.api.commands.ServiceFunctionUpdateCommand */
   String level;
   String message;
 

@@ -176,7 +176,7 @@ public abstract class Execution<T extends ScriptElement> {
     return variables;
   }
 
-  public Engine getConfiguration() {
-    return getScriptExecution().getConfiguration();
+  public Engine getEngine() {
+    return getScriptExecution().getEngineScript().getEngine();
   }
 }

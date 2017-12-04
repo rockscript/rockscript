@@ -156,8 +156,10 @@ public class ServerResponse {
     }
 
     // Log body
-    BufferedReader reader = new BufferedReader(new StringReader(logBody));
-    reader.lines().forEach(line->log.debug("  "+line));
+    if (logBody!=null) {
+      BufferedReader reader = new BufferedReader(new StringReader(logBody));
+      reader.lines().forEach(line->log.debug("  "+line));
+    }
   }
 
   public void sendRedirect(String location) {

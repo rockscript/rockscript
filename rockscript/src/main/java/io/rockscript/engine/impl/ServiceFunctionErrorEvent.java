@@ -1,17 +1,19 @@
 package io.rockscript.engine.impl;
 
+import io.rockscript.engine.job.RetryPolicy;
+
 import java.time.Instant;
 
-public class ServiceFunctionStartErrorEvent extends ScriptExecutionErrorEvent<ArgumentsExpressionExecution> {
+public class ServiceFunctionErrorEvent extends ScriptExecutionErrorEvent<ArgumentsExpressionExecution> {
 
   Instant retryTime;
 
   /** constructor for gson deserialization
    * */
-  ServiceFunctionStartErrorEvent() {
+  ServiceFunctionErrorEvent() {
   }
 
-  public ServiceFunctionStartErrorEvent(ArgumentsExpressionExecution execution, String error, Instant retryTime) {
+  public ServiceFunctionErrorEvent(ArgumentsExpressionExecution execution, String error, Instant retryTime) {
     super(execution, error);
     this.retryTime = retryTime;
   }
@@ -22,7 +24,7 @@ public class ServiceFunctionStartErrorEvent extends ScriptExecutionErrorEvent<Ar
 
   @Override
   public void execute(ArgumentsExpressionExecution execution) {
-    execution.failedAttemptsCount++;
+    execution.incrementFailedAttemptsCount();
   }
 
   @Override

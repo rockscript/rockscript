@@ -123,10 +123,12 @@ public class Engine {
     this.http = new Http(gson);
     throwIfNotProperlyConfigured();
     plugins.forEach(plugin->plugin.start(this));
+    this.jobService.startup();
     return this;
   }
 
   public void stop() {
+    this.jobService.shutdown();
     plugins.forEach(plugin->plugin.stop(this));
   }
 
@@ -168,7 +170,7 @@ public class Engine {
       .typeName(new TypeToken<ScriptEndedEvent>(){},           "scriptEnded")
       .typeName(new TypeToken<ScriptStartedEvent>(){},         "scriptStarted")
       .typeName(new TypeToken<VariableCreatedEvent>(){},       "variableCreated")
-      .typeName(new TypeToken<ServiceFunctionStartErrorEvent>(){}, "serviceFunctionError")
+      .typeName(new TypeToken<ServiceFunctionErrorEvent>(){}, "serviceFunctionError")
       .typeName(new TypeToken<ScriptExecutionErrorEvent>(){},  "scriptExecutionError")
       ;
   }

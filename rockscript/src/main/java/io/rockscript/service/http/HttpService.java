@@ -15,11 +15,14 @@
  */
 package io.rockscript.service.http;
 
+import io.rockscript.engine.job.RetryPolicy;
 import io.rockscript.http.client.Http;
 import io.rockscript.service.ImportObject;
 import io.rockscript.service.ImportProvider;
 
 public class HttpService extends ImportObject implements ImportProvider {
+
+  private RetryPolicy defaultRetryPolicy = RetryPolicy.createDefaultRetryPolicy();
 
   public HttpService() {
     super("rockscript.io/http");
@@ -32,5 +35,9 @@ public class HttpService extends ImportObject implements ImportProvider {
   @Override
   public ImportObject getImportObject() {
     return this;
+  }
+
+  public RetryPolicy getDefaultRetryPolicy() {
+    return defaultRetryPolicy;
   }
 }

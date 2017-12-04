@@ -17,12 +17,14 @@ package io.rockscript.service;
 
 import io.rockscript.engine.job.RetryPolicy;
 
+import java.time.Instant;
+
 public class ServiceFunctionOutput {
 
   private boolean ended;
   private Object result;
   private String error;
-  private RetryPolicy retryPolicy;
+  private Instant retryTime;
 
   public ServiceFunctionOutput() {
   }
@@ -32,17 +34,17 @@ public class ServiceFunctionOutput {
     this.result = result;
   }
 
-  public ServiceFunctionOutput(String error, RetryPolicy retryPolicy) {
+  public ServiceFunctionOutput(String error, Instant retryTime) {
     this.error = error;
-    this.retryPolicy = retryPolicy;
+    this.retryTime = retryTime;
   }
 
   public static ServiceFunctionOutput error(String error) {
     return error(error, null);
   }
 
-  public static ServiceFunctionOutput error(String error, RetryPolicy retryPolicy) {
-    return new ServiceFunctionOutput(error, retryPolicy);
+  public static ServiceFunctionOutput error(String error, Instant retryTime) {
+    return new ServiceFunctionOutput(error, retryTime);
   }
 
   public static ServiceFunctionOutput waitForFunctionEndCallback() {
@@ -73,7 +75,7 @@ public class ServiceFunctionOutput {
     return error;
   }
 
-  public RetryPolicy getRetryPolicy() {
-    return retryPolicy;
+  public Instant getRetryTime() {
+    return retryTime;
   }
 }

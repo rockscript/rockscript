@@ -54,6 +54,9 @@ public class ClientRequest {
   protected Map<String,List<String>> headers;
   protected String body;
 
+  protected ClientRequest() {
+  }
+
   protected ClientRequest(Http http, String method, String url) {
     this.http = http;
     this.method = method;
