@@ -38,4 +38,8 @@ public class RetryServiceFunctionJobHandler implements JobHandler {
       .continuationReference(continuationReference)
       .execute(engine);
   }
+
+  public ContinuationReference getContinuationReference() {
+    return continuationReference;
+  }
 }

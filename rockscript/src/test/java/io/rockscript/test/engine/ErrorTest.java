@@ -32,7 +32,7 @@ public class ErrorTest extends AbstractEngineTest {
   protected static Logger log = LoggerFactory.getLogger(ErrorTest.class);
 
   @Override
-  protected Engine initializeEngine() {
+  protected TestEngine initializeEngine() {
     // This ensures that each test will get a new CommandExecutorService
     // so that the tests can customize the import resolver without
     // polluting any cached script services.

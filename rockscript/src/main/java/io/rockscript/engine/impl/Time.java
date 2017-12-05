@@ -17,35 +17,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.engine.job;
-
-import io.rockscript.Engine;
-import io.rockscript.engine.impl.Time;
+package io.rockscript.engine.impl;
 
 import java.time.Instant;
-import java.time.temporal.TemporalAmount;
 
-public class JobContext extends Engine {
+public class Time {
 
-  Engine engine;
-  Job job;
-  JobRun jobRun;
-  JobService jobService;
+  protected static Instant now;
 
-  public JobContext(Engine engine, Job job, JobRun jobRun, JobService jobService) {
-    this.engine = engine;
-    this.job = job;
-    this.jobRun = jobRun;
-    this.jobService = jobService;
+  public static Instant now() {
+    return now!=null ? now : Instant.now();
   }
-
-  public void handleError(String error) {
-    jobService.handleError(job, jobRun, error);
-  }
-
-  public void reschedule(TemporalAmount retryDuration) {
-    job.setExecutionTime(Time.now().plus(retryDuration));
-    jobService.schedule(job);
-  }
-
 }

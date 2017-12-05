@@ -30,7 +30,7 @@ public abstract class ExecutionEvent<T extends Execution> implements Event {
   }
 
   public ExecutionEvent(T execution) {
-    this.time = Instant.now();
+    this.time = Time.now();
     this.scriptExecutionId = execution.getScriptExecution().getId();
     if (! (execution instanceof EngineScriptExecution)) {
       this.executionId = execution.getId();

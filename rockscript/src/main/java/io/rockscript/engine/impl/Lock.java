@@ -27,7 +27,7 @@ public class Lock {
 
   public Lock(String scriptExecutionId) {
     this.scriptExecutionId = EngineException.throwIfNull(scriptExecutionId);
-    this.createTime = Instant.now();
+    this.createTime = Time.now();
   }
 
   public String getScriptExecutionId() {

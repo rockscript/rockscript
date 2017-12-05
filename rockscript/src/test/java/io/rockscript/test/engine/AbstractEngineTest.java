@@ -20,7 +20,6 @@
 package io.rockscript.test.engine;
 
 import com.google.gson.Gson;
-import io.rockscript.Engine;
 import io.rockscript.TestEngine;
 import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.EndServiceFunctionCommand;
@@ -28,6 +27,7 @@ import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.ContinuationReference;
+import io.rockscript.engine.impl.Time;
 import io.rockscript.http.servlet.ServerRequest;
 import org.junit.After;
 import org.junit.Before;
@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -43,15 +44,16 @@ public class AbstractEngineTest {
 
   protected static Logger log = LoggerFactory.getLogger(AbstractEngineTest.class);
 
-  protected static Map<Class<? extends EngineProvider>,Engine> cachedEngines = new HashMap<>();
+  protected static Map<Class<? extends EngineProvider>,TestEngine> cachedEngines = new HashMap<>();
 
-  protected Engine engine;
+  protected TestEngine engine;
   protected Gson gson;
 
   @Before
   public void setUp() {
     engine = initializeEngine();
     gson = engine.getGson();
+    resetNow();
   }
 
   public <T> T parseBodyAs(ServerRequest request, Type type) {
@@ -73,10 +75,10 @@ public class AbstractEngineTest {
    *
    * Overwrite {@link #getEngineProvider()} if you want to
    * customize and cache a CommandExecutorService in your tests. */
-  protected Engine initializeEngine() {
+  protected TestEngine initializeEngine() {
     EngineProvider engineProvider = getEngineProvider();
     Class<? extends EngineProvider> providerClass = engineProvider.getClass();
-    Engine engine = cachedEngines.get(providerClass);
+    TestEngine engine = cachedEngines.get(providerClass);
     if (engine==null) {
       engine = engineProvider.createEngine();
       cachedEngines.put(providerClass, engine);
@@ -85,7 +87,7 @@ public class AbstractEngineTest {
   }
 
   protected interface EngineProvider {
-    Engine createEngine();
+    TestEngine createEngine();
   }
 
   /** Override this method to use a customized Engine in your tests.
@@ -97,11 +99,26 @@ public class AbstractEngineTest {
   protected EngineProvider getEngineProvider() {
     return new EngineProvider() {
       @Override
-      public Engine createEngine() {
+      public TestEngine createEngine() {
         return new TestEngine().start();
       }
     };
   }
+
+  static class TestTime extends Time {
+    static void setNow(Instant now) {
+      Time.now = now;
+    }
+  }
+
+  public void setNow(Instant now) {
+    TestTime.setNow(now);
+  }
+
+  public void resetNow() {
+    TestTime.setNow(null);
+  }
+
 
   public ScriptVersion deployScript(String scriptText) {
     return new DeployScriptVersionCommand()

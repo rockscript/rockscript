@@ -91,7 +91,7 @@ public class Engine {
     this.scriptExecutionIdGenerator = new TestIdGenerator(this, "se");
     this.lockService = new LockServiceImpl(this);
     this.lockOperationExecutor = new LockOperationExecutorImpl(this);
-    this.jobService = new JobService(this);
+    this.jobService = createJobService();
 
     this.importResolver = new ImportResolver(this);
     importProvider(new HttpService());
@@ -112,6 +112,10 @@ public class Engine {
     }
 
     plugins.forEach(plugin->plugin.created(this));
+  }
+
+  protected JobService createJobService() {
+    return new JobService(this);
   }
 
   public Engine importProvider(ImportProvider importProvider) {

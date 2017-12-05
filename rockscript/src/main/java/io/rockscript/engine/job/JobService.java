@@ -21,7 +21,10 @@ package io.rockscript.engine.job;
 
 import io.rockscript.Engine;
 import io.rockscript.engine.impl.IdGenerator;
+import io.rockscript.engine.impl.Time;
 import io.rockscript.util.Exceptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -33,13 +36,15 @@ import java.util.TimerTask;
 
 public class JobService {
 
-  Engine engine;
-  Timer timer;
-  List<Job> jobs = new ArrayList<>();
-  IdGenerator idGenerator;
+  static Logger log = LoggerFactory.getLogger(JobService.class);
+
+  protected Engine engine;
+  protected Timer timer;
+  protected List<Job> jobs = new ArrayList<>();
+  protected IdGenerator idGenerator;
   /** jobs that are stuck */
-  List<Job> errorJobs = new ArrayList<>();
-  RetryPolicy defaultJobRetryPolicy; // TODO initialize this
+  protected List<Job> errorJobs = new ArrayList<>();
+  protected RetryPolicy defaultJobRetryPolicy; // TODO initialize this
 
   public JobService(Engine engine) {
     this.engine = engine;
@@ -54,16 +59,6 @@ public class JobService {
     timer.cancel();
   }
 
-//  /** The job handler is immediately executed like a command in a queue */
-//  public Job schedule(JobHandler jobHandler) {
-//  }
-//
-//  /** The job handler executed at the specified event, if an exception occurs,
-//   * the job moves to the errorJobs. */
-//  public Job schedule(JobHandler jobHandler, Instant executionTime) {
-//  }
-//
-
   /**
    * The job handler executed at the specified event, if an exception occurs,
    * the job is first retried according to the retry policy and if that doesn't
@@ -77,6 +72,7 @@ public class JobService {
    * the job is first retried according to the retry policy and if that doesn't
    * help, the job is put in the errorJobs. */
   public Job schedule(JobHandler jobHandler, Instant executionTime, RetryPolicy retryPolicy) {
+    log.debug("Scheduling "+jobHandler.getClass().getSimpleName()+" for "+executionTime);
     Job job = new Job(idGenerator.createId(), jobHandler, executionTime, retryPolicy);
     schedule(job);
     jobs.add(job);
@@ -84,7 +80,7 @@ public class JobService {
   }
 
   public void schedule(Job job) {
-    long millisFromNow = Duration.between(Instant.now(), job.getExecutionTime()).toMillis();
+    long millisFromNow = Duration.between(Time.now(), job.getExecutionTime()).toMillis();
     timer.schedule(new TimerTask() {
       @Override
       public void run() {
@@ -93,12 +89,12 @@ public class JobService {
     }, millisFromNow);
   }
 
-  private void executeJob(Job job) {
+  protected void executeJob(Job job) {
     JobHandler jobHandler = job.getJobHandler();
     JobRun jobRun = new JobRun();
     job.addJobRun(jobRun);
     try {
-      jobHandler.execute(new JobContext(engine, job, jobRun, this));
+      jobHandler.execute(engine);
       jobRun.endOk();
     } catch (Exception e) {
       String error = Exceptions.getStackTraceString(e);
@@ -111,7 +107,7 @@ public class JobService {
     long errorCount = job.getErrorCount();
     TemporalAmount retryDuration = job.getNextRetryDuration();
     if (retryDuration!=null) {
-      Instant nextRetryTime = Instant.now().plus(retryDuration);
+      Instant nextRetryTime = Time.now().plus(retryDuration);
       job.setExecutionTime(nextRetryTime);
       schedule(job);
 

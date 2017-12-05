@@ -24,6 +24,7 @@ import io.rockscript.Engine;
 import io.rockscript.api.commands.ServiceFunctionErrorCommand;
 import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.LockOperationEnd;
+import io.rockscript.engine.impl.Time;
 import io.rockscript.engine.job.RetryPolicy;
 import io.rockscript.http.client.ClientResponse;
 import org.slf4j.Logger;
@@ -72,15 +73,16 @@ public class HttpRequestRunnable implements Runnable {
 
       Instant retry = null;
       if (retryPolicy!=null) {
-        failedAttemptsCount = failedAttemptsCount!=null ? failedAttemptsCount++ : 1;
+        failedAttemptsCount = failedAttemptsCount!=null ? failedAttemptsCount+1 : 1;
         if (retryPolicy.size()>failedAttemptsCount) {
-          TemporalAmount timeBeforeRetry = retryPolicy.get(failedAttemptsCount);
-          retry = Instant.now().plus(timeBeforeRetry);
+          TemporalAmount timeBeforeRetry = retryPolicy.get(failedAttemptsCount-1);
+          retry = Time.now().plus(timeBeforeRetry);
         }
       }
 
       new ServiceFunctionErrorCommand()
         .continuationReference(continuationReference)
+        .error(e.getMessage())
         .retry(retry)
         .execute(engine);
     }

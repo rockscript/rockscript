@@ -41,7 +41,7 @@ public class ObjectLiteralExpressionTest extends AbstractEngineTest {
   List<Object> capturedValues = new ArrayList<>();
 
   @Override
-  protected Engine initializeEngine() {
+  protected TestEngine initializeEngine() {
     TestEngine engine = new TestEngine();
     engine.getImportResolver().createImport("example.com/assert")
       .put("assertLiteralValue", input -> {

@@ -45,7 +45,7 @@ public class CrashTest extends AbstractEngineTest {
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
   @Override
-  protected Engine initializeEngine() {
+  protected TestEngine initializeEngine() {
     TestEngine engine = new TestEngine();
     addHelloService(engine);
     engine.start();

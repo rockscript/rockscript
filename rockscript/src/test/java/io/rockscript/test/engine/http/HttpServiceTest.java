@@ -19,12 +19,13 @@
  */
 package io.rockscript.test.engine.http;
 
-import io.rockscript.api.commands.ScriptExecutionResponse;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.EngineScriptExecution;
 import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
-import io.rockscript.engine.job.JobService;
+import io.rockscript.engine.impl.Time;
+import io.rockscript.engine.job.Job;
+import io.rockscript.engine.job.RetryServiceFunctionJobHandler;
 import io.rockscript.http.servlet.PathRequestHandler;
 import io.rockscript.http.servlet.RouterServlet;
 import io.rockscript.http.servlet.ServerRequest;
@@ -37,8 +38,9 @@ import java.util.List;
 import java.util.Map;
 
 import static io.rockscript.http.servlet.PathRequestHandler.GET;
-import static io.rockscript.http.servlet.PathRequestHandler.POST;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class HttpServiceTest extends AbstractHttpTest {
 
@@ -100,6 +102,7 @@ public class HttpServiceTest extends AbstractHttpTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testHttpGetError() {
+    setNow(Time.now()); // fix time
     int wrongPort = 7236;
     ScriptVersion scriptVersion = deployScript(
       "var http = system.import('rockscript.io/http'); \n" +
@@ -114,8 +117,17 @@ public class HttpServiceTest extends AbstractHttpTest {
 
     ScriptExecutionErrorEvent errorEvent = engineScriptExecution.getErrorEvent();
 
-    JobService jobService = engine.getJobService();
-    jobService.toString();
-  }
+    List<Job> jobs = engine.getJobService().getjobs();
+    Job job = jobs.get(0);
+    RetryServiceFunctionJobHandler retryServiceFunctionJobHandler = (RetryServiceFunctionJobHandler) job.getJobHandler();
+    assertEquals(engineScriptExecution.getId(), retryServiceFunctionJobHandler.getContinuationReference().getScriptExecutionId());
+    assertNotNull(retryServiceFunctionJobHandler.getContinuationReference().getExecutionId());
+    assertEquals(Time.now().plusSeconds(5), job.getExecutionTime());
+    assertEquals(1, jobs.size());
 
+    engine.getJobService().executeJob(job);
+
+//    assertEquals(1, job.getJobRuns().size());
+//    assertEquals(2, jobs.size());
+  }
 }

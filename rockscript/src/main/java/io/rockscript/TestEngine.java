@@ -19,6 +19,10 @@
  */
 package io.rockscript;
 
+import io.rockscript.engine.job.Job;
+import io.rockscript.engine.job.JobService;
+
+import java.util.List;
 import java.util.concurrent.Executor;
 
 /** Engine with predictable execution of async stuff because
@@ -27,6 +31,11 @@ public class TestEngine extends Engine {
 
   public TestEngine() {
     this.executor = createExecutor();
+  }
+
+  @Override
+  public TestEngine start() {
+    return (TestEngine) super.start();
   }
 
   protected Executor createExecutor() {
@@ -39,5 +48,29 @@ public class TestEngine extends Engine {
         command.run();
       }
     };
+  }
+
+  @Override
+  protected JobService createJobService() {
+    return new TestJobService(this);
+  }
+
+  public static class TestJobService extends JobService {
+    public TestJobService(Engine engine) {
+      super(engine);
+    }
+    public List<Job> getjobs() {
+      return jobs;
+    }
+
+    @Override
+    public void executeJob(Job job) {
+      super.executeJob(job);
+    }
+  }
+
+  @Override
+  public TestJobService getJobService() {
+    return (TestJobService) super.getJobService();
   }
 }

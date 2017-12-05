@@ -90,8 +90,8 @@ public class ServiceFunctionErrorCommand implements Command<Void> {
   public void setError(String error) {
     this.error = error;
   }
-  public ServiceFunctionErrorCommand message(String message) {
-    this.error = message;
+  public ServiceFunctionErrorCommand error(String error) {
+    this.error = error;
     return this;
   }
 

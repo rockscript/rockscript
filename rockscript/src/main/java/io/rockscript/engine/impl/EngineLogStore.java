@@ -77,7 +77,7 @@ public class EngineLogStore {
 
   public void log(String level, String message, Throwable exception) {
     String logMessage = getStackTraceString(message, exception);
-    add(new EngineLog(Instant.now(), level, logMessage));
+    add(new EngineLog(Time.now(), level, logMessage));
   }
 
   private void add(EngineLog log) {

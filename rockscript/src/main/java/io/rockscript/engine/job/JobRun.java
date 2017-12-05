@@ -19,6 +19,8 @@
  */
 package io.rockscript.engine.job;
 
+import io.rockscript.engine.impl.Time;
+
 import java.time.Instant;
 
 public class JobRun {
@@ -56,11 +58,11 @@ public class JobRun {
   }
 
   public void endOk() {
-    this.end = Instant.now();
+    this.end = Time.now();
   }
 
   public void endError(String error) {
-    this.end = Instant.now();
+    this.end = Time.now();
     this.error = error;
   }
 
