@@ -47,7 +47,7 @@ public class ServiceFunctionErrorCommand implements Command<Void> {
     try {
       ContinuationReference continuationReference = new ContinuationReference(scriptExecutionId, executionId);
 
-      engine.getScriptRunner().serviceFunctionError(continuationReference, error, retryTime);
+      engine.getLockOperationExecutor().executeInLock(new LockOperationError(continuationReference, error, retryTime));
 
       return null;
 

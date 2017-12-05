@@ -21,7 +21,7 @@ package io.rockscript.engine.impl;
 
 import io.rockscript.Engine;
 
-public interface UnlockListener {
+public interface LockReleaseListener {
 
   void releasingLock(Engine engine, Lock lock, EngineScriptExecution lockedScriptExecution);
 }

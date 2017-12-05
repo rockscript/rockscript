@@ -21,20 +21,24 @@ package io.rockscript.engine.impl;
 
 import io.rockscript.Engine;
 
-import java.time.Instant;
+public abstract class LockOperation implements LockReleaseListener {
 
-public class ServiceFunctionRetryRequest implements UnlockListener {
+  protected String scriptExecutionId;
 
-  LocalScriptRunner localScriptRunner;
-  ContinuationReference continuationReference;
+  public LockOperation(String scriptExecutionId) {
+    this.scriptExecutionId = scriptExecutionId;
+  }
 
-  public ServiceFunctionRetryRequest(LocalScriptRunner localScriptRunner, ContinuationReference continuationReference) {
-    this.localScriptRunner = localScriptRunner;
-    this.continuationReference = continuationReference;
+  public abstract EngineScriptExecution getLockedScriptExecution(Engine engine);
+
+  public abstract void execute(Engine engine, Lock lock, EngineScriptExecution lockedScriptExecution);
+
+  public String getScriptExecutionId() {
+    return scriptExecutionId;
   }
 
   @Override
   public void releasingLock(Engine engine, Lock lock, EngineScriptExecution lockedScriptExecution) {
-    localScriptRunner.retryFunctionLocked(lockedScriptExecution, lock, continuationReference);
+    execute(engine, lock, lockedScriptExecution);
   }
 }

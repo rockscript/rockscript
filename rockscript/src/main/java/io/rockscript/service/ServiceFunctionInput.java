@@ -87,8 +87,8 @@ public class ServiceFunctionInput {
     return getEngine().getGson();
   }
 
-  public ScriptRunner getScriptRunner() {
-    return getEngine().getScriptRunner();
+  public LockOperationExecutor getScriptRunner() {
+    return getEngine().getLockOperationExecutor();
   }
 
   public Location getElementLocation() {

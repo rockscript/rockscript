@@ -20,31 +20,20 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.Engine;
-import io.rockscript.api.Command;
+import io.rockscript.engine.EngineException;
 
-public class ServiceFunctionRetryCommand implements Command<Void> {
+public class LockOperationEnd extends LockOperationExecution<ArgumentsExpressionExecution> {
 
-  protected ContinuationReference continuationReference;
+  Object result;
 
-  @Override
-  public String getType() {
-    return null;
+  public LockOperationEnd(ContinuationReference continuationReference, Object result) {
+    super(continuationReference.getScriptExecutionId(), continuationReference.getExecutionId());
+    this.result = result;
   }
 
   @Override
-  public Void execute(Engine engine) {
-    engine.getLockOperationExecutor().executeInLock(new LockOperationRetry(continuationReference));
-    return null;
-  }
-
-  public ContinuationReference getContinuationReference() {
-    return this.continuationReference;
-  }
-  public void setContinuationReference(ContinuationReference continuationReference) {
-    this.continuationReference = continuationReference;
-  }
-  public ServiceFunctionRetryCommand continuationReference(ContinuationReference continuationReference) {
-    this.continuationReference = continuationReference;
-    return this;
+  public void execute(Engine engine, Lock lock, EngineScriptExecution lockedScriptExecution, ArgumentsExpressionExecution execution) {
+    execution.endFunction(result);
+    lockedScriptExecution.doWork();
   }
 }

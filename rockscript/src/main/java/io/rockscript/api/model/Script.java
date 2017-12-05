@@ -18,9 +18,9 @@ package io.rockscript.api.model;
 import java.util.ArrayList;
 import java.util.List;
 
-/** A script is a named and versioned RockScript text that can be executed by the scriptRunner.
+/** A script is a named and versioned RockScript text that can be executed by the lockService.
  *
- * RockScript requires scripts to be stored in the scriptRunner because it
+ * RockScript requires scripts to be stored in the lockService because it
  * long running scripts may need to be reloaded after long waits.
  *
  * The name can represent eg the path on the file system or any other user defined name.

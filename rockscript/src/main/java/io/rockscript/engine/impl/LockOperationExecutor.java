@@ -23,13 +23,8 @@ import java.time.Instant;
  * The goal is to also have an in-memory
  * implementation for single-node deployments and a distributed
  * implementations based on Consul. */
-public interface ScriptRunner {
+public interface LockOperationExecutor {
 
-  EngineScriptExecution startScriptExecution(String scriptVersionId, Object input);
+  EngineScriptExecution executeInLock(LockOperation lockOperation);
 
-  EngineScriptExecution endFunction(ContinuationReference continuationReference, Object result);
-
-  EngineScriptExecution serviceFunctionError(ContinuationReference continuationReference, String error, Instant retryTime);
-
-  EngineScriptExecution retryFunction(ContinuationReference continuationReference);
 }

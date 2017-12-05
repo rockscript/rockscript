@@ -83,7 +83,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
       .setValue(systemJsonObject);
   }
 
-  void setInput(Object input) {
+  public void setInput(Object input) {
     JsonObject systemJsonObject = (JsonObject) getVariable("system").getValue();
     systemJsonObject.put("input", input);
   }
@@ -120,7 +120,6 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
             log.debug("Expected, unreplayed event: "+unreplayedEvent.toString());
             throw new RuntimeException();
           }
-
         }
       }
     }

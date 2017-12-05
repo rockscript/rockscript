@@ -19,32 +19,11 @@
  */
 package io.rockscript.engine.impl;
 
-import io.rockscript.Engine;
-import io.rockscript.api.Command;
+public interface LockService {
 
-public class ServiceFunctionRetryCommand implements Command<Void> {
+  Lock acquireLock(String scriptExecutionId);
 
-  protected ContinuationReference continuationReference;
+  void releaseLock(Lock lock, EngineScriptExecution lockedScriptExecution);
 
-  @Override
-  public String getType() {
-    return null;
-  }
-
-  @Override
-  public Void execute(Engine engine) {
-    engine.getLockOperationExecutor().executeInLock(new LockOperationRetry(continuationReference));
-    return null;
-  }
-
-  public ContinuationReference getContinuationReference() {
-    return this.continuationReference;
-  }
-  public void setContinuationReference(ContinuationReference continuationReference) {
-    this.continuationReference = continuationReference;
-  }
-  public ServiceFunctionRetryCommand continuationReference(ContinuationReference continuationReference) {
-    this.continuationReference = continuationReference;
-    return this;
-  }
+  void addUnlockListener(String scriptExecutionId, LockReleaseListener lockReleaseListener);
 }

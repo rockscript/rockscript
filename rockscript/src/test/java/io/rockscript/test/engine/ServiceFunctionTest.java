@@ -21,11 +21,12 @@ package io.rockscript.test.engine;
 
 import io.rockscript.Engine;
 import io.rockscript.TestEngine;
-import io.rockscript.service.ServiceFunctionInput;
-import io.rockscript.service.ServiceFunctionOutput;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.ExecutionEvent;
+import io.rockscript.engine.impl.LockOperationEnd;
+import io.rockscript.service.ServiceFunctionInput;
+import io.rockscript.service.ServiceFunctionOutput;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +81,7 @@ public class ServiceFunctionTest extends AbstractEngineTest {
   public void testEvents() {
     engine.getImportResolver().createImport("approvalService")
       .put("getMessage", input -> {
-        input.getScriptRunner().endFunction(input.getContinuationReference(), "hello");
+        input.getScriptRunner().executeInLock(new LockOperationEnd(input.getContinuationReference(), "hello"));
         return ServiceFunctionOutput.waitForFunctionEndCallback();
       }).put("approve", input -> {
       inputs.add(input);

@@ -23,6 +23,7 @@ import com.google.gson.JsonParser;
 import io.rockscript.Engine;
 import io.rockscript.api.commands.ServiceFunctionErrorCommand;
 import io.rockscript.engine.impl.ContinuationReference;
+import io.rockscript.engine.impl.LockOperationEnd;
 import io.rockscript.engine.job.RetryPolicy;
 import io.rockscript.http.client.ClientResponse;
 import org.slf4j.Logger;
@@ -63,8 +64,8 @@ public class HttpRequestRunnable implements Runnable {
       }
 
       engine
-        .getScriptRunner()
-        .endFunction(continuationReference, responseObject);
+        .getLockOperationExecutor()
+        .executeInLock(new LockOperationEnd(continuationReference, responseObject));
 
     } catch (Exception e) {
       log.debug("Exception while executing HTTP "+request.getMethod()+" "+request.getUrl()+": "+e.getMessage(), e);

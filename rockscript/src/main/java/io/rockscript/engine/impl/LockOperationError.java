@@ -20,25 +20,23 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.Engine;
+import io.rockscript.engine.EngineException;
 
 import java.time.Instant;
 
-public class ServiceFunctionErrorRequest implements UnlockListener {
+public class LockOperationError extends LockOperationExecution<ArgumentsExpressionExecution> {
 
-  LocalScriptRunner localScriptRunner;
-  ContinuationReference continuationReference;
   String error;
   Instant retryTime;
 
-  public ServiceFunctionErrorRequest(LocalScriptRunner localScriptRunner, ContinuationReference continuationReference, String error, Instant retryTime) {
-    this.localScriptRunner = localScriptRunner;
-    this.continuationReference = continuationReference;
+  public LockOperationError(ContinuationReference continuationReference, String error, Instant retryTime) {
+    super(continuationReference.getScriptExecutionId(), continuationReference.getExecutionId());
     this.error = error;
     this.retryTime = retryTime;
   }
 
   @Override
-  public void releasingLock(Engine engine, Lock lock, EngineScriptExecution lockedScriptExecution) {
-    localScriptRunner.serviceFunctionErrorLocked(lockedScriptExecution, lock, continuationReference, error, retryTime);
+  public void execute(Engine engine, Lock lock, EngineScriptExecution lockedScriptExecution, ArgumentsExpressionExecution execution) {
+    execution.handleServiceFunctionError(error, retryTime);
   }
 }

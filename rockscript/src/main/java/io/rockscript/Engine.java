@@ -66,7 +66,8 @@ public class Engine {
   protected ScriptStore scriptStore;
   protected EngineLogStore engineLogStore;
   protected EventListener eventListener;
-  protected ScriptRunner scriptRunner;
+  protected LockOperationExecutor lockOperationExecutor;
+  protected LockService lockService;
   protected ImportResolver importResolver;
   protected Executor executor;
   protected Gson gson;
@@ -88,7 +89,8 @@ public class Engine {
     this.scriptIdGenerator = new TestIdGenerator(this, "s");
     this.scriptVersionIdGenerator = new TestIdGenerator(this, "sv");
     this.scriptExecutionIdGenerator = new TestIdGenerator(this, "se");
-    this.scriptRunner = new LocalScriptRunner(this);
+    this.lockService = new LockServiceImpl(this);
+    this.lockOperationExecutor = new LockOperationExecutorImpl(this);
     this.jobService = new JobService(this);
 
     this.importResolver = new ImportResolver(this);
@@ -290,8 +292,8 @@ public class Engine {
     return eventListener;
   }
 
-  public ScriptRunner getScriptRunner() {
-    return scriptRunner;
+  public LockOperationExecutor getLockOperationExecutor() {
+    return lockOperationExecutor;
   }
 
   public ImportResolver getImportResolver() {
@@ -320,5 +322,9 @@ public class Engine {
 
   public EngineLogStore getEngineLogStore() {
     return engineLogStore;
+  }
+
+  public LockService getLockService() {
+    return lockService;
   }
 }

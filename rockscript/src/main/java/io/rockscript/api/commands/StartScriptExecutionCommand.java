@@ -18,7 +18,10 @@ package io.rockscript.api.commands;
 import io.rockscript.Engine;
 import io.rockscript.api.Command;
 import io.rockscript.api.model.Script;
+import io.rockscript.engine.EngineException;
+import io.rockscript.engine.impl.EngineScript;
 import io.rockscript.engine.impl.EngineScriptExecution;
+import io.rockscript.engine.impl.LockOperationStart;
 import io.rockscript.engine.impl.ScriptStore;
 import io.rockscript.http.servlet.BadRequestException;
 
@@ -57,9 +60,26 @@ public class StartScriptExecutionCommand implements Command<ScriptExecutionRespo
       BadRequestException.throwIfNull(scriptVersionId, "Script %s does not have an active version yet", scriptId);
     }
 
+    if (scriptVersionId==null) {
+      throw new EngineException("No scriptVersionId specified");
+    }
+
+    ScriptStore scriptStore = engine.getScriptStore();
+    EngineScript engineScript = scriptStore.findScriptAstByScriptVersionId(scriptVersionId);
+
+    EngineException.throwIfNull(engineScript, "ScriptVersion %s not found", scriptVersionId);
+
+    String scriptExecutionId = engine
+      .getScriptExecutionIdGenerator()
+      .createId();
+
+    EngineScriptExecution scriptExecution = new EngineScriptExecution(scriptExecutionId, engine, engineScript);
+    scriptExecution.setInput(input);
+
     EngineScriptExecution engineScriptExecution = engine
-      .getScriptRunner()
-      .startScriptExecution(scriptVersionId, input);
+      .getLockOperationExecutor()
+      .executeInLock(new LockOperationStart(scriptExecution, input));
+
     return new ScriptExecutionResponse(engineScriptExecution);
   }
 

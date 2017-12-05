@@ -19,6 +19,7 @@ import io.rockscript.Engine;
 import io.rockscript.api.Command;
 import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.EngineScriptExecution;
+import io.rockscript.engine.impl.LockOperationEnd;
 import io.rockscript.http.servlet.BadRequestException;
 import io.rockscript.http.servlet.InternalServerException;
 
@@ -43,12 +44,13 @@ public class EndServiceFunctionCommand implements Command<ScriptExecutionRespons
     try {
       ContinuationReference continuationReference = new ContinuationReference(scriptExecutionId, executionId);
       EngineScriptExecution engineScriptExecution = engine
-          .getScriptRunner()
-          .endFunction(continuationReference, result);
+          .getLockOperationExecutor()
+          .executeInLock(new LockOperationEnd(continuationReference, result));
+
       return new ScriptExecutionResponse(engineScriptExecution);
 
     } catch (Exception e) {
-      throw new InternalServerException();
+      throw new InternalServerException("Couldn't execute end service function command: "+e.getMessage(), e);
     }
   }
 
