@@ -19,9 +19,9 @@
  */
 package io.rockscript.engine.impl;
 
-public class ServiceFunctionRetryEvent extends ExecutionEvent<ArgumentsExpressionExecution> {
+public class ServiceFunctionRetryingEvent extends ServiceFunctionStartingEvent {
 
-  public ServiceFunctionRetryEvent(ArgumentsExpressionExecution execution) {
+  public ServiceFunctionRetryingEvent(ArgumentsExpressionExecution execution) {
     super(execution);
   }
 

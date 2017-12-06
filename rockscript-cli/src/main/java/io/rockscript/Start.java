@@ -32,7 +32,7 @@ import java.util.Properties;
 public class Start extends ClientCommand {
 
   protected String scriptName;
-  protected String scriptId;
+  protected String scriptVersionId;
   protected Properties input;
 
   @Override
@@ -51,15 +51,15 @@ public class Start extends ClientCommand {
   protected Options getOptions() {
     Options options = super.getOptions();
     options.addOption(Option.builder("n")
-      .desc("ScriptVersion name. The latest version of the script with the " +
+      .desc("Script name. The latest version of the script with the " +
             "given name will be started.  The name has to identify one " +
             "script by matching the last part so you don't have to type " +
-            "the full name. It's required to provide either n or sid.")
+            "the full name. It's required to provide either n or v.")
       .hasArg()
       .build());
-    options.addOption(Option.builder("sid")
-      .desc("ScriptVersion id. This identifies the specific version of a script " +
-            "to start. It's required to provide either n or sid.")
+    options.addOption(Option.builder("v")
+      .desc("Script version id. This identifies the specific version of a script " +
+            "to start. It's required to provide either n or v.")
       .hasArg()
       .build());
     options.addOption(Option.builder("p")
@@ -75,7 +75,7 @@ public class Start extends ClientCommand {
   protected void parse(CommandLine commandLine) {
     super.parse(commandLine);
     this.scriptName = commandLine.getOptionValue("n");
-    this.scriptId = commandLine.getOptionValue("sid");
+    this.scriptVersionId = commandLine.getOptionValue("v");
     this.input = commandLine.getOptionProperties("p");
     if (this.input.isEmpty()) {
       this.input = null;
@@ -84,12 +84,12 @@ public class Start extends ClientCommand {
 
   @Override
   public void execute() {
-    if (scriptName==null && scriptId==null) {
-      log("No -n or -sid provided.  One of those two has to be specified.");
+    if (scriptName==null && scriptVersionId==null) {
+      log("No -n or -v provided.  One of those two has to be specified.");
       return;
     }
-    if (scriptName!=null && scriptId!=null) {
-      log("Both -n and -sid are provided.  -id "+scriptId+ " will be used.");
+    if (scriptName!=null && scriptVersionId!=null) {
+      log("Both -n and -v are provided.  -v " + scriptVersionId + " will be used.");
       scriptName = null;
     }
 
@@ -98,7 +98,7 @@ public class Start extends ClientCommand {
       .headerContentTypeApplicationJson()
       .bodyJson(new StartScriptExecutionCommand()
         .scriptName(scriptName)
-        .scriptVersionId(scriptId)
+        .scriptVersionId(scriptVersionId)
         .input(input)
       );
 
@@ -129,14 +129,14 @@ public class Start extends ClientCommand {
     return this;
   }
 
-  public String getScriptId() {
-    return this.scriptId;
+  public String getScriptVersionId() {
+    return this.scriptVersionId;
   }
-  public void setScriptId(String scriptId) {
-    this.scriptId = scriptId;
+  public void setScriptVersionId(String scriptVersionId) {
+    this.scriptVersionId = scriptVersionId;
   }
   public Start scriptId(String scriptId) {
-    this.scriptId = scriptId;
+    this.scriptVersionId = scriptId;
     return this;
   }
 }

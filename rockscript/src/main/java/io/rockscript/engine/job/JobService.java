@@ -79,7 +79,7 @@ public class JobService {
     return job;
   }
 
-  public void schedule(Job job) {
+  protected void schedule(Job job) {
     long millisFromNow = Duration.between(Time.now(), job.getExecutionTime()).toMillis();
     timer.schedule(new TimerTask() {
       @Override
@@ -94,7 +94,9 @@ public class JobService {
     JobRun jobRun = new JobRun();
     job.addJobRun(jobRun);
     try {
+      log.debug("Job handler "+jobHandler.getClass().getSimpleName()+" execution starts");
       jobHandler.execute(engine);
+      log.debug("Job handler "+jobHandler.getClass().getSimpleName()+" execution ended ok");
       jobRun.endOk();
     } catch (Exception e) {
       String error = Exceptions.getStackTraceString(e);
@@ -103,6 +105,7 @@ public class JobService {
   }
 
   public void handleError(Job job, JobRun jobRun, String error) {
+    log.debug("Job handler "+job.getJobHandler().getClass().getSimpleName()+" error occurred: "+error);
     jobRun.endError(error);
     long errorCount = job.getErrorCount();
     TemporalAmount retryDuration = job.getNextRetryDuration();

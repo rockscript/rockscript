@@ -56,7 +56,7 @@ public class TestImportObject extends ImportObject implements ImportProvider {
         if (response.getErrorEvent()==null) {
           return ServiceFunctionOutput.endFunction(response.getScriptExecution());
         } else {
-          return ServiceFunctionOutput.error("ScriptVersion start failed: " + response.getErrorEvent().getError());
+          return ServiceFunctionOutput.error("Script start failed: " + response.getErrorEvent().getError());
         }
       } catch (Exception e) {
         return ServiceFunctionOutput.error("Test execution error: " + e.getMessage());

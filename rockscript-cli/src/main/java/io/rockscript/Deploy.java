@@ -64,7 +64,7 @@ public class Deploy extends ClientCommand {
       "Default is not recursive. " +
       "Ignored if specified with a file.");
     options.addOption("n", true,
-      "ScriptVersion file name regex used for scanning a directory. The file " +
+      "Script file name regex used for scanning a directory. The file " +
       "name has to end with the given name. " +
       "Default is " +DEFAULT_NAME_REGEX+" "+
       "Ignored if a file is specified. " +

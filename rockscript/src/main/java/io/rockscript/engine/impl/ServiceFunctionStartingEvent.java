@@ -23,18 +23,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ServiceFunctionStartedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
+public class ServiceFunctionStartingEvent extends ExecutionEvent<ArgumentsExpressionExecution> {
 
   String serviceName;
   String functionName;
   Object args;
 
   /** constructor for gson serialization */
-  ServiceFunctionStartedEvent() {
+  ServiceFunctionStartingEvent() {
   }
 
   @SuppressWarnings("unchecked")
-  public ServiceFunctionStartedEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
+  public ServiceFunctionStartingEvent(ArgumentsExpressionExecution argumentsExpressionExecution) {
     super(argumentsExpressionExecution);
     if (argumentsExpressionExecution.serviceFunction==null) {
       throw new EngineException("ServiceFunction doesn't exist: "+argumentsExpressionExecution.element.getText());
@@ -71,10 +71,10 @@ public class ServiceFunctionStartedEvent extends ExecutableEvent<ArgumentsExpres
     }
   }
 
-  @Override
-  public void execute(ArgumentsExpressionExecution execution) {
-    execution.startFunctionExecute();
-  }
+//  @Override
+//  public void execute(ArgumentsExpressionExecution execution) {
+//    execution.startFunctionExecute();
+//  }
 
   @Override
   public String toString() {

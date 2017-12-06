@@ -50,7 +50,7 @@ public class End extends ClientCommand {
   protected Options getOptions() {
     Options options = super.getOptions();
     options.addOption(Option.builder("seid")
-      .desc("ScriptVersion execution id. This identifies the script execution. " +
+      .desc("Script execution id. This identifies the script execution. " +
             "Required.")
       .required()
       .hasArg()

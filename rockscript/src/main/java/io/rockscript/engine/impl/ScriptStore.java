@@ -47,7 +47,7 @@ public class ScriptStore {
     this.scripts = other.scripts;
   }
 
-  /** Parses the scriptVersion and initializes
+  /** Parses the script and initializes
    * the engineScript if parse is succesfull. */
   // TODO move this method into a ScriptParser in Engine
   public Parse parseScriptText(String scriptText) {

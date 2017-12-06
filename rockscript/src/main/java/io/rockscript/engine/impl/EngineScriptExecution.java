@@ -55,20 +55,14 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
     this.executionMode = ExecutionMode.REBUILDING;
     this.unreplayedEvents = new LinkedList<>(storedEvents);
 
-    log.info("Building scriptVersion execution from events:");
+    log.info("Building script execution from events:");
     this.unreplayedEvents.forEach(e->log.info("  "+e.toString()));
 
     while (!this.unreplayedEvents.isEmpty()) {
       ExecutableEvent executableEvent = (ExecutableEvent) unreplayedEvents.removeFirst();
-      // ScriptVersion execution events do not have an executionId in the event, only the scriptExecutionId.
+      // Script execution events do not have an executionId in the event, only the scriptExecutionId.
       Execution execution = executableEvent.executionId!=null ? findExecutionRecursive(executableEvent.executionId) : this;
       log.info("Reexecuting event: "+executableEvent.toString());
-
-      if (executableEvent instanceof ServiceFunctionStartedEvent
-          && !isNextUnreplayedOrWaitOrEnd()) {
-        this.executionMode = ExecutionMode.RECOVERING;
-      }
-
       executableEvent.execute(execution);
     }
 

@@ -127,7 +127,7 @@ public class HttpServiceTest extends AbstractHttpTest {
 
     engine.getJobService().executeJob(job);
 
-//    assertEquals(1, job.getJobRuns().size());
-//    assertEquals(2, jobs.size());
+    assertEquals(1, job.getJobRuns().size());
+    assertEquals(2, jobs.size());
   }
 }

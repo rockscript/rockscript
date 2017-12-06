@@ -26,7 +26,7 @@ public class ScriptExecutionErrorEvent<T extends Execution> extends ExecutableEv
   @Override
   public String toString() {
     return "[" + scriptExecutionId +"] " +
-           "Error [scriptVersion:"+scriptId+",line:"+line+"] "+error;
+           "Error [script:"+scriptId+",line:"+line+"] "+error;
   }
 
   public String getScriptId() {

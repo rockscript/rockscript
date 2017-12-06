@@ -65,7 +65,7 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
   @Test
   public void testTestRunnerAssertionFailure() {
     new DeployScriptVersionCommand()
-        .scriptName("The ScriptVersion.rs")
+        .scriptName("The Script.rs")
         .scriptText(
           "var http = system.import('rockscript.io/http'); \n" +
           "var country = http \n" +
@@ -74,11 +74,11 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
         .execute(engine);
 
     String testScriptId = new DeployScriptVersionCommand()
-        .scriptName("The ScriptVersion Test.rst")
+        .scriptName("The Script Test.rst")
         .scriptText(
           "var test = system.import('rockscript.io/test'); \n" +
           "var scriptExecution = test.start({ \n" +
-          "  script: 'The ScriptVersion.rs', \n" +
+          "  script: 'The Script.rs', \n" +
           "  skipActivities: true}); \n" +
           "test.assertEquals(scriptExecution.variables.country, 'The Netherlands');")
         .execute(engine)
@@ -111,7 +111,7 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
   @Test
   public void testTestRunnerScriptFailure() {
     String targetScriptId = new DeployScriptVersionCommand()
-        .scriptName("The ScriptVersion.rs")
+        .scriptName("The Script.rs")
         .scriptText(
           /* 1 */ "var http = system.import('rockscript.io/http'); \n" +
           /* 2 */ "unexistingvar.unexistingmethod();")
@@ -119,12 +119,12 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
         .getId();
 
     String testScriptId = new DeployScriptVersionCommand()
-        .scriptName("The ScriptVersion Test.rst")
+        .scriptName("The Script Test.rst")
         .scriptText(
           /* 1 */ "var test = system.import('rockscript.io/test'); \n" +
           /* 2 */ "\n" +
           /* 3 */ "var scriptExecution = test.start({ \n" +
-          /* 4 */ "  script: 'The ScriptVersion.rs', \n" +
+          /* 4 */ "  script: 'The Script.rs', \n" +
           /* 5 */ "  skipActivities: true}); ")
         .execute(engine)
         .getId();
@@ -148,7 +148,7 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
     assertNotNull(targetScriptErrorEvent.getLine());
 
     ServiceFunctionErrorEvent testScriptErrorEvent = (ServiceFunctionErrorEvent) testEvents.get(testEvents.size() - 1);
-    Assert.assertContains("ScriptVersion start failed: ReferenceError: unexistingvar is not defined", testScriptErrorEvent.getError());
+    Assert.assertContains("Script start failed: ReferenceError: unexistingvar is not defined", testScriptErrorEvent.getError());
     Assert.assertContains(testScriptId, testScriptErrorEvent.getScriptId());
     assertNotNull(testScriptErrorEvent.getLine());
 
@@ -159,7 +159,7 @@ public class TestRunnerHttpTest extends AbstractHttpTest {
     assertNotNull(firstTestError.getLine());
 
     TestError secondTestError = testErrors.get(1);
-    Assert.assertContains("ScriptVersion start failed: ReferenceError: unexistingvar is not defined", secondTestError.getMessage());
+    Assert.assertContains("Script start failed: ReferenceError: unexistingvar is not defined", secondTestError.getMessage());
     Assert.assertContains(testScriptId, secondTestError.getScriptVersionId());
     assertNotNull(secondTestError.getLine());
   }

@@ -65,8 +65,8 @@ public class ScriptStartedEvent extends ExecutableEvent<EngineScriptExecution> {
   @Override
   public String toString() {
     return "[" + scriptExecutionId + "] " +
-        "Started scriptVersion [" +
-           scriptVersionId + "|" +
+        "Started script [scriptVersionId=" +
+           scriptVersionId + ",scriptName=" +
         scriptName + "]" +
         (input!=null ? " with input "+input.toString() : " without input");
   }

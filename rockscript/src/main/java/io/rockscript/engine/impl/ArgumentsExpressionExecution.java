@@ -74,7 +74,8 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   }
 
   private void startFunction() {
-    dispatchAndExecute(new ServiceFunctionStartedEvent(this));
+    dispatch(new ServiceFunctionStartingEvent(this));
+    startFunctionExecute();
   }
 
   public void startFunctionExecute() {
@@ -118,8 +119,8 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   }
 
   public void retry() {
-    dispatchAndExecute(new ServiceFunctionStartedEvent(this));
-    startFunctionInvoke();
+    dispatch(new ServiceFunctionRetryingEvent(this));
+    startFunctionExecute();
   }
 
   public void endFunction(Object result) {

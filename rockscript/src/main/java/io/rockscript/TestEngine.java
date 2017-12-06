@@ -62,10 +62,18 @@ public class TestEngine extends Engine {
     public List<Job> getjobs() {
       return jobs;
     }
-
+    @Override
+    public void startup() {
+    }
+    @Override
+    public void shutdown() {
+    }
     @Override
     public void executeJob(Job job) {
       super.executeJob(job);
+    }
+    @Override
+    protected void schedule(Job job) {
     }
   }
 

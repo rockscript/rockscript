@@ -30,7 +30,6 @@ import java.util.Map;
 public class ScriptExecution {
 
   String id;
-//  ScriptVersion script;
   Map<String,Object> variables;
   List<ServiceFunctionContinuation> serviceFunctionContinuations;
   Instant start;
@@ -41,7 +40,6 @@ public class ScriptExecution {
 
   public ScriptExecution(EngineScriptExecution engineScriptExecution) {
     this.id = engineScriptExecution.getId();
-//    this.script = engineScriptExecution.getEngineScript().getScriptVersion();
     this.start = engineScriptExecution.getStart();
     this.end = engineScriptExecution.getEnded();
     scanVariables(engineScriptExecution.getVariables());
@@ -76,10 +74,6 @@ public class ScriptExecution {
       }
     }
   }
-
-//  public ScriptVersion getScriptVersion() {
-//    return script;
-//  }
 
   public List<ServiceFunctionContinuation> getServiceFunctionContinuations() {
     return serviceFunctionContinuations;

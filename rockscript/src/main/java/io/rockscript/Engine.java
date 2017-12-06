@@ -168,16 +168,17 @@ public class Engine {
 
   protected static PolymorphicTypeAdapterFactory createEventJsonTypeAdapterFactory() {
     return new PolymorphicTypeAdapterFactory()
-      .typeName(new TypeToken<Event>(){},                      "event") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
-      .typeName(new TypeToken<ExecutionEvent>(){},             "executionEvent") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
-      .typeName(new TypeToken<ServiceFunctionEndedEvent>(){},  "serviceFunctionEnd")
-      .typeName(new TypeToken<ServiceFunctionStartedEvent>(){},"serviceFunctionStarted")
-      .typeName(new TypeToken<ServiceFunctionWaitingEvent>(){},"serviceFunctionWaiting")
-      .typeName(new TypeToken<ScriptEndedEvent>(){},           "scriptEnded")
-      .typeName(new TypeToken<ScriptStartedEvent>(){},         "scriptStarted")
-      .typeName(new TypeToken<VariableCreatedEvent>(){},       "variableCreated")
-      .typeName(new TypeToken<ServiceFunctionErrorEvent>(){}, "serviceFunctionError")
-      .typeName(new TypeToken<ScriptExecutionErrorEvent>(){},  "scriptExecutionError")
+      .typeName(new TypeToken<Event>(){},                       "event") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
+      .typeName(new TypeToken<ExecutionEvent>(){},              "executionEvent") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
+      .typeName(new TypeToken<ServiceFunctionStartingEvent>(){},"serviceFunctionStarting")
+      .typeName(new TypeToken<ServiceFunctionRetryingEvent>(){},"serviceFunctionRetrying")
+      .typeName(new TypeToken<ServiceFunctionWaitingEvent>(){}, "serviceFunctionWaiting")
+      .typeName(new TypeToken<ServiceFunctionEndedEvent>(){},   "serviceFunctionEnd")
+      .typeName(new TypeToken<ServiceFunctionErrorEvent>(){},   "serviceFunctionError")
+      .typeName(new TypeToken<ScriptEndedEvent>(){},            "scriptEnded")
+      .typeName(new TypeToken<ScriptStartedEvent>(){},          "scriptStarted")
+      .typeName(new TypeToken<VariableCreatedEvent>(){},        "variableCreated")
+      .typeName(new TypeToken<ScriptExecutionErrorEvent>(){},   "scriptExecutionError")
       ;
   }
 

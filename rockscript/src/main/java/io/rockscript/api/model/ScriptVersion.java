@@ -18,7 +18,7 @@ package io.rockscript.api.model;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/** ScriptVersion data as exposed in the CommandExecutorService API.
+/** ScriptVersion's represent one version of a {@link Script}.
  * ScriptVersion's are serializable with Gson. */
 public class ScriptVersion {
 
