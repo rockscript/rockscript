@@ -60,14 +60,12 @@ public class StartScriptExecutionCommand implements Command<ScriptExecutionRespo
       BadRequestException.throwIfNull(scriptVersionId, "Script %s does not have an active version yet", scriptId);
     }
 
-    if (scriptVersionId==null) {
-      throw new EngineException("No active script version found");
-    }
+    BadRequestException.throwIfNull(scriptVersionId, "No active script version found");
 
     ScriptStore scriptStore = engine.getScriptStore();
     EngineScript engineScript = scriptStore.findScriptAstByScriptVersionId(scriptVersionId);
 
-    EngineException.throwIfNull(engineScript, "ScriptVersion %s not found", scriptVersionId);
+    BadRequestException.throwIfNull(engineScript, "Script version %s not found", scriptVersionId);
 
     String scriptExecutionId = engine
       .getScriptExecutionIdGenerator()

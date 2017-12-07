@@ -64,6 +64,13 @@ public class HttpRequestRunnable implements Runnable {
         responseObject = getResponseObjectWithOtherBody(response);
       }
 
+      if (request.getExpectedStatus()!=null) {
+        int status = response.getStatus();
+        if (status!=request.getExpectedStatus()) {
+          throw new RuntimeException("Expected response status " + request.getExpectedStatus() + ", but was " + status + "\n" + response.toString());
+        }
+      }
+
       engine
         .getLockOperationExecutor()
         .executeInLock(new LockOperationEnd(continuationReference, responseObject));

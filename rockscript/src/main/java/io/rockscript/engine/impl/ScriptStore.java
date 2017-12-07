@@ -111,7 +111,7 @@ public class ScriptStore {
     }
     scriptVersion.setId(scriptVersionId);
     scriptVersion.setScriptId(script.getId());
-    scriptVersion.setName(script.getName());
+    scriptVersion.setScriptName(script.getName());
     scriptVersion.setText(scriptText);
 
     List<ScriptVersion> scriptVersions = script.getScriptVersions();

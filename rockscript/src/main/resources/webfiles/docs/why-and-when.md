@@ -3,7 +3,7 @@ background information and jump straight to the
 <a onclick="show('getting-started')">geting started</a> and 
 <a onclick="show('tutorial')">the tutorial</a>.
 
-#### Resilient script execution 
+## Resilient script execution 
 
 Most system interactions these days are done over HTTP and are non 
 transactional.  Between the time you start sending a request and the 
@@ -30,7 +30,7 @@ and after the execution finishes.  Imagine that you can investigate production
 issues with [the exeuction inspector](http://rockscript.io/products/#webui) 
 that lets you see what happened like in a debugger.  
 
-#### Juggle with JSON
+## Juggle with JSON
 
 When combining multiple microservices interactions, you often need to 
 transform the data between those interactions.  Most of the microservices 
@@ -39,7 +39,7 @@ JSON manipulation than JavaScript.  That's why RockScript is based on
 JavaScript.  So that coding your data transformations between microservice 
 interactions becomes super easy. 
 
-#### Write blocking code, get non-blocking execution
+## Write blocking code, get non-blocking execution
 
 With asynchronous messaging, you're forced to cut up your code in pieces and 
 connect the code-pieces with message queues, configuration and infrastructure. 
@@ -59,7 +59,7 @@ messages and message handlers.
 RockScript lets you use a style of coding that is familiar to all developers.
 So it's a safe choice in larger teams or teams where churn can be expected. 
 
-#### Alternatives
+## Alternatives
 
 The most used alternative is message queues.  This is a lower level solution that requires 
 you to cut your code into pieces and tie your code-pieces together with with message 

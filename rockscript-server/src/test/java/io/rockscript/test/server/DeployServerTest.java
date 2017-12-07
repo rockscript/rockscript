@@ -46,7 +46,7 @@ public class DeployServerTest extends AbstractServerTest {
 
     assertNotNull(saveScriptVersionResponse.getId());
     assertEquals((Integer) 1, saveScriptVersionResponse.getVersion());
-    assertEquals("Test script", saveScriptVersionResponse.getName());
+    assertEquals("Test script", saveScriptVersionResponse.getScriptName());
     assertNull(saveScriptVersionResponse.getErrors());
   }
 

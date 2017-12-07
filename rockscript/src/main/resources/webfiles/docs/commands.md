@@ -8,7 +8,8 @@ Commands have a the following JSON serialization form
 ```
 Example of a command request/response:
 ```
-&gt; POST http://localhost:3652/command
+> POST http://localhost:3652/command
+  Content-Type: application/json
   { "saveScript":
     {
       "scriptName": "My first script",
@@ -16,7 +17,7 @@ Example of a command request/response:
     }
   }
 
-&lt; HTTP/1.1 200 OK
+< HTTP/1.1 200 OK
   Access-Control-Allow-Origin: *
   Content-Type: application/json
   { "id":"sv1",

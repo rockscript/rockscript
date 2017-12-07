@@ -24,7 +24,7 @@ public class ScriptVersion {
 
   protected String id;
   protected String scriptId;
-  protected String name;
+  protected String scriptName;
   protected Integer version;
   protected String text;
   protected Boolean active;
@@ -37,7 +37,7 @@ public class ScriptVersion {
     if (other!=null) {
       this.id = other.id;
       this.scriptId = other.scriptId;
-      this.name = other.name;
+      this.scriptName = other.scriptName;
       this.text = other.text;
       this.version = other.version;
       this.active = other.active;
@@ -57,8 +57,8 @@ public class ScriptVersion {
     this.scriptId = scriptId;
   }
 
-  public String getName() {
-    return name;
+  public String getScriptName() {
+    return scriptName;
   }
 
   public String getText() {
@@ -73,8 +73,8 @@ public class ScriptVersion {
     this.id = id;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setScriptName(String scriptName) {
+    this.scriptName = scriptName;
   }
 
   public void setText(String text) {

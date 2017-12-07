@@ -52,7 +52,7 @@ public class RunTestsCommand implements Command<TestResults> {
   }
 
   private TestResult runTest(Engine engineEngine, ScriptVersion scriptVersion) {
-    TestResult testResult = new TestResult(scriptVersion.getName());
+    TestResult testResult = new TestResult(scriptVersion.getScriptName());
     TestImportObject testImportObject = new TestImportObject(testResult);
     Engine testEngine = new TestRunEngine(engineEngine, testImportObject, testResult)
       .start();
@@ -67,7 +67,7 @@ public class RunTestsCommand implements Command<TestResults> {
 
       TestScriptExecution testScriptExecution = new TestScriptExecution();
       testScriptExecution.setId("test-"+scriptExecution.getId());
-      testScriptExecution.setScriptName(engineScriptExecution.getEngineScript().getScriptVersion().getName());
+      testScriptExecution.setScriptName(engineScriptExecution.getEngineScript().getScriptVersion().getScriptName());
       String scriptText = engineScriptExecution.getEngineScript().getScriptVersion().getText();
       log.debug("Script text: "+scriptText);
       testScriptExecution.setScriptText(scriptText);

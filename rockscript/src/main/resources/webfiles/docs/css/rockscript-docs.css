@@ -24,18 +24,25 @@ body {
   height: 100%;
 }
 
+@media screen and (max-device-width : 800px) {
+  body {
+    font-size: 2.2em;
+  }
+}
+
 h1 {
-  font-size: 2em;
+  font-size: 2.2em;
   font-family: "Roboto Slab";
   font-weight: 100;
   color: black;
   margin: 0 0 .4em 0;
 }
-h2 { font-size: 1.4em;  margin: .7em 0 .35em 0; color: #717171;}
-h3 { font-size: 1.3em;  margin: .6em 0 .25em 0; color: #717171;}
-h4 { font-size: 1.2em;  margin: .5em 0 .20em  0; color: #717171;}
-h5 { font-size: 1.15em; margin: .4em 0 .15em  0; color: #717171;}
-h6 { font-size: 1.10em; margin: .3em 0 .10em  0; color: #717171;}
+
+h2 { font-size: 1.8em;  margin: .7em 0 .35em 0; color: #784225; font-weight: normal;}
+h3 { font-size: 1.4em;  margin: .6em 0 .25em 0; color: #717171; font-weight: normal;}
+h4 { font-size: 1.2em;  margin: .5em 0 .20em 0; color: #555555;}
+h5 { font-size: 1.15em; margin: .4em 0 .15em 0; color: #252525;}
+h6 { font-size: 1.10em; margin: .3em 0 .10em 0; color: #000000;}
 
 p {
   margin-top: .2em;
@@ -121,6 +128,10 @@ th, td {
   display: inline-block;
 }
 
+.titlebar .brand img {
+  height: .9em;
+}
+
 .toc {
   width: 100%;
   padding: 20px 0 0 20px;
@@ -129,7 +140,7 @@ th, td {
   margin-bottom: 20px;
 }
 
-@media (min-width: 800px) {
+@media screen and (min-device-width : 800px) and (min-width: 800px) {
   .toc {
     width: 200px;
     border-width: 0 1px 0 0;
@@ -159,13 +170,14 @@ th, td {
 
 .content {
   padding: 20px;
+  max-width: 900px;
   width: calc(100% - 40px);
-  float: right;
+  float: left;
   border: solid 0 #ddd;
   border-width: 1px 0 0 0;
 }
 
-@media (min-width: 800px) {
+@media screen and (min-device-width : 800px) and (min-width: 800px) {
   .content {
     width: calc(100% - 272px);
     border-width: 0 0 0 1px;

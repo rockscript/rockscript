@@ -45,7 +45,7 @@ public class ScriptStartedEvent extends ExecutableEvent<EngineScriptExecution> {
 
     this.scriptVersionId = scriptVersion.getId();
     this.scriptId = scriptVersion.getScriptId();
-    this.scriptName = scriptVersion.getName();
+    this.scriptName = scriptVersion.getScriptName();
     this.scriptVersion = scriptVersion.getVersion();
     this.input = input;
   }

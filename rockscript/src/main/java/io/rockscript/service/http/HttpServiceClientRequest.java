@@ -24,10 +24,14 @@ import io.rockscript.http.client.ClientRequest;
 
 public class HttpServiceClientRequest extends ClientRequest {
 
-
+  Integer expectedStatus;
   RetryPolicy retryPolicy;
 
   public RetryPolicy getRetryPolicy() {
     return retryPolicy;
+  }
+
+  public Integer getExpectedStatus() {
+    return expectedStatus;
   }
 }

@@ -20,9 +20,9 @@ transormations between service function invocations.
 For more reasons why and when to use RockScript, see <a onclick="show('why-and-when')">Why and 
 when</a>
 
-## The RockScript language
+## Overview
 
-The RockScript language is a subset of JavaScript. For example:
+The <a onclick="show('language')">RockScript language</a> is a subset of JavaScript. For example:
 
 ```javascript
 var http = system.import('rockscript.io/http');
@@ -35,14 +35,26 @@ var chuckResponse = http.get({url:'http://api.icndb.com/jokes/random'});
 approvalService.approve(chuckResponse.body.value.joke);
 ```
 
-For more details about which subset of JavaScript is supported, see 
-<a onclick="show('language')">RockScript language</a>
-
-## Terminology
-
-The *RockScript server* is the server that manages scripts and script executions.
+The *RockScript server* is the server that manages scripts, script versions and script executions.
 
 ![RockScript Overview](img/overview.png)
+
+The RockScript server has a HTTP web <a onclick="show('api')">API</a> to 
+* Manage scripts
+* Manage script versions
+* Start script executions
+* Query events, script executions, scripts and script versions
+
+There is a <a onclick="show('cli')">command line interface</a> which you can use to call the API and SPI 
+through the command line.
+
+<a onclick="show('services')">Services</a> make functionality available through service functions that can be invoked 
+from the scripts. The first and most common service is the HTTP service which comes out of the box.  
+
+The RockScript server also has a HTTP <a onclick="show('service-spi')">Service SPI</a> to add new service functions 
+really fast and easy.  
+
+## Terminology
 
 A *script* on the server can be identified by its name and has multiple *script version*s. 
 

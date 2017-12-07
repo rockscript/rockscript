@@ -67,6 +67,7 @@ function load(fileName, label, classes) {
 function show(id) {
   showContent(id);
   history.pushState(id, 'Back title '+id, '#'+id);
+  $('#'+id+' > h1')[0].scrollIntoView(false);
 }
 
 function scrollOnSamePage(id) {
@@ -79,8 +80,6 @@ function showContent(id) {
 }
 
 window.onpopstate = function(data) {
-  console.log("Document location"+document.location);
-  console.log("State"+JSON.stringify(event.state));
   showContent(event.state);
   return true;
 };
