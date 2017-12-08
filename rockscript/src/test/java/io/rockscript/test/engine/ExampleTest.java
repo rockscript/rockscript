@@ -79,7 +79,7 @@ public class ExampleTest extends AbstractEngineTest {
 
   private ScriptVersion deployScriptResource(String fileName) throws FileNotFoundException {
     File file = new File(fileName);
-    String scriptText = Io.toString(new FileInputStream(file));
+    String scriptText = Io.getString(new FileInputStream(file));
     return new DeployScriptVersionCommand()
         .scriptName(fileName)
         .scriptText(scriptText)

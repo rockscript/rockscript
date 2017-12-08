@@ -195,7 +195,7 @@ public class HttpTestServer {
     }
     public String body() {
       try {
-        return Io.toString(request.getInputStream());
+        return Io.getString(request.getInputStream());
       } catch (IOException e) {
         throw new RuntimeException("Couldn't get http request input stream", e);
       }

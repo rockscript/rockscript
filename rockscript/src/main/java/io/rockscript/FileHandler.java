@@ -19,6 +19,7 @@
  */
 package io.rockscript;
 
+import io.rockscript.http.client.Http;
 import io.rockscript.http.servlet.RequestHandler;
 import io.rockscript.http.servlet.ServerRequest;
 import io.rockscript.http.servlet.ServerResponse;
@@ -29,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URLConnection;
 import java.util.Map;
 
+import static io.rockscript.http.client.Http.Methods.GET;
 import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
 
@@ -52,35 +54,28 @@ public class FileHandler implements RequestHandler {
   }
 
   @Override
-  public String getBodyLogText(ServerRequest request) {
-    return "...content of resource "+getResource(request)+"...";
-  }
-
-  @Override
   public boolean matches(ServerRequest request) {
-    return request.getPathInfo().equals("/")
-      || Io.hasResource(getResource(request));
+    return GET.equals(request.getMethod())
+           && Io.hasResource(getResource(request));
   }
 
   @Override
   public void handle(ServerRequest request, ServerResponse response) {
     if (!redirect(request, response)) {
       String resource = getResource(request);
-
       String contentType = getContentType(resource);
+
       response.headerContentType(contentType);
 
       if (contentType.startsWith("text")
           || contentType.startsWith("application/json")) {
         String fileContent = Io.getResourceAsString(resource);
-        response
-          .bodyStringLog(fileContent, "...contents of "+resource+"...");
+        response.bodyString(fileContent, "...contents of "+resource+"...");
 
       } else if (contentType.startsWith("image")
                  || contentType.startsWith("font")) {
-        byte[] bytes = Io.getBytesFromResource(resource);
-        response
-          .bodyBytesLog(bytes, "..."+bytes.length+" bytes...");
+        byte[] bytes = Io.getResourceAsBytes(resource);
+        response.bodyBytes(bytes, "..."+bytes.length+" bytes...");
       }
       response.statusOk();
     }

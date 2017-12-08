@@ -31,10 +31,7 @@ import javax.servlet.ServletException;
 
 public class Servlet extends RouterServlet {
 
-  private Engine engine;
-
-  public Servlet() {
-  }
+  protected Engine engine;
 
   /** Optionally pass a **non-started** Engine,
    * If no engine is passed, a default one will be created
@@ -60,13 +57,21 @@ public class Servlet extends RouterServlet {
       engine = new DevEngine().start();
     }
 
+    if (!engine.isStarted()) {
+      engine.start();
+    }
+
     setGson(engine.getGson());
 
-    requestHandler(new CommandHandler(engine));
-    requestHandler(new QueryHandler(engine));
-    requestHandler(new FileHandler(engine));
-    requestHandler(new PingHandler(engine));
+    registerRequestHandlers();
 
     defaultResponseHeader("Access-Control-Allow-Origin", "*");
+  }
+
+  protected void registerRequestHandlers() {
+    requestHandler(new CommandHandler(engine));
+    requestHandler(new QueryHandler(engine));
+    requestHandler(new PingHandler(engine));
+    requestHandler(new FileHandler(engine));
   }
 }

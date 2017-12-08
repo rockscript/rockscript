@@ -29,18 +29,20 @@ import static org.junit.Assert.fail;
 public class HttpServerTest extends AbstractHttpServerTest {
 
   @Override
-  protected void configureServer(HttpServer server) {
+  protected HttpServer createHttpServer() {
     RouterServlet servlet = new RouterServlet();
     servlet.requestHandler(new GreetingHandler());
     servlet.requestHandler(new RuntimeHandler());
     servlet.requestHandler(new BadRequestHandler());
     servlet.exceptionListener(new LatestServerExceptionListener());
-    server.servlet(servlet);
+
+    return new HttpServer(PORT)
+      .servlet(servlet);
   }
 
   /** All tests in this class that are executed
    * subsequent, will use the same server as configured in
-   * {@link #configureServer(HttpServer)}*/
+   * {@link AbstractHttpServerTest#createHttpServer()}*/
   @Override
   protected String getServerName() {
     return HttpServerTest.class.getName();

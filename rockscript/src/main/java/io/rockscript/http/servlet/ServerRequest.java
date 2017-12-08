@@ -33,12 +33,27 @@ import java.util.Scanner;
 
 public class ServerRequest {
 
+  private static final BodyStringLogger DEFAULT_BODY_STRING_LOGGER = new BodyStringLogger() {
+    @Override
+    public void logBodyString(String bodyString, Logger log) {
+      if (log.isDebugEnabled()) {
+        if (bodyString!=null) {
+          BufferedReader reader = new BufferedReader(new StringReader(bodyString));
+          reader.lines().forEach(line->log.debug("  "+line));
+        } else {
+          log.debug("  ---body-is-null---");
+        }
+      }
+    }
+  };
+
   protected Gson gson;
   protected HttpServletRequest request;
   protected Map<String, String> pathParameters;
   protected String bodyString;
   protected boolean bodyIsReadAsString;
   protected RequestHandler requestHandler;
+  protected BodyStringLogger bodyStringLogger = DEFAULT_BODY_STRING_LOGGER;
 
   public ServerRequest(HttpServletRequest request) {
     this.request = request;
@@ -95,6 +110,8 @@ public class ServerRequest {
         request.setCharacterEncoding(charset);
         Scanner scanner = new Scanner(request.getInputStream(), charset).useDelimiter("\\A");
         bodyString = scanner.hasNext() ? scanner.next() : null;
+        bodyStringLogger.logBodyString(bodyString, RouterServlet.log);
+
       } catch (IOException e) {
         throw new RuntimeException("Couldn't read request body string: "+e.getMessage(), e);
       }
@@ -144,33 +161,31 @@ public class ServerRequest {
     return request.getParameterMap();
   }
 
+  public void logRequest() {
+    if (RouterServlet.log.isDebugEnabled()) {
+      // Log request url line
+      String queryString = request.getQueryString() != null ? "?"+request.getQueryString() : "";
+      RouterServlet.log.debug("> " + request.getMethod() + " " + request.getRequestURI()+queryString);
 
-  public void logTo(Logger log) {
-    // Log request url line
-    String queryString = request.getQueryString() != null ? "?"+request.getQueryString() : "";
-    log.debug("> " + request.getMethod() + " " + request.getRequestURI()+queryString);
-
-    // Log headers
-    if (request.getHeaderNames().hasMoreElements()) {
-      Collections.list(request.getHeaderNames()).stream()
-        .forEach(headerName -> {
-          Collections.list(request.getHeaders(headerName)).stream()
-            .forEach(headerValue -> {
-              log.debug("  " + headerName + ": " + headerValue);
-            });
-        });
-    }
-
-    // Log body
-    if (bodyString!=null) {
-      String bodyText = null;
-      if (requestHandler!=null) {
-        bodyText = requestHandler.getBodyLogText(this);
-      } else {
-        bodyText = getBodyAsString();
+      // Log headers
+      if (request.getHeaderNames().hasMoreElements()) {
+        Collections.list(request.getHeaderNames()).stream()
+          .forEach(headerName -> {
+            Collections.list(request.getHeaders(headerName)).stream()
+              .forEach(headerValue -> {
+                RouterServlet.log.debug("  " + headerName + ": " + headerValue);
+              });
+          });
       }
-      BufferedReader reader = new BufferedReader(new StringReader(bodyText));
-      reader.lines().forEach(line->log.debug("  "+line));
     }
+  }
+
+  /** Use to change the default behavior of logging the string body */
+  public void setBodyStringLogger(BodyStringLogger bodyStringLogger) {
+    this.bodyStringLogger = bodyStringLogger;
+  }
+
+  public HttpServletRequest getRequest() {
+    return request;
   }
 }

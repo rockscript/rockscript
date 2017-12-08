@@ -46,9 +46,4 @@ public abstract class PathRequestHandler implements RequestHandler {
     return method.equals(request.getMethod())
            && path.matches(request);
   }
-
-  @Override
-  public String getBodyLogText(ServerRequest request) {
-    return request.getBodyAsString();
-  }
 }

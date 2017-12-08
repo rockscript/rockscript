@@ -26,23 +26,25 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
-import io.rockscript.service.ServiceFunction;
-import io.rockscript.service.ImportObject;
-import io.rockscript.service.ImportProvider;
-import io.rockscript.service.ImportResolver;
-import io.rockscript.service.http.HttpService;
 import io.rockscript.api.Command;
 import io.rockscript.api.Query;
 import io.rockscript.api.commands.*;
 import io.rockscript.api.queries.ScriptExecutionQuery;
-import io.rockscript.engine.ServiceFunctionSerializer;
+import io.rockscript.api.queries.ScriptVersionsQuery;
+import io.rockscript.api.queries.ScriptsQuery;
 import io.rockscript.engine.EngineException;
 import io.rockscript.engine.ImportObjectSerializer;
+import io.rockscript.engine.ServiceFunctionSerializer;
 import io.rockscript.engine.impl.*;
 import io.rockscript.engine.impl.EventListener;
 import io.rockscript.engine.job.JobService;
 import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.http.client.Http;
+import io.rockscript.service.ImportObject;
+import io.rockscript.service.ImportProvider;
+import io.rockscript.service.ImportResolver;
+import io.rockscript.service.ServiceFunction;
+import io.rockscript.service.http.HttpService;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -79,6 +81,7 @@ public class Engine {
   protected Map<String,Object> objects = new HashMap<>();
   protected Map<String,ImportProvider> importProviders = new HashMap<>();
   protected List<EnginePlugin> plugins = new ArrayList<>();
+  protected boolean started;
 
   public Engine() {
     this.eventStore = new EventStore(this);
@@ -97,6 +100,8 @@ public class Engine {
     importProvider(new HttpService());
 
     this.queryTypes = new HashMap<>();
+    queryType(new ScriptsQuery());
+    queryType(new ScriptVersionsQuery());
     queryType(new ScriptExecutionQuery());
 
     this.commandTypes = new HashMap<>();
@@ -130,12 +135,14 @@ public class Engine {
     throwIfNotProperlyConfigured();
     plugins.forEach(plugin->plugin.start(this));
     this.jobService.startup();
+    started = true;
     return this;
   }
 
   public void stop() {
     this.jobService.shutdown();
     plugins.forEach(plugin->plugin.stop(this));
+    started = false;
   }
 
   protected Gson createGson() {
@@ -180,6 +187,10 @@ public class Engine {
       .typeName(new TypeToken<VariableCreatedEvent>(){},        "variableCreated")
       .typeName(new TypeToken<ScriptExecutionErrorEvent>(){},   "scriptExecutionError")
       ;
+  }
+
+  public boolean isStarted() {
+    return started;
   }
 
   static class InstantTypeAdapter extends TypeAdapter<Instant> {

@@ -119,7 +119,7 @@ public class Deploy extends ClientCommand {
     String scriptPath = getPath(file);
     log("Deploying " + scriptPath + " to " + server + " ...");
     try {
-      String scriptText = Io.toString(new FileInputStream(file));
+      String scriptText = Io.getString(new FileInputStream(file));
       String scriptName = scriptPath;
 
       if (dirPath!=null && scriptPath.startsWith(dirPath)) {

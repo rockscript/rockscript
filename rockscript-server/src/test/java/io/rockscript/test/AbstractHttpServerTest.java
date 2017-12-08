@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 
 public abstract class AbstractHttpServerTest {
 
@@ -43,7 +42,7 @@ public abstract class AbstractHttpServerTest {
   private static String baseUrl;
 
   /** implementions can add servlets and filters to the test server */
-  protected abstract void configureServer(HttpServer server);
+  protected abstract HttpServer createHttpServer();
   /** tests with the same serverName can use the cached server */
   protected abstract String getServerName();
 
@@ -70,10 +69,9 @@ public abstract class AbstractHttpServerTest {
 
   /** override to customize the test server creation */
   protected HttpServer startServer() {
-    HttpServer server = new HttpServer(PORT);
-    configureServer(server);
-    server.startup();
-    return server;
+    HttpServer httpServer = createHttpServer();
+    httpServer.startup();
+    return httpServer;
   }
 
   /** override to customize the http client */

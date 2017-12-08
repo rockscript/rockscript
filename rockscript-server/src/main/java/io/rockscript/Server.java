@@ -24,23 +24,41 @@ import io.rockscript.http.servlet.RouterServlet;
 
 public class Server {
 
-
   public static final int DEFAULT_ROCKSCRIPT_PORT = 3652;
 
-  public static void main(String[] args) {
+  private Engine engine;
+  private HttpServer server;
 
-    Engine engine = new TestEngine().start();
+  protected void start() {
+    this.engine = createEngine();
+    this.engine.start();
 
-    RouterServlet servlet = new Servlet(engine)
-      .gson(engine.getGson());
-
-    HttpServer server = new HttpServer(DEFAULT_ROCKSCRIPT_PORT)
-      .servlet(servlet)
-      .startup();
-
-    server.join();
-
-    System.out.println("RockScript server stopped");
+    this.server = createHttpServer(engine);
+    this.server.startup();
   }
 
+  protected HttpServer createHttpServer(Engine engine) {
+    RouterServlet servlet = new Servlet(engine)
+      .gson(engine.getGson());
+    return new HttpServer(DEFAULT_ROCKSCRIPT_PORT)
+      .servlet(servlet);
+  }
+
+  protected TestEngine createEngine() {
+    return new TestEngine();
+  }
+
+  protected void join() {
+    server.join();
+  }
+
+  public static void main(String[] args) {
+    runServerTillCtrlC(new Server());
+  }
+
+  protected static void runServerTillCtrlC(Server server) {
+    server.start();
+    server.join();
+    System.out.println("RockScript server stopped");
+  }
 }

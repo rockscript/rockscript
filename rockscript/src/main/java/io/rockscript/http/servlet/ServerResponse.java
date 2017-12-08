@@ -24,6 +24,7 @@ import io.rockscript.http.client.Http;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,16 +33,17 @@ import java.nio.charset.Charset;
 
 public class ServerResponse {
 
+  ServerRequest serverRequest;
   HttpServletResponse response;
   Gson gson;
-  String logProtocol;
-  String logBody;
+  String bodyLog;
+  /** Used to prevent that headers setting is ignored after body was sent */
   boolean isBodyStarted;
 
-  public ServerResponse(HttpServletResponse response, Gson gson, String logProtocol) {
+  public ServerResponse(ServerRequest serverRequest, HttpServletResponse response, Gson gson) {
+    this.serverRequest = serverRequest;
     this.response = response;
     this.gson = gson;
-    this.logProtocol = logProtocol;
   }
 
   public ServerResponse statusOk() {
@@ -63,16 +65,16 @@ public class ServerResponse {
 
   public ServerResponse bodyBytes(byte[] bytes) {
     if (bytes!=null) {
-      bodyBytesLog(bytes, "..." + bytes.length + " bytes...");
+      bodyBytes(bytes, "..." + bytes.length + " bytes...");
     }
     return this;
   }
 
-  public ServerResponse bodyBytesLog(byte[] bytes, String bodyLog) {
+  public ServerResponse bodyBytes(byte[] bytes, String bodyLog) {
     if (bytes!=null) {
       writeBodyBytes(bytes);
     }
-    this.logBody = bodyLog;
+    setBodyLog(bodyLog);
     return this;
   }
 
@@ -89,12 +91,12 @@ public class ServerResponse {
   }
 
   public ServerResponse bodyString(String responseBody) {
-    return bodyStringLog(responseBody, responseBody);
+    return bodyString(responseBody, responseBody);
   }
 
-  public ServerResponse bodyStringLog(String responseBody, String bodyLog) {
-    this.logBody = bodyLog;
+  public ServerResponse bodyString(String responseBody, String bodyLog) {
     byte[] bytes = responseBody.getBytes(Charset.forName("UTF-8"));
+    setBodyLog(bodyLog);
     writeBodyBytes(bytes);
     return this;
   }
@@ -107,6 +109,11 @@ public class ServerResponse {
 
   public ServerResponse bodyJson(Object object) {
     return bodyJsonString(gson.toJson(object));
+  }
+
+  /** sets the string that will be logged by {@link #logTo(Logger)} as the body. */
+  public void setBodyLog(String bodyLog) {
+    this.bodyLog = bodyLog;
   }
 
   public ServerResponse header(String name, String value) {
@@ -139,9 +146,12 @@ public class ServerResponse {
     return header(Http.Headers.CONTENT_TYPE, Http.ContentTypes.TEXT_HTML);
   }
 
+  /** invoked at the end of {@link RouterServlet#service(HttpServletRequest, HttpServletResponse)} */
   public void logTo(Logger log) {
     // Log status line
-    log.debug("< "+logProtocol + " " + response.getStatus() + " " + Http.ResponseCodes.getText(response.getStatus()));
+    log.debug("< "+serverRequest.getRequest().getProtocol() + " " +
+                   response.getStatus() + " " +
+                   Http.ResponseCodes.getText(response.getStatus()));
 
     // Log response headers
     if (response.getHeaderNames()!=null && !response.getHeaderNames().isEmpty()) {
@@ -156,8 +166,8 @@ public class ServerResponse {
     }
 
     // Log body
-    if (logBody!=null) {
-      BufferedReader reader = new BufferedReader(new StringReader(logBody));
+    if (bodyLog!=null) {
+      BufferedReader reader = new BufferedReader(new StringReader(bodyLog));
       reader.lines().forEach(line->log.debug("  "+line));
     }
   }

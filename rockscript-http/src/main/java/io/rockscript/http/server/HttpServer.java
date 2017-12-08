@@ -81,9 +81,11 @@ public class HttpServer {
     } catch (Exception e) {
       if (isPortTakenException(e)) {
         // IDEA consider sending a shutdown command.  But only if you can do it safe so that it's impossible to shutdown production servers.
-        throw new RuntimeException("Port "+getPort()+" blocked.  You probably have a separate RockScript server running.  Please shut down that one and retry.");
+        throw new RuntimeException("Port " +
+                                   getPort() +
+                                   " blocked.  You probably have a separate RockScript server running.  Please shut down that one and retry.");
       } else {
-        throw new RuntimeException("Couldn't start server: "+ e.getMessage(), e);
+        throw new RuntimeException("Couldn't start server: " + e.getMessage(), e);
       }
     }
     return this;
@@ -99,7 +101,7 @@ public class HttpServer {
       server.stop();
       server.join();
     } catch (Exception e) {
-      throw new RuntimeException("Couldn't shutdown: "+e.getMessage(), e);
+      throw new RuntimeException("Couldn't shutdown: " + e.getMessage(), e);
     }
   }
 
@@ -111,7 +113,7 @@ public class HttpServer {
     try {
       server.join();
     } catch (InterruptedException e) {
-      throw new RuntimeException("Couldn't join: "+e.getMessage(), e);
+      throw new RuntimeException("Couldn't join: " + e.getMessage(), e);
     }
   }
 }

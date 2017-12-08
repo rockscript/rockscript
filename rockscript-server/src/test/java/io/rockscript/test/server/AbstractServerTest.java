@@ -33,7 +33,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class AbstractServerTest extends AbstractHttpServerTest {
 
-  static Engine engine = null;
+  protected static Engine engine = null;
 
   @Override
   @Before
@@ -42,24 +42,26 @@ public class AbstractServerTest extends AbstractHttpServerTest {
       // First the engine will be initialized
       engine = new TestEngine().start();
     }
-    // The super.setUp will invoke the configureServer below
+    // The super.setUp will invoke the createHttpServer below
     super.setUp();
   }
 
   /** Invoked by super.setUp */
   @Override
-  protected void configureServer(HttpServer server) {
-    // Now, the engine is already initialized.  See #setUp()
+  protected HttpServer createHttpServer() {
+    // engine is initialized above in the setUp
     assertNotNull(engine);
+
     Servlet servlet = new Servlet(engine);
     servlet.exceptionListener(new LatestServerExceptionListener());
-    servlet.gson(engine.getGson());
-    server.servlet(servlet);
+
+    return new HttpServer(PORT)
+      .servlet(servlet);
   }
 
   /** All tests in subclasses of AbstractServerTest that are executed
    * subsequent, will use the same server as configured in
-   * {@link #configureServer(HttpServer)}*/
+   * {@link AbstractHttpServerTest#createHttpServer()}*/
   @Override
   protected String getServerName() {
     return AbstractServerTest.class.getName();

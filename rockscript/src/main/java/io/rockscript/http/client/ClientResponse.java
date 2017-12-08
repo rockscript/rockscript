@@ -65,7 +65,7 @@ public class ClientResponse {
         try {
           String charset = getContentTypeCharset("UTF-8");
           InputStream content = entity.getContent();
-          this.body = Io.toString(content, charset);
+          this.body = Io.getString(content, charset);
         } catch (Exception e) {
           throw new RuntimeException("Couldn't ready body/entity from http request " + toString(), e);
         }
@@ -186,6 +186,11 @@ public class ClientResponse {
   @SuppressWarnings("unchecked")
   public <T> T getBodyAs(Type type) {
     return (T) request.getHttp().getGson().fromJson(body, type);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> T getBodyAs(Class<T> type) {
+    return getBodyAs((Type)type);
   }
 
   public void setHeaders(Map<String, List<String>> headers) {

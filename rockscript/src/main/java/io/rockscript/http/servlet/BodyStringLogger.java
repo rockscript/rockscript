@@ -19,9 +19,9 @@
  */
 package io.rockscript.http.servlet;
 
-public interface RequestHandler {
+import org.slf4j.Logger;
 
-  boolean matches(ServerRequest request);
+public interface BodyStringLogger {
 
-  void handle(ServerRequest request, ServerResponse response);
+  void logBodyString(String bodyString, Logger log);
 }

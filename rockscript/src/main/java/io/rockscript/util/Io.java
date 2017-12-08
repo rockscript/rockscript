@@ -22,11 +22,11 @@ import java.util.Scanner;
 
 public class Io {
 
-  public static String toString(InputStream inputStream) {
-    return toString(inputStream, "UTF-8");
+  public static String getString(InputStream inputStream) {
+    return getString(inputStream, "UTF-8");
   }
 
-  public static String toString(InputStream inputStream, String charset) {
+  public static String getString(InputStream inputStream, String charset) {
     Scanner scanner = new Scanner(inputStream, charset)
       .useDelimiter("\\A");
     if (scanner.hasNext()) {
@@ -41,28 +41,20 @@ public class Io {
   }
 
   public static String getResourceAsString(String resource, String charset) {
-    InputStream resourceAsStream = Io.class.getClassLoader().getResourceAsStream(resource);
-    if (resourceAsStream==null) {
-      throw new RuntimeException("Resource "+resource+" doesn't exist");
-    }
-    try {
-      return Io.toString(resourceAsStream, charset);
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new RuntimeException("Couldn't get resource as string: "+e.getMessage(), e);
-    }
+    InputStream resourceAsStream = Io.getResourceAsStream(resource);
+    return getString(resourceAsStream, charset);
   }
 
   public static boolean hasResource(String resource) {
     return Io.class.getClassLoader().getResource(resource)!=null;
   }
 
-  public static byte[] getBytesFromResource(String resource) {
-    InputStream resourceStream = Io.class.getClassLoader().getResourceAsStream(resource);
-    return readBytesFromStream(resourceStream);
+  public static byte[] getResourceAsBytes(String resource) {
+    InputStream resourceStream = Io.getResourceAsStream(resource);
+    return getBytes(resourceStream);
   }
 
-  public static byte[] readBytesFromStream(InputStream is) {
+  public static byte[] getBytes(InputStream is) {
     try {
       ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
@@ -79,5 +71,9 @@ public class Io {
     } catch (IOException e) {
       throw new RuntimeException("Couldn't read bytes from stream: "+e.getMessage(), e);
     }
+  }
+
+  public static InputStream getResourceAsStream(String resource) {
+    return Io.class.getClassLoader().getResourceAsStream(resource);
   }
 }

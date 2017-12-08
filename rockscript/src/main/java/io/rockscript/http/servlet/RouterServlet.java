@@ -43,16 +43,19 @@ public class RouterServlet extends HttpServlet {
   protected Gson gson;
   protected ExceptionListener exceptionListener;
 
+  public RouterServlet() {
+  }
+
   @Override
   protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
     ServerRequest request = new ServerRequest(servletRequest, gson);
-    ServerResponse response = new ServerResponse(servletResponse, gson, servletRequest.getProtocol());
+    ServerResponse response = new ServerResponse(request, servletResponse, gson);
 
     RequestHandler requestHandler = findMatchingRequestHandler(request);
     if (requestHandler!=null) {
       request.setRequestHandler(requestHandler);
       try {
-        if (log.isDebugEnabled()) request.logTo(log);
+        request.logRequest();
         applyDefaultResponseHeaders(response);
         requestHandler.handle(request, response);
       } catch (HttpException e) {
