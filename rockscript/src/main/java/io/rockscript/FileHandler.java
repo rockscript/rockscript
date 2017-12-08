@@ -56,7 +56,7 @@ public class FileHandler implements RequestHandler {
   @Override
   public boolean matches(ServerRequest request) {
     return GET.equals(request.getMethod())
-           && Io.hasResource(getResource(request));
+           && ("/".equals(request.getPathInfo()) || Io.hasResource(getResource(request)));
   }
 
   @Override
