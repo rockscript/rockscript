@@ -54,7 +54,7 @@
 
         <dependency>
             <groupId>io.rockscript</groupId>
-            <artifactId>rockscript-docs</artifactId>
+            <artifactId>rockscript-httpfiles</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 

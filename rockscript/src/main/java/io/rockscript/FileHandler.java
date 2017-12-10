@@ -19,7 +19,6 @@
  */
 package io.rockscript;
 
-import io.rockscript.http.client.Http;
 import io.rockscript.http.servlet.RequestHandler;
 import io.rockscript.http.servlet.ServerRequest;
 import io.rockscript.http.servlet.ServerResponse;
@@ -94,7 +93,7 @@ public class FileHandler implements RequestHandler {
     if (path.endsWith("/")) {
       path += "index.html";
     }
-    return path.substring(1); // removes the first slash
+    return "http"+path;
   }
 
   protected String getContentType(String path) {
