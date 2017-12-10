@@ -94,7 +94,7 @@ public class FileHandler implements RequestHandler {
     if (path.endsWith("/")) {
       path += "index.html";
     }
-    return "webfiles"+path;
+    return path.substring(1); // removes the first slash
   }
 
   protected String getContentType(String path) {

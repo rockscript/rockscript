@@ -28,6 +28,7 @@
     <modules>
         <module>rockscript-gson</module>
         <module>rockscript-http</module>
+        <module>rockscript-docs</module>
         <module>rockscript</module>
         <module>rockscript-server</module>
         <module>rockscript-cli</module>
