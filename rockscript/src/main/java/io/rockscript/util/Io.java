@@ -22,11 +22,16 @@ import java.util.Scanner;
 
 public class Io {
 
+  public static final String DEFAULT_CHARSET = "UTF-8";
+
   public static String getString(InputStream inputStream) {
-    return getString(inputStream, "UTF-8");
+    return getString(inputStream, DEFAULT_CHARSET);
   }
 
   public static String getString(InputStream inputStream, String charset) {
+    if (inputStream==null) {
+      return null;
+    }
     Scanner scanner = new Scanner(inputStream, charset)
       .useDelimiter("\\A");
     if (scanner.hasNext()) {
@@ -37,11 +42,11 @@ public class Io {
   }
 
   public static String getResourceAsString(String resource) {
-    return getResourceAsString(resource, "UTF-8");
+    return getResourceAsString(resource, DEFAULT_CHARSET);
   }
 
   public static String getResourceAsString(String resource, String charset) {
-    InputStream resourceAsStream = Io.getResourceAsStream(resource);
+    InputStream resourceAsStream = getResourceAsStream(resource);
     return getString(resourceAsStream, charset);
   }
 
@@ -50,18 +55,21 @@ public class Io {
   }
 
   public static byte[] getResourceAsBytes(String resource) {
-    InputStream resourceStream = Io.getResourceAsStream(resource);
+    InputStream resourceStream = getResourceAsStream(resource);
     return getBytes(resourceStream);
   }
 
-  public static byte[] getBytes(InputStream is) {
+  public static byte[] getBytes(InputStream inputStream) {
+    if (inputStream==null) {
+      return null;
+    }
     try {
       ByteArrayOutputStream buffer = new ByteArrayOutputStream();
 
       int nRead;
       byte[] data = new byte[16384];
 
-      while ((nRead = is.read(data, 0, data.length)) != -1) {
+      while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
         buffer.write(data, 0, nRead);
       }
 

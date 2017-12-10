@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class ScriptsQuery implements Query<List<Script>> {
 
   @Override
-  public String getType() {
+  public String getName() {
     return "scripts";
   }
 
@@ -48,6 +48,7 @@ public class ScriptsQuery implements Query<List<Script>> {
     copyWithoutVersions.setId(script.getId());
     copyWithoutVersions.setName(script.getName());
     copyWithoutVersions.setActiveScriptVersionId(script.getActiveScriptVersionId());
+    copyWithoutVersions.setScriptVersions(null);
     return copyWithoutVersions;
   }
 

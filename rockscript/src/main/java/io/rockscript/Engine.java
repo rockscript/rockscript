@@ -30,6 +30,7 @@ import io.rockscript.api.Command;
 import io.rockscript.api.Query;
 import io.rockscript.api.commands.*;
 import io.rockscript.api.queries.ScriptExecutionQuery;
+import io.rockscript.api.queries.ScriptExecutionsQuery;
 import io.rockscript.api.queries.ScriptVersionsQuery;
 import io.rockscript.api.queries.ScriptsQuery;
 import io.rockscript.engine.EngineException;
@@ -100,16 +101,17 @@ public class Engine {
     importProvider(new HttpService());
 
     this.queryTypes = new HashMap<>();
-    queryType(new ScriptsQuery());
-    queryType(new ScriptVersionsQuery());
-    queryType(new ScriptExecutionQuery());
+    query(new ScriptsQuery());
+    query(new ScriptVersionsQuery());
+    query(new ScriptExecutionQuery());
+    query(new ScriptExecutionsQuery());
 
     this.commandTypes = new HashMap<>();
-    commandType(new SaveScriptVersionCommand());
-    commandType(new DeployScriptVersionCommand());
-    commandType(new StartScriptExecutionCommand());
-    commandType(new EndServiceFunctionCommand());
-    commandType(new RunTestsCommand());
+    command(new SaveScriptVersionCommand());
+    command(new DeployScriptVersionCommand());
+    command(new StartScriptExecutionCommand());
+    command(new EndServiceFunctionCommand());
+    command(new RunTestsCommand());
 
     ServiceLoader<EnginePlugin> pluginLoader = ServiceLoader.load(EnginePlugin.class);
     for (EnginePlugin plugin : pluginLoader) {
@@ -265,8 +267,8 @@ public class Engine {
     return this.queryTypes;
   }
 
-  public Engine queryType(Query query) {
-    this.queryTypes.put(query.getType(), query.getClass());
+  public Engine query(Query query) {
+    this.queryTypes.put(query.getName(), query.getClass());
     return this;
   }
 
@@ -274,7 +276,7 @@ public class Engine {
     return commandTypes;
   }
 
-  public Engine commandType(Command command) {
+  public Engine command(Command command) {
     this.commandTypes.put(command.getType(), command.getClass());
     return this;
   }

@@ -153,17 +153,17 @@ public class ServerResponse {
                    response.getStatus() + " " +
                    Http.ResponseCodes.getText(response.getStatus()));
 
-    // Log response headers
-    if (response.getHeaderNames()!=null && !response.getHeaderNames().isEmpty()) {
-      // Log headers
-      response.getHeaderNames().stream()
-        .forEach(headerName->{
-          response.getHeaders(headerName).stream()
-            .forEach(headerValue->{
-              log.debug("  "+headerName+": "+headerValue);
-            });
-        });
-    }
+//    // Log response headers
+//    if (response.getHeaderNames()!=null && !response.getHeaderNames().isEmpty()) {
+//      // Log headers
+//      response.getHeaderNames().stream()
+//        .forEach(headerName->{
+//          response.getHeaders(headerName).stream()
+//            .forEach(headerValue->{
+//              log.debug("  "+headerName+": "+headerValue);
+//            });
+//        });
+//    }
 
     // Log body
     if (bodyLog!=null) {

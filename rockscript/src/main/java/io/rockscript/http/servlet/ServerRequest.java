@@ -167,16 +167,16 @@ public class ServerRequest {
       String queryString = request.getQueryString() != null ? "?"+request.getQueryString() : "";
       RouterServlet.log.debug("> " + request.getMethod() + " " + request.getRequestURI()+queryString);
 
-      // Log headers
-      if (request.getHeaderNames().hasMoreElements()) {
-        Collections.list(request.getHeaderNames()).stream()
-          .forEach(headerName -> {
-            Collections.list(request.getHeaders(headerName)).stream()
-              .forEach(headerValue -> {
-                RouterServlet.log.debug("  " + headerName + ": " + headerValue);
-              });
-          });
-      }
+//      // Log headers
+//      if (request.getHeaderNames().hasMoreElements()) {
+//        Collections.list(request.getHeaderNames()).stream()
+//          .forEach(headerName -> {
+//            Collections.list(request.getHeaders(headerName)).stream()
+//              .forEach(headerValue -> {
+//                RouterServlet.log.debug("  " + headerName + ": " + headerValue);
+//              });
+//          });
+//      }
     }
   }
 

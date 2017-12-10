@@ -31,8 +31,8 @@ import java.util.*;
 public class ScriptExecutionsQuery implements Query<Collection<ScriptExecutionsQuery.ScriptExecution>> {
 
   @Override
-  public String getType() {
-    return "scriptExecutions";
+  public String getName() {
+    return "script-executions";
   }
 
   @Override

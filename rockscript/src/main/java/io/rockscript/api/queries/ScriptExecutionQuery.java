@@ -34,8 +34,8 @@ public class ScriptExecutionQuery implements Query<ScriptExecutionQuery.ScriptEx
   String id;
 
   @Override
-  public String getType() {
-    return "execution";
+  public String getName() {
+    return "script-execution";
   }
 
   public static class ScriptExecutionDetails extends ScriptExecution {

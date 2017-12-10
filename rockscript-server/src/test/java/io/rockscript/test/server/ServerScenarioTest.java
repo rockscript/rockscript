@@ -60,7 +60,8 @@ public class ServerScenarioTest extends AbstractServerTest {
       .getBodyAs(ScriptExecutionResponse.class);
 
     String scriptExecutionId = startScriptResponse.getScriptExecutionId();
-    ScriptExecutionQuery.ScriptExecutionDetails scriptExecutionDetails = newGet("/query?q=execution&id=" + scriptExecutionId)
+    ScriptExecutionQuery.ScriptExecutionDetails scriptExecutionDetails =
+        newGet("/query/script-execution?id=" + scriptExecutionId)
       .execute()
       .assertStatusOk()
       .getBodyAs(new TypeToken<ScriptExecutionQuery.ScriptExecutionDetails>(){}.getType());

@@ -19,6 +19,8 @@
  */
 package io.rockscript;
 
+import io.rockscript.api.commands.DeployScriptVersionCommand;
+import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.http.server.HttpServer;
 import io.rockscript.http.servlet.RouterServlet;
 
@@ -53,12 +55,32 @@ public class Server {
   }
 
   public static void main(String[] args) {
-    runServerTillCtrlC(new Server());
+    runServerTillCtrlC(new Server(), args);
   }
 
-  protected static void runServerTillCtrlC(Server server) {
+  protected void examples() {
+    new DeployScriptVersionCommand()
+      .scriptName("hello")
+      .scriptText("var http = system.import('io.rockscript/http');")
+      .execute(engine);
+
+    new StartScriptExecutionCommand()
+      .scriptName("hello")
+      .execute(engine);
+  }
+
+  protected static void runServerTillCtrlC(Server server, String[] args) {
     server.start();
+
+    if (hasArgExamples(args)) {
+      server.examples();
+    }
+
     server.join();
     System.out.println("RockScript server stopped");
+  }
+
+  private static boolean hasArgExamples(String[] args) {
+    return args!=null && args.length>0 && "examples".equals(args[0]);
   }
 }

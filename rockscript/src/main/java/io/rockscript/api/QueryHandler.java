@@ -20,10 +20,7 @@
 package io.rockscript.api;
 
 import io.rockscript.Engine;
-import io.rockscript.http.servlet.HttpException;
-import io.rockscript.http.servlet.InternalServerException;
-import io.rockscript.http.servlet.ServerRequest;
-import io.rockscript.http.servlet.ServerResponse;
+import io.rockscript.http.servlet.*;
 import io.rockscript.util.Reflection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +34,7 @@ public class QueryHandler extends AbstractRequestHandler {
   static Logger log = LoggerFactory.getLogger(QueryHandler.class);
 
   public QueryHandler(Engine engine) {
-    super(GET, "/query", engine);
+    super(GET, "/query/{queryName}", engine);
   }
 
   @Override
@@ -46,9 +43,8 @@ public class QueryHandler extends AbstractRequestHandler {
       Query query = parseQuery(request);
       Object queryResponse = query.execute(engine);
 
-      String responseBodyJson = engine.getGson().toJson(queryResponse);
       response
-        .bodyString(responseBodyJson)
+        .bodyJson(queryResponse)
         .status(200);
 
     } catch (HttpException e) {
@@ -62,8 +58,9 @@ public class QueryHandler extends AbstractRequestHandler {
   private Query parseQuery(ServerRequest request) {
     try {
       Map<String,Class<? extends Query>> queryTypes = engine.getQueryTypes();
-      String queryName = request.getQueryParameter("q");
+      String queryName = request.getPathParameter("queryName");
       Class<? extends Query> queryClass = queryTypes.get(queryName);
+      BadRequestException.throwIfNull(queryClass, "No query for q=%s. Expected one of %s", queryName, queryTypes.keySet());
       Query query = queryClass.newInstance();
       Map<String, String[]> parameterMap = request.getQueryParameterMap();
       for (String parameterName: parameterMap.keySet()) {

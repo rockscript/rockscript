@@ -30,7 +30,7 @@ import java.util.List;
 public class ScriptVersionsQuery implements Query<List<ScriptVersion>> {
 
   @Override
-  public String getType() {
+  public String getName() {
     return "scriptVersions";
   }
 

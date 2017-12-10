@@ -23,7 +23,7 @@ import io.rockscript.Engine;
 
 public interface Query<R> {
 
-  String getType();
+  String getName();
 
   R execute(Engine engine);
 }
