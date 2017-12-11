@@ -32,7 +32,7 @@
     <artifactId>rockscript-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  
+
   <dependencies>
 
     <dependency>

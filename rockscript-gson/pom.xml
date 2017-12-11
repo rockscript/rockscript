@@ -34,24 +34,24 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>rockscript-gson</artifactId>
+  <artifactId>rockscript-gson</artifactId>
 
-    <parent>
-        <groupId>io.rockscript</groupId>
-        <artifactId>rockscript-parent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
+  <parent>
+    <groupId>io.rockscript</groupId>
+    <artifactId>rockscript-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
 
-    <dependencies>
+  <dependencies>
 
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.7</version>
-        </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.7</version>
+    </dependency>
 
-    </dependencies>
+  </dependencies>
 
 </project>
