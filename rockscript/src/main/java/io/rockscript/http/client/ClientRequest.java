@@ -20,6 +20,7 @@
 
 package io.rockscript.http.client;
 
+import io.rockscript.http.Http;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpGet;
@@ -29,7 +30,6 @@ import org.apache.http.entity.StringEntity;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +45,7 @@ public class ClientRequest {
   static final String NEWLINE = System.getProperty("line.separator");
 
   /** transient because this field should not be serialized by gson */
-  transient Http http;
+  transient HttpClient httpClient;
   /** transient because this field should not be serialized by gson */
   transient HttpRequestBase apacheRequest;
 
@@ -57,8 +57,8 @@ public class ClientRequest {
   protected ClientRequest() {
   }
 
-  protected ClientRequest(Http http, String method, String url) {
-    this.http = http;
+  protected ClientRequest(HttpClient httpClient, String method, String url) {
+    this.httpClient = httpClient;
     this.method = method;
     this.url = url;
   }
@@ -215,19 +215,19 @@ public class ClientRequest {
   }
 
   /** sets Content-Type:application/json and serializes the jsonObject
-   * with {@link Http#getGson()} as the body string */
+   * with {@link HttpClient#getGson()} as the body string */
   public ClientRequest bodyJson(Object jsonObject) {
     headerContentTypeApplicationJson();
-    String json = http.getGson().toJson(jsonObject);
+    String json = httpClient.getGson().toJson(jsonObject);
     return body(json);
   }
 
-  public Http getHttp() {
-    return http;
+  public HttpClient getHttpClient() {
+    return httpClient;
   }
 
-  public void setHttp(Http http) {
-    this.http = http;
+  public void setHttpClient(HttpClient httpClient) {
+    this.httpClient = httpClient;
   }
 
   public String getMethod() {

@@ -19,7 +19,7 @@
  */
 package io.rockscript;
 
-import io.rockscript.http.client.Http;
+import io.rockscript.http.client.HttpClient;
 import org.apache.commons.cli.*;
 
 import java.util.Map;
@@ -81,7 +81,7 @@ public abstract class CliCommand {
     formatter.printHelp(usage, getOptions());
   }
 
-  protected Http createHttp() {
-    return new Http(new TestEngine().start().getGson());
+  protected HttpClient createHttp() {
+    return new HttpClient(new TestEngine().start().getGson());
   }
 }

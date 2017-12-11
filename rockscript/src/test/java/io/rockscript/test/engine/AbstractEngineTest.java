@@ -64,7 +64,7 @@ public class AbstractEngineTest {
   @After
   public void tearDown() {
     engine
-      .getHttp()
+      .getHttpClient()
       .getApacheHttpClient()
       .getConnectionManager()
       .closeIdleConnections(0, TimeUnit.NANOSECONDS);

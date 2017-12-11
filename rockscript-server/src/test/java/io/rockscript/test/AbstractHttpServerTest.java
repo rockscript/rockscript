@@ -19,9 +19,10 @@
  */
 package io.rockscript.test;
 
+import io.rockscript.http.Http;
 import io.rockscript.http.client.ClientRequest;
 import io.rockscript.http.client.ClientResponse;
-import io.rockscript.http.client.Http;
+import io.rockscript.http.client.HttpClient;
 import io.rockscript.http.server.HttpServer;
 import org.junit.Before;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public abstract class AbstractHttpServerTest {
 
   protected static final int PORT = 9999;
 
-  private static Http http;
+  private static HttpClient httpClient;
   private static HttpServer server;
   /** @see #getServerName() */
   private static String serverName;
@@ -54,7 +55,7 @@ public abstract class AbstractHttpServerTest {
         server.shutdown();
         server = null;
         serverName = null;
-        http = null;
+        httpClient = null;
         baseUrl = null;
       }
     }
@@ -62,7 +63,7 @@ public abstract class AbstractHttpServerTest {
       this.server = startServer();
       this.serverName = getServerName();
       log.debug("Started server "+serverName);
-      this.http = createHttp();
+      this.httpClient = createHttp();
       this.baseUrl = createBaseUrl();
     }
   }
@@ -75,8 +76,8 @@ public abstract class AbstractHttpServerTest {
   }
 
   /** override to customize the http client */
-  protected Http createHttp() {
-    return new Http();
+  protected HttpClient createHttp() {
+    return new HttpClient();
   }
 
   /** override to customize the baseUrl */
@@ -89,24 +90,24 @@ public abstract class AbstractHttpServerTest {
   }
 
   public ClientRequest newGet(final String path) {
-    return new TestClientRequest(http, Http.Methods.GET, createUri(path));
+    return new TestClientRequest(httpClient, Http.Methods.GET, createUri(path));
   }
 
   public ClientRequest newPost(final String path) {
-    return new TestClientRequest(http, Http.Methods.POST, createUri(path));
+    return new TestClientRequest(httpClient, Http.Methods.POST, createUri(path));
   }
 
   public ClientRequest newPut(final String path) {
-    return new TestClientRequest(http, Http.Methods.PUT, createUri(path));
+    return new TestClientRequest(httpClient, Http.Methods.PUT, createUri(path));
   }
 
   public ClientRequest newDelete(final String path) {
-    return new TestClientRequest(http, Http.Methods.DELETE, createUri(path));
+    return new TestClientRequest(httpClient, Http.Methods.DELETE, createUri(path));
   }
 
   static class TestClientRequest extends ClientRequest {
-    public TestClientRequest(Http http, String method, String url) {
-      super(http, method, url);
+    public TestClientRequest(HttpClient httpClient, String method, String url) {
+      super(httpClient, method, url);
     }
     @Override
     protected ClientResponse createHttpResponse() throws IOException {

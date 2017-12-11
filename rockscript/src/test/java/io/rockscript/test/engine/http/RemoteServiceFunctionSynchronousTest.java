@@ -19,11 +19,11 @@
  */
 package io.rockscript.test.engine.http;
 
+import io.rockscript.http.Http;
 import io.rockscript.service.ServiceFunctionInput;
 import io.rockscript.service.ServiceFunctionOutput;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.http.client.Http;
 import io.rockscript.http.servlet.PathRequestHandler;
 import io.rockscript.http.servlet.RouterServlet;
 import io.rockscript.http.servlet.ServerRequest;

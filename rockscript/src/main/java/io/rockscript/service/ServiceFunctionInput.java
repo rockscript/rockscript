@@ -18,7 +18,7 @@ package io.rockscript.service;
 import com.google.gson.Gson;
 import io.rockscript.Engine;
 import io.rockscript.engine.impl.*;
-import io.rockscript.http.client.Http;
+import io.rockscript.http.client.HttpClient;
 
 import java.util.List;
 import java.util.Map;
@@ -103,8 +103,8 @@ public class ServiceFunctionInput {
     return execution;
   }
 
-  public Http getHttp() {
-    return getEngine().getHttp();
+  public HttpClient getHttp() {
+    return getEngine().getHttpClient();
   }
 
   public Integer getFailedAttemptsCount() {

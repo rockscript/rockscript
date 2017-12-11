@@ -16,7 +16,7 @@
 package io.rockscript.service.http;
 
 import io.rockscript.engine.job.RetryPolicy;
-import io.rockscript.http.client.Http;
+import io.rockscript.http.Http;
 import io.rockscript.service.ImportObject;
 import io.rockscript.service.ImportProvider;
 

@@ -19,7 +19,7 @@
  */
 package io.rockscript.http.servlet;
 
-import io.rockscript.http.client.Http;
+import io.rockscript.http.Http;
 
 public abstract class PathRequestHandler implements RequestHandler {
 

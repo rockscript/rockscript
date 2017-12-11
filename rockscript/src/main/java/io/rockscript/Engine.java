@@ -40,7 +40,7 @@ import io.rockscript.engine.impl.*;
 import io.rockscript.engine.impl.EventListener;
 import io.rockscript.engine.job.JobService;
 import io.rockscript.gson.PolymorphicTypeAdapterFactory;
-import io.rockscript.http.client.Http;
+import io.rockscript.http.client.HttpClient;
 import io.rockscript.service.ImportObject;
 import io.rockscript.service.ImportProvider;
 import io.rockscript.service.ImportResolver;
@@ -74,7 +74,7 @@ public class Engine {
   protected ImportResolver importResolver;
   protected Executor executor;
   protected Gson gson;
-  protected Http http;
+  protected HttpClient httpClient;
   protected JobService jobService;
   protected Map<String,Class<? extends Command>> commandTypes = new HashMap<>();
   protected Map<String,Class<? extends Query>> queryTypes = new HashMap<>();
@@ -133,7 +133,7 @@ public class Engine {
   public Engine start() {
     this.gson = createGson();
     this.executor = new LoggingExecutor(engineLogStore, createExecutor());
-    this.http = new Http(gson);
+    this.httpClient = new HttpClient(gson);
     throwIfNotProperlyConfigured();
     plugins.forEach(plugin->plugin.start(this));
     this.jobService.startup();
@@ -326,8 +326,8 @@ public class Engine {
     return executor;
   }
 
-  public Http getHttp() {
-    return http;
+  public HttpClient getHttpClient() {
+    return httpClient;
   }
 
   public JobService getJobService() {

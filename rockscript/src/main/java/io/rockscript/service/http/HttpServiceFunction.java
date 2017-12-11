@@ -56,7 +56,7 @@ public class HttpServiceFunction extends AbstractServiceFunction {
     JsonElement requestElement = gson.toJsonTree(requestObject);
 
     HttpServiceClientRequest clientRequest = gson.fromJson(requestElement, HttpServiceClientRequest.class);
-    clientRequest.setHttp(input.getHttp());
+    clientRequest.setHttpClient(input.getHttp());
     clientRequest.setMethod(this.method);
 
     // Maybe this should be optional and configurable with a property in the requestObject?

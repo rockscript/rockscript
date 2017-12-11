@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static io.rockscript.http.client.Http.ContentTypes.APPLICATION_JSON;
-import static io.rockscript.http.client.Http.Headers.CONTENT_TYPE;
+import static io.rockscript.http.Http.ContentTypes.APPLICATION_JSON;
+import static io.rockscript.http.Http.Headers.CONTENT_TYPE;
 
 public class RemoteServiceFunction extends AbstractServiceFunction {
 

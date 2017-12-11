@@ -22,7 +22,7 @@ package io.rockscript.test.server;
 import io.rockscript.Engine;
 import io.rockscript.Servlet;
 import io.rockscript.TestEngine;
-import io.rockscript.http.client.Http;
+import io.rockscript.http.client.HttpClient;
 import io.rockscript.http.server.HttpServer;
 import io.rockscript.test.AbstractHttpServerTest;
 import io.rockscript.test.LatestServerExceptionListener;
@@ -68,8 +68,8 @@ public class AbstractServerTest extends AbstractHttpServerTest {
   }
 
   @Override
-  protected Http createHttp() {
-    return new Http(engine.getGson());
+  protected HttpClient createHttp() {
+    return new HttpClient(engine.getGson());
   }
 
   /** {@link AbstractHttpServerTest#tearDownStatic()} will shut down the server */

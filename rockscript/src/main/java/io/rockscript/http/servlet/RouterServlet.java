@@ -35,7 +35,9 @@ import java.util.*;
  * and {@link #defaultResponseHeader(String, String)}. */
 public class RouterServlet extends HttpServlet {
 
-  static Logger log = LoggerFactory.getLogger(RouterServlet.class);
+  static class HttpServer {
+  }
+  static Logger log = LoggerFactory.getLogger(HttpServer.class);
 
   /** maps methods to list of request paths */
   private List<RequestHandler> requestHandlers = new ArrayList<>();

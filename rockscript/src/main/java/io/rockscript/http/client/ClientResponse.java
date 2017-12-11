@@ -19,6 +19,7 @@
  */
 package io.rockscript.http.client;
 
+import io.rockscript.http.Http;
 import io.rockscript.util.Io;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 import static io.rockscript.http.client.ClientRequest.NEWLINE;
 
 
-/** Obtain a response by starting from the {@link Http} object
+/** Obtain a response by starting from the {@link HttpClient} object
  * use one of the newXxx methods to get a request and then
  * invoke {@link ClientRequest#execute()} */
 public class ClientResponse {
@@ -55,7 +56,7 @@ public class ClientResponse {
 
   protected ClientResponse(ClientRequest request) throws IOException {
     this.request = request;
-    this.apacheResponse = request.http.apacheHttpClient.execute(request.apacheRequest);
+    this.apacheResponse = request.httpClient.apacheHttpClient.execute(request.apacheRequest);
     try {
       this.status = apacheResponse.getStatusLine().getStatusCode();
       this.headers = extractHeaders(apacheResponse);
@@ -185,7 +186,7 @@ public class ClientResponse {
 
   @SuppressWarnings("unchecked")
   public <T> T getBodyAs(Type type) {
-    return (T) request.getHttp().getGson().fromJson(body, type);
+    return (T) request.getHttpClient().getGson().fromJson(body, type);
   }
 
   @SuppressWarnings("unchecked")

@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URLConnection;
 import java.util.Map;
 
-import static io.rockscript.http.client.Http.Methods.GET;
+import static io.rockscript.http.Http.Methods.GET;
 import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
 

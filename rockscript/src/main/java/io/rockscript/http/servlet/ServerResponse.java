@@ -20,7 +20,7 @@
 package io.rockscript.http.servlet;
 
 import com.google.gson.Gson;
-import io.rockscript.http.client.Http;
+import io.rockscript.http.Http;
 import org.slf4j.Logger;
 
 import javax.servlet.ServletOutputStream;
@@ -149,9 +149,9 @@ public class ServerResponse {
   /** invoked at the end of {@link RouterServlet#service(HttpServletRequest, HttpServletResponse)} */
   public void logTo(Logger log) {
     // Log status line
-    log.debug("< "+serverRequest.getRequest().getProtocol() + " " +
-                   response.getStatus() + " " +
-                   Http.ResponseCodes.getText(response.getStatus()));
+    log.debug("< " + serverRequest.getRequest().getProtocol() + " " +
+              response.getStatus() + " " +
+              Http.ResponseCodes.getText(response.getStatus()));
 
 //    // Log response headers
 //    if (response.getHeaderNames()!=null && !response.getHeaderNames().isEmpty()) {

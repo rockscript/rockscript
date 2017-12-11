@@ -22,7 +22,7 @@ package io.rockscript;
 
 import io.rockscript.http.client.ClientRequest;
 import io.rockscript.http.client.ClientResponse;
-import io.rockscript.http.client.Http;
+import io.rockscript.http.client.HttpClient;
 
 public class Ping extends ClientCommand {
 
@@ -44,7 +44,7 @@ public class Ping extends ClientCommand {
 
       log("Pinging server " + server + " ...");
 
-       ClientRequest request = new Http()
+       ClientRequest request = new HttpClient()
         .newGet(pingUrl);
 
       log(request);
