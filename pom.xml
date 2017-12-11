@@ -99,6 +99,20 @@
               <property>skipTests</property>
           </properties>
       </profile>
+      <profile>
+          <id>travis</id>
+          <build>
+              <plugins>
+                  <plugin>
+                      <groupId>org.apache.maven.plugins</groupId>
+                      <artifactId>maven-surefire-plugin</artifactId>
+                      <configuration>
+                          <redirectTestOutputToFile>false</redirectTestOutputToFile>
+                      </configuration>
+                  </plugin>
+              </plugins>
+          </build>
+      </profile>
     </profiles>
 
 </project>

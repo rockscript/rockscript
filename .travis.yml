@@ -2,7 +2,7 @@ language: java
 jdk:
   - oraclejdk8
 install: true
-script: mvn -X clean install
+script: mvn -Ptravis clean install
 cache:
   directories:
   - $HOME/.m2
