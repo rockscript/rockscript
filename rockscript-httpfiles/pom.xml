@@ -19,20 +19,24 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.rockscript</groupId>
   <artifactId>rockscript-httpfiles</artifactId>
   <packaging>jar</packaging>
-  <version>0.0.1-SNAPSHOT</version>
+
+  <parent>
+    <groupId>io.rockscript</groupId>
+    <artifactId>rockscript-parent</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
 
   <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <includes>
-          <include>**</include>
-        </includes>
-      </resource>
-    </resources>
+    <!--<resources>-->
+      <!--<resource>-->
+        <!--<directory>src/main/resources</directory>-->
+        <!--<includes>-->
+          <!--<include>**</include>-->
+        <!--</includes>-->
+      <!--</resource>-->
+    <!--</resources>-->
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
