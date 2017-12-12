@@ -30,4 +30,8 @@ public abstract class AbstractRequestHandler extends PathRequestHandler {
     super(method, pathTemplate);
     this.engine = engine;
   }
+
+  public void setEngine(Engine engine) {
+    this.engine = engine;
+  }
 }

@@ -20,11 +20,15 @@ import io.rockscript.engine.job.RetryServiceFunctionJobHandler;
 import io.rockscript.service.ServiceFunction;
 import io.rockscript.service.ServiceFunctionInput;
 import io.rockscript.service.ServiceFunctionOutput;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.List;
 
 public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression> {
+
+  static Logger log = LoggerFactory.getLogger(ArgumentsExpressionExecution.class);
 
   ServiceFunction serviceFunction = null;
   List<Object> args = null;
@@ -140,6 +144,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     try {
       return serviceFunction.invoke(input);
     } catch (Exception e) {
+      log.debug("Service function error: "+e.getMessage(), e);
       return ServiceFunctionOutput.error(e.getMessage());
     }
   }

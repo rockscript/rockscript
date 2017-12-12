@@ -17,64 +17,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript;
+package io.rockscript.test;
 
-import io.rockscript.engine.job.Job;
+import io.rockscript.Engine;
 import io.rockscript.engine.job.JobService;
+import io.rockscript.util.Maps;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.Executor;
+
+import static io.rockscript.util.Maps.entry;
+import static io.rockscript.util.Maps.hashMap;
 
 /** Engine with predictable execution of async stuff because
  * it's all executed directly in the thread of the client. */
 public class TestEngine extends Engine {
 
   public TestEngine() {
-    this.executor = createExecutor();
+    super(hashMap(entry(CFG_KEY_ENGINE, CFG_VALUE_ENGINE_TEST)));
   }
 
   @Override
   public TestEngine start() {
     return (TestEngine) super.start();
-  }
-
-  protected Executor createExecutor() {
-    // In test, commands are executed in the thread of the caller
-    // when they commands are being added to the executor.
-    // This makes testing predictable and hence easier.
-    return new Executor() {
-      @Override
-      public void execute(Runnable command) {
-        command.run();
-      }
-    };
-  }
-
-  @Override
-  protected JobService createJobService() {
-    return new TestJobService(this);
-  }
-
-  public static class TestJobService extends JobService {
-    public TestJobService(Engine engine) {
-      super(engine);
-    }
-    public List<Job> getjobs() {
-      return jobs;
-    }
-    @Override
-    public void startup() {
-    }
-    @Override
-    public void shutdown() {
-    }
-    @Override
-    public void executeJob(Job job) {
-      super.executeJob(job);
-    }
-    @Override
-    protected void schedule(Job job) {
-    }
   }
 
   @Override

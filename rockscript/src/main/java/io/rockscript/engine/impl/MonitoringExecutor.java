@@ -24,12 +24,12 @@ import java.util.concurrent.Executor;
 /** Wraps all commands that are executed so that if an exception
  * happens comes out of the commands, it is logged in the
  * {@link EngineLogStore} */
-public class LoggingExecutor implements Executor {
+public class MonitoringExecutor implements Executor {
 
   EngineLogStore engineLogStore;
   Executor executor;
 
-  public LoggingExecutor(EngineLogStore engineLogStore, Executor executor) {
+  public MonitoringExecutor(EngineLogStore engineLogStore, Executor executor) {
     this.engineLogStore = engineLogStore;
     this.executor = executor;
   }

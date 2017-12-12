@@ -15,7 +15,7 @@
  */
 package io.rockscript.service.test;
 
-import io.rockscript.TestEngine;
+import io.rockscript.test.TestEngine;
 import io.rockscript.engine.impl.ScriptStore;
 import io.rockscript.Engine;
 

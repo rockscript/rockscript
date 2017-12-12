@@ -20,6 +20,7 @@
 package io.rockscript.engine.job;
 
 import io.rockscript.Engine;
+import io.rockscript.EngineListener;
 import io.rockscript.engine.impl.IdGenerator;
 import io.rockscript.engine.impl.Time;
 import io.rockscript.util.Exceptions;
@@ -34,7 +35,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class JobService {
+public class JobService implements EngineListener {
 
   static Logger log = LoggerFactory.getLogger(JobService.class);
 
@@ -51,8 +52,18 @@ public class JobService {
     idGenerator = engine.getJobIdGenerator();
   }
 
+  @Override
+  public void engineStarts(Engine engine) {
+    startup();
+  }
+
   public void startup() {
     timer = new Timer();
+  }
+
+  @Override
+  public void engineStops(Engine engine) {
+    shutdown();
   }
 
   public void shutdown() {

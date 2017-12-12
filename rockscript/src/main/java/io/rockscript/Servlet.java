@@ -19,28 +19,28 @@
  */
 package io.rockscript;
 
-import io.rockscript.api.CommandHandler;
-import io.rockscript.api.QueryHandler;
-import io.rockscript.engine.PingHandler;
 import io.rockscript.http.servlet.RouterServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class Servlet extends RouterServlet {
 
-  protected Engine engine;
+  static Logger log = LoggerFactory.getLogger(Servlet.class);
 
-  /** Optionally pass a **non-started** Engine,
-   * If no engine is passed, a default one will be created
-   * in the {@link #init(ServletConfig)}. */
+  private Engine engine;
+
+  public Servlet() {
+  }
+
   public Servlet(Engine engine) {
     this.engine = engine;
   }
-
-  static Logger log = LoggerFactory.getLogger(Servlet.class);
 
   @Override
   public void init(ServletConfig config) throws ServletException {
@@ -54,24 +54,34 @@ public class Servlet extends RouterServlet {
     log.debug("                                        |_|         ");
 
     if (engine==null) {
-      engine = new DevEngine().start();
+      Map<String,String> configuration = readConfiguration(config);
+      engine = createEngine(configuration);
     }
 
-    if (!engine.isStarted()) {
-      engine.start();
-    }
+    engine.start();
 
     setGson(engine.getGson());
 
-    registerRequestHandlers();
+    requestHandler(engine.getCommandHandler());
+    requestHandler(engine.getQueryHandler());
+    requestHandler(engine.getPingHandler());
+    requestHandler(engine.getFileHandler());
 
     defaultResponseHeader("Access-Control-Allow-Origin", "*");
   }
 
-  protected void registerRequestHandlers() {
-    requestHandler(new CommandHandler(engine));
-    requestHandler(new QueryHandler(engine));
-    requestHandler(new PingHandler(engine));
-    requestHandler(new FileHandler(engine));
+  protected Engine createEngine(Map<String,String> configuration) {
+    return new Engine(configuration);
+  }
+
+  protected Map<String, String> readConfiguration(ServletConfig config) {
+    Map<String,String> initParameters = new LinkedHashMap<>();
+    Enumeration<String> initParameterNames = config.getInitParameterNames();
+    while (initParameterNames.hasMoreElements()) {
+      String initParameterName = initParameterNames.nextElement();
+      String initParameterValue = config.getInitParameter(initParameterName);
+      initParameters.put(initParameterName, initParameterValue);
+    }
+    return initParameters;
   }
 }

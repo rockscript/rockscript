@@ -1,4 +1,4 @@
-### Prerequisites
+## Prerequisites
 
  * A running RockScript server.  See <a onclick="show('getting-started')">Getting started</a> 
  * NodeJS 7.7.1+

@@ -63,7 +63,7 @@ public abstract class AbstractHttpServerTest {
       this.server = startServer();
       this.serverName = getServerName();
       log.debug("Started server "+serverName);
-      this.httpClient = createHttp();
+      this.httpClient = createHttpClient();
       this.baseUrl = createBaseUrl();
     }
   }
@@ -76,7 +76,7 @@ public abstract class AbstractHttpServerTest {
   }
 
   /** override to customize the http client */
-  protected HttpClient createHttp() {
+  protected HttpClient createHttpClient() {
     return new HttpClient();
   }
 

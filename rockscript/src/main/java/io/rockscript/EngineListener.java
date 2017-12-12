@@ -19,17 +19,8 @@
  */
 package io.rockscript;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
+public interface EngineListener {
 
-public class DevEngine extends TestEngine {
-
-  public DevEngine() {
-  }
-
-  @Override
-  protected Executor createExecutor() {
-    return Executors.newWorkStealingPool();
-  }
-
+  void engineStarts(Engine engine);
+  void engineStops(Engine engine);
 }

@@ -20,7 +20,7 @@
 package io.rockscript.test.engine;
 
 import com.google.gson.Gson;
-import io.rockscript.TestEngine;
+import io.rockscript.test.TestEngine;
 import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.EndServiceFunctionCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;

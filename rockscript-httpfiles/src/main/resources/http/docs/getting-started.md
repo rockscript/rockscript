@@ -1,4 +1,4 @@
-#### Prerequisites
+## Prerequisites
 
 To run the server and the command line interface (CLI)
  * Java 8 SE JRE+
@@ -7,7 +7,7 @@ To build RockScript
  * Java 8 JDK+
  * Maven 3.3.9+
 
-### Clone the rockscript repo
+## Clone the rockscript repo
 
 ```
 git clone git@github.com:rockscript/rockscript.git
@@ -15,7 +15,7 @@ git clone git@github.com:rockscript/rockscript.git
 
 Will create a folder called `rockscript`. 
 
-### Build rockscript.jar and rockscript-cli.jar 
+## Build rockscript.jar and rockscript-cli.jar 
 
 Open a terminal in the `rockscript` root folder and run
 
@@ -39,7 +39,7 @@ That means you have successfully created
  * `rockscript-server/target/rockscript.jar`
  * `rockscript-cli/target/rockscript-cli.jar` (see <a onclick="show('cli')">Command line args</a>)
  
-### Starting the RockScript server
+## Starting the RockScript server
 
 Start the RockScript server with 
 

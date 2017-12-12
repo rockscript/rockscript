@@ -22,8 +22,4 @@ package io.rockscript;
 public interface EnginePlugin {
 
   void created(Engine engine);
-
-  void start(Engine engine);
-
-  void stop(Engine engine);
 }

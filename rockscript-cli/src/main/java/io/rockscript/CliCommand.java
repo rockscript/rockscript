@@ -20,6 +20,7 @@
 package io.rockscript;
 
 import io.rockscript.http.client.HttpClient;
+import io.rockscript.test.TestEngine;
 import org.apache.commons.cli.*;
 
 import java.util.Map;

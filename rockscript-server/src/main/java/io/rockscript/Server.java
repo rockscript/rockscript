@@ -31,10 +31,16 @@ public class Server {
   private Engine engine;
   private HttpServer server;
 
-  protected void start() {
-    this.engine = createEngine();
-    this.engine.start();
+  public Server(String[] args) {
+    this.engine = createEngine(args);
+  }
 
+  protected Engine createEngine(String[] args) {
+    return new Engine(args);
+  }
+
+  protected void start() {
+    this.engine.start();
     this.server = createHttpServer(engine);
     this.server.startup();
   }
@@ -46,41 +52,17 @@ public class Server {
       .servlet(servlet);
   }
 
-  protected TestEngine createEngine() {
-    return new TestEngine();
-  }
-
   protected void join() {
     server.join();
   }
 
   public static void main(String[] args) {
-    runServerTillCtrlC(new Server(), args);
+    runServer(new Server(args));
   }
 
-  protected void examples() {
-    new DeployScriptVersionCommand()
-      .scriptName("hello")
-      .scriptText("var http = system.import('io.rockscript/http');")
-      .execute(engine);
-
-    new StartScriptExecutionCommand()
-      .scriptName("hello")
-      .execute(engine);
-  }
-
-  protected static void runServerTillCtrlC(Server server, String[] args) {
+  protected static void runServer(Server server) {
     server.start();
-
-    if (hasArgExamples(args)) {
-      server.examples();
-    }
-
     server.join();
     System.out.println("RockScript server stopped");
-  }
-
-  private static boolean hasArgExamples(String[] args) {
-    return args!=null && args.length>0 && "examples".equals(args[0]);
   }
 }

@@ -20,13 +20,29 @@
 package io.rockscript.test;
 
 import io.rockscript.Engine;
-import io.rockscript.EnginePlugin;
+import io.rockscript.engine.job.Job;
+import io.rockscript.engine.job.JobService;
 
-public class TestPlugin implements EnginePlugin {
+import java.util.List;
 
-  @Override
-  public void created(Engine engine) {
-    engine.importProvider(new SimpleImportProvider());
+public class TestJobService extends JobService {
+  public TestJobService(Engine engine) {
+    super(engine);
   }
-
+  public List<Job> getjobs() {
+    return jobs;
+  }
+  @Override
+  public void startup() {
+  }
+  @Override
+  public void shutdown() {
+  }
+  @Override
+  public void executeJob(Job job) {
+    super.executeJob(job);
+  }
+  @Override
+  protected void schedule(Job job) {
+  }
 }

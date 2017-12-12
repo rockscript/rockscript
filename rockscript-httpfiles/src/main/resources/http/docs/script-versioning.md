@@ -2,7 +2,7 @@ A RockScript server stores a collection of scripts and each script has a collect
 of script versions.  Each script execution runs against a particular script version.
 Once started, script executions keep running in the same script version.
 
-#### Why
+## Why
 
 The RockScript server needs to store the scripts for 2 reasons:
 
@@ -17,7 +17,7 @@ The RockScript server needs to store the scripts for 2 reasons:
  in that case script execution also needs to continue from persistent storage 
  as well.
 
-#### Deploying scripts
+## Deploying scripts
 
 The most common way to make scripts available for execution on the server is 
 using the deploy command.   When we deploy the script to the server, we 
@@ -26,7 +26,7 @@ using the deploy command.   When we deploy the script to the server, we
 * Create a new script version with the given text and associate it with the script.
 * Mark the new script version as the active script version.  
   
-#### The active script version 
+## The active script version 
 
 The active script version is the version that is started when a script 
 is specified with the `Start script` command.  The active script version 
@@ -36,7 +36,7 @@ is the most common.
 With the `saveScript` command, it's also possible to save a new script without 
 making it the active script version.
 
-#### Deleting old versions
+## Deleting old versions
 
 Old versions of the script need to be kept on the server for as long as you 
 want to keep the executions executed in those respective script versions.

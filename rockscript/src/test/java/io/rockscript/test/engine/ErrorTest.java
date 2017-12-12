@@ -19,8 +19,7 @@
  */
 package io.rockscript.test.engine;
 
-import io.rockscript.Engine;
-import io.rockscript.TestEngine;
+import io.rockscript.test.TestEngine;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
 import org.junit.Test;

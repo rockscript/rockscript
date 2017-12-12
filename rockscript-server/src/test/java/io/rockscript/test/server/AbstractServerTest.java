@@ -21,7 +21,7 @@ package io.rockscript.test.server;
 
 import io.rockscript.Engine;
 import io.rockscript.Servlet;
-import io.rockscript.TestEngine;
+import io.rockscript.test.TestEngine;
 import io.rockscript.http.client.HttpClient;
 import io.rockscript.http.server.HttpServer;
 import io.rockscript.test.AbstractHttpServerTest;
@@ -40,10 +40,15 @@ public class AbstractServerTest extends AbstractHttpServerTest {
   public void setUp() {
     if (engine==null) {
       // First the engine will be initialized
-      engine = new TestEngine().start();
+      engine = createEngine();
+      engine.start();
     }
     // The super.setUp will invoke the createHttpServer below
     super.setUp();
+  }
+
+  protected Engine createEngine() {
+    return new TestEngine();
   }
 
   /** Invoked by super.setUp */
@@ -68,7 +73,7 @@ public class AbstractServerTest extends AbstractHttpServerTest {
   }
 
   @Override
-  protected HttpClient createHttp() {
+  protected HttpClient createHttpClient() {
     return new HttpClient(engine.getGson());
   }
 
@@ -76,6 +81,7 @@ public class AbstractServerTest extends AbstractHttpServerTest {
   @AfterClass
   public static void tearDownStatic() {
     // AbstractHttpServerTest.tearDownStatic will shutdown the server
+    engine.stop();
     engine = null;
   }
 }

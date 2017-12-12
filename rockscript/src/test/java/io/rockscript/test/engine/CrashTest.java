@@ -20,7 +20,7 @@
 package io.rockscript.test.engine;
 
 import io.rockscript.Engine;
-import io.rockscript.TestEngine;
+import io.rockscript.test.TestEngine;
 import io.rockscript.service.ServiceFunctionOutput;
 import io.rockscript.api.commands.RecoverExecutionsCommand;
 import io.rockscript.api.commands.RecoverExecutionsResponse;

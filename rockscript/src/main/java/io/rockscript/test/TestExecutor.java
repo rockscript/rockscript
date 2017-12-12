@@ -17,35 +17,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.engine.job;
+package io.rockscript.test;
 
-import io.rockscript.Engine;
-import io.rockscript.engine.impl.Time;
+import java.util.concurrent.Executor;
 
-import java.time.Instant;
-import java.time.temporal.TemporalAmount;
+public class TestExecutor implements Executor {
 
-public class JobContext extends Engine {
-
-  Engine engine;
-  Job job;
-  JobRun jobRun;
-  JobService jobService;
-
-  public JobContext(Engine engine, Job job, JobRun jobRun, JobService jobService) {
-    this.engine = engine;
-    this.job = job;
-    this.jobRun = jobRun;
-    this.jobService = jobService;
+  @Override
+  public void execute(Runnable command) {
+    command.run();
   }
-
-  public void handleError(String error) {
-    jobService.handleError(job, jobRun, error);
-  }
-
-  public void reschedule(TemporalAmount retryDuration) {
-    job.setExecutionTime(Time.now().plus(retryDuration));
-    jobService.schedule(job);
-  }
-
 }

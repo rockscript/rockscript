@@ -73,7 +73,6 @@ public class HttpServiceTest extends AbstractHttpTest {
         response.headerContentTypeTextPlain();
         response.status(200);
         response.bodyString("thread was here");
-        response.status(200);
       }
     };
 
