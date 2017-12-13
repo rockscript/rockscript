@@ -49,7 +49,6 @@ import io.rockscript.service.ImportProvider;
 import io.rockscript.service.ImportResolver;
 import io.rockscript.service.ServiceFunction;
 import io.rockscript.service.http.HttpService;
-import io.rockscript.test.TestEngine;
 import io.rockscript.test.TestExecutor;
 import io.rockscript.test.TestJobService;
 
@@ -110,7 +109,7 @@ public class Engine {
    * For args not having '=' configuration.put(arg, null); */
   public static Map<String, String> parseConfigurationArgs(String[] args) {
     Map<String, String> configuration = new LinkedHashMap<>();
-    if (args!=null && args.length==0) {
+    if (args!=null && args.length>0) {
       for (String arg: args) {
         int separatorIndex = arg.indexOf('=');
         String key = null;
@@ -203,7 +202,6 @@ public class Engine {
     if (!started) {
       started = true;
       engineListeners.forEach(listener->listener.engineStarts(this));
-
       if (configuration.containsKey("examples")) {
         initializeExamples();
       }

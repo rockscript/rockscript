@@ -97,7 +97,7 @@ public class ScriptStore {
     if (findScriptById(script.getId())!=null) {
       throw new BadRequestException("Script with id '"+script.getId()+"' already exists");
     }
-    scripts.add(script);
+    scripts.add(0, script);
   }
 
   public ScriptVersion createScriptVersion(String scriptId, String scriptText, Boolean activate) {

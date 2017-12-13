@@ -31,7 +31,7 @@ public class ScriptVersionsQuery implements Query<List<ScriptVersion>> {
 
   @Override
   public String getName() {
-    return "scriptVersions";
+    return "script-versions";
   }
 
   String scriptId;
