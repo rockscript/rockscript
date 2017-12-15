@@ -47,8 +47,7 @@ public class ScriptExecutionQuery implements Query<ScriptExecutionQuery.ScriptEx
       ScriptVersion scriptVersion) {
       super(scriptExecution);
       this.events = events;
-      this.scriptVersion = new ScriptVersion(scriptVersion);
-      this.scriptVersion.setText(null);
+      this.scriptVersion = scriptVersion;
     }
     public List<ExecutionEvent> getEvents() {
       return events;

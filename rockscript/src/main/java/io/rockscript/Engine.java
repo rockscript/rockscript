@@ -262,7 +262,7 @@ public class Engine {
       .typeName(new TypeToken<ServiceFunctionStartingEvent>(){},"serviceFunctionStarting")
       .typeName(new TypeToken<ServiceFunctionRetryingEvent>(){},"serviceFunctionRetrying")
       .typeName(new TypeToken<ServiceFunctionWaitingEvent>(){}, "serviceFunctionWaiting")
-      .typeName(new TypeToken<ServiceFunctionEndedEvent>(){},   "serviceFunctionEnd")
+      .typeName(new TypeToken<ServiceFunctionEndedEvent>(){},   "serviceFunctionEnded")
       .typeName(new TypeToken<ServiceFunctionErrorEvent>(){},   "serviceFunctionError")
       .typeName(new TypeToken<ScriptEndedEvent>(){},            "scriptEnded")
       .typeName(new TypeToken<ScriptStartedEvent>(){},          "scriptStarted")
