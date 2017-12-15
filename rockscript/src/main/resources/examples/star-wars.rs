@@ -4,7 +4,7 @@ var http = system.import('rockscript.io/http');
 var lukeResponse = http.get({url: 'https://swapi.co/api/people/1/'});
 
 // Luke Skywalker's first vehicle
-var firstVehicleUrl = lukeResponse.vehicles[0];
+var homeworldUrl = lukeResponse.body.homeworld;
 
 // Get all the data from Like's first vehicle
-var firstVehicle = http.get({url: firstVehicleUrl});
+var homeworld = http.get({url: homeworldUrl});
