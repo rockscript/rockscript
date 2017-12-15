@@ -35,9 +35,12 @@ public class IdentifierExpressionExecution extends Execution<IdentifierExpressio
   public Object getIdentifierValue() {
     String variableName = element.getIdentifier();
     Variable variable = parent.getVariable(variableName);
-    if (variable==null) {
-      throw new EngineException("ReferenceError: "+variableName+" is not defined", this);
+    if (variable!=null) {
+      return variable.getValue();
     }
-    return variable.getValue();
+    if ("encodeURI".equals(variableName)) {
+      return EncodeUriFunction.INSTANCE;
+    }
+    throw new EngineException("ReferenceError: "+variableName+" is not defined", this);
   }
 }

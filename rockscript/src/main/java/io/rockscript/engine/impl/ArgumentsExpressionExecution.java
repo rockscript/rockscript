@@ -60,7 +60,9 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
       this.serviceFunction = (ServiceFunction) functionExpressionExecution.getResult();
       this.args = collectResultsFromChildren().subList(1, children.size());
 
-      if (serviceFunction instanceof SystemImportServiceFunction) {
+      // TODO create separate mechanism for non-service functions
+      if (serviceFunction instanceof SystemImportServiceFunction
+          || serviceFunction instanceof EncodeUriFunction) {
         invokeSystemImportFunction();
       } else {
         startFunction();

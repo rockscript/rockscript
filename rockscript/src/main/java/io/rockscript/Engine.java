@@ -51,6 +51,7 @@ import io.rockscript.service.ServiceFunction;
 import io.rockscript.service.http.HttpService;
 import io.rockscript.test.TestExecutor;
 import io.rockscript.test.TestJobService;
+import io.rockscript.util.Io;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -210,12 +211,23 @@ public class Engine {
   }
 
   private void initializeExamples() {
-    new DeployScriptVersionCommand()
-      .scriptName("hello")
-      .scriptText("var http = system.import('io.rockscript/http');")
+    deployExample("examples/local-error.rs");
+    deployExample("examples/local-retry.rs");
+    deployExample("examples/star-wars.rs");
+    deployExample("examples/chuck-norris.rs");
+    new StartScriptExecutionCommand()
+      .scriptName("examples/star-wars.rs")
       .execute(this);
     new StartScriptExecutionCommand()
-      .scriptName("hello")
+      .scriptName("examples/chuck-norris.rs")
+      .execute(this);
+  }
+
+  private void deployExample(String resource) {
+    String scriptText = Io.getResourceAsString(resource);
+    new DeployScriptVersionCommand()
+      .scriptName(resource)
+      .scriptText(scriptText)
       .execute(this);
   }
 
