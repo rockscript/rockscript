@@ -5,7 +5,9 @@ public class ScriptExecutionErrorEvent<T extends Execution> extends ExecutableEv
   String error;
   String scriptId;
 
-  /** constructor for gson deserialization */
+  /**
+   * constructor for gson deserialization
+   */
   ScriptExecutionErrorEvent() {
   }
 
@@ -25,8 +27,8 @@ public class ScriptExecutionErrorEvent<T extends Execution> extends ExecutableEv
 
   @Override
   public String toString() {
-    return "[" + scriptExecutionId +"] " +
-           "Error [script:"+scriptId+",line:"+line+"] "+error;
+    return "[" + scriptExecutionId + "] " +
+           "Error [script:" + scriptId + ",line:" + line + "] " + error;
   }
 
   public String getScriptId() {

@@ -1,9 +1,9 @@
 var http = system.import('rockscript.io/http');
 
-// This will succeed after a retry
-// By specifying the expectedStatus, the request will fail if the
-// response status is different from 200.
+// This is a request to ask if you're lucky.
+// The response will alternate between status 200 OK and
+// status 500 INTERNAL SERVER ERROR with each request made
 var response = http.get({
-  url: 'http://localhost:3652/examples/succeed-every-one-in-two',
+  url: 'http://localhost:3652/examples/lucky?',
   expectedStatus: 200
 });

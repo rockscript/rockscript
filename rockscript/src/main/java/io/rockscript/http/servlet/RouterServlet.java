@@ -91,7 +91,9 @@ public class RouterServlet extends HttpServlet {
   }
 
   public RouterServlet requestHandler(RequestHandler requestHandler) {
-    requestHandlers.add(requestHandler);
+    if (requestHandler!=null) {
+      requestHandlers.add(requestHandler);
+    }
     return this;
   }
 

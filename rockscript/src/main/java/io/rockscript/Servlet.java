@@ -19,6 +19,7 @@
  */
 package io.rockscript;
 
+import io.rockscript.examples.ExamplesHandler;
 import io.rockscript.http.servlet.RouterServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +66,7 @@ public class Servlet extends RouterServlet {
     requestHandler(engine.getCommandHandler());
     requestHandler(engine.getQueryHandler());
     requestHandler(engine.getPingHandler());
+    requestHandler(engine.getExamplesHandler());
     requestHandler(engine.getFileHandler());
 
     defaultResponseHeader("Access-Control-Allow-Origin", "*");

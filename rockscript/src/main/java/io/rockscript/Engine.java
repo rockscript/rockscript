@@ -31,10 +31,7 @@ import io.rockscript.api.CommandHandler;
 import io.rockscript.api.Query;
 import io.rockscript.api.QueryHandler;
 import io.rockscript.api.commands.*;
-import io.rockscript.api.queries.ScriptExecutionQuery;
-import io.rockscript.api.queries.ScriptExecutionsQuery;
-import io.rockscript.api.queries.ScriptVersionsQuery;
-import io.rockscript.api.queries.ScriptsQuery;
+import io.rockscript.api.queries.*;
 import io.rockscript.engine.EngineException;
 import io.rockscript.engine.ImportObjectSerializer;
 import io.rockscript.engine.PingHandler;
@@ -42,8 +39,10 @@ import io.rockscript.engine.ServiceFunctionSerializer;
 import io.rockscript.engine.impl.*;
 import io.rockscript.engine.impl.EventListener;
 import io.rockscript.engine.job.JobService;
+import io.rockscript.examples.ExamplesHandler;
 import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.http.client.HttpClient;
+import io.rockscript.http.servlet.RequestHandler;
 import io.rockscript.service.ImportObject;
 import io.rockscript.service.ImportProvider;
 import io.rockscript.service.ImportResolver;
@@ -97,6 +96,7 @@ public class Engine {
   protected QueryHandler queryHandler;
   protected PingHandler pingHandler;
   protected FileHandler fileHandler;
+  protected ExamplesHandler examplesHandler;
 
   protected List<EnginePlugin> plugins = new ArrayList<>();
   protected List<EngineListener> engineListeners = new ArrayList<>();
@@ -146,6 +146,7 @@ public class Engine {
     this.fileHandler = createFileHandler();
     this.executor = new MonitoringExecutor(engineLogStore, createExecutor());
     this.jobService = createJobService();
+    engineListeners.add(this.jobService);
 
     this.importResolver = new ImportResolver(this);
     importProvider(new HttpService());
@@ -155,6 +156,7 @@ public class Engine {
     query(new ScriptVersionsQuery());
     query(new ScriptExecutionQuery());
     query(new ScriptExecutionsQuery());
+    query(new EventsQuery());
 
     this.commandTypes = new HashMap<>();
     command(new SaveScriptVersionCommand());
@@ -211,6 +213,7 @@ public class Engine {
   }
 
   private void initializeExamples() {
+    this.examplesHandler = new ExamplesHandler(this);
     deployExample("examples/local-error.rs");
     deployExample("examples/local-retry.rs");
     deployExample("examples/star-wars.rs");
@@ -445,6 +448,10 @@ public class Engine {
 
   public PingHandler getPingHandler() {
     return pingHandler;
+  }
+
+  public RequestHandler getExamplesHandler() {
+    return examplesHandler;
   }
 
   public FileHandler getFileHandler() {

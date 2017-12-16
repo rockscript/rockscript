@@ -67,7 +67,7 @@ public class QueryHandler extends AbstractRequestHandler {
         if (!"q".equals(parameterName)) {
           Field field = Reflection.findFieldInClass(queryClass, parameterName);
           String[] parameterStringValues = (String[]) parameterMap.get(parameterName);
-          Object fieldValue = convertParameterValuesToFieldType(parameterStringValues, field.getGenericType());
+          Object fieldValue = convertParameterValuesToFieldType(parameterStringValues, field);
           if (fieldValue!=null) {
             field.setAccessible(true);
             field.set(query, fieldValue);
@@ -80,9 +80,16 @@ public class QueryHandler extends AbstractRequestHandler {
     }
   }
 
-  private Object convertParameterValuesToFieldType(String[] values, Type fieldType) {
+  private Object convertParameterValuesToFieldType(String[] values, Field field) {
+    Type fieldType = field.getGenericType();
+
+    if (values==null || values.length==0) {
+      return null;
+    }
+
     if (fieldType == String.class) {
       return hasSingleValue(values) ? values[0] : null;
+
     } else if (fieldType == Boolean.class || fieldType == boolean.class) {
       if (values!=null) {
         if (values.length==0) {
@@ -93,12 +100,14 @@ public class QueryHandler extends AbstractRequestHandler {
         }
       }
       return false;
+
     } else if (fieldType == Integer.class || fieldType == int.class) {
       if (hasSingleValue(values)) {
         return Integer.parseInt(values[0]);
       }
     }
-    return null;
+
+    throw new BadRequestException("Couldn't parse query parameter "+field.getName()+" as a "+(fieldType instanceof Class ? ((Class)fieldType).getSimpleName() : fieldType.toString()));
   }
 
   private boolean hasSingleValue(String[] values) {

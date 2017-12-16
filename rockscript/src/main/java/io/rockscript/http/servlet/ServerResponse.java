@@ -37,8 +37,6 @@ public class ServerResponse {
   HttpServletResponse response;
   Gson gson;
   String bodyLog;
-  /** Used to prevent that headers setting is ignored after body was sent */
-  boolean isBodyStarted;
 
   public ServerResponse(ServerRequest serverRequest, HttpServletResponse response, Gson gson) {
     this.serverRequest = serverRequest;
@@ -81,7 +79,6 @@ public class ServerResponse {
   private void writeBodyBytes(byte[] bytes) {
     try {
       headerContentLength(bytes.length);
-      isBodyStarted = true;
       ServletOutputStream out = response.getOutputStream();
       out.write(bytes);
       out.flush();
@@ -117,7 +114,7 @@ public class ServerResponse {
   }
 
   public ServerResponse header(String name, String value) {
-    if (isBodyStarted) {
+    if (response.isCommitted()) {
       throw new RuntimeException("Bug: headers need to be set before the body is sent");
     }
     if (name!=null && value!=null) {
