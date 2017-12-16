@@ -52,18 +52,23 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
   public EngineScriptExecution(String scriptExecutionId, Engine engine, EngineScript engineScript, List<ExecutionEvent> storedEvents) {
     this(scriptExecutionId, engine, engineScript);
 
-    this.executionMode = ExecutionMode.REBUILDING;
+    this.executionMode = ExecutionMode.REPLAYING;
     this.unreplayedEvents = new LinkedList<>(storedEvents);
 
     log.info("Building script execution from events:");
     this.unreplayedEvents.forEach(e->log.info("  "+e.toString()));
 
     while (!this.unreplayedEvents.isEmpty()) {
-      ExecutableEvent executableEvent = (ExecutableEvent) unreplayedEvents.removeFirst();
-      // Script execution events do not have an executionId in the event, only the scriptExecutionId.
-      Execution execution = executableEvent.executionId!=null ? findExecutionRecursive(executableEvent.executionId) : this;
-      log.info("Reexecuting event: "+executableEvent.toString());
-      executableEvent.execute(execution);
+      ExecutionEvent event = unreplayedEvents.removeFirst();
+      if (event instanceof ExecutableEvent) {
+        ExecutableEvent executableEvent = (ExecutableEvent) event;
+        // Script execution events do not have an executionId in the event, only the scriptExecutionId.
+        Execution execution = executableEvent.executionId!=null ? findExecutionRecursive(executableEvent.executionId) : this;
+        log.info("Reexecuting event: "+executableEvent);
+        executableEvent.execute(execution);
+      } else {
+        log.debug("Ignoring unreplayed event "+event);
+      }
     }
 
     this.executionMode = ExecutionMode.EXECUTING;
@@ -95,11 +100,8 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
 
   @Override
   protected void dispatch(ExecutionEvent event) {
-    if (executionMode!=ExecutionMode.REBUILDING) {
+    if (executionMode!=ExecutionMode.REPLAYING) {
       eventListener.handle(event);
-      if (executionMode == ExecutionMode.RECOVERING) {
-        executionMode = ExecutionMode.EXECUTING;
-      }
     } else {
       if (!(event instanceof ExecutableEvent)) {
         if (unreplayedEvents.isEmpty()) {
@@ -122,15 +124,14 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
   protected void dispatchAndExecute(ExecutableEvent event, Execution execution) {
     dispatch(event);
 
-    if (!rebuilding()) {
+    // when rebuilding, the loop in the constructor will re-execute the ExecutableEvent's
+    if (!isRebuilding()) {
       addWork(new ExecuteEventOperation(event, execution));
-      // event.execute(execution);
-    } // when rebuilding, the loop in the constructor will re-execute the ExecutableEvent's
+    }
   }
 
-  private boolean rebuilding() {
-    return executionMode==ExecutionMode.REBUILDING
-           || executionMode==ExecutionMode.RECOVERING;
+  private boolean isRebuilding() {
+    return executionMode==ExecutionMode.REPLAYING;
   }
 
   public String createInternalExecutionId() {

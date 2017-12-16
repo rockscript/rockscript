@@ -63,14 +63,14 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
       // TODO create separate mechanism for non-service functions
       if (serviceFunction instanceof SystemImportServiceFunction
           || serviceFunction instanceof EncodeUriFunction) {
-        invokeSystemImportFunction();
+        invokeSystemFunction();
       } else {
-        startFunction();
+        startServiceFunction();
       }
     }
   }
 
-  private void invokeSystemImportFunction() {
+  private void invokeSystemFunction() {
     // import functions have to be re-executed when the events
     // are applied because they can return functions
     ServiceFunctionOutput output = startFunctionInvoke();
@@ -79,7 +79,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
     endFunctionExecute(importedObject);
   }
 
-  private void startFunction() {
+  private void startServiceFunction() {
     dispatch(new ServiceFunctionStartingEvent(this));
     startFunctionExecute();
   }
@@ -87,7 +87,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   public void startFunctionExecute() {
     EngineScriptExecution scriptExecution = getScriptExecution();
     ExecutionMode executionMode = scriptExecution.getExecutionMode();
-    if (executionMode!=ExecutionMode.REBUILDING) {
+    if (executionMode!=ExecutionMode.REPLAYING) {
       ServiceFunctionOutput serviceFunctionOutput = null;
       try {
         serviceFunctionOutput = startFunctionInvoke();

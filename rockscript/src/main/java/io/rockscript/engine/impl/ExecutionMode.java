@@ -17,7 +17,7 @@ package io.rockscript.engine.impl;
 
 public enum ExecutionMode {
 
-  REBUILDING,
+  REPLAYING,
   RECOVERING,
   EXECUTING
 }
