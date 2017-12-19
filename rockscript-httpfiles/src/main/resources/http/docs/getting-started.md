@@ -1,4 +1,31 @@
-## Prerequisites
+## Open source server vs commercial app
+
+In order to fund further development of RockScript, we are building a commercial 
+product called the RockScript App.  The RockScript App includes 
+
+* RockScript open source server
+* Web UI script editor
+* Web UI execution inspector
+
+For now, early access versions are free, but require registration. 
+
+<a class="button" href="https://goo.gl/vdgHdG">Download RockScript App<br/><span class="version">(Free, early access version)</span></a>
+
+Run the downloaded jar file with 
+
+```
+java -jar rockscript-app.jar examples
+```
+
+The `examples` argument will ensure that a couple of example scripts and executions 
+are initialized when the server starts. 
+
+Then open [http://localhost:3652/](http://localhost:3652/)
+
+**Limitation**: Bear in mind that for now, the server only has an in-memory event store.
+So each time you reboot the server, it looses all it's scripts and script executions. 
+
+## Instructions to build the open source server
 
 To run the server and the command line interface (CLI)
  * Java 8 SE JRE+

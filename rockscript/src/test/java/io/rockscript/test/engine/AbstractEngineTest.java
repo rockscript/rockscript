@@ -20,6 +20,7 @@
 package io.rockscript.test.engine;
 
 import com.google.gson.Gson;
+import io.rockscript.Engine;
 import io.rockscript.test.TestEngine;
 import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.EndServiceFunctionCommand;
@@ -44,7 +45,7 @@ public class AbstractEngineTest {
 
   protected static Logger log = LoggerFactory.getLogger(AbstractEngineTest.class);
 
-  protected static Map<Class<? extends EngineProvider>,TestEngine> cachedEngines = new HashMap<>();
+  protected static TestEngineCache testEngineCache = new TestEngineCache();
 
   protected TestEngine engine;
   protected Gson gson;
@@ -70,39 +71,23 @@ public class AbstractEngineTest {
       .closeIdleConnections(0, TimeUnit.NANOSECONDS);
   }
 
-  /** Override this method if you want your CommandExecutorService to be
+  /** Override this method if you want your engine to be
    * created for each test.
    *
    * Overwrite {@link #getEngineProvider()} if you want to
-   * customize and cache a CommandExecutorService in your tests. */
+   * customize and cache the engine in your tests. */
   protected TestEngine initializeEngine() {
-    EngineProvider engineProvider = getEngineProvider();
-    Class<? extends EngineProvider> providerClass = engineProvider.getClass();
-    TestEngine engine = cachedEngines.get(providerClass);
-    if (engine==null) {
-      engine = engineProvider.createEngine();
-      cachedEngines.put(providerClass, engine);
-    }
-    return engine;
-  }
-
-  protected interface EngineProvider {
-    TestEngine createEngine();
+    return (TestEngine) testEngineCache.getTestEngine(getEngineProvider());
   }
 
   /** Override this method to use a customized Engine in your tests.
    * The AbstractEngineTest will cache the created engine between all tests
    * that use the same engine provider.
    *
-   * Overwrite {@link #initializeEngine()} if you want your Engine
+   * Overwrite {@link #initializeEngine()} if you want your engine
    * to be created for each test. */
-  protected EngineProvider getEngineProvider() {
-    return new EngineProvider() {
-      @Override
-      public TestEngine createEngine() {
-        return new TestEngine().start();
-      }
-    };
+  protected TestEngineProvider getEngineProvider() {
+    return TestEngineProvider.DEFAULT_TEST_ENGINE_PROVIDER;
   }
 
   static class TestTime extends Time {

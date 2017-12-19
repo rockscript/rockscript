@@ -108,7 +108,7 @@ th, td {
 .titlebar {
   background-color: #1A7CB1 !important;
   color: white;
-  padding: 21px;
+  padding: 17px;
 }
 
 .titlebar .brand {
@@ -205,6 +205,23 @@ th, td {
 
 .hljs, .hljs-subst {
   color: #a05216;
+}
+
+a.button, a.button:visited {
+  background-color: #1a90bf;
+  color: white;
+  font-weight: normal;
+  margin: 5px;
+  border: 0px;
+  border-radius: 5px;
+  padding: 20px;
+  display: inline-block;
+  text-align: center;
+}
+
+a.button span.version {
+  font-style: italic;
+  font-size: .8em;
 }
 
 @font-face {

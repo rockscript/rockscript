@@ -31,6 +31,7 @@ import io.rockscript.api.CommandHandler;
 import io.rockscript.api.Query;
 import io.rockscript.api.QueryHandler;
 import io.rockscript.api.commands.*;
+import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.api.queries.*;
 import io.rockscript.engine.EngineException;
 import io.rockscript.engine.ImportObjectSerializer;
@@ -51,6 +52,8 @@ import io.rockscript.service.http.HttpService;
 import io.rockscript.test.TestExecutor;
 import io.rockscript.test.TestJobService;
 import io.rockscript.util.Io;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -65,8 +68,11 @@ import java.util.concurrent.Executors;
 @SuppressWarnings("unchecked")
 public class Engine {
 
+  static Logger log = LoggerFactory.getLogger(Engine.class);
+
   public static final String CFG_KEY_ENGINE = "engine";
   public static final String CFG_VALUE_ENGINE_TEST = "test";
+  public static final String CFG_KEY_EXAMPLES = "examples";
 
   protected boolean created;
   protected boolean started;
@@ -205,8 +211,13 @@ public class Engine {
     if (!started) {
       started = true;
       engineListeners.forEach(listener->listener.engineStarts(this));
-      if (configuration.containsKey("examples")) {
+      if (configuration.containsKey(CFG_KEY_EXAMPLES)) {
+        // The executor juggling is to ensure that the rockscript startup logging
+        // happens after the examples are loaded
+        Executor original = this.executor;
+        this.executor = new TestExecutor();
         initializeExamples();
+        this.executor = original;
       }
     }
     return this;
@@ -214,21 +225,30 @@ public class Engine {
 
   private void initializeExamples() {
     this.examplesHandler = new ExamplesHandler(this);
-    deployExample("examples/local-error.rs");
-    deployExample("examples/local-retry.rs");
-    deployExample("examples/star-wars.rs");
-    deployExample("examples/chuck-norris.rs");
-    new StartScriptExecutionCommand()
-      .scriptName("examples/star-wars.rs")
-      .execute(this);
-    new StartScriptExecutionCommand()
-      .scriptName("examples/chuck-norris.rs")
+    List<ScriptVersion> exampleScripts = new ArrayList<>();
+    exampleScripts.add(deployExampleScript("examples/local-error.rs"));
+    exampleScripts.add(deployExampleScript("examples/local-retry.rs"));
+    exampleScripts.add(deployExampleScript("examples/star-wars.rs"));
+    exampleScripts.add(deployExampleScript("examples/chuck-norris.rs"));
+
+    List<ScriptExecutionResponse> exampleExecutions = new ArrayList<>();
+    exampleExecutions.add(startExampleScriptExecution("examples/star-wars.rs"));
+    exampleExecutions.add(startExampleScriptExecution("examples/chuck-norris.rs"));
+
+    log.debug("Examples initialized: "+exampleScripts.size()+" example scripts and "+exampleExecutions.size()+" script executions available:");
+    exampleScripts.forEach(script->log.debug("  Script "+script.getId()+" : "+script.getScriptName()));
+    exampleExecutions.forEach(execution->log.debug("  Script execution "+execution.getScriptExecutionId()+" : "+execution.getEngineScriptExecution().getEngineScript().getScriptVersion().getScriptName()));
+  }
+
+  private ScriptExecutionResponse startExampleScriptExecution(String scriptName) {
+    return new StartScriptExecutionCommand()
+      .scriptName(scriptName)
       .execute(this);
   }
 
-  private void deployExample(String resource) {
+  private ScriptVersion deployExampleScript(String resource) {
     String scriptText = Io.getResourceAsString(resource);
-    new DeployScriptVersionCommand()
+    return new DeployScriptVersionCommand()
       .scriptName(resource)
       .scriptText(scriptText)
       .execute(this);

@@ -24,6 +24,7 @@ import io.rockscript.engine.job.JobService;
 import io.rockscript.util.Maps;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
@@ -35,7 +36,19 @@ import static io.rockscript.util.Maps.hashMap;
 public class TestEngine extends Engine {
 
   public TestEngine() {
-    super(hashMap(entry(CFG_KEY_ENGINE, CFG_VALUE_ENGINE_TEST)));
+    this(null);
+  }
+
+  public TestEngine(Map<String,String> configuration) {
+    super(initializeConfiguration(configuration));
+  }
+
+  private static Map<String, String> initializeConfiguration(Map<String, String> configuration) {
+    if (configuration==null) {
+      configuration = new HashMap<>();
+    }
+    configuration.put(CFG_KEY_ENGINE, CFG_VALUE_ENGINE_TEST);
+    return configuration;
   }
 
   @Override

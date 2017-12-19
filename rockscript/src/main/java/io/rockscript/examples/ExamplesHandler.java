@@ -38,15 +38,20 @@ public class ExamplesHandler extends AbstractRequestHandler {
   }
 
   @Override
+  public boolean matches(ServerRequest request) {
+    return super.matches(request);
+  }
+
+  @Override
   public void handle(ServerRequest request, ServerResponse response) {
     if (returnError) {
       response.statusOk();
       response.bodyString("You're lucky");
-      returnError = true;
+      returnError = false;
     } else {
       response.statusInternalServerError();
       response.bodyString("Better luck next time");
-      returnError = false;
+      returnError = true;
     }
   }
 }

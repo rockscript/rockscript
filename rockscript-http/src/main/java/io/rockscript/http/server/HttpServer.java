@@ -24,12 +24,16 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.FilterMapping;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.Filter;
 import javax.servlet.http.HttpServlet;
 import java.net.BindException;
 
 public class HttpServer {
+
+  static Logger log = LoggerFactory.getLogger(HttpServer.class);
 
   private int port;
   private Server server;
@@ -78,6 +82,7 @@ public class HttpServer {
   public HttpServer startup() {
     try {
       server.start();
+      log.debug("RockScript server started on port "+port);
     } catch (Exception e) {
       if (isPortTakenException(e)) {
         // IDEA consider sending a shutdown command.  But only if you can do it safe so that it's impossible to shutdown production servers.

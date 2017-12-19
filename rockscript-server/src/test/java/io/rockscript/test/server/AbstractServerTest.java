@@ -19,13 +19,16 @@
  */
 package io.rockscript.test.server;
 
+import com.google.gson.Gson;
 import io.rockscript.Engine;
 import io.rockscript.Servlet;
-import io.rockscript.test.TestEngine;
 import io.rockscript.http.client.HttpClient;
 import io.rockscript.http.server.HttpServer;
 import io.rockscript.test.AbstractHttpServerTest;
 import io.rockscript.test.LatestServerExceptionListener;
+import io.rockscript.test.TestEngine;
+import io.rockscript.test.engine.TestEngineCache;
+import io.rockscript.test.engine.TestEngineProvider;
 import org.junit.AfterClass;
 import org.junit.Before;
 
@@ -33,18 +36,20 @@ import static org.junit.Assert.assertNotNull;
 
 public class AbstractServerTest extends AbstractHttpServerTest {
 
-  protected static Engine engine = null;
+  protected static TestEngineCache testEngineCache = new TestEngineCache();
+
+  protected Engine engine;
 
   @Override
   @Before
   public void setUp() {
-    if (engine==null) {
-      // First the engine will be initialized
-      engine = createEngine();
-      engine.start();
-    }
+    engine = testEngineCache.getTestEngine(getEngineProvider());
     // The super.setUp will invoke the createHttpServer below
     super.setUp();
+  }
+
+  protected TestEngineProvider getEngineProvider() {
+    return TestEngineProvider.DEFAULT_TEST_ENGINE_PROVIDER;
   }
 
   protected Engine createEngine() {
@@ -75,13 +80,5 @@ public class AbstractServerTest extends AbstractHttpServerTest {
   @Override
   protected HttpClient createHttpClient() {
     return new HttpClient(engine.getGson());
-  }
-
-  /** {@link AbstractHttpServerTest#tearDownStatic()} will shut down the server */
-  @AfterClass
-  public static void tearDownStatic() {
-    // AbstractHttpServerTest.tearDownStatic will shutdown the server
-    engine.stop();
-    engine = null;
   }
 }

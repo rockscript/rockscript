@@ -1,7 +1,9 @@
 var http = system.import('rockscript.io/http');
 
 // Gets a random Chuck Norris joke
-var chuckResponse = http.get({url: 'http://api.icndb.com/jokes/random'});
+var chuckResponse = http.get({
+  url: 'http://api.icndb.com/jokes/random'
+});
 
 // Get the joke from the response body
 var jokeEncoded = encodeURI(chuckResponse.body.value.joke);

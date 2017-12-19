@@ -19,7 +19,7 @@
  */
 package io.rockscript;
 
-import io.rockscript.examples.ExamplesHandler;
+import io.rockscript.engine.impl.MonitoringExecutor;
 import io.rockscript.http.servlet.RouterServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +29,7 @@ import javax.servlet.ServletException;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 public class Servlet extends RouterServlet {
 
@@ -47,19 +48,19 @@ public class Servlet extends RouterServlet {
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
 
-    log.debug(" ____            _     ____            _       _    ");
-    log.debug("|  _ \\ ___   ___| | __/ ___|  ___ _ __(_)_ __ | |_  ");
-    log.debug("| |_) / _ \\ / __| |/ /\\___ \\ / __| '__| | '_ \\| __| ");
-    log.debug("|  _ < (_) | (__|   <  ___) | (__| |  | | |_) | |_  ");
-    log.debug("|_| \\_\\___/ \\___|_|\\_\\|____/ \\___|_|  |_| .__/ \\__| ");
-    log.debug("                                        |_|         ");
-
     if (engine==null) {
       Map<String,String> configuration = readConfiguration(config);
       engine = createEngine(configuration);
     }
 
     engine.start();
+
+    log.debug(" ____            _     ____            _       _    ");
+    log.debug("|  _ \\ ___   ___| | __/ ___|  ___ _ __(_)_ __ | |_  ");
+    log.debug("| |_) / _ \\ / __| |/ /\\___ \\ / __| '__| | '_ \\| __| ");
+    log.debug("|  _ < (_) | (__|   <  ___) | (__| |  | | |_) | |_  ");
+    log.debug("|_| \\_\\___/ \\___|_|\\_\\|____/ \\___|_|  |_| .__/ \\__| ");
+    log.debug("                                        |_|         ");
 
     setGson(engine.getGson());
 
