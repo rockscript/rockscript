@@ -52,8 +52,13 @@ public class AbstractServerTest extends AbstractHttpServerTest {
     return TestEngineProvider.DEFAULT_TEST_ENGINE_PROVIDER;
   }
 
-  protected Engine createEngine() {
-    return new TestEngine();
+  /** All tests in subclasses of AbstractServerTest that are executed
+   * subsequent, will use the same server as configured in
+   * {@link AbstractHttpServerTest#createHttpServer()} */
+  @Override
+  protected String getServerName() {
+    // matching this with the engine...
+    return getEngineProvider().getClass().getName();
   }
 
   /** Invoked by super.setUp */
@@ -67,14 +72,6 @@ public class AbstractServerTest extends AbstractHttpServerTest {
 
     return new HttpServer(PORT)
       .servlet(servlet);
-  }
-
-  /** All tests in subclasses of AbstractServerTest that are executed
-   * subsequent, will use the same server as configured in
-   * {@link AbstractHttpServerTest#createHttpServer()}*/
-  @Override
-  protected String getServerName() {
-    return AbstractServerTest.class.getName();
   }
 
   @Override

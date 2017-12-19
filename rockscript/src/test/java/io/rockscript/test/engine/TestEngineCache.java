@@ -20,12 +20,15 @@
 package io.rockscript.test.engine;
 
 import io.rockscript.Engine;
-import io.rockscript.test.TestEngine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class TestEngineCache {
+
+  static Logger log = LoggerFactory.getLogger(TestEngineCache.class);
 
   protected Engine previousTestEngine = null;
   protected Map<Class<? extends TestEngineProvider>,Engine> cachedEngines = new HashMap<>();
@@ -34,10 +37,13 @@ public class TestEngineCache {
     Class<? extends TestEngineProvider> providerClass = engineProvider.getClass();
     Engine engine = cachedEngines.get(providerClass);
     if (previousTestEngine!=null && previousTestEngine!=engine) {
+      log.debug("Stopping previous engine "+previousTestEngine);
       previousTestEngine.stop();
     }
     if (engine==null) {
+      log.debug("Starting new test engine with "+engineProvider);
       engine = engineProvider.createEngine();
+      log.debug("Created new test engine "+engine);
       cachedEngines.put(providerClass, engine);
     }
     return engine;

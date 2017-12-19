@@ -66,6 +66,14 @@
 
     <dependency>
       <groupId>io.rockscript</groupId>
+      <artifactId>rockscript</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.rockscript</groupId>
       <artifactId>rockscript-server</artifactId>
       <version>0.0.1-SNAPSHOT</version>
       <classifier>tests</classifier>

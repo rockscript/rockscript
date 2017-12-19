@@ -35,7 +35,7 @@ import java.util.*;
  * and {@link #defaultResponseHeader(String, String)}. */
 public class RouterServlet extends HttpServlet {
 
-  static Logger log = LoggerFactory.getLogger(RouterServlet.class.getName()+".HttpServer");
+  static Logger log = LoggerFactory.getLogger(RouterServlet.class.getName()+".HTTP");
 
   /** maps methods to list of request paths */
   private List<RequestHandler> requestHandlers = new ArrayList<>();
@@ -81,7 +81,6 @@ public class RouterServlet extends HttpServlet {
   private RequestHandler findMatchingRequestHandler(ServerRequest request) {
     if (requestHandlers!=null) {
       for (RequestHandler requestHandler: requestHandlers) {
-        log.debug(getClass().getSimpleName()+" checking "+requestHandler.getClass().getSimpleName());
         if (requestHandler.matches(request)) {
           return requestHandler;
         }
