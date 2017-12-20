@@ -33,5 +33,9 @@ public class Lock {
   public String getScriptExecutionId() {
     return scriptExecutionId;
   }
+
+  public Instant getCreateTime() {
+    return createTime;
+  }
 }
 

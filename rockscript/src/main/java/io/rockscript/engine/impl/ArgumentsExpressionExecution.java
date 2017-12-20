@@ -15,6 +15,7 @@
  */
 package io.rockscript.engine.impl;
 
+import io.rockscript.api.events.*;
 import io.rockscript.engine.ServiceFunctionContinuation;
 import io.rockscript.engine.job.RetryServiceFunctionJobHandler;
 import io.rockscript.service.ServiceFunction;
@@ -80,43 +81,39 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   }
 
   private void startServiceFunction() {
-    dispatch(new ServiceFunctionStartingEvent(this));
-    startFunctionExecute();
+    dispatchAndExecute(new ServiceFunctionStartedEvent(this));
   }
 
   public void startFunctionExecute() {
     EngineScriptExecution scriptExecution = getScriptExecution();
     ExecutionMode executionMode = scriptExecution.getExecutionMode();
-    if (executionMode!=ExecutionMode.REPLAYING) {
-      ServiceFunctionOutput serviceFunctionOutput = null;
-      try {
-        serviceFunctionOutput = startFunctionInvoke();
-      } catch (Exception e) {
-        // TODO transform this to an Engine.engineLogStore notification because it
-        // should be considered a bug if a service function throws an error.
-        // ServiceFunction's should use serviceFunctionOutput.isError() to indicate errors.
-        handleServiceFunctionError(e.getMessage(), null);
-      }
-      if (serviceFunctionOutput!=null) {
-        if (serviceFunctionOutput.isEnded()) {
-          endFunction(serviceFunctionOutput.getResult());
+    ServiceFunctionOutput serviceFunctionOutput = null;
+    try {
+      serviceFunctionOutput = startFunctionInvoke();
+    } catch (Exception e) {
+      // TODO transform this to an Engine.engineLogStore notification because it
+      // should be considered a bug if a service function throws an error.
+      // ServiceFunction's should use serviceFunctionOutput.isError() to indicate errors.
+      handleServiceFunctionError(e.getMessage(), null);
+    }
+    if (serviceFunctionOutput!=null) {
+      if (serviceFunctionOutput.isEnded()) {
+        endFunction(serviceFunctionOutput.getResult());
 
-        } else if (serviceFunctionOutput.isError()) {
-          Instant retryTime = serviceFunctionOutput.getRetryTime();
-          String errorMessage = serviceFunctionOutput.getError();
-          handleServiceFunctionError(errorMessage, retryTime);
+      } else if (serviceFunctionOutput.isError()) {
+        Instant retryTime = serviceFunctionOutput.getRetryTime();
+        String errorMessage = serviceFunctionOutput.getError();
+        handleServiceFunctionError(errorMessage, retryTime);
 
-        } else {
-          dispatch(new ServiceFunctionWaitingEvent(this));
-        }
+      } else {
+        dispatch(new ServiceFunctionWaitedEvent(this));
       }
     }
   }
 
   public void handleServiceFunctionError(String errorMessage, Instant retryTime) {
     EngineScriptExecution scriptExecution = getScriptExecution();
-    scriptExecution.errorEvent = new ServiceFunctionErrorEvent(this, errorMessage, retryTime);
-    dispatchAndExecute(scriptExecution.errorEvent);
+    dispatch(new ServiceFunctionFailedEvent(this, errorMessage, retryTime));
     if (retryTime!=null) {
       getEngine().getJobService().schedule(
         new RetryServiceFunctionJobHandler(this),
@@ -125,8 +122,8 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   }
 
   public void retry() {
-    dispatch(new ServiceFunctionRetryingEvent(this));
-    startFunctionExecute();
+    dispatchAndExecute(new ServiceFunctionRetriedEvent(this));
+    // Continues at this.startFunctionExecute()
   }
 
   public void endFunction(Object result) {
@@ -135,7 +132,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
   }
 
   // Continuation from endFunction -> ServiceFunctionEndedEvent
-  void endFunctionExecute(Object result) {
+  public void endFunctionExecute(Object result) {
     setResult(result);
     ended = true;
     end();
@@ -164,6 +161,18 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
 
   public void incrementFailedAttemptsCount() {
     failedAttemptsCount++;
+  }
+
+  public ServiceFunction getServiceFunction() {
+    return serviceFunction;
+  }
+
+  public List<Object> getArgs() {
+    return args;
+  }
+
+  public boolean isEnded() {
+    return ended;
   }
 }
 

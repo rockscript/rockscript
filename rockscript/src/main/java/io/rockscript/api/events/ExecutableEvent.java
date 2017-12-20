@@ -17,26 +17,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.engine.impl;
 
-import io.rockscript.Engine;
-import io.rockscript.engine.EngineException;
+package io.rockscript.api.events;
 
-import java.time.Instant;
+import io.rockscript.engine.impl.Execution;
 
-public class LockOperationError extends LockOperationExecution<ArgumentsExpressionExecution> {
+public abstract class ExecutableEvent<T extends Execution> extends ExecutionEvent<T> {
 
-  String error;
-  Instant retryTime;
-
-  public LockOperationError(ContinuationReference continuationReference, String error, Instant retryTime) {
-    super(continuationReference.getScriptExecutionId(), continuationReference.getExecutionId());
-    this.error = error;
-    this.retryTime = retryTime;
+  /** constructor for gson serialization */
+  protected ExecutableEvent() {
   }
 
-  @Override
-  public void execute(Engine engine, Lock lock, EngineScriptExecution lockedScriptExecution, ArgumentsExpressionExecution execution) {
-    execution.handleServiceFunctionError(error, retryTime);
+  public ExecutableEvent(T execution) {
+    super(execution);
   }
+
+  public abstract void execute(T execution);
 }

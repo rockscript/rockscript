@@ -82,7 +82,8 @@ public class Db {
   public SqlType getSqlType() {
     return configuration.getSqlType();
   }
-  
+
+  @SuppressWarnings("unchecked")
   public <T> T tx(TxLogic txLogic) {
     Connection connection = null;
     Tx tx = null;

@@ -27,7 +27,7 @@ import io.rockscript.http.servlet.InternalServerException;
 
 import java.time.Instant;
 
-public class ServiceFunctionErrorCommand implements Command<Void> {
+public class ServiceFunctionFailureCommand implements Command<Void> {
 
   protected String scriptExecutionId;
   protected String executionId;
@@ -47,7 +47,9 @@ public class ServiceFunctionErrorCommand implements Command<Void> {
     try {
       ContinuationReference continuationReference = new ContinuationReference(scriptExecutionId, executionId);
 
-      engine.getLockOperationExecutor().executeInLock(new LockOperationError(continuationReference, error, retryTime));
+      engine
+        .getLockOperationExecutor()
+        .executeInLock(new LockOperationFailure(continuationReference, error, retryTime));
 
       return null;
 
@@ -56,7 +58,7 @@ public class ServiceFunctionErrorCommand implements Command<Void> {
     }
   }
 
-  public ServiceFunctionErrorCommand continuationReference(ContinuationReference continuationReference) {
+  public ServiceFunctionFailureCommand continuationReference(ContinuationReference continuationReference) {
     this.scriptExecutionId = continuationReference.getScriptExecutionId();
     this.executionId = continuationReference.getExecutionId();
     return this;
@@ -68,7 +70,7 @@ public class ServiceFunctionErrorCommand implements Command<Void> {
   public void setScriptExecutionId(String scriptExecutionId) {
     this.scriptExecutionId = scriptExecutionId;
   }
-  public ServiceFunctionErrorCommand scriptExecutionId(String scriptExecutionId) {
+  public ServiceFunctionFailureCommand scriptExecutionId(String scriptExecutionId) {
     this.scriptExecutionId = scriptExecutionId;
     return this;
   }
@@ -79,7 +81,7 @@ public class ServiceFunctionErrorCommand implements Command<Void> {
   public void setExecutionId(String executionId) {
     this.executionId = executionId;
   }
-  public ServiceFunctionErrorCommand executionId(String executionId) {
+  public ServiceFunctionFailureCommand executionId(String executionId) {
     this.executionId = executionId;
     return this;
   }
@@ -90,7 +92,7 @@ public class ServiceFunctionErrorCommand implements Command<Void> {
   public void setError(String error) {
     this.error = error;
   }
-  public ServiceFunctionErrorCommand error(String error) {
+  public ServiceFunctionFailureCommand error(String error) {
     this.error = error;
     return this;
   }
@@ -101,7 +103,7 @@ public class ServiceFunctionErrorCommand implements Command<Void> {
   public void setRetryTime(Instant retryTime) {
     this.retryTime = retryTime;
   }
-  public ServiceFunctionErrorCommand retry(Instant retry) {
+  public ServiceFunctionFailureCommand retry(Instant retry) {
     this.retryTime = retry;
     return this;
   }

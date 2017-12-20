@@ -17,7 +17,11 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.Engine;
+import io.rockscript.api.events.ExecutableEvent;
+import io.rockscript.api.events.ExecutionEvent;
 import io.rockscript.engine.EngineException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -26,6 +30,8 @@ import java.util.Map;
 
 /** Base class for the runtime state of operations. */
 public abstract class Execution<T extends ScriptElement> {
+
+  static Logger log = LoggerFactory.getLogger(Execution.class);
 
   String id;
   T element;

@@ -16,12 +16,11 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.Engine;
+import io.rockscript.api.events.ScriptExecutionErrorEvent;
 import io.rockscript.engine.EngineException;
 import io.rockscript.http.servlet.InternalServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 
 /** A simple, fast, single-node lockService. */
@@ -54,8 +53,7 @@ public class LockOperationExecutorImpl implements LockOperationExecutor {
       } catch (Exception e) {
         log.debug("Exception while executing script: " + e.getMessage(), e);
         Execution execution = getExecution(e, lockedScriptExecution);
-        lockedScriptExecution.errorEvent = new ScriptExecutionErrorEvent(execution, e.getMessage());
-        lockedScriptExecution.dispatch(lockedScriptExecution.errorEvent);
+        lockedScriptExecution.dispatch(new ScriptExecutionErrorEvent(execution, e.getMessage()));
       }
     } else {
       lockService.addUnlockListener(scriptExecutionId, lockOperation);

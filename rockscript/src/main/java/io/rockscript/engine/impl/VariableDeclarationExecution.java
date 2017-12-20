@@ -15,6 +15,8 @@
  */
 package io.rockscript.engine.impl;
 
+import io.rockscript.api.events.VariableCreatedEvent;
+
 public class VariableDeclarationExecution extends Execution<VariableDeclaration> {
 
   public VariableDeclarationExecution(VariableDeclaration element, Execution parent) {

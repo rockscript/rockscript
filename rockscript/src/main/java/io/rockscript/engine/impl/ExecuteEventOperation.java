@@ -15,6 +15,8 @@
  */
 package io.rockscript.engine.impl;
 
+import io.rockscript.api.events.ExecutableEvent;
+
 public class ExecuteEventOperation implements Operation {
 
   ExecutableEvent event;

@@ -31,6 +31,7 @@ import io.rockscript.api.CommandHandler;
 import io.rockscript.api.Query;
 import io.rockscript.api.QueryHandler;
 import io.rockscript.api.commands.*;
+import io.rockscript.api.events.*;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.api.queries.*;
 import io.rockscript.engine.EngineException;
@@ -294,11 +295,11 @@ public class Engine {
     return new PolymorphicTypeAdapterFactory()
       .typeName(new TypeToken<Event>(){},                       "event") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
       .typeName(new TypeToken<ExecutionEvent>(){},              "executionEvent") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
-      .typeName(new TypeToken<ServiceFunctionStartingEvent>(){},"serviceFunctionStarting")
-      .typeName(new TypeToken<ServiceFunctionRetryingEvent>(){},"serviceFunctionRetrying")
-      .typeName(new TypeToken<ServiceFunctionWaitingEvent>(){}, "serviceFunctionWaiting")
+      .typeName(new TypeToken<ServiceFunctionStartedEvent>(){}, "serviceFunctionStarted")
+      .typeName(new TypeToken<ServiceFunctionRetriedEvent>(){}, "serviceFunctionRetried")
+      .typeName(new TypeToken<ServiceFunctionWaitedEvent>(){},  "serviceFunctionWaited")
       .typeName(new TypeToken<ServiceFunctionEndedEvent>(){},   "serviceFunctionEnded")
-      .typeName(new TypeToken<ServiceFunctionErrorEvent>(){},   "serviceFunctionError")
+      .typeName(new TypeToken<ServiceFunctionFailedEvent>(){},   "serviceFunctionFailed")
       .typeName(new TypeToken<ScriptEndedEvent>(){},            "scriptEnded")
       .typeName(new TypeToken<ScriptStartedEvent>(){},          "scriptStarted")
       .typeName(new TypeToken<VariableCreatedEvent>(){},        "variableCreated")

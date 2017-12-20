@@ -27,15 +27,17 @@ import io.rockscript.api.commands.RecoverExecutionsResponse;
 import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptExecution;
-import io.rockscript.engine.impl.Event;
+import io.rockscript.api.events.Event;
 import io.rockscript.engine.impl.EventListener;
 import io.rockscript.test.ScriptExecutionComparator;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 public class CrashTest extends AbstractEngineTest {
 

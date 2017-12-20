@@ -111,7 +111,7 @@ public class End extends ClientCommand {
     if (response.getStatus()==200) {
       log("ServiceFunction "+executionId+" in script execution "+scriptExecutionId+" ended.");
     } else {
-      log("Error starting script execution: "+endResponse.getErrorEvent());
+      log("Error starting script execution "+response.getStatus());
     }
   }
 

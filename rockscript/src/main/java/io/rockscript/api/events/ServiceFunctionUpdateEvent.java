@@ -18,9 +18,10 @@
  * under the License.
  */
 
-package io.rockscript.engine.impl;
+package io.rockscript.api.events;
 
 import io.rockscript.engine.EngineException;
+import io.rockscript.engine.impl.ArgumentsExpressionExecution;
 import io.rockscript.service.ServiceFunction;
 
 public class ServiceFunctionUpdateEvent extends ExecutionEvent<ArgumentsExpressionExecution> {
@@ -37,11 +38,11 @@ public class ServiceFunctionUpdateEvent extends ExecutionEvent<ArgumentsExpressi
   public ServiceFunctionUpdateEvent(ArgumentsExpressionExecution execution, String level, String message) {
     super(execution);
 
-    if (execution.serviceFunction==null) {
-      throw new EngineException("ServiceFunction doesn't exist: "+execution.element.getText());
+    ServiceFunction serviceFunction = execution.getServiceFunction();
+    if (serviceFunction==null) {
+      throw new EngineException("ServiceFunction doesn't exist: "+execution.getElement().getText());
     }
 
-    ServiceFunction serviceFunction = execution.serviceFunction;
     this.serviceName = serviceFunction.getServiceName();
     this.functionName = serviceFunction.getFunctionName();
     this.message = message;

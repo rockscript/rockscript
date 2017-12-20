@@ -15,6 +15,8 @@
  */
 package io.rockscript.engine.impl;
 
+import io.rockscript.api.events.Event;
+
 public interface EventListener {
 
   void handle(Event event);

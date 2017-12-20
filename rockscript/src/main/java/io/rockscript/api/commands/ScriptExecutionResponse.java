@@ -16,12 +16,8 @@
 package io.rockscript.api.commands;
 
 import io.rockscript.api.model.ScriptExecution;
-import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.EngineScriptExecution;
-import io.rockscript.engine.impl.ExecutionEvent;
-import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
-
-import java.util.List;
+import io.rockscript.api.events.ScriptExecutionErrorEvent;
 
 public class ScriptExecutionResponse {
 
@@ -29,7 +25,6 @@ public class ScriptExecutionResponse {
   transient EngineScriptExecution engineScriptExecution;
 
   protected String scriptExecutionId;
-  protected ScriptExecutionErrorEvent errorEvent;
 
   /** constructor for Gson serialization */
   ScriptExecutionResponse() {
@@ -38,10 +33,6 @@ public class ScriptExecutionResponse {
   public ScriptExecutionResponse(EngineScriptExecution engineScriptExecution) {
     this.engineScriptExecution = engineScriptExecution;
     this.scriptExecutionId = engineScriptExecution.getId();
-    ScriptExecutionErrorEvent errorEvent = engineScriptExecution.getErrorEvent();
-    if (errorEvent!=null) {
-      this.errorEvent = errorEvent;
-    }
   }
 
   public ScriptExecution getScriptExecution() {
@@ -54,9 +45,5 @@ public class ScriptExecutionResponse {
 
   public String getScriptExecutionId() {
     return scriptExecutionId;
-  }
-
-  public ScriptExecutionErrorEvent getErrorEvent() {
-    return errorEvent;
   }
 }

@@ -29,4 +29,19 @@ public class Lists {
   public static <T> T removeLast(List<T> list) {
     return list.remove(list.size()-1);
   }
+
+  /** the last element or null if the list is null or empty */
+  public static <T> T getLast(List<T> list) {
+    return list!=null && !list.isEmpty() ? list.get(list.size()-1) : null;
+  }
+
+  /** replaces the last element with the given element if the list
+   * is not null and not empty.  The method returns without exception
+   * and without effect if the list is null or empty */
+  public static <T> T setLast(List<T> list, T element) {
+    if (list!=null && !list.isEmpty()) {
+      return list.set(list.size()-1, element);
+    }
+    return null;
+  }
 }

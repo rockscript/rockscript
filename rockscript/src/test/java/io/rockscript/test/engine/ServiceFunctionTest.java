@@ -22,7 +22,7 @@ package io.rockscript.test.engine;
 import io.rockscript.test.TestEngine;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.engine.impl.ExecutionEvent;
+import io.rockscript.api.events.ExecutionEvent;
 import io.rockscript.engine.impl.LockOperationEnd;
 import io.rockscript.service.ServiceFunctionInput;
 import io.rockscript.service.ServiceFunctionOutput;

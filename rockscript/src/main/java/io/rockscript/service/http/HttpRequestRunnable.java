@@ -21,7 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.rockscript.Engine;
-import io.rockscript.api.commands.ServiceFunctionErrorCommand;
+import io.rockscript.api.commands.ServiceFunctionFailureCommand;
 import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.LockOperationEnd;
 import io.rockscript.engine.impl.Time;
@@ -87,7 +87,7 @@ public class HttpRequestRunnable implements Runnable {
         }
       }
 
-      new ServiceFunctionErrorCommand()
+      new ServiceFunctionFailureCommand()
         .continuationReference(continuationReference)
         .error(e.getMessage())
         .retry(retry)

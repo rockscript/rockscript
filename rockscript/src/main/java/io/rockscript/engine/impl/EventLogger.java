@@ -16,6 +16,7 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.Engine;
+import io.rockscript.api.events.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

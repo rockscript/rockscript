@@ -17,6 +17,7 @@ package io.rockscript.api.queries;
 
 import io.rockscript.Engine;
 import io.rockscript.api.Query;
+import io.rockscript.api.events.ExecutionEvent;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.*;

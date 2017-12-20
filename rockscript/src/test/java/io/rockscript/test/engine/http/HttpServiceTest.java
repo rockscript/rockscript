@@ -22,7 +22,7 @@ package io.rockscript.test.engine.http;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.EngineScriptExecution;
-import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
+import io.rockscript.api.events.ScriptExecutionErrorEvent;
 import io.rockscript.engine.impl.Time;
 import io.rockscript.engine.job.Job;
 import io.rockscript.engine.job.RetryServiceFunctionJobHandler;
@@ -113,8 +113,6 @@ public class HttpServiceTest extends AbstractHttpTest {
       .scriptVersionId(scriptVersion.getId())
       .execute(engine)
       .getEngineScriptExecution();
-
-    ScriptExecutionErrorEvent errorEvent = engineScriptExecution.getErrorEvent();
 
     List<Job> jobs = engine.getJobService().getjobs();
     Job job = jobs.get(0);

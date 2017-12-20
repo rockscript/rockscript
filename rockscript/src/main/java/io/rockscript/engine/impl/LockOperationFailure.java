@@ -22,27 +22,21 @@ package io.rockscript.engine.impl;
 import io.rockscript.Engine;
 import io.rockscript.engine.EngineException;
 
-public abstract class LockOperationExecution<T extends Execution> extends LockOperation {
+import java.time.Instant;
 
-  String executionId;
+public class LockOperationFailure extends LockOperationExecution<ArgumentsExpressionExecution> {
 
-  public LockOperationExecution(String scriptExecutionId, String executionId) {
-    super(scriptExecutionId);
-    this.executionId = executionId;
+  String error;
+  Instant retryTime;
+
+  public LockOperationFailure(ContinuationReference continuationReference, String error, Instant retryTime) {
+    super(continuationReference.getScriptExecutionId(), continuationReference.getExecutionId());
+    this.error = error;
+    this.retryTime = retryTime;
   }
 
   @Override
-  public EngineScriptExecution getLockedScriptExecution(Engine engine) {
-    return engine.getEventStore().findScriptExecutionById(scriptExecutionId);
+  public void execute(Engine engine, Lock lock, EngineScriptExecution lockedScriptExecution, ArgumentsExpressionExecution execution) {
+    execution.handleServiceFunctionError(error, retryTime);
   }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public void execute(Engine engine, Lock lock, EngineScriptExecution lockedScriptExecution) {
-    Execution execution = lockedScriptExecution.findExecutionRecursive(executionId);
-    EngineException.throwIfNull(execution, "Execution %s not found in script execution %s", executionId, lockedScriptExecution.getId());
-    execute(engine, lock, lockedScriptExecution, (T) execution);
-  }
-
-  public abstract void execute(Engine engine, Lock lock, EngineScriptExecution lockedScriptExecution, T execution);
 }

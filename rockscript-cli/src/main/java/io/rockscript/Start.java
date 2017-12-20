@@ -114,7 +114,7 @@ public class Start extends ClientCommand {
       log("Started script execution "+startResponse
         .getScriptExecutionId());
     } else {
-      log("Error starting script execution: "+startResponse.getErrorEvent());
+      log("Error starting script execution: "+response.getStatus());
     }
   }
 

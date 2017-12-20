@@ -15,8 +15,8 @@
  */
 package io.rockscript.service.test;
 
-import io.rockscript.engine.impl.Event;
-import io.rockscript.engine.impl.ScriptExecutionErrorEvent;
+import io.rockscript.api.events.Event;
+import io.rockscript.api.events.ScriptExecutionErrorEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +47,7 @@ public class TestResult {
     events.add(event);
     if (event instanceof ScriptExecutionErrorEvent) {
       ScriptExecutionErrorEvent errorEvent = (ScriptExecutionErrorEvent) event;
-      addError(new TestError(errorEvent.getError(), errorEvent.getScriptId(), errorEvent.getLine()));
+      addError(new TestError(errorEvent.getError(), errorEvent.getScriptVersionId(), errorEvent.getLine()));
     }
   }
 

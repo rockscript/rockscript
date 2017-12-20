@@ -22,10 +22,13 @@ package io.rockscript.engine.impl;
 import io.rockscript.Engine;
 import io.rockscript.engine.EngineException;
 
+import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class LockServiceImpl implements LockService {
 
+  /** maps scriptExecutionIds to locks */
   Map<String, Lock> locks = Collections.synchronizedMap(new HashMap<>());
   /** maps script execution ids to listeners for that script execution to be unlocked */
   Map<String, List<LockReleaseListener>> unlockListeners = Collections.synchronizedMap(new HashMap<>());
@@ -82,5 +85,11 @@ public class LockServiceImpl implements LockService {
 
   public synchronized List<Lock> getLocks() {
     return new ArrayList<>(locks.values());
+  }
+
+  public List<Lock> getLocksOlderThan(Instant time) {
+    return locks.values().stream()
+      .filter(lock->lock.getCreateTime().isBefore(time))
+      .collect(Collectors.toList());
   }
 }

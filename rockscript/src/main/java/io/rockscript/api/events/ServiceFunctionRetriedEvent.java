@@ -17,11 +17,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.engine.impl;
+package io.rockscript.api.events;
 
-public class ServiceFunctionRetryingEvent extends ServiceFunctionStartingEvent {
+import io.rockscript.engine.impl.ArgumentsExpressionExecution;
 
-  public ServiceFunctionRetryingEvent(ArgumentsExpressionExecution execution) {
+public class ServiceFunctionRetriedEvent extends ServiceFunctionStartedEvent {
+
+  public ServiceFunctionRetriedEvent(ArgumentsExpressionExecution execution) {
     super(execution);
   }
 

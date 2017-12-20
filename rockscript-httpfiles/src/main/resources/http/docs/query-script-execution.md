@@ -32,7 +32,7 @@ Here's an `execution` query example
         }
       },
       {
-        "serviceFunctionStarting": {
+        "serviceFunctionStarted": {
           "time": "2017-12-07T08:53:25.793Z",
           "scriptExecutionId": "se1",
           "executionId": "e7",
@@ -43,7 +43,7 @@ Here's an `execution` query example
         }
       },
       {
-        "serviceFunctionWaiting": {
+        "serviceFunctionWaited": {
           "time": "2017-12-07T08:53:25.794Z",
           "scriptExecutionId": "se1",
           "executionId": "e7",

@@ -22,6 +22,10 @@ package io.rockscript.api.queries;
 import com.google.gson.Gson;
 import io.rockscript.Engine;
 import io.rockscript.api.Query;
+import io.rockscript.api.events.Event;
+import io.rockscript.api.events.ExecutionEvent;
+import io.rockscript.api.events.ScriptEndedEvent;
+import io.rockscript.api.events.ScriptStartedEvent;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.*;
 

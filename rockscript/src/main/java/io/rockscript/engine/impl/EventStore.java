@@ -17,13 +17,18 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.Engine;
+import io.rockscript.api.events.*;
 import io.rockscript.engine.EngineException;
 import io.rockscript.service.ServiceFunction;
+import io.rockscript.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static io.rockscript.util.Lists.getLast;
+import static io.rockscript.util.Lists.setLast;
 
 public class EventStore implements EventListener {
 
@@ -43,9 +48,8 @@ public class EventStore implements EventListener {
 
   public EngineScriptExecution findScriptExecutionById(String scriptExecutionId) {
     List<ExecutionEvent> executionEvents = findEventsByScriptExecutionId(scriptExecutionId);
-    return recreateScriptExecution(executionEvents, scriptExecutionId);
+    return replayScriptExecution(executionEvents, scriptExecutionId, false);
   }
-
 
   public List<ExecutionEvent> findEventsByScriptExecutionId(String scriptExecutionId) {
     return events.stream()
@@ -55,12 +59,59 @@ public class EventStore implements EventListener {
       .collect(Collectors.toList());
   }
 
-  private EngineScriptExecution recreateScriptExecution(List<ExecutionEvent> executionEvents, String scriptExecutionId) {
+  private boolean isLastEventUnlocking(List<ExecutionEvent> executionEvents) {
+    return executionEvents.get(executionEvents.size()-1).isUnlocking();
+  }
+
+  /** When recovering, we remove all the 'dangling' events at the end
+   * until the last event is a recoverable event.  Recoverable means a
+   * startScript or a serviceFunctionStartEvent. */
+  private void removeEventsThatWillBeReplayed(List<ExecutionEvent> executionEvents) {
+    while (!getLast(executionEvents).isRecoverable()) {
+      executionEvents.remove(executionEvents.size() - 1);
+    }
+  }
+
+  private void throwExceptionInconsistentEventStream(List<ExecutionEvent> executionEvents) {
+    String eventsText = executionEvents.stream()
+      .map(event->event.toString())
+      .collect(Collectors.joining("\n"));
+    throw new RuntimeException("Inconsistent event stream. This script execution needs recovery:\n"+eventsText);
+  }
+
+
+  private boolean isLastRecoverable(List<ExecutionEvent> executionEvents) {
+    Class<? extends ExecutionEvent> eventClass = executionEvents.get(executionEvents.size() - 1).getClass();
+    return eventClass==ScriptStartedEvent.class || eventClass==ServiceFunctionStartedEvent.class;
+  }
+
+  private EngineScriptExecution replayScriptExecution(List<ExecutionEvent> executionEvents, String scriptExecutionId, boolean recovering) {
     if (executionEvents==null || executionEvents.isEmpty()) {
+      throw new RuntimeException("Inconsistent event stream. No events.");
+    }
+
+    // If the event sequence was not properly ended with a locking event,
+    if (!isLastEventUnlocking(executionEvents)) {
+      // If we want to recover this execution
+      if (recovering) {
+        removeEventsThatWillBeReplayed(executionEvents);
+      } else {
+        throwExceptionInconsistentEventStream(executionEvents);
+      }
+    }
+
+    // Remove all non replay events and return
+    // the result as executable events
+    List<ExecutableEvent> replayEvents = executionEvents.stream()
+      .filter(executionEvent->executionEvent.isReplay())
+      .map(executionEvent->(ExecutableEvent)executionEvent)
+      .collect(Collectors.toList());
+
+    if (replayEvents==null || replayEvents.isEmpty()) {
       throw new EngineException("Script execution "+scriptExecutionId+" does not exist");
     }
 
-    ScriptStartedEvent scriptStartedEvent = findScriptStartedEventJson(executionEvents);
+    ScriptStartedEvent scriptStartedEvent = findScriptStartedEventJson(replayEvents);
     if (scriptStartedEvent==null) {
       throw new EngineException("Script execution "+scriptExecutionId+" does not have a start event. Huh?!");
     }
@@ -72,13 +123,30 @@ public class EventStore implements EventListener {
       .findScriptAstByScriptVersionId(scriptId);
     EngineException.throwIfNull(scriptId, "Script not found for scriptId %s in engineScript execution %s", scriptId, scriptExecutionId);
 
-    EngineScriptExecution scriptExecution = new EngineScriptExecution(scriptExecutionId, engine, engineScript, executionEvents);
+    EngineScriptExecution scriptExecution = new EngineScriptExecution(scriptExecutionId, engine, engineScript);
+    scriptExecution.setExecutionMode(ExecutionMode.REPLAYING);
+
+    log.info("Replaying script execution from events:");
+    replayEvents.forEach(replayEvent->{
+      String executionId = replayEvent.getExecutionId();
+      // Script execution events do not have an executionId in the event, only the scriptExecutionId.
+      Execution execution = executionId!=null ? scriptExecution.findExecutionRecursive(executionId) : scriptExecution;
+
+      if (recovering && replayEvent==getLast(replayEvents)) {
+        scriptExecution.setExecutionMode(ExecutionMode.RECOVERING);
+      }
+
+      log.info("Reexecuting event: "+replayEvent);
+      replayEvent.execute(execution);
+    });
+
+    scriptExecution.setExecutionMode(ExecutionMode.EXECUTING);
     scriptExecution.doWork();
 
     return scriptExecution;
   }
 
-  private ScriptStartedEvent findScriptStartedEventJson(List<ExecutionEvent> scriptExecutionEvents) {
+  private ScriptStartedEvent findScriptStartedEventJson(List<? extends ExecutionEvent> scriptExecutionEvents) {
     // Normally the ScriptStartedEventJson should be the first in the list so this should be quick
     return (ScriptStartedEvent) scriptExecutionEvents.stream()
       .filter(event->(event instanceof ScriptStartedEvent))
@@ -90,8 +158,8 @@ public class EventStore implements EventListener {
     List<EngineScriptExecution> scriptExecutions = new ArrayList<>();
     Map<String,List<ExecutionEvent>> groupedEvents = findCrashedScriptExecutionEvents();
     for (String scriptExecutionId: groupedEvents.keySet()) {
-      List<ExecutionEvent> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
-      EngineScriptExecution scriptExecution = recreateScriptExecution(scriptExecutionEvents, scriptExecutionId);
+      List<ExecutionEvent> executionEvents = groupedEvents.get(scriptExecutionId);
+      EngineScriptExecution scriptExecution = replayScriptExecution(executionEvents, scriptExecutionId, true);
       scriptExecutions.add(scriptExecution);
     }
     return scriptExecutions;
@@ -99,6 +167,9 @@ public class EventStore implements EventListener {
 
   /** @return a list of events grouped by engineScript execution. */
   public Map<String,List<ExecutionEvent>> findCrashedScriptExecutionEvents() {
+
+    // TODO only scan for the script executions that have an expired lock
+
     Map<String,List<ExecutionEvent>> groupedEvents = new HashMap<>();
     for (Event event: events) {
       if (event instanceof ExecutionEvent) {
@@ -119,17 +190,11 @@ public class EventStore implements EventListener {
     for (String scriptExecutionId: new ArrayList<>(groupedEvents.keySet())) {
       List<ExecutionEvent> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
       ExecutionEvent lastEvent = scriptExecutionEvents.get(scriptExecutionEvents.size()-1);
-      if (isUnlocking(lastEvent)) {
+      if (lastEvent.isUnlocking()) {
         groupedEvents.remove(scriptExecutionId);
       }
     }
     return groupedEvents;
-  }
-
-  private boolean isUnlocking(ExecutionEvent lastEvent) {
-    return lastEvent!=null
-      && ( lastEvent instanceof ServiceFunctionWaitingEvent
-           || lastEvent instanceof ScriptEndedEvent);
   }
 
   public Object valueToJson(Object value) {
