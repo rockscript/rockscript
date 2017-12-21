@@ -17,7 +17,6 @@ package io.rockscript.service.test;
 
 import io.rockscript.api.events.Event;
 import io.rockscript.engine.impl.EventDispatcher;
-import io.rockscript.engine.impl.EventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +34,9 @@ public class TestEventLogger extends EventDispatcher {
   }
 
   @Override
-  public void handle(Event event) {
+  public void dispatch(Event event) {
     testResult.addEvent(event);
     log.debug(event.toString());
-    next.handle(event);
+    next.dispatch(event);
   }
 }

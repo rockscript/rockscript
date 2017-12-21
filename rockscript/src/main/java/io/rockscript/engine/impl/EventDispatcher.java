@@ -31,10 +31,12 @@ public class EventDispatcher {
     this.engine = engine;
   }
 
-  public void handle(Event event) {
+  public void dispatch(Event event) {
     log.debug(event.toString());
     if (event instanceof ExecutionEvent) {
       engine.getScriptExecutionStore().handle(event);
-    } // else if (event instanceof ScriptEvent) ...
+    } else if (event instanceof ScriptEvent){
+      engine.getScriptStore().handle((ScriptEvent)event);
+    }
   }
 }

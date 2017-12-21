@@ -17,22 +17,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.api.events;
+package io.rockscript.engine.impl;
 
-import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.Engine;
 
-public class ScriptVersionSavedEvent implements ScriptEvent {
+public class ScriptParser {
 
-  ScriptVersion scriptVersion;
+  Engine engine;
 
-  ScriptVersionSavedEvent() {
+  public ScriptParser(Engine engine) {
+    this.engine = engine;
   }
 
-  public ScriptVersionSavedEvent(ScriptVersion scriptVersion) {
-    this.scriptVersion = scriptVersion;
-  }
-
-  public ScriptVersion getScriptVersion() {
-    return scriptVersion;
+  /** Parses the script and initializes
+   * the engineScript if parse is succesfull. */
+  public Parse parseScriptText(String scriptText) {
+    return Parse.parse(scriptText, engine);
   }
 }

@@ -89,14 +89,14 @@ public class CrashTest extends AbstractEngineTest {
     }
 
     @Override
-    public void handle(Event event) {
+    public void dispatch(Event event) {
       if (throwing) {
         if (eventCount>=eventsWithoutCrash) {
           throw new CrashException("Exception after the "+eventCount+"th event");
         }
         eventCount++;
       }
-      target.handle(event);
+      target.dispatch(event);
     }
   }
 

@@ -19,20 +19,5 @@
  */
 package io.rockscript.api.events;
 
-import io.rockscript.api.model.ScriptVersion;
-
-public class ScriptVersionSavedEvent implements ScriptEvent {
-
-  ScriptVersion scriptVersion;
-
-  ScriptVersionSavedEvent() {
-  }
-
-  public ScriptVersionSavedEvent(ScriptVersion scriptVersion) {
-    this.scriptVersion = scriptVersion;
-  }
-
-  public ScriptVersion getScriptVersion() {
-    return scriptVersion;
-  }
+public interface ScriptEvent extends Event {
 }

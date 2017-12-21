@@ -24,9 +24,12 @@ import io.rockscript.api.Command;
 import io.rockscript.api.events.ScriptVersionSavedEvent;
 import io.rockscript.api.model.Script;
 import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.engine.EngineException;
 import io.rockscript.engine.impl.Parse;
 import io.rockscript.engine.impl.ScriptStore;
 import io.rockscript.http.servlet.BadRequestException;
+
+import java.util.List;
 
 /** Saves a new script version, but does not make it the active one.
  *
@@ -57,35 +60,34 @@ public class SaveScriptVersionCommand implements Command<ScriptVersion> {
 
   @Override
   public ScriptVersion execute(Engine engine) {
+    Parse parse = engine.getScriptParser().parseScriptText(scriptText);
+
     ScriptStore scriptStore = engine.getScriptStore();
 
-    Parse parse = scriptStore.parseScriptText(scriptText);
     if (scriptId!=null) {
       Script script = scriptStore.findScriptById(scriptId);
       BadRequestException.throwIfNull(script, "Script %s does not exist", scriptId);
-
-    } else {
-      if (scriptName==null) {
-        scriptName = "Unnamed script";
-      }
-      Script script = scriptStore.findScriptByName(scriptName);
-      if (script==null) {
-        script = new Script();
-        script.setName(scriptName);
-        // insertScript will assign the id of the script
-        scriptStore.insertScript(script);
-      }
-      // update the scriptId as it will be used later
-      scriptId = script.getId();
+    } else if (scriptName==null) {
+      scriptName = "Unnamed script";
     }
 
-    ScriptVersion scriptVersion = scriptStore.createScriptVersion(scriptId, scriptText, getActivate());
+    ScriptVersion scriptVersion = new ScriptVersion();
+    String scriptVersionId = scriptVersion.getId();
+    if (scriptVersionId==null) {
+      scriptVersionId = engine.getScriptVersionIdGenerator().createId();
+    }
+    scriptVersion.setId(scriptVersionId);
+    scriptVersion.setScriptId(scriptId);
+    scriptVersion.setScriptName(scriptName);
+    scriptVersion.setText(scriptText);
     scriptVersion.setErrors(parse.getErrors());
-    scriptStore.addParsedScriptAstToCache(parse, scriptVersion);
+    scriptVersion.setActive(getActivate() ? Boolean.TRUE : null);
 
     engine
       .getEventDispatcher()
-      .handle(new ScriptVersionSavedEvent(scriptVersion));
+      .dispatch(new ScriptVersionSavedEvent(scriptVersion));
+
+    scriptStore.addParsedScriptAstToCache(parse, scriptVersion);
 
     return scriptVersion;
   }

@@ -87,6 +87,7 @@ public class Engine {
   protected ScriptStore scriptStore;
   protected EngineLogStore engineLogStore;
   protected ScriptExecutionStore scriptExecutionStore;
+  protected ScriptParser scriptParser;
   protected LockOperationExecutor lockOperationExecutor;
   protected LockService lockService;
   protected ImportResolver importResolver;
@@ -140,6 +141,7 @@ public class Engine {
     this.scriptExecutionStore = new ScriptExecutionStore(this);
     this.scriptStore = new ScriptStore(this);
     this.engineLogStore = new EngineLogStore(this);
+    this.scriptParser = new ScriptParser(this);
     this.jobIdGenerator = new TestIdGenerator(this, "j");
     this.scriptIdGenerator = new TestIdGenerator(this, "s");
     this.scriptVersionIdGenerator = new TestIdGenerator(this, "sv");
@@ -478,5 +480,9 @@ public class Engine {
 
   public FileHandler getFileHandler() {
     return fileHandler;
+  }
+
+  public ScriptParser getScriptParser() {
+    return scriptParser;
   }
 }

@@ -71,7 +71,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
   @Override
   protected void dispatch(ExecutionEvent event) {
     if (!isReplaying()) {
-      eventDispatcher.handle(event);
+      eventDispatcher.dispatch(event);
     }
   }
 

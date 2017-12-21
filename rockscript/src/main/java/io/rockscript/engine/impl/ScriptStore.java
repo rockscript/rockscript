@@ -16,9 +16,11 @@
 
 package io.rockscript.engine.impl;
 
+import io.rockscript.Engine;
+import io.rockscript.api.events.ScriptEvent;
+import io.rockscript.api.events.ScriptVersionSavedEvent;
 import io.rockscript.api.model.Script;
 import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.Engine;
 import io.rockscript.engine.EngineException;
 import io.rockscript.http.servlet.BadRequestException;
 
@@ -45,13 +47,6 @@ public class ScriptStore {
   public ScriptStore(Engine engine, ScriptStore other) {
     this.engine = engine;
     this.scripts = other.scripts;
-  }
-
-  /** Parses the script and initializes
-   * the engineScript if parse is succesfull. */
-  // TODO move this method into a ScriptParser in Engine
-  public Parse parseScriptText(String scriptText) {
-    return Parse.parse(scriptText, engine);
   }
 
   /** Finds the first script for which the name ends with the given scriptNameSuffix */
@@ -100,48 +95,6 @@ public class ScriptStore {
     scripts.add(0, script);
   }
 
-  public ScriptVersion createScriptVersion(String scriptId, String scriptText, Boolean activate) {
-    Script script = findScriptById(scriptId);
-    EngineException.throwIfNull(script, "No script found with id %s", scriptId);
-
-    ScriptVersion scriptVersion = new ScriptVersion();
-    String scriptVersionId = scriptVersion.getId();
-    if (scriptVersionId==null) {
-      scriptVersionId = engine.getScriptVersionIdGenerator().createId();
-    }
-    scriptVersion.setId(scriptVersionId);
-    scriptVersion.setScriptId(script.getId());
-    scriptVersion.setScriptName(script.getName());
-    scriptVersion.setText(scriptText);
-
-    List<ScriptVersion> scriptVersions = script.getScriptVersions();
-
-    if (Boolean.TRUE.equals(activate)) {
-      ScriptVersion scriptVersionToInactivate = findScriptVersionById(script.getActiveScriptVersionId());
-      if (scriptVersionToInactivate!=null) {
-        scriptVersionToInactivate.setActive(null);
-      }
-      scriptVersion.setActive(true);
-      script.setActiveScriptVersionId(scriptVersionId);
-
-    } else {
-      // Find the latest script version id (if there is one)
-      ScriptVersion latestVersion = !scriptVersions.isEmpty() ? scriptVersions.get(scriptVersions.size()-1) : null;
-      String latestScriptVersionId = latestVersion!=null ? latestVersion.getId() : null;
-      // If the latest version was not the active version
-      if (latestScriptVersionId!=null && !latestScriptVersionId.equals(script.getActiveScriptVersionId())) {
-        // Remove the latest version because it becomes irrelevant
-        // Only one non-active version should be maintained
-        scriptVersions.remove(scriptVersions.size()-1);
-      }
-    }
-
-    scriptVersions.add(scriptVersion);
-    scriptVersion.setVersion(scriptVersions.size());
-
-    return scriptVersion;
-  }
-
   public void addParsedScriptAstToCache(String scriptVersionId, EngineScript parsedScriptAst) {
     parsedScriptAsts.put(scriptVersionId, parsedScriptAst);
   }
@@ -169,7 +122,9 @@ public class ScriptStore {
     if (engineScript == null) {
       ScriptVersion scriptVersion = findScriptVersionById(scriptVersionId);
       if (scriptVersion!=null) {
-        Parse parse = parseScriptText(scriptVersion.getText());
+        Parse parse = engine
+          .getScriptParser()
+          .parseScriptText(scriptVersion.getText());
         if (!parse.hasErrors()) {
           addParsedScriptAstToCache(parse, scriptVersion);
           engineScript = parse.getEngineScript();
@@ -209,5 +164,58 @@ public class ScriptStore {
 
   public List<Script> getScripts() {
     return scripts;
+  }
+
+  public void handle(ScriptEvent event) {
+    if (event instanceof ScriptVersionSavedEvent) {
+      handleScriptVersionSavedEvent((ScriptVersionSavedEvent) event);
+    }
+  }
+
+  public void handleScriptVersionSavedEvent(ScriptVersionSavedEvent event) {
+    ScriptVersion scriptVersion = event.getScriptVersion();
+    Script script = null;
+
+    String scriptId = scriptVersion.getScriptId();
+    if (scriptId!=null) {
+      script = findScriptById(scriptId);
+      BadRequestException.throwIfNull(script, "Script %s does not exist", scriptId);
+
+    } else {
+      String scriptName = scriptVersion.getScriptName();
+      script = findScriptByName(scriptName);
+      if (script==null) {
+        script = new Script();
+        script.setName(scriptName);
+        // insertScript will assign the id of the script
+        insertScript(script);
+      }
+      scriptVersion.setScriptId(script.getId());
+    }
+
+    List<ScriptVersion> scriptVersions = script.getScriptVersions();
+
+    if (Boolean.TRUE.equals(scriptVersion.getActive())) {
+      ScriptVersion scriptVersionToInactivate = findScriptVersionById(script.getActiveScriptVersionId());
+      if (scriptVersionToInactivate!=null) {
+        scriptVersionToInactivate.setActive(null);
+      }
+      script.setActiveScriptVersionId(scriptVersion.getId());
+
+    } else {
+      // Find the latest script version id (if there is one)
+      ScriptVersion latestVersion = !scriptVersions.isEmpty() ? scriptVersions.get(scriptVersions.size()-1) : null;
+      String latestScriptVersionId = latestVersion!=null ? latestVersion.getId() : null;
+      // If the latest version was not the active version
+      if (latestScriptVersionId!=null && !latestScriptVersionId.equals(script.getActiveScriptVersionId())) {
+        // Remove the latest version because it becomes irrelevant
+        // Only one non-active version should be maintained
+        scriptVersions.remove(scriptVersions.size()-1);
+      }
+    }
+
+    scriptVersions.add(scriptVersion);
+
+    scriptVersion.setVersion(scriptVersions.size());
   }
 }
