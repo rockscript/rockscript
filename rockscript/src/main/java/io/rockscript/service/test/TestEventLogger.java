@@ -16,20 +16,24 @@
 package io.rockscript.service.test;
 
 import io.rockscript.api.events.Event;
+import io.rockscript.engine.impl.EventDispatcher;
 import io.rockscript.engine.impl.EventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TestEventLogger implements EventListener {
+public class TestEventLogger extends EventDispatcher {
 
   static final Logger log = LoggerFactory.getLogger(TestEventLogger.class.getName());
 
   TestResult testResult;
-  EventListener next;
-  public TestEventLogger(TestResult testResult, EventListener next) {
+  EventDispatcher next;
+
+  public TestEventLogger(TestRunEngine engine, TestResult testResult, EventDispatcher next) {
+    super(engine);
     this.testResult = testResult;
     this.next = next;
   }
+
   @Override
   public void handle(Event event) {
     testResult.addEvent(event);

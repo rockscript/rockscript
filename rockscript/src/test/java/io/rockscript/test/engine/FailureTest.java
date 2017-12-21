@@ -26,9 +26,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ErrorTest extends AbstractEngineTest {
+public class FailureTest extends AbstractEngineTest {
 
-  protected static Logger log = LoggerFactory.getLogger(ErrorTest.class);
+  protected static Logger log = LoggerFactory.getLogger(FailureTest.class);
 
   @Override
   protected TestEngine initializeEngine() {
@@ -51,6 +51,9 @@ public class ErrorTest extends AbstractEngineTest {
 
     ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
 
-    engine.getEventStore().getEvents().forEach(e-> log.debug(e.toString()));
+    engine
+      .getScriptExecutionStore()
+      .findEventsByScriptExecutionId(scriptExecution.getId())
+      .forEach(e-> log.debug(e.toString()));
   }
 }

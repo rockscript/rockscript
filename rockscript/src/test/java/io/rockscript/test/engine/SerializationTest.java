@@ -98,7 +98,7 @@ public class SerializationTest extends AbstractEngineTest {
 
   private EngineScriptExecution reloadScriptExecution(String scriptExecutionId) {
     return engine
-        .getEventStore()
+        .getScriptExecutionStore()
         .findScriptExecutionById(scriptExecutionId);
   }
 }

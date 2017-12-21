@@ -27,4 +27,10 @@ public class ServiceFunctionRetriedEvent extends ServiceFunctionStartedEvent {
     super(execution);
   }
 
+  @Override
+  public String toString() {
+    return "[" + scriptExecutionId + "|" + executionId + "] Service function " +
+           "[" + functionName + "] Retry started";
+  }
+
 }

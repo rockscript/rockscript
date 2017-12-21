@@ -21,7 +21,6 @@ package io.rockscript.api.queries;
 
 import io.rockscript.Engine;
 import io.rockscript.api.Query;
-import io.rockscript.engine.impl.EventStore;
 import io.rockscript.api.events.ExecutionEvent;
 import io.rockscript.http.servlet.BadRequestException;
 import org.slf4j.Logger;
@@ -47,9 +46,8 @@ public class EventsQuery implements Query<List<ExecutionEvent>> {
   public List<ExecutionEvent> execute(Engine engine) {
     BadRequestException.throwIfNull(scriptExecutionId, "scriptExecutionId is a required parameter");
 
-    EventStore eventStore = engine.getEventStore();
-
-    List<ExecutionEvent> events = eventStore
+    List<ExecutionEvent> events = engine
+      .getScriptExecutionStore()
       .findEventsByScriptExecutionId(scriptExecutionId);
 
     if (minIndex!=null && minIndex>0) {

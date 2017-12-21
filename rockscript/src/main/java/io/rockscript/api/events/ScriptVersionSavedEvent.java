@@ -17,38 +17,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package io.rockscript.api.events;
 
-import io.rockscript.engine.impl.ArgumentsExpressionExecution;
+import io.rockscript.api.model.ScriptVersion;
 
-public class ServiceFunctionEndedEvent extends ExecutableEvent<ArgumentsExpressionExecution> {
+public class ScriptVersionSavedEvent implements Event {
 
-  Object result;
+  ScriptVersion scriptVersion;
 
-  /** constructor for gson serialization */
-  ServiceFunctionEndedEvent() {
+  ScriptVersionSavedEvent() {
   }
 
-  public ServiceFunctionEndedEvent(ArgumentsExpressionExecution argumentsExpressionExecution, Object result) {
-    super(argumentsExpressionExecution);
-    this.result = result;
-  }
-
-  @Override
-  public void execute(ArgumentsExpressionExecution execution) {
-    execution.endFunctionExecute(result);
-  }
-
-  @Override
-  public boolean isReplay() {
-    return true;
-  }
-
-  @Override
-  public String toString() {
-    return "[" + scriptExecutionId + "|" + executionId + "] " +
-        "Service function ended" +
-        (result!=null ? " with result "+result : "");
+  public ScriptVersionSavedEvent(ScriptVersion scriptVersion) {
+    this.scriptVersion = scriptVersion;
   }
 }

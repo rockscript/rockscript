@@ -22,12 +22,11 @@ package io.rockscript.api.queries;
 import com.google.gson.Gson;
 import io.rockscript.Engine;
 import io.rockscript.api.Query;
-import io.rockscript.api.events.Event;
 import io.rockscript.api.events.ExecutionEvent;
 import io.rockscript.api.events.ScriptEndedEvent;
 import io.rockscript.api.events.ScriptStartedEvent;
 import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.engine.impl.*;
+import io.rockscript.engine.impl.ScriptExecutionStore;
 
 import java.time.Instant;
 import java.util.*;
@@ -37,6 +36,43 @@ public class ScriptExecutionsQuery implements Query<Collection<ScriptExecutionsQ
   @Override
   public String getName() {
     return "script-executions";
+  }
+
+  public static class ScriptExecution {
+    public String id;
+    public String scriptShortName;
+    public String scriptName;
+    public Integer scriptVersion;
+    public Instant start;
+    public Instant end;
+    public ScriptExecution(){
+    }
+    public ScriptExecution(String scriptExecutionId, List<ExecutionEvent> scriptExecutionEvents, Map<String, ScriptVersion> scriptVersionsById) {
+      this.id = scriptExecutionId;
+
+      scriptExecutionEvents.forEach(event->{
+        if (event instanceof ScriptStartedEvent) {
+          this.start = event.getTime();
+          ScriptStartedEvent scriptStartedEvent = (ScriptStartedEvent) event;
+          String scriptVersionId = scriptStartedEvent.getScriptVersionId();
+          ScriptVersion scriptVersion = scriptVersionsById.get(scriptVersionId);
+          this.scriptName = scriptVersion.getScriptName();
+          this.scriptShortName = getScriptShortName(scriptVersion.getScriptName());
+          this.scriptVersion = scriptVersion.getVersion();
+
+        } else if (event instanceof ScriptEndedEvent) {
+          this.end = event.getTime();
+        }
+      });
+    }
+
+    private static String getScriptShortName(String name) {
+      int lastSlashIndex = name.lastIndexOf('/');
+      if (lastSlashIndex>=0 && name.length()>lastSlashIndex+1) {
+        return name.substring(lastSlashIndex+1);
+      }
+      return name;
+    }
   }
 
   @Override
@@ -51,62 +87,16 @@ public class ScriptExecutionsQuery implements Query<Collection<ScriptExecutionsQ
         .getScriptVersions()
         .forEach(scriptVersion->scriptVersionsById.put(scriptVersion.getId(), scriptVersion)));
 
-    ScriptExecutionList list = new ScriptExecutionList(scriptVersionsById);
-    EventStore eventStore = engine.getEventStore();
-    eventStore
-      .getEvents()
-      .forEach(list::processEvent);
+    List<ScriptExecution> scriptExecutions = new ArrayList<>();
 
-    return list.scriptExecutions.values();
-  }
+    ScriptExecutionStore scriptExecutionStore = engine.getScriptExecutionStore();
+    scriptExecutionStore
+      .findAllScriptExecutionIds()
+      .forEach(scriptExecutionId->{
+        List<ExecutionEvent> scriptExecutionEvents = scriptExecutionStore.findEventsByScriptExecutionId(scriptExecutionId);
+        scriptExecutions.add(new ScriptExecution(scriptExecutionId, scriptExecutionEvents, scriptVersionsById));
+      });
 
-  public static class ScriptExecution {
-    public String id;
-    public String scriptShortName;
-    public String scriptName;
-    public Integer scriptVersion;
-    public Instant start;
-    public Instant end;
-    public ScriptExecution(){
-    }
-    public ScriptExecution(String scriptExecutionId) {
-      this.id = scriptExecutionId;
-    }
-  }
-
-  public static class ScriptExecutionList {
-    private final Map<String, ScriptVersion> scriptVersionsById;
-    Map<String,ScriptExecution> scriptExecutions = new LinkedHashMap<>();
-
-    public ScriptExecutionList(Map<String, ScriptVersion> scriptVersionsById) {
-      this.scriptVersionsById = scriptVersionsById;
-    }
-
-    public void processEvent(Event event) {
-      ExecutionEvent executionEvent = (ExecutionEvent) event;
-      String scriptExecutionId = executionEvent.getScriptExecutionId();
-      ScriptExecution scriptExecution = scriptExecutions
-        .computeIfAbsent(scriptExecutionId, se -> new ScriptExecution(scriptExecutionId));
-
-      if (executionEvent instanceof ScriptStartedEvent) {
-        scriptExecution.start = executionEvent.getTime();
-        ScriptStartedEvent scriptStartedEvent = (ScriptStartedEvent) executionEvent;
-        String scriptVersionId = scriptStartedEvent.getScriptVersionId();
-        ScriptVersion scriptVersion = scriptVersionsById.get(scriptVersionId);
-        scriptExecution.scriptName = scriptVersion.getScriptName();
-        scriptExecution.scriptShortName = getScriptShortName(scriptVersion.getScriptName());
-        scriptExecution.scriptVersion = scriptVersion.getVersion();
-
-      } else if (executionEvent instanceof ScriptEndedEvent) {
-        scriptExecution.end = executionEvent.getTime();
-      }
-    }
-    private static String getScriptShortName(String name) {
-      int lastSlashIndex = name.lastIndexOf('/');
-      if (lastSlashIndex>=0 && name.length()>lastSlashIndex+1) {
-        return name.substring(lastSlashIndex+1);
-      }
-      return name;
-    }
+    return scriptExecutions;
   }
 }

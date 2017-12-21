@@ -18,7 +18,7 @@ public class RecoverExecutionsCommand implements Command<RecoverExecutionsRespon
   @Override
   public RecoverExecutionsResponse execute(Engine engine) {
     List<ScriptExecution> recoveredScriptExecutions = (List) engine
-      .getEventStore()
+      .getScriptExecutionStore()
       .recoverCrashedScriptExecutions()
       .stream()
       .map(ese->ese.toScriptExecution())

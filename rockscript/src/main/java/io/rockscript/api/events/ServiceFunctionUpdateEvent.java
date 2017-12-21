@@ -50,10 +50,8 @@ public class ServiceFunctionUpdateEvent extends ExecutionEvent<ArgumentsExpressi
 
   @Override
   public String toString() {
-    return "[" + scriptExecutionId + "|" + executionId + "] " +
-        "Update [" +
-           functionName +
-        "]"+
+    return "[" + scriptExecutionId + "|" + executionId + "] Service function " +
+        "[" + functionName + "]"+
         (level!=null ? " " +level+" ": " ") +
         message;
   }

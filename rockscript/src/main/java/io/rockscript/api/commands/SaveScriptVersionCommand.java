@@ -21,6 +21,7 @@ package io.rockscript.api.commands;
 
 import io.rockscript.Engine;
 import io.rockscript.api.Command;
+import io.rockscript.api.events.ScriptVersionSavedEvent;
 import io.rockscript.api.model.Script;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.Parse;
@@ -81,6 +82,10 @@ public class SaveScriptVersionCommand implements Command<ScriptVersion> {
     ScriptVersion scriptVersion = scriptStore.createScriptVersion(scriptId, scriptText, getActivate());
     scriptVersion.setErrors(parse.getErrors());
     scriptStore.addParsedScriptAstToCache(parse, scriptVersion);
+
+    engine
+      .getEventDispatcher()
+      .handle(new ScriptVersionSavedEvent(scriptVersion));
 
     return scriptVersion;
   }

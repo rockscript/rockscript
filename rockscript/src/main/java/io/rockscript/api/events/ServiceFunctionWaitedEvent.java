@@ -44,7 +44,6 @@ public class ServiceFunctionWaitedEvent extends ExecutableEvent<ArgumentsExpress
   @Override
   public String toString() {
     return "[" + scriptExecutionId + "|" + executionId + "] " +
-        "Waiting for completion callback";
+           "Service function waiting for completion callback";
   }
-
 }

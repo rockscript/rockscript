@@ -20,6 +20,7 @@
 package io.rockscript.test.engine;
 
 import io.rockscript.Engine;
+import io.rockscript.engine.impl.EventDispatcher;
 import io.rockscript.test.TestEngine;
 import io.rockscript.service.ServiceFunctionOutput;
 import io.rockscript.api.commands.RecoverExecutionsCommand;
@@ -28,9 +29,7 @@ import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.events.Event;
-import io.rockscript.engine.impl.EventListener;
 import io.rockscript.test.ScriptExecutionComparator;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,17 +62,18 @@ public class CrashTest extends AbstractEngineTest {
 
   public static class CrashEngine extends TestEngine {
     public CrashEngine() {
-      eventListener = new CrashEventListener(this.eventListener);
+      this.eventDispatcher = new CrashEventDispatcher(this, this.eventDispatcher);
     }
   }
 
-  public static class CrashEventListener implements EventListener {
+  public static class CrashEventDispatcher extends EventDispatcher {
     boolean throwing = false;
     int eventsWithoutCrash;
     int eventCount;
-    EventListener target;
+    EventDispatcher target;
 
-    public CrashEventListener(EventListener target) {
+    public CrashEventDispatcher(Engine engine, EventDispatcher target) {
+      super(engine);
       this.eventCount = 0;
       this.target = target;
     }
@@ -132,7 +132,7 @@ public class CrashTest extends AbstractEngineTest {
     boolean crashOccurred = false;
 
     CrashEngine crashEngine = createCrashEngine();
-    CrashEventListener eventListener = (CrashEventListener) crashEngine.getEventListener();
+    CrashEventDispatcher eventDispatcher = (CrashEventDispatcher) crashEngine.getEventDispatcher();
 
     String scriptId = new DeployScriptVersionCommand()
         .scriptText(scriptText)
@@ -143,7 +143,7 @@ public class CrashTest extends AbstractEngineTest {
       try  {
         crashOccurred = false;
 
-        eventListener.throwAfterEventCount(eventsWithoutCrash);
+        eventDispatcher.throwAfterEventCount(eventsWithoutCrash);
 
         log.debug("\n\n----- Starting script execution and throwing after "+eventsWithoutCrash+" events ------");
         new StartScriptExecutionCommand()
@@ -155,7 +155,7 @@ public class CrashTest extends AbstractEngineTest {
         crashOccurred = true;
         eventsWithoutCrash++;
 
-        eventListener.stopThrowing();
+        eventDispatcher.stopThrowing();
         RecoverExecutionsResponse recoverExecutionsResponse = new RecoverExecutionsCommand()
           .execute(crashEngine);
         List<ScriptExecution> recoverCrashedScriptExecutions = recoverExecutionsResponse.getScriptExecutions();

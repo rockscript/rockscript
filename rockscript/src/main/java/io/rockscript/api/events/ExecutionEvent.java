@@ -46,14 +46,17 @@ public abstract class ExecutionEvent<T extends Execution> implements Event {
     }
   }
 
+  /** Does this event imply unlocking of the script execution? */
   public boolean isUnlocking() {
     return false;
   }
 
+  /** Does this event need to be included in replay? */
   public boolean isReplay() {
     return false;
   }
 
+  /** Can execution be resumed from this event? */
   public boolean isRecoverable() {
     return false;
   }

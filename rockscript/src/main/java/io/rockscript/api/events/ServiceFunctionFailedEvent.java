@@ -66,7 +66,7 @@ public class ServiceFunctionFailedEvent extends ExecutableEvent<ArgumentsExpress
   @Override
   public String toString() {
     return "[" + scriptExecutionId + "|" + executionId + "] " +
-           "ServiceFunction error [script:" +
+           "ServiceFunction failed [script:" +
            scriptVersionId + ",line:" + line + "] " + error + (retryTime!=null ? ", retry scheduled for " + retryTime.toString() : "");
   }
 }

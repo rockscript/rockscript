@@ -1,17 +1,21 @@
 /*
- * Copyright ©2017, RockScript.io. All rights reserved.
+ * Copyright (c) 2017 RockScript.io.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 package io.rockscript.engine.impl;
@@ -20,7 +24,6 @@ import io.rockscript.Engine;
 import io.rockscript.api.events.*;
 import io.rockscript.engine.EngineException;
 import io.rockscript.service.ServiceFunction;
-import io.rockscript.util.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,22 +31,32 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.rockscript.util.Lists.getLast;
-import static io.rockscript.util.Lists.setLast;
 
-public class EventStore implements EventListener {
+public class ScriptExecutionStore implements EventListener {
 
-  static final Logger log = LoggerFactory.getLogger(EventStore.class);
+  static final Logger log = LoggerFactory.getLogger(ScriptExecutionStore.class);
 
   Engine engine;
-  List<Event> events = new ArrayList<>();
+  /** maps script execution ids to ordered list of execution events for that script execution */
+  Map<String,List<ExecutionEvent>> events = new HashMap<>();
 
-  public EventStore(Engine engine) {
+  public ScriptExecutionStore(Engine engine) {
     this.engine = engine;
   }
 
   @Override
   public void handle(Event event) {
-    events.add(event);
+    if (event instanceof ExecutionEvent) {
+      ExecutionEvent executionEvent = (ExecutionEvent) event;
+      String scriptExecutionId = executionEvent.getScriptExecutionId();
+      events
+        .computeIfAbsent(scriptExecutionId,id->new ArrayList<ExecutionEvent>())
+        .add(executionEvent);
+    }
+  }
+
+  public List<String> findAllScriptExecutionIds() {
+    return new ArrayList<>(events.keySet());
   }
 
   public EngineScriptExecution findScriptExecutionById(String scriptExecutionId) {
@@ -52,11 +65,7 @@ public class EventStore implements EventListener {
   }
 
   public List<ExecutionEvent> findEventsByScriptExecutionId(String scriptExecutionId) {
-    return events.stream()
-      .filter(event-> event instanceof ExecutionEvent)
-      .map(event->((ExecutionEvent)event))
-      .filter(executionEvent->scriptExecutionId.equals(executionEvent.getScriptExecutionId()))
-      .collect(Collectors.toList());
+    return events.get(scriptExecutionId);
   }
 
   private boolean isLastEventUnlocking(List<ExecutionEvent> executionEvents) {
@@ -166,35 +175,20 @@ public class EventStore implements EventListener {
   }
 
   /** @return a list of events grouped by engineScript execution. */
-  public Map<String,List<ExecutionEvent>> findCrashedScriptExecutionEvents() {
+  private Map<String,List<ExecutionEvent>> findCrashedScriptExecutionEvents() {
 
     // TODO only scan for the script executions that have an expired lock
 
-    Map<String,List<ExecutionEvent>> groupedEvents = new HashMap<>();
-    for (Event event: events) {
-      if (event instanceof ExecutionEvent) {
-        ExecutionEvent executableEvent = (ExecutionEvent) event;
-        String scriptExecutionId = executableEvent.getScriptExecutionId();
-        if (executableEvent instanceof ScriptEndedEvent) {
-          groupedEvents.remove(scriptExecutionId);
-        } else {
-          List<ExecutionEvent> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
-          if (scriptExecutionEvents==null) {
-            scriptExecutionEvents = new ArrayList<>();
-            groupedEvents.put(scriptExecutionId, scriptExecutionEvents);
-          }
-          scriptExecutionEvents.add(executableEvent);
-        }
-      }
-    }
-    for (String scriptExecutionId: new ArrayList<>(groupedEvents.keySet())) {
-      List<ExecutionEvent> scriptExecutionEvents = groupedEvents.get(scriptExecutionId);
+    Map<String,List<ExecutionEvent>> scriptExecutionsToRecover = new HashMap<>();
+    for (String scriptExecutionId: new ArrayList<>(events.keySet())) {
+      List<ExecutionEvent> scriptExecutionEvents = events.get(scriptExecutionId);
       ExecutionEvent lastEvent = scriptExecutionEvents.get(scriptExecutionEvents.size()-1);
-      if (lastEvent.isUnlocking()) {
-        groupedEvents.remove(scriptExecutionId);
+      if (!lastEvent.isUnlocking()) {
+        scriptExecutionsToRecover.put(scriptExecutionId, scriptExecutionEvents);
       }
     }
-    return groupedEvents;
+
+    return scriptExecutionsToRecover;
   }
 
   public Object valueToJson(Object value) {
@@ -222,15 +216,6 @@ public class EventStore implements EventListener {
   }
 
   public boolean hasScriptExecution(String scriptExecutionId) {
-    return events.stream()
-      .filter(event-> event instanceof ExecutionEvent)
-      .map(event->((ExecutionEvent)event))
-      .filter(executionEvent->scriptExecutionId.equals(executionEvent.getScriptExecutionId()))
-      .findFirst()
-      .isPresent();
-  }
-
-  public List<Event> getEvents() {
-    return events;
+    return events.containsKey(scriptExecutionId);
   }
 }

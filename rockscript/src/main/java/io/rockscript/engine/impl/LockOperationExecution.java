@@ -33,7 +33,7 @@ public abstract class LockOperationExecution<T extends Execution> extends LockOp
 
   @Override
   public EngineScriptExecution getLockedScriptExecution(Engine engine) {
-    return engine.getEventStore().findScriptExecutionById(scriptExecutionId);
+    return engine.getScriptExecutionStore().findScriptExecutionById(scriptExecutionId);
   }
 
   @SuppressWarnings("unchecked")

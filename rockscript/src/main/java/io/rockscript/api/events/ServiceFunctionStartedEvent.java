@@ -90,9 +90,7 @@ public class ServiceFunctionStartedEvent extends ExecutableEvent<ArgumentsExpres
   @Override
   public String toString() {
     return "[" + scriptExecutionId + "|" + executionId + "] " +
-        "Started [" +
-           functionName +
-        "]"+
-        (args!=null ? " with args "+args.toString() : " without args");
+        "Service function [" + functionName + "] started"+
+        (args!=null ? " with args "+args.toString() : "");
   }
 }

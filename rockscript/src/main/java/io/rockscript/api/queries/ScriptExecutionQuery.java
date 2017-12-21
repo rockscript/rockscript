@@ -62,16 +62,16 @@ public class ScriptExecutionQuery implements Query<ScriptExecutionQuery.ScriptEx
   public ScriptExecutionDetails execute(Engine engine) {
     BadRequestException.throwIfNull(id, "id is a required parameter");
 
-    EventStore eventStore = engine.getEventStore();
+    ScriptExecutionStore scriptExecutionStore = engine.getScriptExecutionStore();
 
-    EngineScriptExecution engineScriptExecution = eventStore
+    EngineScriptExecution engineScriptExecution = scriptExecutionStore
       .findScriptExecutionById(id);
 
     ScriptVersion scriptVersion = engineScriptExecution
       .getEngineScript()
       .getScriptVersion();
 
-    List<ExecutionEvent> events = eventStore.findEventsByScriptExecutionId(id);
+    List<ExecutionEvent> events = scriptExecutionStore.findEventsByScriptExecutionId(id);
 
     return new ScriptExecutionDetails(
         engineScriptExecution,

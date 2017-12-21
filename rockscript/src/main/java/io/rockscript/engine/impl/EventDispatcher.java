@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, RockScript.io. All rights reserved.
+ * Copyright ©2017, RockScript.io. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package io.rockscript.engine.impl;
 
 import io.rockscript.Engine;
-import io.rockscript.api.events.Event;
+import io.rockscript.api.events.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EventLogger implements EventListener {
+public class EventDispatcher {
 
-  static final Logger log = LoggerFactory.getLogger(EventLogger.class.getName());
+  static final Logger log = LoggerFactory.getLogger(EventDispatcher.class);
 
-  EventListener next;
+  Engine engine;
 
-  public EventLogger(Engine engine, EventListener next) {
-    this.next = next;
+  public EventDispatcher(Engine engine) {
+    this.engine = engine;
   }
 
-  @Override
   public void handle(Event event) {
     log.debug(event.toString());
-    next.handle(event);
+    if (event instanceof ExecutionEvent) {
+      engine.getScriptExecutionStore().handle(event);
+    } // else if (event instanceof ScriptEvent) ...
   }
 }

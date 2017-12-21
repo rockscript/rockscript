@@ -97,7 +97,8 @@ public class ServiceFunctionTest extends AbstractEngineTest {
     ServiceFunctionInput input = inputs.get(0);
     scriptExecution = endFunction(input.getContinuationReference());
 
-    List<ExecutionEvent> events = engine.getEventStore()
+    List<ExecutionEvent> events = engine
+      .getScriptExecutionStore()
       .findEventsByScriptExecutionId(scriptExecution.getId());
     events.forEach(e->log.debug(e.toString()));
   }

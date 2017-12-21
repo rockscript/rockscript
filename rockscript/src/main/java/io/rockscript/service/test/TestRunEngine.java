@@ -24,6 +24,6 @@ public class TestRunEngine extends TestEngine {
   public TestRunEngine(Engine engineEngine, TestImportObject testImportObject, TestResult testResult) {
     getImportResolver().add(testImportObject);
     this.scriptStore = new ScriptStore(this, engineEngine.getScriptStore());
-    this.eventListener = new TestEventLogger(testResult, eventStore);
+    this.eventDispatcher = new TestEventLogger(this, testResult, eventDispatcher);
   }
 }

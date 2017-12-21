@@ -31,7 +31,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
 
   static Logger log = LoggerFactory.getLogger(EngineScriptExecution.class);
 
-  EventListener eventListener;
+  EventDispatcher eventDispatcher;
   int nextInternalExecutionId = 1;
   ExecutionMode executionMode;
   Instant start;
@@ -40,7 +40,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
 
   public EngineScriptExecution(String scriptExecutionId, Engine engine, EngineScript engineScript) {
     super(scriptExecutionId, engineScript, null);
-    this.eventListener = engine.getEventListener();
+    this.eventDispatcher = engine.getEventDispatcher();
     this.executionMode = ExecutionMode.EXECUTING;
     initializeSystemVariable(engine);
   }
@@ -71,7 +71,7 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
   @Override
   protected void dispatch(ExecutionEvent event) {
     if (!isReplaying()) {
-      eventListener.handle(event);
+      eventDispatcher.handle(event);
     }
   }
 
@@ -133,12 +133,8 @@ public class EngineScriptExecution extends BlockExecution<EngineScript> {
     argumentsExpressionExecution.endFunctionExecute(result);
   }
 
-  public EventListener getEventListener() {
-    return eventListener;
-  }
-
-  public void setEventListener(EventListener eventListener) {
-    this.eventListener = eventListener;
+  public EventDispatcher getEventDispatcher() {
+    return eventDispatcher;
   }
 
   public EngineScript getElement() {

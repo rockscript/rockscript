@@ -83,10 +83,10 @@ public class Engine {
   protected IdGenerator scriptVersionIdGenerator;
   protected IdGenerator scriptExecutionIdGenerator;
   protected IdGenerator jobIdGenerator;
-  protected EventStore eventStore;
+  protected EventDispatcher eventDispatcher;
   protected ScriptStore scriptStore;
   protected EngineLogStore engineLogStore;
-  protected EventListener eventListener;
+  protected ScriptExecutionStore scriptExecutionStore;
   protected LockOperationExecutor lockOperationExecutor;
   protected LockService lockService;
   protected ImportResolver importResolver;
@@ -136,10 +136,10 @@ public class Engine {
 
   public Engine(Map<String,String> configuration) {
     this.configuration = configuration;
-    this.eventStore = new EventStore(this);
+    this.eventDispatcher = new EventDispatcher(this);
+    this.scriptExecutionStore = new ScriptExecutionStore(this);
     this.scriptStore = new ScriptStore(this);
     this.engineLogStore = new EngineLogStore(this);
-    this.eventListener = new EventLogger(this, eventStore);
     this.jobIdGenerator = new TestIdGenerator(this, "j");
     this.scriptIdGenerator = new TestIdGenerator(this, "s");
     this.scriptVersionIdGenerator = new TestIdGenerator(this, "sv");
@@ -304,6 +304,7 @@ public class Engine {
       .typeName(new TypeToken<ScriptStartedEvent>(){},          "scriptStarted")
       .typeName(new TypeToken<VariableCreatedEvent>(){},        "variableCreated")
       .typeName(new TypeToken<ScriptExecutionErrorEvent>(){},   "scriptExecutionError")
+      .typeName(new TypeToken<ScriptVersionSavedEvent>(){},     "scriptVersionSaved")
       ;
   }
 
@@ -411,16 +412,16 @@ public class Engine {
     return jobIdGenerator;
   }
 
-  public EventStore getEventStore() {
-    return eventStore;
+  public EventDispatcher getEventDispatcher() {
+    return eventDispatcher;
+  }
+
+  public ScriptExecutionStore getScriptExecutionStore() {
+    return scriptExecutionStore;
   }
 
   public ScriptStore getScriptStore() {
     return scriptStore;
-  }
-
-  public EventListener getEventListener() {
-    return eventListener;
   }
 
   public LockOperationExecutor getLockOperationExecutor() {

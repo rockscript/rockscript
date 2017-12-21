@@ -30,7 +30,7 @@ import java.util.function.Function;
 public class ScriptExecutionComparator extends DeepComparator {
 
   public ScriptExecutionComparator() {
-    ignoreField(EngineScriptExecution.class, "eventListener");
+    ignoreField(EngineScriptExecution.class, "eventDispatcher");
     ignoreField(Execution.class, "element");
     ignoreField(EngineScript.class, "elements");
     ignoreField(EngineScript.class, "engine");
