@@ -17,40 +17,40 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.test;
+package io.rockscript.api.events;
 
-import io.rockscript.Engine;
+import io.rockscript.engine.job.Job;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Instant;
 
-/** Engine with predictable execution of async stuff because
- * it's all executed directly in the thread of the client. */
-public class TestEngine extends Engine {
+public class JobFailedEvent extends JobEvent {
 
-  public TestEngine() {
-    this(null);
+  String jobId;
+  String error;
+  Instant nextRetryTime;
+
+  JobFailedEvent() {
   }
 
-  public TestEngine(Map<String,String> configuration) {
-    super(initializeConfiguration(configuration));
+  public JobFailedEvent(String jobId, String error) {
+    this(jobId, error, null);
   }
 
-  private static Map<String, String> initializeConfiguration(Map<String, String> configuration) {
-    if (configuration==null) {
-      configuration = new HashMap<>();
-    }
-    configuration.put(CFG_KEY_ENGINE, CFG_VALUE_ENGINE_TEST);
-    return configuration;
+  public JobFailedEvent(String jobId, String error, Instant nextRetryTime) {
+    this.jobId = jobId;
+    this.error = error;
+    this.nextRetryTime = nextRetryTime;
   }
 
-  @Override
-  public TestEngine start() {
-    return (TestEngine) super.start();
+  public String getJobId() {
+    return jobId;
   }
 
-  @Override
-  public TestJobExecutor getJobExecutor() {
-    return (TestJobExecutor) super.getJobExecutor();
+  public String getError() {
+    return error;
+  }
+
+  public Instant getNextRetryTime() {
+    return nextRetryTime;
   }
 }

@@ -20,37 +20,27 @@
 package io.rockscript.test;
 
 import io.rockscript.Engine;
+import io.rockscript.api.events.JobEvent;
+import io.rockscript.engine.job.AbstractJobExecutor;
+import io.rockscript.engine.job.Job;
+import io.rockscript.engine.job.JobExecutor;
+import io.rockscript.engine.job.JobService;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-/** Engine with predictable execution of async stuff because
- * it's all executed directly in the thread of the client. */
-public class TestEngine extends Engine {
 
-  public TestEngine() {
-    this(null);
-  }
+/** In tests, job execution is to be triggered by the test */
+public class TestJobExecutor extends AbstractJobExecutor {
 
-  public TestEngine(Map<String,String> configuration) {
-    super(initializeConfiguration(configuration));
-  }
-
-  private static Map<String, String> initializeConfiguration(Map<String, String> configuration) {
-    if (configuration==null) {
-      configuration = new HashMap<>();
-    }
-    configuration.put(CFG_KEY_ENGINE, CFG_VALUE_ENGINE_TEST);
-    return configuration;
+  public TestJobExecutor(Engine engine) {
+    super(engine);
   }
 
   @Override
-  public TestEngine start() {
-    return (TestEngine) super.start();
+  public void scheduleJob(Job job) {
   }
 
   @Override
-  public TestJobExecutor getJobExecutor() {
-    return (TestJobExecutor) super.getJobExecutor();
+  public void handle(JobEvent jobEvent) {
   }
 }

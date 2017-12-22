@@ -39,8 +39,7 @@ import io.rockscript.engine.ImportObjectSerializer;
 import io.rockscript.engine.PingHandler;
 import io.rockscript.engine.ServiceFunctionSerializer;
 import io.rockscript.engine.impl.*;
-import io.rockscript.engine.impl.EventListener;
-import io.rockscript.engine.job.JobService;
+import io.rockscript.engine.job.*;
 import io.rockscript.examples.ExamplesHandler;
 import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.http.client.HttpClient;
@@ -51,7 +50,7 @@ import io.rockscript.service.ImportResolver;
 import io.rockscript.service.ServiceFunction;
 import io.rockscript.service.http.HttpService;
 import io.rockscript.test.TestExecutor;
-import io.rockscript.test.TestJobService;
+import io.rockscript.test.TestJobExecutor;
 import io.rockscript.util.Io;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,11 +89,13 @@ public class Engine {
   protected ScriptParser scriptParser;
   protected LockOperationExecutor lockOperationExecutor;
   protected LockService lockService;
+  protected JobService jobService;
+  protected JobStore jobStore;
+  protected JobExecutor jobExecutor;
   protected ImportResolver importResolver;
   protected Executor executor;
   protected Gson gson;
   protected HttpClient httpClient;
-  protected JobService jobService;
   protected Map<String,Class<? extends Command>> commandTypes = new HashMap<>();
   protected Map<String,Class<? extends Query>> queryTypes = new HashMap<>();
   @Deprecated // I think this can be deleted, but now is not a good time to check it
@@ -155,7 +156,8 @@ public class Engine {
     this.fileHandler = createFileHandler();
     this.executor = new MonitoringExecutor(engineLogStore, createExecutor());
     this.jobService = createJobService();
-    engineListeners.add(this.jobService);
+    this.jobStore = createJobStore();
+    this.jobExecutor = createJobExecutor();
 
     this.importResolver = new ImportResolver(this);
     importProvider(new HttpService());
@@ -192,17 +194,32 @@ public class Engine {
   }
 
   protected Executor createExecutor() {
-    if (CFG_VALUE_ENGINE_TEST.equals(configuration.get(CFG_KEY_ENGINE))) {
+    if (isTestEngine()) {
       return new TestExecutor();
     }
     return Executors.newWorkStealingPool();
   }
 
   protected JobService createJobService() {
-    if (CFG_VALUE_ENGINE_TEST.equals(configuration.get(CFG_KEY_ENGINE))) {
-      return new TestJobService(this);
-    }
     return new JobService(this);
+  }
+
+  protected JobStore createJobStore() {
+    return new InMemoryJobStore(this);
+  }
+
+  protected JobExecutor createJobExecutor() {
+    if (isTestEngine()) {
+      return new TestJobExecutor(this);
+    } else {
+      InMemoryJobExecutor jobExecutor = new InMemoryJobExecutor(this);
+      engineListeners.add(jobExecutor);
+      return jobExecutor;
+    }
+  }
+
+  protected boolean isTestEngine() {
+    return CFG_VALUE_ENGINE_TEST.equals(configuration.get(CFG_KEY_ENGINE));
   }
 
   public Engine importProvider(ImportProvider importProvider) {
@@ -259,7 +276,6 @@ public class Engine {
 
   public void stop() {
     if (started) {
-      this.jobService.shutdown();
       engineListeners.forEach(plugin->plugin.engineStops(this));
       started = false;
     }
@@ -402,6 +418,10 @@ public class Engine {
     return this;
   }
 
+  public void addEngineListener(EngineListener engineListener) {
+    engineListeners.add(engineListener);
+  }
+
   public IdGenerator getScriptIdGenerator() {
     return scriptIdGenerator;
   }
@@ -484,5 +504,13 @@ public class Engine {
 
   public ScriptParser getScriptParser() {
     return scriptParser;
+  }
+
+  public JobStore getJobStore() {
+    return jobStore;
+  }
+
+  public JobExecutor getJobExecutor() {
+    return jobExecutor;
   }
 }

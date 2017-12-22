@@ -17,32 +17,30 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.test;
+package io.rockscript.engine.job;
 
 import io.rockscript.Engine;
-import io.rockscript.engine.job.Job;
-import io.rockscript.engine.job.JobService;
+import io.rockscript.api.events.JobEndedEvent;
+import io.rockscript.api.events.JobFailedEvent;
+import io.rockscript.engine.impl.Time;
+import io.rockscript.util.Exceptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.time.Instant;
+import java.time.temporal.TemporalAmount;
 
-public class TestJobService extends JobService {
-  public TestJobService(Engine engine) {
-    super(engine);
+public abstract class AbstractJobExecutor implements JobExecutor {
+
+  static Logger log = LoggerFactory.getLogger(AbstractJobExecutor.class);
+
+  Engine engine;
+
+  public AbstractJobExecutor(Engine engine) {
+    this.engine = engine;
   }
-  public List<Job> getjobs() {
-    return jobs;
-  }
-  @Override
-  public void startup() {
-  }
-  @Override
-  public void shutdown() {
-  }
-  @Override
-  public void executeJob(Job job) {
-    super.executeJob(job);
-  }
-  @Override
-  protected void schedule(Job job) {
-  }
+
+  public abstract void scheduleJob(Job job);
+
 }
+

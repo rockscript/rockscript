@@ -22,8 +22,9 @@ package io.rockscript.test.engine.http;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.EngineScriptExecution;
-import io.rockscript.api.events.ScriptExecutionErrorEvent;
 import io.rockscript.engine.impl.Time;
+import io.rockscript.engine.job.AbstractJobExecutor;
+import io.rockscript.engine.job.InMemoryJobStore;
 import io.rockscript.engine.job.Job;
 import io.rockscript.engine.job.RetryServiceFunctionJobHandler;
 import io.rockscript.http.servlet.PathRequestHandler;
@@ -40,7 +41,6 @@ import java.util.Map;
 import static io.rockscript.http.servlet.PathRequestHandler.GET;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class HttpServiceTest extends AbstractHttpTest {
 
@@ -114,17 +114,19 @@ public class HttpServiceTest extends AbstractHttpTest {
       .execute(engine)
       .getEngineScriptExecution();
 
-    List<Job> jobs = engine.getJobService().getjobs();
-    Job job = jobs.get(0);
+    InMemoryJobStore jobStore = (InMemoryJobStore) engine.getJobStore();
+    Job job = jobStore.findNextJob();
     RetryServiceFunctionJobHandler retryServiceFunctionJobHandler = (RetryServiceFunctionJobHandler) job.getJobHandler();
     assertEquals(engineScriptExecution.getId(), retryServiceFunctionJobHandler.getContinuationReference().getScriptExecutionId());
     assertNotNull(retryServiceFunctionJobHandler.getContinuationReference().getExecutionId());
     assertEquals(Time.now().plusSeconds(5), job.getExecutionTime());
-    assertEquals(1, jobs.size());
+    assertEquals(1, jobStore.getJobCount());
 
-    engine.getJobService().executeJob(job);
+    engine
+      .getJobService()
+      .executeJob(job);
 
     assertEquals(1, job.getJobRuns().size());
-    assertEquals(2, jobs.size());
+    assertEquals(2, jobStore.getJobCount());
   }
 }

@@ -20,54 +20,31 @@
 package io.rockscript.engine.job;
 
 import io.rockscript.Engine;
-import io.rockscript.EngineListener;
-import io.rockscript.engine.impl.IdGenerator;
+import io.rockscript.api.events.JobEndedEvent;
+import io.rockscript.api.events.JobFailedEvent;
+import io.rockscript.api.events.JobScheduledEvent;
+import io.rockscript.api.events.JobStartedEvent;
 import io.rockscript.engine.impl.Time;
 import io.rockscript.util.Exceptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
-public class JobService implements EngineListener {
+/** Used by the engine to schedule and manipulate jobs.
+ * The JobService will dispatch events which will be picked
+ * up by the JobStore and the JobExecutor. JobStore and the JobExecutor
+ * take care of execution of jobs */
+public class JobService {
 
   static Logger log = LoggerFactory.getLogger(JobService.class);
 
   protected Engine engine;
-  protected Timer timer;
-  protected List<Job> jobs = new ArrayList<>();
-  protected IdGenerator idGenerator;
-  /** jobs that are stuck */
-  protected List<Job> errorJobs = new ArrayList<>();
-  protected RetryPolicy defaultJobRetryPolicy; // TODO initialize this
+  RetryPolicy defaultJobRetryPolicy; // TODO initialize
 
   public JobService(Engine engine) {
     this.engine = engine;
-    idGenerator = engine.getJobIdGenerator();
-  }
-
-  @Override
-  public void engineStarts(Engine engine) {
-    startup();
-  }
-
-  public void startup() {
-    timer = new Timer();
-  }
-
-  @Override
-  public void engineStops(Engine engine) {
-    shutdown();
-  }
-
-  public void shutdown() {
-    timer.cancel();
   }
 
   /**
@@ -84,50 +61,60 @@ public class JobService implements EngineListener {
    * help, the job is put in the errorJobs. */
   public Job schedule(JobHandler jobHandler, Instant executionTime, RetryPolicy retryPolicy) {
     log.debug("Scheduling "+jobHandler.getClass().getSimpleName()+" for "+executionTime);
-    Job job = new Job(idGenerator.createId(), jobHandler, executionTime, retryPolicy);
-    schedule(job);
-    jobs.add(job);
+    String jobId = engine
+      .getJobIdGenerator()
+      .createId();
+    Job job = new Job(jobId, jobHandler, executionTime, retryPolicy);
+    engine
+      .getEventDispatcher()
+      .dispatch(new JobScheduledEvent(job));
     return job;
   }
 
-  protected void schedule(Job job) {
-    long millisFromNow = Duration.between(Time.now(), job.getExecutionTime()).toMillis();
-    timer.schedule(new TimerTask() {
-      @Override
-      public void run() {
-        executeJob(job);
-      }
-    }, millisFromNow);
-  }
-
-  protected void executeJob(Job job) {
+  public void executeJob(Job job) {
     JobHandler jobHandler = job.getJobHandler();
-    JobRun jobRun = new JobRun();
-    job.addJobRun(jobRun);
     try {
-      log.debug("Job handler "+jobHandler.getClass().getSimpleName()+" execution starts");
+      dispatchJobStartedEvent(job);
       jobHandler.execute(engine);
       log.debug("Job handler "+jobHandler.getClass().getSimpleName()+" execution ended ok");
-      jobRun.endOk();
+      dispatchJobEndedEvent(job);
     } catch (Exception e) {
       String error = Exceptions.getStackTraceString(e);
-      handleError(job, jobRun, error);
+      handleJobFailure(job, error);
     }
   }
 
-  public void handleError(Job job, JobRun jobRun, String error) {
+  protected void dispatchJobStartedEvent(Job job) {
+    try {
+      engine
+        .getEventDispatcher()
+        .dispatch(new JobStartedEvent(job.getId(), Time.now()));
+    } catch (Exception e) {
+      log.debug("Job event dispatching failed: "+e.getMessage(), e);
+    }
+  }
+
+  protected void dispatchJobEndedEvent(Job job) {
+    try {
+      engine
+        .getEventDispatcher()
+        .dispatch(new JobEndedEvent(job.getId(), Time.now()));
+    } catch (Exception e) {
+      log.debug("Job event dispatching failed: "+e.getMessage(), e);
+    }
+  }
+
+  public void handleJobFailure(Job job, String error) {
     log.debug("Job handler "+job.getJobHandler().getClass().getSimpleName()+" error occurred: "+error);
-    jobRun.endError(error);
     long errorCount = job.getErrorCount();
     TemporalAmount retryDuration = job.getNextRetryDuration();
     if (retryDuration!=null) {
       Instant nextRetryTime = Time.now().plus(retryDuration);
       job.setExecutionTime(nextRetryTime);
-      schedule(job);
+      engine.getEventDispatcher().dispatch(new JobFailedEvent(job.getId(), error, nextRetryTime));
 
     } else {
-      jobs.remove(job);
-      errorJobs.add(job);
+      engine.getEventDispatcher().dispatch(new JobFailedEvent(job.getId(), error));
     }
   }
 

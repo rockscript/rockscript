@@ -32,9 +32,12 @@ public class EventDispatcher {
   }
 
   public void dispatch(Event event) {
-    log.debug(event.toString());
+    // Could eventually be dispatched to 3 distinct queues
     if (event instanceof ExecutionEvent) {
       engine.getScriptExecutionStore().handle(event);
+    } else if (event instanceof JobEvent){
+      engine.getJobStore().handle((JobEvent)event);
+      engine.getJobExecutor().handle((JobEvent)event);
     } else if (event instanceof ScriptEvent){
       engine.getScriptStore().handle((ScriptEvent)event);
     }

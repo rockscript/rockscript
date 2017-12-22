@@ -215,7 +215,6 @@ public class ScriptStore {
     }
 
     scriptVersions.add(scriptVersion);
-
     scriptVersion.setVersion(scriptVersions.size());
   }
 }
