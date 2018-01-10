@@ -56,6 +56,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -69,6 +71,11 @@ import java.util.concurrent.Executors;
 public class Engine {
 
   static Logger log = LoggerFactory.getLogger(Engine.class);
+
+  /** annotation that should be used for optional Engine fields */
+  @Retention(RetentionPolicy.RUNTIME)
+  private @interface Optional {
+  }
 
   public static final String CFG_KEY_ENGINE = "engine";
   public static final String CFG_VALUE_ENGINE_TEST = "test";
@@ -105,6 +112,7 @@ public class Engine {
   protected QueryHandler queryHandler;
   protected PingHandler pingHandler;
   protected FileHandler fileHandler;
+  @Optional
   protected ExamplesHandler examplesHandler;
 
   protected List<EnginePlugin> plugins = new ArrayList<>();
@@ -347,15 +355,21 @@ public class Engine {
   }
 
   protected void throwIfNotProperlyConfigured() {
-    for (Field field: getClass().getDeclaredFields()) {
-      Object value = null;
-      try {
-        field.setAccessible(true);
-        value = field.get(this);
-      } catch (IllegalAccessException e) {
-        throw new EngineException(e);
+    Class<?> clazz = getClass();
+    while (clazz!=Object.class) {
+      for (Field field: clazz.getDeclaredFields()) {
+        if (field.getAnnotation(Optional.class)==null) {
+          Object value = null;
+          try {
+            field.setAccessible(true);
+            value = field.get(this);
+          } catch (IllegalAccessException e) {
+            throw new EngineException(e);
+          }
+          EngineException.throwIfNull(value, "Engine field '%s' is null", field.getName());
+        }
       }
-      EngineException.throwIfNull(value, "ServiceLocator field '%s' is null", field.getName());
+      clazz = clazz.getSuperclass();
     }
   }
 
