@@ -25,8 +25,7 @@ import io.rockscript.EnginePlugin;
 public class TestPlugin implements EnginePlugin {
 
   @Override
-  public void created(Engine engine) {
-    engine.importProvider(new SimpleImportProvider());
+  public void engineConfigured(Engine engine) {
+    engine.getImportResolver().add(new SimpleImportProvider());
   }
-
 }

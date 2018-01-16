@@ -19,30 +19,12 @@
  */
 package io.rockscript.test.server;
 
-import io.rockscript.api.commands.DeployScriptVersionCommand;
-import io.rockscript.api.commands.RunTestsCommand;
-import io.rockscript.api.commands.StartScriptExecutionCommand;
-import io.rockscript.api.model.ScriptExecution;
-import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.engine.impl.EngineScriptExecution;
-import io.rockscript.service.test.TestResult;
-import io.rockscript.service.test.TestResults;
-import io.rockscript.test.TestEngine;
-import io.rockscript.test.engine.AbstractEngineTest;
+import io.rockscript.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.test.engine.TestEngineProvider;
-import io.rockscript.util.Io;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
-import static io.rockscript.Engine.CFG_KEY_EXAMPLES;
-import static io.rockscript.util.Maps.entry;
-import static io.rockscript.util.Maps.hashMap;
-import static org.junit.Assert.*;
 
 
 public class ExampleTest extends AbstractServerTest {
@@ -53,8 +35,12 @@ public class ExampleTest extends AbstractServerTest {
   protected TestEngineProvider getEngineProvider() {
     return new TestEngineProvider() {
       @Override
-      public TestEngine createEngine() {
-        return new TestEngine(hashMap(entry(CFG_KEY_EXAMPLES, null))).start();
+      public Engine createEngine() {
+        return new Configuration()
+          .configureTest()
+          .configureExamples()
+          .build()
+          .start();
       }
     };
   }
@@ -68,5 +54,4 @@ public class ExampleTest extends AbstractServerTest {
       .execute()
       .assertStatusOk();
   }
-
 }

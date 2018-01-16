@@ -20,7 +20,6 @@
 package io.rockscript;
 
 import io.rockscript.http.client.HttpClient;
-import io.rockscript.test.TestEngine;
 import org.apache.commons.cli.*;
 
 import java.util.Map;
@@ -61,7 +60,6 @@ public abstract class CliCommand {
     }
   }
 
-
   public CliCommand parseArgs(String... args) {
     this.args = args;
     Options options = getOptions();
@@ -83,6 +81,6 @@ public abstract class CliCommand {
   }
 
   protected HttpClient createHttp() {
-    return new HttpClient(new TestEngine().start().getGson());
+    return new HttpClient(new Configuration().configureTest().build().getGson());
   }
 }

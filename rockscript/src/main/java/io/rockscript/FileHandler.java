@@ -49,9 +49,6 @@ public class FileHandler implements RequestHandler {
     entry(".png",   "image/png")
   );
 
-  public FileHandler(Engine engine) {
-  }
-
   @Override
   public boolean matches(ServerRequest request) {
     return GET.equals(request.getMethod())

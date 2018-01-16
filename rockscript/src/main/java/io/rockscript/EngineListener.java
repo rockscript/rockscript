@@ -19,6 +19,9 @@
  */
 package io.rockscript;
 
+/** At the end of constructing an Engine, all fields of of
+ * Engine are checked with reflection to see if they implement {@link EngineListener}.
+ * See also {@link Engine#scanMemberFieldsForEngineListeners()} */
 public interface EngineListener {
 
   void engineStarts(Engine engine);

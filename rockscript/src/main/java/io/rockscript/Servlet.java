@@ -19,7 +19,6 @@
  */
 package io.rockscript;
 
-import io.rockscript.engine.impl.MonitoringExecutor;
 import io.rockscript.http.servlet.RouterServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,6 @@ import javax.servlet.ServletException;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 
 public class Servlet extends RouterServlet {
 
@@ -45,12 +43,12 @@ public class Servlet extends RouterServlet {
   }
 
   @Override
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
+  public void init(ServletConfig servletConfig) throws ServletException {
+    super.init(servletConfig);
 
     if (engine==null) {
-      Map<String,String> configuration = readConfiguration(config);
-      engine = createEngine(configuration);
+      Map<String,String> configurationProperties = readConfigurationProperties(servletConfig);
+      engine = createEngine(configurationProperties);
     }
 
     engine.start();
@@ -64,25 +62,25 @@ public class Servlet extends RouterServlet {
 
     setGson(engine.getGson());
 
-    requestHandler(engine.getCommandHandler());
-    requestHandler(engine.getQueryHandler());
-    requestHandler(engine.getPingHandler());
-    requestHandler(engine.getExamplesHandler());
-    requestHandler(engine.getFileHandler());
+    engine
+      .getRequestHandlers()
+      .forEach(requestHandler->requestHandler(requestHandler));
 
     defaultResponseHeader("Access-Control-Allow-Origin", "*");
   }
 
-  protected Engine createEngine(Map<String,String> configuration) {
-    return new Engine(configuration);
+  protected Engine createEngine(Map<String,String> configurationProperties) {
+    return new Configuration()
+      .configureProperties(configurationProperties)
+      .build();
   }
 
-  protected Map<String, String> readConfiguration(ServletConfig config) {
+  protected Map<String, String> readConfigurationProperties(ServletConfig servletConfig) {
     Map<String,String> initParameters = new LinkedHashMap<>();
-    Enumeration<String> initParameterNames = config.getInitParameterNames();
+    Enumeration<String> initParameterNames = servletConfig.getInitParameterNames();
     while (initParameterNames.hasMoreElements()) {
       String initParameterName = initParameterNames.nextElement();
-      String initParameterValue = config.getInitParameter(initParameterName);
+      String initParameterValue = servletConfig.getInitParameter(initParameterName);
       initParameters.put(initParameterName, initParameterValue);
     }
     return initParameters;

@@ -19,7 +19,8 @@
  */
 package io.rockscript.test.engine;
 
-import io.rockscript.test.TestEngine;
+import io.rockscript.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
 import org.junit.Test;
@@ -31,11 +32,14 @@ public class FailureTest extends AbstractEngineTest {
   protected static Logger log = LoggerFactory.getLogger(FailureTest.class);
 
   @Override
-  protected TestEngine initializeEngine() {
+  protected Engine initializeEngine() {
     // This ensures that each test will get a new CommandExecutorService
     // so that the tests can customize the import resolver without
     // polluting any cached script services.
-    return new TestEngine().start();
+    return new Configuration()
+      .configureTest()
+      .build()
+      .start();
   }
 
   @Test

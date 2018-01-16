@@ -15,15 +15,20 @@
  */
 package io.rockscript.service.test;
 
-import io.rockscript.test.TestEngine;
-import io.rockscript.engine.impl.ScriptStore;
 import io.rockscript.Engine;
+import io.rockscript.engine.impl.MonitoringExecutor;
+import io.rockscript.engine.impl.ScriptStore;
+import io.rockscript.test.TestExecutor;
+import io.rockscript.test.TestJobExecutor;
 
-public class TestRunEngine extends TestEngine {
+public class TestRunEngine extends Engine {
 
-  public TestRunEngine(Engine engineEngine, TestImportObject testImportObject, TestResult testResult) {
+  public TestRunEngine(Engine engine, TestImportObject testImportObject, TestResult testResult) {
+    super(engine);
     getImportResolver().add(testImportObject);
-    this.scriptStore = new ScriptStore(this, engineEngine.getScriptStore());
+    this.scriptStore = new ScriptStore(this, engine.getScriptStore());
     this.eventDispatcher = new TestEventLogger(this, testResult, eventDispatcher);
+    this.executor = MonitoringExecutor.createTest(getEngineLogStore());
+    this.jobExecutor = new TestJobExecutor(this);
   }
 }

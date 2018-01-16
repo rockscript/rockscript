@@ -19,7 +19,9 @@
  */
 package io.rockscript;
 
+
+/** Plugins can also implement {@link EngineListener} */
 public interface EnginePlugin {
 
-  void created(Engine engine);
+  void engineConfigured(Engine engine);
 }

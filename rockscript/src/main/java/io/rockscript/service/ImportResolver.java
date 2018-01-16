@@ -20,6 +20,7 @@ import io.rockscript.Engine;
 import io.rockscript.engine.impl.RemoteServiceFunctionJsonObject;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ImportResolver {
@@ -27,7 +28,8 @@ public class ImportResolver {
   /** importProviders by name */
   Map<String,ImportProvider> importProviders = new HashMap<>();
 
-  public ImportResolver(Engine engine) {
+  public ImportResolver(Engine engine, List<ImportProvider> importProviders) {
+    importProviders.forEach(importProvider -> add(importProvider));
   }
 
   public ImportResolver add(ImportProvider importProvider) {

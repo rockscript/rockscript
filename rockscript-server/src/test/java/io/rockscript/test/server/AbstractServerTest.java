@@ -19,17 +19,14 @@
  */
 package io.rockscript.test.server;
 
-import com.google.gson.Gson;
 import io.rockscript.Engine;
 import io.rockscript.Servlet;
 import io.rockscript.http.client.HttpClient;
 import io.rockscript.http.server.HttpServer;
 import io.rockscript.test.AbstractHttpServerTest;
 import io.rockscript.test.LatestServerExceptionListener;
-import io.rockscript.test.TestEngine;
 import io.rockscript.test.engine.TestEngineCache;
 import io.rockscript.test.engine.TestEngineProvider;
-import org.junit.AfterClass;
 import org.junit.Before;
 
 import static org.junit.Assert.assertNotNull;

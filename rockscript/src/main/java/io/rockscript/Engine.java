@@ -26,21 +26,17 @@ import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import io.rockscript.api.AbstractRequestHandler;
 import io.rockscript.api.Command;
-import io.rockscript.api.CommandHandler;
 import io.rockscript.api.Query;
-import io.rockscript.api.QueryHandler;
-import io.rockscript.api.commands.*;
 import io.rockscript.api.events.*;
-import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.api.queries.*;
 import io.rockscript.engine.EngineException;
 import io.rockscript.engine.ImportObjectSerializer;
-import io.rockscript.engine.PingHandler;
 import io.rockscript.engine.ServiceFunctionSerializer;
 import io.rockscript.engine.impl.*;
 import io.rockscript.engine.job.*;
 import io.rockscript.examples.ExamplesHandler;
+import io.rockscript.examples.ExamplesLoader;
 import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.http.client.HttpClient;
 import io.rockscript.http.servlet.RequestHandler;
@@ -48,10 +44,8 @@ import io.rockscript.service.ImportObject;
 import io.rockscript.service.ImportProvider;
 import io.rockscript.service.ImportResolver;
 import io.rockscript.service.ServiceFunction;
-import io.rockscript.service.http.HttpService;
 import io.rockscript.test.TestExecutor;
 import io.rockscript.test.TestJobExecutor;
-import io.rockscript.util.Io;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +57,10 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -77,14 +74,8 @@ public class Engine {
   private @interface Optional {
   }
 
-  public static final String CFG_KEY_ENGINE = "engine";
-  public static final String CFG_VALUE_ENGINE_TEST = "test";
-  public static final String CFG_KEY_EXAMPLES = "examples";
-
-  protected boolean created;
   protected boolean started;
 
-  protected Map<String,String> configuration;
   protected IdGenerator scriptIdGenerator;
   protected IdGenerator scriptVersionIdGenerator;
   protected IdGenerator scriptExecutionIdGenerator;
@@ -103,50 +94,27 @@ public class Engine {
   protected Executor executor;
   protected Gson gson;
   protected HttpClient httpClient;
-  protected Map<String,Class<? extends Command>> commandTypes = new HashMap<>();
-  protected Map<String,Class<? extends Query>> queryTypes = new HashMap<>();
-  @Deprecated // I think this can be deleted, but now is not a good time to check it
-  protected Map<String,Object> objects = new HashMap<>();
-  protected Map<String,ImportProvider> importProviders = new HashMap<>();
-  protected CommandHandler commandHandler;
-  protected QueryHandler queryHandler;
-  protected PingHandler pingHandler;
-  protected FileHandler fileHandler;
-  @Optional
-  protected ExamplesHandler examplesHandler;
 
-  protected List<EnginePlugin> plugins = new ArrayList<>();
-  protected List<EngineListener> engineListeners = new ArrayList<>();
+  protected List<Command> commands;
+  protected List<Query> queries;
+  protected List<EngineListener> engineListeners;
+  protected List<RequestHandler> requestHandlers;
 
-  public Engine(String[] args) {
-    this(parseConfigurationArgs(args));
-  }
-
-  /** Parses args like this
-   * For args like this key=value => configuration.put(key, value);
-   * For args not having '=' configuration.put(arg, null); */
-  public static Map<String, String> parseConfigurationArgs(String[] args) {
-    Map<String, String> configuration = new LinkedHashMap<>();
-    if (args!=null && args.length>0) {
-      for (String arg: args) {
-        int separatorIndex = arg.indexOf('=');
-        String key = null;
-        String value = null;
-        if (separatorIndex!=-1) {
-          key = arg.substring(0, separatorIndex);
-          value = arg.length()>separatorIndex ? arg.substring(separatorIndex+1) : null;
-        } else {
-          key = arg;
-        }
-        configuration.put(key, value);
-      }
+  public Engine(Configuration configuration) {
+    if (configuration.isExamples()) {
+      configuration.addEngineListener(new ExamplesLoader());
+      configuration.addRequestHandler(new ExamplesHandler(this));
     }
-    return configuration;
-  }
 
-  public Engine(Map<String,String> configuration) {
-    this.configuration = configuration;
-    this.eventDispatcher = new EventDispatcher(this);
+    if (configuration.isTest()) {
+      this.executor = MonitoringExecutor.createTest(getEngineLogStore());
+      this.jobExecutor = new TestJobExecutor(this);
+    } else {
+      this.executor = MonitoringExecutor.createDefault(getEngineLogStore());
+      this.jobExecutor = new InMemoryJobExecutor(this);
+    }
+
+    this.eventDispatcher = createEventDispatcher();
     this.scriptExecutionStore = new ScriptExecutionStore(this);
     this.scriptStore = new ScriptStore(this);
     this.engineLogStore = new EngineLogStore(this);
@@ -157,143 +125,46 @@ public class Engine {
     this.scriptExecutionIdGenerator = new TestIdGenerator(this, "se");
     this.lockService = new LockServiceImpl(this);
     this.lockOperationExecutor = new LockOperationExecutorImpl(this);
-    this.commandHandler = new CommandHandler(this);
-    this.queryHandler = new QueryHandler(this);
-    this.pingHandler = new PingHandler(this);
+    this.jobService = new JobService(this);
+    this.jobStore = new InMemoryJobStore(this);
+    this.importResolver = new ImportResolver(this, configuration.getImportProviders());
 
-    this.fileHandler = createFileHandler();
-    this.executor = new MonitoringExecutor(engineLogStore, createExecutor());
-    this.jobService = createJobService();
-    this.jobStore = createJobStore();
-    this.jobExecutor = createJobExecutor();
+    this.commands = configuration.getCommands();
+    this.queries = configuration.getQueries();
+    this.engineListeners = configuration.getEngineListeners();
+    this.requestHandlers = configuration.getRequestHandlers();
 
-    this.importResolver = new ImportResolver(this);
-    importProvider(new HttpService());
-
-    this.queryTypes = new HashMap<>();
-    query(new ScriptsQuery());
-    query(new ScriptVersionsQuery());
-    query(new ScriptExecutionQuery());
-    query(new ScriptExecutionsQuery());
-    query(new EventsQuery());
-
-    this.commandTypes = new HashMap<>();
-    command(new SaveScriptVersionCommand());
-    command(new DeployScriptVersionCommand());
-    command(new StartScriptExecutionCommand());
-    command(new EndServiceFunctionCommand());
-    command(new RunTestsCommand());
-
-    ServiceLoader<EnginePlugin> pluginLoader = ServiceLoader.load(EnginePlugin.class);
-    for (EnginePlugin plugin : pluginLoader) {
-      plugin.created(this);
-    }
-
-    plugins.forEach(plugin->plugin.created(this));
-
-    this.gson = createGson();
-    this.httpClient = new HttpClient(gson);
-    throwIfNotProperlyConfigured();
-    this.created = true;
-  }
-
-  protected FileHandler createFileHandler() {
-    return new FileHandler(this);
-  }
-
-  protected Executor createExecutor() {
-    if (isTestEngine()) {
-      return new TestExecutor();
-    }
-    return Executors.newWorkStealingPool();
-  }
-
-  protected JobService createJobService() {
-    return new JobService(this);
-  }
-
-  protected JobStore createJobStore() {
-    return new InMemoryJobStore(this);
-  }
-
-  protected JobExecutor createJobExecutor() {
-    if (isTestEngine()) {
-      return new TestJobExecutor(this);
-    } else {
-      InMemoryJobExecutor jobExecutor = new InMemoryJobExecutor(this);
-      engineListeners.add(jobExecutor);
-      return jobExecutor;
-    }
-  }
-
-  protected boolean isTestEngine() {
-    return CFG_VALUE_ENGINE_TEST.equals(configuration.get(CFG_KEY_ENGINE));
-  }
-
-  public Engine importProvider(ImportProvider importProvider) {
-    importResolver.add(importProvider);
-    return this;
-  }
-
-  public Engine start() {
-    if (!started) {
-      started = true;
-      engineListeners.forEach(listener->listener.engineStarts(this));
-      if (configuration.containsKey(CFG_KEY_EXAMPLES)) {
-        // The executor juggling is to ensure that the rockscript startup logging
-        // happens after the examples are loaded
-        Executor original = this.executor;
-        this.executor = new TestExecutor();
-        initializeExamples();
-        this.executor = original;
+    // Initialize AbstractRequestHandlers
+    this.requestHandlers.forEach(requestHandler->{
+      if (requestHandler instanceof AbstractRequestHandler) {
+        ((AbstractRequestHandler)requestHandler).setEngine(this);
       }
-    }
-    return this;
+    });
+
+    configuration.getEnginePlugins().forEach(plugin->{
+      plugin.engineConfigured(this);
+      if (plugin instanceof EngineListener) {
+        engineListeners.add((EngineListener) plugin);
+      }
+    });
+
+    // Requires plugins to be initialized
+    this.gson = buildGson(configuration);
+    this.httpClient = new HttpClient(this.gson);
+
+    scanMemberFieldsForEngineListeners();
+    throwIfNotProperlyInitialized();
   }
 
-  private void initializeExamples() {
-    this.examplesHandler = new ExamplesHandler(this);
-    List<ScriptVersion> exampleScripts = new ArrayList<>();
-    exampleScripts.add(deployExampleScript("examples/local-error.rs"));
-    exampleScripts.add(deployExampleScript("examples/local-retry.rs"));
-    exampleScripts.add(deployExampleScript("examples/star-wars.rs"));
-    exampleScripts.add(deployExampleScript("examples/chuck-norris.rs"));
-
-    List<ScriptExecutionResponse> exampleExecutions = new ArrayList<>();
-    exampleExecutions.add(startExampleScriptExecution("examples/star-wars.rs"));
-    exampleExecutions.add(startExampleScriptExecution("examples/chuck-norris.rs"));
-
-    log.debug("Examples initialized: "+exampleScripts.size()+" example scripts and "+exampleExecutions.size()+" script executions available:");
-    exampleScripts.forEach(script->log.debug("  Script "+script.getId()+" : "+script.getScriptName()));
-    exampleExecutions.forEach(execution->log.debug("  Script execution "+execution.getScriptExecutionId()+" : "+execution.getEngineScriptExecution().getEngineScript().getScriptVersion().getScriptName()));
+  protected EventDispatcher createEventDispatcher() {
+    return new EventDispatcher(this);
   }
 
-  private ScriptExecutionResponse startExampleScriptExecution(String scriptName) {
-    return new StartScriptExecutionCommand()
-      .scriptName(scriptName)
-      .execute(this);
-  }
-
-  private ScriptVersion deployExampleScript(String resource) {
-    String scriptText = Io.getResourceAsString(resource);
-    return new DeployScriptVersionCommand()
-      .scriptName(resource)
-      .scriptText(scriptText)
-      .execute(this);
-  }
-
-  public void stop() {
-    if (started) {
-      engineListeners.forEach(plugin->plugin.engineStops(this));
-      started = false;
-    }
-  }
-
-  private Gson createGson() {
+  public Gson buildGson(Configuration configuration) {
     return new GsonBuilder()
-      .registerTypeAdapterFactory(createCommandTypeAdapterFactory())
-      .registerTypeAdapterFactory(createQueryTypeAdapterFactory())
-      .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
+      .registerTypeAdapterFactory(createCommandTypeAdapterFactory(configuration))
+      .registerTypeAdapterFactory(createQueryTypeAdapterFactory(configuration))
+      .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory(configuration))
       .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
       .registerTypeHierarchyAdapter(ServiceFunction.class, new ServiceFunctionSerializer())
       .registerTypeHierarchyAdapter(ImportObject.class, new ImportObjectSerializer())
@@ -301,23 +172,23 @@ public class Engine {
       .create();
   }
 
-  protected PolymorphicTypeAdapterFactory createCommandTypeAdapterFactory() {
+  protected PolymorphicTypeAdapterFactory createCommandTypeAdapterFactory(Configuration configuration) {
     PolymorphicTypeAdapterFactory polymorphicTypeAdapterFactory = new PolymorphicTypeAdapterFactory();
     polymorphicTypeAdapterFactory.typeName(new TypeToken<Command>(){}, "command");
-    commandTypes.entrySet()
-      .forEach(entry->polymorphicTypeAdapterFactory.typeName(entry.getValue(),entry.getKey()));
+    configuration.getCommands().stream()
+      .forEach(command->polymorphicTypeAdapterFactory.typeName(command.getClass(),command.getType()));
     return polymorphicTypeAdapterFactory;
   }
 
-  protected PolymorphicTypeAdapterFactory createQueryTypeAdapterFactory() {
+  protected PolymorphicTypeAdapterFactory createQueryTypeAdapterFactory(Configuration configuration) {
     PolymorphicTypeAdapterFactory polymorphicTypeAdapterFactory = new PolymorphicTypeAdapterFactory();
     polymorphicTypeAdapterFactory.typeName(new TypeToken<Query>() {}, "query");
-    queryTypes.entrySet()
-      .forEach(entry->polymorphicTypeAdapterFactory.typeName(entry.getValue(),entry.getKey()));
+    configuration.getQueries().stream()
+      .forEach(query->polymorphicTypeAdapterFactory.typeName(query.getClass(),query.getName()));
     return polymorphicTypeAdapterFactory;
   }
 
-  protected static PolymorphicTypeAdapterFactory createEventJsonTypeAdapterFactory() {
+  protected static PolymorphicTypeAdapterFactory createEventJsonTypeAdapterFactory(Configuration configuration) {
     return new PolymorphicTypeAdapterFactory()
       .typeName(new TypeToken<Event>(){},                       "event") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
       .typeName(new TypeToken<ExecutionEvent>(){},              "executionEvent") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
@@ -354,7 +225,47 @@ public class Engine {
     }
   }
 
-  protected void throwIfNotProperlyConfigured() {
+  public Engine(Engine other) {
+    Class<?> clazz = getClass();
+    while (clazz!=Object.class) {
+      for (Field field: clazz.getDeclaredFields()) {
+        Object value = null;
+        try {
+          field.setAccessible(true);
+          if (field.getDeclaringClass().isAssignableFrom(other.getClass())) {
+            value = field.get(other);
+            field.set(this, value);
+          }
+        } catch (IllegalAccessException e) {
+          throw new EngineException(e);
+        }
+      }
+      clazz = clazz.getSuperclass();
+    }
+  }
+
+  protected void scanMemberFieldsForEngineListeners() {
+    Class<?> clazz = getClass();
+    while (clazz!=Object.class) {
+      for (Field field: clazz.getDeclaredFields()) {
+        Object value = null;
+        try {
+          field.setAccessible(true);
+          value = field.get(this);
+          if (value instanceof EngineListener) {
+            if (!engineListeners.contains(value)) {
+              engineListeners.add((EngineListener) value);
+            }
+          }
+        } catch (IllegalAccessException e) {
+          throw new EngineException(e);
+        }
+      }
+      clazz = clazz.getSuperclass();
+    }
+  }
+
+  protected void throwIfNotProperlyInitialized() {
     Class<?> clazz = getClass();
     while (clazz!=Object.class) {
       for (Field field: clazz.getDeclaredFields()) {
@@ -373,63 +284,27 @@ public class Engine {
     }
   }
 
+  public Engine start() {
+    if (!started) {
+      started = true;
+      engineListeners.forEach(listener->listener.engineStarts(this));
+    }
+    return this;
+  }
+
+  public void stop() {
+    if (started) {
+      engineListeners.forEach(plugin->plugin.engineStops(this));
+      started = false;
+    }
+  }
+
   public boolean isStarted() {
     return started;
   }
 
-  public Engine object(String key, Object value) {
-    objects.put(key, value);
-    return this;
-  }
-
-  public Engine object(Class<?> key, Object value) {
-    if (value!=null && key!=Object.class) {
-      objects.put(key.getName(), value);
-      for (Class<?> interfaceClass: key.getInterfaces()) {
-        object(interfaceClass, value);
-      }
-      object(key.getSuperclass(), value);
-    }
-    return this;
-  }
-
-  public Engine object(Object value) {
-    if (value!=null) {
-      object(value.getClass(), value);
-    }
-    return this;
-  }
-
-  public <T> T getObject(String key) {
-    return (T) objects.get(key);
-  }
-
-  public <T> T getObject(Class<T> clazz) {
-    return (T) objects.get(clazz.getName());
-  }
-
-  public Map<String,Class<? extends Query>> getQueryTypes() {
-    return this.queryTypes;
-  }
-
-  public Engine query(Query query) {
-    if (created) {
-      throw new RuntimeException("Queries can only be added when the Engine is created. Consider using "+EnginePlugin.class.getSimpleName());
-    }
-    this.queryTypes.put(query.getName(), query.getClass());
-    return this;
-  }
-
-  public Map<String, Class<? extends Command>> getCommandTypes() {
-    return commandTypes;
-  }
-
-  public Engine command(Command command) {
-    if (created) {
-      throw new RuntimeException("Command can only be added when the Engine is created. Consider using "+EnginePlugin.class.getSimpleName());
-    }
-    this.commandTypes.put(command.getType(), command.getClass());
-    return this;
+  public List<Query> getQueries() {
+    return queries;
   }
 
   public void addEngineListener(EngineListener engineListener) {
@@ -496,26 +371,6 @@ public class Engine {
     return lockService;
   }
 
-  public CommandHandler getCommandHandler() {
-    return commandHandler;
-  }
-
-  public QueryHandler getQueryHandler() {
-    return queryHandler;
-  }
-
-  public PingHandler getPingHandler() {
-    return pingHandler;
-  }
-
-  public RequestHandler getExamplesHandler() {
-    return examplesHandler;
-  }
-
-  public FileHandler getFileHandler() {
-    return fileHandler;
-  }
-
   public ScriptParser getScriptParser() {
     return scriptParser;
   }
@@ -526,5 +381,9 @@ public class Engine {
 
   public JobExecutor getJobExecutor() {
     return jobExecutor;
+  }
+
+  public List<RequestHandler> getRequestHandlers() {
+    return requestHandlers;
   }
 }

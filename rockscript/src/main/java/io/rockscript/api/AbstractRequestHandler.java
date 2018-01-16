@@ -26,9 +26,8 @@ public abstract class AbstractRequestHandler extends PathRequestHandler {
 
   protected Engine engine;
 
-  public AbstractRequestHandler(String method, String pathTemplate, Engine engine) {
+  public AbstractRequestHandler(String method, String pathTemplate) {
     super(method, pathTemplate);
-    this.engine = engine;
   }
 
   public void setEngine(Engine engine) {

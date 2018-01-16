@@ -19,10 +19,8 @@
  */
 package io.rockscript.examples;
 
-import com.google.gson.Gson;
 import io.rockscript.Engine;
 import io.rockscript.api.AbstractRequestHandler;
-import io.rockscript.api.Command;
 import io.rockscript.http.servlet.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +32,7 @@ public class ExamplesHandler extends AbstractRequestHandler {
   boolean returnError = false;
 
   public ExamplesHandler(Engine engine) {
-    super(GET, "/examples/lucky", engine);
+    super(GET, "/examples/lucky");
   }
 
   @Override

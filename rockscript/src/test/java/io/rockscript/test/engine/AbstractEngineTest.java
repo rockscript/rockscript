@@ -21,7 +21,6 @@ package io.rockscript.test.engine;
 
 import com.google.gson.Gson;
 import io.rockscript.Engine;
-import io.rockscript.test.TestEngine;
 import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.EndServiceFunctionCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
@@ -37,8 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class AbstractEngineTest {
@@ -47,7 +44,7 @@ public class AbstractEngineTest {
 
   protected static TestEngineCache testEngineCache = new TestEngineCache();
 
-  protected TestEngine engine;
+  protected Engine engine;
   protected Gson gson;
 
   @Before
@@ -76,8 +73,8 @@ public class AbstractEngineTest {
    *
    * Overwrite {@link #getEngineProvider()} if you want to
    * customize and cache the engine in your tests. */
-  protected TestEngine initializeEngine() {
-    return (TestEngine) testEngineCache.getTestEngine(getEngineProvider());
+  protected Engine initializeEngine() {
+    return testEngineCache.getTestEngine(getEngineProvider());
   }
 
   /** Override this method to use a customized Engine in your tests.

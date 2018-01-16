@@ -29,8 +29,8 @@ public class CommandHandler extends AbstractRequestHandler {
 
   static Logger log = LoggerFactory.getLogger(CommandHandler.class);
 
-  public CommandHandler(Engine engine) {
-    super(POST, "/command", engine);
+  public CommandHandler() {
+    super(POST, "/command");
   }
 
   @Override

@@ -19,16 +19,18 @@
  */
 package io.rockscript.test.engine;
 
+import io.rockscript.Configuration;
 import io.rockscript.Engine;
-import io.rockscript.engine.impl.EventDispatcher;
-import io.rockscript.test.TestEngine;
-import io.rockscript.service.ServiceFunctionOutput;
+import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.RecoverExecutionsCommand;
 import io.rockscript.api.commands.RecoverExecutionsResponse;
-import io.rockscript.api.commands.DeployScriptVersionCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
-import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.events.Event;
+import io.rockscript.api.model.ScriptExecution;
+import io.rockscript.engine.impl.EventDispatcher;
+import io.rockscript.service.ImportObject;
+import io.rockscript.service.ServiceFunctionOutput;
+import io.rockscript.service.StaticImportProvider;
 import io.rockscript.test.ScriptExecutionComparator;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -46,24 +48,37 @@ public class CrashTest extends AbstractEngineTest {
   List<String> waitingAsyncFunctionInvocationIds = new ArrayList<>();
 
   @Override
-  protected TestEngine initializeEngine() {
-    TestEngine engine = new TestEngine();
-    addHelloService(engine);
-    engine.start();
-    return engine;
+  protected Engine initializeEngine() {
+    return new Configuration()
+      .addImportProvider(createHelloServiceImportProvider())
+      .configureTest()
+      .build()
+      .start();
   }
 
-  protected CrashEngine createCrashEngine() {
-    CrashEngine crashEngine = new CrashEngine();
-    addHelloService(crashEngine);
-    crashEngine.start();
-    return crashEngine;
-  }
-
-  public static class CrashEngine extends TestEngine {
-    public CrashEngine() {
-      this.eventDispatcher = new CrashEventDispatcher(this, this.eventDispatcher);
+  public static class CrashConfiguration extends Configuration {
+    @Override
+    public Engine build() {
+      return new CrashEngine(this);
     }
+  }
+
+  public static class CrashEngine extends Engine {
+    public CrashEngine(Configuration configuration) {
+      super(configuration);
+    }
+    @Override
+    protected EventDispatcher createEventDispatcher() {
+      return new CrashEventDispatcher(this, new EventDispatcher(this));
+    }
+  }
+
+  protected Engine createCrashEngine() {
+    return new CrashConfiguration()
+      .addImportProvider(createHelloServiceImportProvider())
+      .configureTest()
+      .build()
+      .start();
   }
 
   public static class CrashEventDispatcher extends EventDispatcher {
@@ -106,8 +121,8 @@ public class CrashTest extends AbstractEngineTest {
     }
   }
 
-  private void addHelloService(Engine engine) {
-    engine.getImportResolver().createImport("example.com/hello")
+  private StaticImportProvider createHelloServiceImportProvider() {
+    ImportObject importObject = new ImportObject("example.com/hello")
       .put("aSyncFunction", input -> {
         synchronousCapturedData.add("Execution was here");
         synchronousCapturedData.add(input.getArgs().get(0));
@@ -115,6 +130,7 @@ public class CrashTest extends AbstractEngineTest {
       .put("anAsyncFunction", input -> {
         waitingAsyncFunctionInvocationIds.add(input.getExecutionId());
         return ServiceFunctionOutput.waitForFunctionEndCallback();});
+    return new StaticImportProvider(importObject);
   }
 
   @Test
@@ -131,7 +147,7 @@ public class CrashTest extends AbstractEngineTest {
     int eventsWithoutCrash = 1;
     boolean crashOccurred = false;
 
-    CrashEngine crashEngine = createCrashEngine();
+    Engine crashEngine = createCrashEngine();
     CrashEventDispatcher eventDispatcher = (CrashEventDispatcher) crashEngine.getEventDispatcher();
 
     String scriptId = new DeployScriptVersionCommand()

@@ -30,8 +30,8 @@ public class PingHandler extends AbstractRequestHandler {
 
   static Logger log = LoggerFactory.getLogger(PingHandler.class);
 
-  public PingHandler(Engine engine) {
-    super(GET, "/ping", engine);
+  public PingHandler() {
+    super(GET, "/ping");
   }
 
   @Override

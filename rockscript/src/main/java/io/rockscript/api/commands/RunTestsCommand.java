@@ -54,8 +54,7 @@ public class RunTestsCommand implements Command<TestResults> {
   private TestResult runTest(Engine engineEngine, ScriptVersion scriptVersion) {
     TestResult testResult = new TestResult(scriptVersion.getScriptName());
     TestImportObject testImportObject = new TestImportObject(testResult);
-    Engine testEngine = new TestRunEngine(engineEngine, testImportObject, testResult)
-      .start();
+    Engine testEngine = new TestRunEngine(engineEngine, testImportObject, testResult);
     testImportObject.setEngine(testEngine);
     try {
       String scriptVersionId = scriptVersion.getId();

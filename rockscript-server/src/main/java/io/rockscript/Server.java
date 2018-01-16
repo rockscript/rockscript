@@ -36,7 +36,9 @@ public class Server {
   }
 
   protected Engine createEngine(String[] args) {
-    return new Engine(args);
+    return new Configuration()
+      .configureArgs(args)
+      .build();
   }
 
   protected void start() {

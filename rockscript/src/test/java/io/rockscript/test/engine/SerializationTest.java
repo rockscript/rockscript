@@ -19,13 +19,14 @@
  */
 package io.rockscript.test.engine;
 
-import io.rockscript.test.TestEngine;
-import io.rockscript.service.ServiceFunctionInput;
-import io.rockscript.service.ServiceFunctionOutput;
+import io.rockscript.Configuration;
+import io.rockscript.Engine;
 import io.rockscript.api.commands.EndServiceFunctionCommand;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.EngineScriptExecution;
+import io.rockscript.service.ServiceFunctionInput;
+import io.rockscript.service.ServiceFunctionOutput;
 import io.rockscript.test.ScriptExecutionComparator;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -45,11 +46,14 @@ public class SerializationTest extends AbstractEngineTest {
   List<ServiceFunctionInput> serviceFunctionInputs = new ArrayList<>();
 
   @Override
-  protected TestEngine initializeEngine() {
+  protected Engine initializeEngine() {
     // This ensures that each test will get a new CommandExecutorService
     // so that the tests can customize the import resolver without
     // polluting any cached script services.
-    return new TestEngine().start();
+    return new Configuration()
+      .configureTest()
+      .build()
+      .start();
   }
 
   @SuppressWarnings("unchecked")

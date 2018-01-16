@@ -19,7 +19,10 @@
  */
 package io.rockscript.engine.impl;
 
+import io.rockscript.test.TestExecutor;
+
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /** Wraps all commands that are executed so that if an exception
  * happens comes out of the commands, it is logged in the
@@ -28,6 +31,14 @@ public class MonitoringExecutor implements Executor {
 
   EngineLogStore engineLogStore;
   Executor executor;
+
+  public static MonitoringExecutor createDefault(EngineLogStore engineLogStore) {
+    return new MonitoringExecutor(engineLogStore, Executors.newWorkStealingPool());
+  }
+
+  public static MonitoringExecutor createTest(EngineLogStore engineLogStore) {
+    return new MonitoringExecutor(engineLogStore, new TestExecutor());
+  }
 
   public MonitoringExecutor(EngineLogStore engineLogStore, Executor executor) {
     this.engineLogStore = engineLogStore;

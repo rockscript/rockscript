@@ -27,14 +27,25 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.Map;
 
 public class QueryHandler extends AbstractRequestHandler {
 
   static Logger log = LoggerFactory.getLogger(QueryHandler.class);
 
-  public QueryHandler(Engine engine) {
-    super(GET, "/query/{queryName}", engine);
+  Map<String,Class<? extends Query>> queryTypes = new HashMap<>();
+
+  public QueryHandler() {
+    super(GET, "/query/{queryName}");
+  }
+
+  public void setEngine(Engine engine) {
+    super.setEngine(engine);
+
+    engine
+      .getQueries()
+      .forEach(query->queryTypes.put(query.getName(), query.getClass()));
   }
 
   @Override
@@ -57,7 +68,6 @@ public class QueryHandler extends AbstractRequestHandler {
 
   private Query parseQuery(ServerRequest request) {
     try {
-      Map<String,Class<? extends Query>> queryTypes = engine.getQueryTypes();
       String queryName = request.getPathParameter("queryName");
       Class<? extends Query> queryClass = queryTypes.get(queryName);
       BadRequestException.throwIfNull(queryClass, "No query for q=%s. Expected one of %s", queryName, queryTypes.keySet());

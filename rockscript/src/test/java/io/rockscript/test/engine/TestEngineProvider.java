@@ -19,15 +19,18 @@
  */
 package io.rockscript.test.engine;
 
+import io.rockscript.Configuration;
 import io.rockscript.Engine;
-import io.rockscript.test.TestEngine;
 
 public interface TestEngineProvider {
 
   TestEngineProvider DEFAULT_TEST_ENGINE_PROVIDER = new TestEngineProvider() {
     @Override
     public Engine createEngine() {
-      return new TestEngine().start();
+      return new Configuration()
+        .configureTest()
+        .build()
+        .start();
     }
   };
 

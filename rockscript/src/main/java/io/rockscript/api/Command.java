@@ -21,6 +21,8 @@ import io.rockscript.Engine;
  * All commands are serializable with Gson. */
 public interface Command<R> {
 
+  /** TODO rename to getName */
+  @Deprecated
   String getType();
 
   R execute(Engine engine);

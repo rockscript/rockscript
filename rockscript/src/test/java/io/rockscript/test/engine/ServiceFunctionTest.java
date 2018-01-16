@@ -19,10 +19,11 @@
  */
 package io.rockscript.test.engine;
 
-import io.rockscript.test.TestEngine;
+import io.rockscript.Configuration;
+import io.rockscript.Engine;
+import io.rockscript.api.events.ExecutionEvent;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
-import io.rockscript.api.events.ExecutionEvent;
 import io.rockscript.engine.impl.LockOperationEnd;
 import io.rockscript.service.ServiceFunctionInput;
 import io.rockscript.service.ServiceFunctionOutput;
@@ -42,11 +43,14 @@ public class ServiceFunctionTest extends AbstractEngineTest {
   List<ServiceFunctionInput> inputs = new ArrayList<>();
 
   @Override
-  protected TestEngine initializeEngine() {
+  protected Engine initializeEngine() {
     // This ensures that each test will get a new CommandExecutorService
     // so that the tests can customize the import resolver without
     // polluting any cached script services.
-    return new TestEngine().start();
+    return new Configuration()
+      .configureTest()
+      .build()
+      .start();
   }
 
   @Test
