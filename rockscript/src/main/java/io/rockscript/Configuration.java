@@ -93,6 +93,7 @@ public class Configuration {
     initializeEngineListeners();
     initializeRequestHandlers();
     initializeImportProviders();
+    initializeEnginePlugins();
   }
 
   protected void initializeQueries() {

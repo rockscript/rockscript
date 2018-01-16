@@ -19,13 +19,13 @@
  */
 package io.rockscript.test;
 
-import io.rockscript.Engine;
+import io.rockscript.Configuration;
 import io.rockscript.EnginePlugin;
 
 public class TestPlugin implements EnginePlugin {
 
   @Override
-  public void engineConfigured(Engine engine) {
-    engine.getImportResolver().add(new SimpleImportProvider());
+  public void configure(Configuration configuration) {
+    configuration.addImportProvider(new SimpleImportProvider());
   }
 }

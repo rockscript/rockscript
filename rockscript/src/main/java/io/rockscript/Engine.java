@@ -41,10 +41,8 @@ import io.rockscript.gson.PolymorphicTypeAdapterFactory;
 import io.rockscript.http.client.HttpClient;
 import io.rockscript.http.servlet.RequestHandler;
 import io.rockscript.service.ImportObject;
-import io.rockscript.service.ImportProvider;
 import io.rockscript.service.ImportResolver;
 import io.rockscript.service.ServiceFunction;
-import io.rockscript.test.TestExecutor;
 import io.rockscript.test.TestJobExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,12 +55,8 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 @SuppressWarnings("unchecked")
 public class Engine {
@@ -127,7 +121,6 @@ public class Engine {
     this.lockOperationExecutor = new LockOperationExecutorImpl(this);
     this.jobService = new JobService(this);
     this.jobStore = new InMemoryJobStore(this);
-    this.importResolver = new ImportResolver(this, configuration.getImportProviders());
 
     this.commands = configuration.getCommands();
     this.queries = configuration.getQueries();
@@ -142,7 +135,7 @@ public class Engine {
     });
 
     configuration.getEnginePlugins().forEach(plugin->{
-      plugin.engineConfigured(this);
+      plugin.configure(configuration);
       if (plugin instanceof EngineListener) {
         engineListeners.add((EngineListener) plugin);
       }
@@ -151,6 +144,7 @@ public class Engine {
     // Requires plugins to be initialized
     this.gson = buildGson(configuration);
     this.httpClient = new HttpClient(this.gson);
+    this.importResolver = new ImportResolver(this, configuration.getImportProviders());
 
     scanMemberFieldsForEngineListeners();
     throwIfNotProperlyInitialized();

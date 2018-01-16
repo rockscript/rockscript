@@ -23,5 +23,5 @@ package io.rockscript;
 /** Plugins can also implement {@link EngineListener} */
 public interface EnginePlugin {
 
-  void engineConfigured(Engine engine);
+  void configure(Configuration configuration);
 }
