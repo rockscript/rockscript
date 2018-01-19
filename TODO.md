@@ -1,25 +1,17 @@
-# Goal: enable replication through event state transfer 
+# Goal: expand script language support for real use cases
 
-### Strategy
+* if-then-else
+* assignment (also of dereferenced properties)
+* for loop
 
-* Ensure all updates to stores are done through the event stream
-* Create central event dispatcher
-* Create shortcut to dispatch events to local stores
-* Create kafka dispatcher for replication
-* Create kafka consumer that pushes remote events to local stores
+# Goal: add concurrency support
 
-### Tasks
+* system.resolveConcurrent({
+  responseOne: http.get({...}),
+  responseTwo: http.post({...})
+}); 
+* array.forEachConcurrent(function)  (this requires functions)
+ 
+# Goal: add persistence 
 
-* Create ScriptExecutionStore
-  * In-memory version of a SCRIPT_EXECUTION_TABLE
-  
-* Migrate all the script execution queries to ScriptExecutionStore
-
-* Transform EventStore to a LocalEventDispatcher 
-
-* Create Job events
-
-* Create single EventListener that dispatches the events to  
-  * ScriptStore
-  * ScriptExecutionStore
-  * JobStore
+# Goal: replication 

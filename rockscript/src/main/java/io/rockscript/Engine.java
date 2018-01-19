@@ -56,6 +56,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 @SuppressWarnings("unchecked")
@@ -88,135 +89,16 @@ public class Engine {
   protected Executor executor;
   protected Gson gson;
   protected HttpClient httpClient;
+  protected Converter converter;
+  protected Map<Object,Object> context;
 
   protected List<Command> commands;
   protected List<Query> queries;
   protected List<EngineListener> engineListeners;
   protected List<RequestHandler> requestHandlers;
 
-  public Engine(Configuration configuration) {
-    if (configuration.isExamples()) {
-      configuration.addEngineListener(new ExamplesLoader());
-      configuration.addRequestHandler(new ExamplesHandler(this));
-    }
-
-    if (configuration.isTest()) {
-      this.executor = MonitoringExecutor.createTest(getEngineLogStore());
-      this.jobExecutor = new TestJobExecutor(this);
-    } else {
-      this.executor = MonitoringExecutor.createDefault(getEngineLogStore());
-      this.jobExecutor = new InMemoryJobExecutor(this);
-    }
-
-    this.eventDispatcher = createEventDispatcher();
-    this.scriptExecutionStore = new ScriptExecutionStore(this);
-    this.scriptStore = new ScriptStore(this);
-    this.engineLogStore = new EngineLogStore(this);
-    this.scriptParser = new ScriptParser(this);
-    this.jobIdGenerator = new TestIdGenerator(this, "j");
-    this.scriptIdGenerator = new TestIdGenerator(this, "s");
-    this.scriptVersionIdGenerator = new TestIdGenerator(this, "sv");
-    this.scriptExecutionIdGenerator = new TestIdGenerator(this, "se");
-    this.lockService = new LockServiceImpl(this);
-    this.lockOperationExecutor = new LockOperationExecutorImpl(this);
-    this.jobService = new JobService(this);
-    this.jobStore = new InMemoryJobStore(this);
-
-    this.commands = configuration.getCommands();
-    this.queries = configuration.getQueries();
-    this.engineListeners = configuration.getEngineListeners();
-    this.requestHandlers = configuration.getRequestHandlers();
-
-    // Initialize AbstractRequestHandlers
-    this.requestHandlers.forEach(requestHandler->{
-      if (requestHandler instanceof AbstractRequestHandler) {
-        ((AbstractRequestHandler)requestHandler).setEngine(this);
-      }
-    });
-
-    configuration.getEnginePlugins().forEach(plugin->{
-      plugin.configure(configuration);
-      if (plugin instanceof EngineListener) {
-        engineListeners.add((EngineListener) plugin);
-      }
-    });
-
-    // Requires plugins to be initialized
-    this.gson = buildGson(configuration);
-    this.httpClient = new HttpClient(this.gson);
-    this.importResolver = new ImportResolver(this, configuration.getImportProviders());
-
-    scanMemberFieldsForEngineListeners();
-    throwIfNotProperlyInitialized();
-  }
-
-  protected EventDispatcher createEventDispatcher() {
-    return new EventDispatcher(this);
-  }
-
-  public Gson buildGson(Configuration configuration) {
-    return new GsonBuilder()
-      .registerTypeAdapterFactory(createCommandTypeAdapterFactory(configuration))
-      .registerTypeAdapterFactory(createQueryTypeAdapterFactory(configuration))
-      .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory(configuration))
-      .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
-      .registerTypeHierarchyAdapter(ServiceFunction.class, new ServiceFunctionSerializer())
-      .registerTypeHierarchyAdapter(ImportObject.class, new ImportObjectSerializer())
-      .setPrettyPrinting()
-      .create();
-  }
-
-  protected PolymorphicTypeAdapterFactory createCommandTypeAdapterFactory(Configuration configuration) {
-    PolymorphicTypeAdapterFactory polymorphicTypeAdapterFactory = new PolymorphicTypeAdapterFactory();
-    polymorphicTypeAdapterFactory.typeName(new TypeToken<Command>(){}, "command");
-    configuration.getCommands().stream()
-      .forEach(command->polymorphicTypeAdapterFactory.typeName(command.getClass(),command.getType()));
-    return polymorphicTypeAdapterFactory;
-  }
-
-  protected PolymorphicTypeAdapterFactory createQueryTypeAdapterFactory(Configuration configuration) {
-    PolymorphicTypeAdapterFactory polymorphicTypeAdapterFactory = new PolymorphicTypeAdapterFactory();
-    polymorphicTypeAdapterFactory.typeName(new TypeToken<Query>() {}, "query");
-    configuration.getQueries().stream()
-      .forEach(query->polymorphicTypeAdapterFactory.typeName(query.getClass(),query.getName()));
-    return polymorphicTypeAdapterFactory;
-  }
-
-  protected static PolymorphicTypeAdapterFactory createEventJsonTypeAdapterFactory(Configuration configuration) {
-    return new PolymorphicTypeAdapterFactory()
-      .typeName(new TypeToken<Event>(){},                       "event") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
-      .typeName(new TypeToken<ExecutionEvent>(){},              "executionEvent") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
-      .typeName(new TypeToken<ServiceFunctionStartedEvent>(){}, "serviceFunctionStarted")
-      .typeName(new TypeToken<ServiceFunctionRetriedEvent>(){}, "serviceFunctionRetried")
-      .typeName(new TypeToken<ServiceFunctionWaitedEvent>(){},  "serviceFunctionWaited")
-      .typeName(new TypeToken<ServiceFunctionEndedEvent>(){},   "serviceFunctionEnded")
-      .typeName(new TypeToken<ServiceFunctionFailedEvent>(){},   "serviceFunctionFailed")
-      .typeName(new TypeToken<ScriptEndedEvent>(){},            "scriptEnded")
-      .typeName(new TypeToken<ScriptStartedEvent>(){},          "scriptStarted")
-      .typeName(new TypeToken<VariableCreatedEvent>(){},        "variableCreated")
-      .typeName(new TypeToken<ScriptExecutionErrorEvent>(){},   "scriptExecutionError")
-      .typeName(new TypeToken<ScriptVersionSavedEvent>(){},     "scriptVersionSaved")
-      ;
-  }
-
-  static class InstantTypeAdapter extends TypeAdapter<Instant> {
-    static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME
-      .withZone(ZoneId.of("UTC"));
-    @Override
-    public void write(JsonWriter out, Instant value) throws IOException {
-      if (value!=null) {
-        out.value(ISO_FORMATTER.format(value));
-      } else {
-        out.nullValue();
-      }
-    }
-    @Override
-    public Instant read(JsonReader in) throws IOException {
-      String isoText = in.nextString();
-      return OffsetDateTime
-        .parse(isoText, ISO_FORMATTER)
-        .toInstant();
-    }
+  public Engine() {
+    // memberfields are initialized in Configuration.build()
   }
 
   public Engine(Engine other) {
@@ -297,12 +179,12 @@ public class Engine {
     return started;
   }
 
-  public List<Query> getQueries() {
-    return queries;
+  public Map<Object, Object> getContext() {
+    return context;
   }
 
-  public void addEngineListener(EngineListener engineListener) {
-    engineListeners.add(engineListener);
+  public List<Query> getQueries() {
+    return queries;
   }
 
   public IdGenerator getScriptIdGenerator() {
@@ -379,5 +261,9 @@ public class Engine {
 
   public List<RequestHandler> getRequestHandlers() {
     return requestHandlers;
+  }
+
+  public Converter getConverter() {
+    return converter;
   }
 }

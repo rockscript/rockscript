@@ -19,6 +19,8 @@ import java.util.List;
 
 public class Literal extends SingleExpression {
 
+  public static final Object UNDEFINED = new Object();
+
   Object value;
 
   public Literal(Integer index, Location location) {

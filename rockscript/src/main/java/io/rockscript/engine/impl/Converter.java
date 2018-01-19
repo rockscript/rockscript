@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 RockScript.io.
+ * Copyright (c) 2018 RockScript.io.
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,17 +17,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.test;
+package io.rockscript.engine.impl;
 
-import io.rockscript.Configuration;
 import io.rockscript.Engine;
-import io.rockscript.EnginePlugin;
 
-public class TestPlugin implements EnginePlugin {
+public class Converter {
 
-  @Override
-  public void configure(Configuration configuration, Engine engine) {
-    configuration.addImportProvider(new SimpleImportProvider());
-    configuration.addImportProvider(new TesterImportObject());
+  Engine engine;
+
+  public Converter(Engine engine) {
+    this.engine = engine;
+  }
+
+  public Boolean toBoolean(Object o) {
+    if (o==null /* || o==UNDEFINED || o==NaN */) {
+      return false;
+    }
+    if (o instanceof Boolean) {
+      return (Boolean) o;
+    }
+    if (o instanceof Number) {
+      return ((Number)o).intValue()!=0;
+      // TODO check with JavaScript conversions
+    }
+    if (o instanceof String) {
+      String string = (String)o;
+      return !"".equalsIgnoreCase(string)
+             && "0".equalsIgnoreCase(string);
+    }
+    return true;
   }
 }

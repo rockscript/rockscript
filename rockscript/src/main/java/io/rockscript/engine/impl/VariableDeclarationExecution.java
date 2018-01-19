@@ -56,6 +56,6 @@ public class VariableDeclarationExecution extends Execution<VariableDeclaration>
 
   private Object getInitialValue() {
     Execution child = children!=null && !children.isEmpty() ? children.get(0) : null;
-    return child!=null ? child.getResult() : null;
+    return child!=null ? child.getResult() : Literal.UNDEFINED;
   }
 }

@@ -24,9 +24,12 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
-public class MemberDotExpressionExecution extends Execution<MemberDotExpression> {
+public class MemberDotExpressionExecution extends Execution<MemberDotExpression> implements Assignable {
 
   static Logger log = LoggerFactory.getLogger(MemberDotExpressionExecution.class);
+
+  Object target;
+  String identifier;
 
   public MemberDotExpressionExecution(MemberDotExpression element, Execution parent) {
     super(parent.createInternalExecutionId(), element, parent);
@@ -39,15 +42,13 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
 
   @Override
   public void childEnded(Execution child) {
-    Object propertyValue = getPropertyValue();
-    // dispatch(new PropertyDereferencedEvent(this, propertyValue));
-    setResult(propertyValue);
+    setResult(getPropertyValue());
     end();
   }
 
   private Object getPropertyValue() {
-    Object target = children.get(0).getResult();
-    String identifier = getElement().getPropertyName();
+    this.target = children.get(0).getResult();
+    this.identifier = getElement().getPropertyName();
     return getFieldValue(target, identifier);
   }
 
@@ -72,5 +73,14 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
     }
     log.debug("Can't dereference "+target+"."+identifier+", returning null");
     return null;
+  }
+
+  @Override
+  public void assign(Object value) {
+    if (target instanceof Map && identifier!=null) {
+      ((Map)target).put(identifier, value);
+      return;
+    }
+    throw new UnsupportedOperationException("Unsupported left hand value: "+target);
   }
 }

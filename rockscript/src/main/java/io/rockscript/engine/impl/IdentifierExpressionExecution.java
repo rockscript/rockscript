@@ -18,7 +18,9 @@ package io.rockscript.engine.impl;
 
 import io.rockscript.engine.EngineException;
 
-public class IdentifierExpressionExecution extends Execution<IdentifierExpression> {
+public class IdentifierExpressionExecution extends Execution<IdentifierExpression> implements Assignable {
+
+  Variable variable = null;
 
   public IdentifierExpressionExecution(IdentifierExpression element, Execution parent) {
     super(parent.createInternalExecutionId(), element, parent);
@@ -27,14 +29,13 @@ public class IdentifierExpressionExecution extends Execution<IdentifierExpressio
   @Override
   public void start() {
     Object identifierValue = getIdentifierValue();
-    // dispatch(new IdentifierResolvedEvent(this, identifierValue));
     setResult(identifierValue);
     end();
   }
 
   public Object getIdentifierValue() {
     String variableName = element.getIdentifier();
-    Variable variable = parent.getVariable(variableName);
+    this.variable = parent.getVariable(variableName);
     if (variable!=null) {
       return variable.getValue();
     }
@@ -42,5 +43,12 @@ public class IdentifierExpressionExecution extends Execution<IdentifierExpressio
       return EncodeUriFunction.INSTANCE;
     }
     throw new EngineException("ReferenceError: "+variableName+" is not defined", this);
+  }
+
+  @Override
+  public void assign(Object value) {
+    if (variable!=null) {
+      variable.setValue(value);
+    }
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 RockScript.io.
+ * Copyright (c) 2018 RockScript.io.
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -17,17 +17,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.test;
+package io.rockscript.engine.impl;
 
-import io.rockscript.Configuration;
-import io.rockscript.Engine;
-import io.rockscript.EnginePlugin;
+public interface Assignable {
 
-public class TestPlugin implements EnginePlugin {
-
-  @Override
-  public void configure(Configuration configuration, Engine engine) {
-    configuration.addImportProvider(new SimpleImportProvider());
-    configuration.addImportProvider(new TesterImportObject());
-  }
+  void assign(Object value);
 }

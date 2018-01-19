@@ -50,7 +50,7 @@ public class ImportResolver {
 
   public ImportObject createImport(String url) {
     ImportObject importObject = new ImportObject(url);
-    add(new StaticImportProvider(importObject));
+    add(importObject);
     return importObject;
   }
 

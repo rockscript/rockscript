@@ -19,17 +19,40 @@
  */
 package io.rockscript;
 
-import io.rockscript.api.Command;
-import io.rockscript.api.CommandHandler;
-import io.rockscript.api.Query;
-import io.rockscript.api.QueryHandler;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import io.rockscript.api.*;
 import io.rockscript.api.commands.*;
+import io.rockscript.api.events.*;
 import io.rockscript.api.queries.*;
+import io.rockscript.engine.ImportObjectSerializer;
 import io.rockscript.engine.PingHandler;
+import io.rockscript.engine.ServiceFunctionSerializer;
+import io.rockscript.engine.impl.*;
+import io.rockscript.engine.job.InMemoryJobExecutor;
+import io.rockscript.engine.job.InMemoryJobStore;
+import io.rockscript.engine.job.JobService;
+import io.rockscript.examples.ExamplesHandler;
+import io.rockscript.examples.ExamplesLoader;
+import io.rockscript.gson.PolymorphicTypeAdapterFactory;
+import io.rockscript.http.client.HttpClient;
 import io.rockscript.http.servlet.RequestHandler;
+import io.rockscript.service.ImportObject;
 import io.rockscript.service.ImportProvider;
+import io.rockscript.service.ImportResolver;
+import io.rockscript.service.ServiceFunction;
 import io.rockscript.service.http.HttpService;
+import io.rockscript.test.TestJobExecutor;
 
+import java.io.IOException;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class Configuration {
@@ -181,7 +204,138 @@ public class Configuration {
   // build ////////////////////////////////////////////////////////////////////////////////////////////////
 
   public Engine build() {
-    return new Engine(this);
+    Engine engine = createEngine();
+
+    enginePlugins.forEach(plugin->{
+      plugin.configure(Configuration.this, engine);
+      if (plugin instanceof EngineListener) {
+        engineListeners.add((EngineListener) plugin);
+      }
+    });
+
+    if (isExamples()) {
+      addEngineListener(new ExamplesLoader());
+      addRequestHandler(new ExamplesHandler(engine));
+    }
+
+    engine.engineLogStore = new EngineLogStore(engine);
+
+    if (isTest()) {
+      engine.executor = MonitoringExecutor.createTest(engine.engineLogStore);
+      engine.jobExecutor = new TestJobExecutor(engine);
+    } else {
+      engine.executor = MonitoringExecutor.createDefault(engine.engineLogStore);
+      engine.jobExecutor = new InMemoryJobExecutor(engine);
+    }
+
+    engine.eventDispatcher = createEventDispatcher(engine);
+    engine.scriptExecutionStore = new ScriptExecutionStore(engine);
+    engine.scriptStore = new ScriptStore(engine);
+    engine.scriptParser = new ScriptParser(engine);
+    engine.jobIdGenerator = new TestIdGenerator(engine, "j");
+    engine.scriptIdGenerator = new TestIdGenerator(engine, "s");
+    engine.scriptVersionIdGenerator = new TestIdGenerator(engine, "sv");
+    engine.scriptExecutionIdGenerator = new TestIdGenerator(engine, "se");
+    engine.lockService = new LockServiceImpl(engine);
+    engine.lockOperationExecutor = new LockOperationExecutorImpl(engine);
+    engine.jobService = new JobService(engine);
+    engine.jobStore = new InMemoryJobStore(engine);
+    engine.converter = new Converter(engine);
+    engine.context = new HashMap<>();
+
+    engine.commands = commands;
+    engine.queries = queries;
+    engine.engineListeners = engineListeners;
+    engine.requestHandlers = requestHandlers;
+
+    // Initialize AbstractRequestHandlers
+    engine.requestHandlers.forEach(requestHandler->{
+      if (requestHandler instanceof AbstractRequestHandler) {
+        ((AbstractRequestHandler)requestHandler).setEngine(engine);
+      }
+    });
+
+    // Requires plugins to be initialized
+    engine.gson = buildGson();
+    engine.httpClient = new HttpClient(engine.gson);
+    engine.importResolver = new ImportResolver(engine, importProviders);
+
+    engine.scanMemberFieldsForEngineListeners();
+    engine.throwIfNotProperlyInitialized();
+    return engine;
+  }
+
+  protected Engine createEngine() {
+    return new Engine();
+  }
+
+  protected EventDispatcher createEventDispatcher(Engine engine) {
+    return new EventDispatcher(engine);
+  }
+
+  public Gson buildGson() {
+    return new GsonBuilder()
+      .registerTypeAdapterFactory(createCommandTypeAdapterFactory())
+      .registerTypeAdapterFactory(createQueryTypeAdapterFactory())
+      .registerTypeAdapterFactory(createEventJsonTypeAdapterFactory())
+      .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
+      .registerTypeHierarchyAdapter(ServiceFunction.class, new ServiceFunctionSerializer())
+      .registerTypeHierarchyAdapter(ImportObject.class, new ImportObjectSerializer())
+      .setPrettyPrinting()
+      .create();
+  }
+
+  protected PolymorphicTypeAdapterFactory createCommandTypeAdapterFactory() {
+    PolymorphicTypeAdapterFactory polymorphicTypeAdapterFactory = new PolymorphicTypeAdapterFactory();
+    polymorphicTypeAdapterFactory.typeName(new TypeToken<Command>(){}, "command");
+    getCommands().stream()
+      .forEach(command->polymorphicTypeAdapterFactory.typeName(command.getClass(),command.getType()));
+    return polymorphicTypeAdapterFactory;
+  }
+
+  protected PolymorphicTypeAdapterFactory createQueryTypeAdapterFactory() {
+    PolymorphicTypeAdapterFactory polymorphicTypeAdapterFactory = new PolymorphicTypeAdapterFactory();
+    polymorphicTypeAdapterFactory.typeName(new TypeToken<Query>() {}, "query");
+    getQueries().stream()
+      .forEach(query->polymorphicTypeAdapterFactory.typeName(query.getClass(),query.getName()));
+    return polymorphicTypeAdapterFactory;
+  }
+
+  protected static PolymorphicTypeAdapterFactory createEventJsonTypeAdapterFactory() {
+    return new PolymorphicTypeAdapterFactory()
+      .typeName(new TypeToken<Event>(){},                       "event") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
+      .typeName(new TypeToken<ExecutionEvent>(){},              "executionEvent") // abstract type 'event' should not be used, but is specified because required by PolymorphicTypeAdapterFactory
+      .typeName(new TypeToken<ServiceFunctionStartedEvent>(){}, "serviceFunctionStarted")
+      .typeName(new TypeToken<ServiceFunctionRetriedEvent>(){}, "serviceFunctionRetried")
+      .typeName(new TypeToken<ServiceFunctionWaitedEvent>(){},  "serviceFunctionWaited")
+      .typeName(new TypeToken<ServiceFunctionEndedEvent>(){},   "serviceFunctionEnded")
+      .typeName(new TypeToken<ServiceFunctionFailedEvent>(){},   "serviceFunctionFailed")
+      .typeName(new TypeToken<ScriptEndedEvent>(){},            "scriptEnded")
+      .typeName(new TypeToken<ScriptStartedEvent>(){},          "scriptStarted")
+      .typeName(new TypeToken<VariableCreatedEvent>(){},        "variableCreated")
+      .typeName(new TypeToken<ScriptExecutionErrorEvent>(){},   "scriptExecutionError")
+      .typeName(new TypeToken<ScriptVersionSavedEvent>(){},     "scriptVersionSaved")
+      ;
+  }
+
+  static class InstantTypeAdapter extends TypeAdapter<Instant> {
+    static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+      .withZone(ZoneId.of("UTC"));
+    @Override
+    public void write(JsonWriter out, Instant value) throws IOException {
+      if (value!=null) {
+        out.value(ISO_FORMATTER.format(value));
+      } else {
+        out.nullValue();
+      }
+    }
+    @Override
+    public Instant read(JsonReader in) throws IOException {
+      String isoText = in.nextString();
+      return OffsetDateTime
+        .parse(isoText, ISO_FORMATTER)
+        .toInstant();
+    }
   }
 
   // getters //////////////////////////////////////////////////////////////////////////////////////////////

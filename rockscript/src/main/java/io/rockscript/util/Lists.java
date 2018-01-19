@@ -16,6 +16,7 @@
 
 package io.rockscript.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,6 +25,10 @@ public class Lists {
   @SafeVarargs
   public static <T> List<T> of(T... elements) {
     return Arrays.asList(elements);
+  }
+
+  public static <T> List<T> arrayList(T... elements) {
+    return new ArrayList(of(elements));
   }
 
   public static <T> T removeLast(List<T> list) {

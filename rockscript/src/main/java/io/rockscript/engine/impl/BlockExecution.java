@@ -23,6 +23,10 @@ public class BlockExecution<T extends ScriptElement> extends Execution<T> {
     super(id, element, parent);
   }
 
+  public BlockExecution(T block, Execution parent) {
+    super(parent.createInternalExecutionId(), block, parent);
+  }
+
   @Override
   public void start() {
     executeNextStatement();

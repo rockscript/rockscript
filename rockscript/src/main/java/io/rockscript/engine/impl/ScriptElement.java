@@ -32,6 +32,7 @@ public abstract class ScriptElement {
   }
 
   public abstract Execution createExecution(Execution parent);
+
   /** null or empty list is allowed */
   protected abstract List<? extends ScriptElement> getChildren();
 

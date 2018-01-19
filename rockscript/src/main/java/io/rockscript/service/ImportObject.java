@@ -22,7 +22,7 @@ import java.util.function.Function;
 /** Special JsonObject used as import object that ensures automatic
  * capturing of the propertyName of ServiceFunction values and wraps the
  * activities so that the toString shows the property name. */
-public class ImportObject extends JsonObject {
+public class ImportObject extends JsonObject implements ImportProvider {
 
   protected String serviceName;
 
@@ -51,5 +51,10 @@ public class ImportObject extends JsonObject {
   @Override
   public String toString() {
     return serviceName;
+  }
+
+  @Override
+  public ImportObject getImportObject() {
+    return this;
   }
 }

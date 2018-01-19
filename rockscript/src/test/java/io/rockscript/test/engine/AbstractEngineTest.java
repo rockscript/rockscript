@@ -29,6 +29,7 @@ import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.ContinuationReference;
 import io.rockscript.engine.impl.Time;
 import io.rockscript.http.servlet.ServerRequest;
+import io.rockscript.test.TesterImportObject;
 import org.junit.After;
 import org.junit.Before;
 import org.slf4j.Logger;
@@ -36,7 +37,12 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static io.rockscript.test.TesterImportObject.CONTEXT_KEY_RETURN_VALUES;
 
 public class AbstractEngineTest {
 
@@ -52,6 +58,7 @@ public class AbstractEngineTest {
     engine = initializeEngine();
     gson = engine.getGson();
     resetNow();
+    resetRecordedItems();
   }
 
   public <T> T parseBodyAs(ServerRequest request, Type type) {
@@ -97,10 +104,15 @@ public class AbstractEngineTest {
     TestTime.setNow(now);
   }
 
-  public void resetNow() {
+  private void resetNow() {
     TestTime.setNow(null);
   }
 
+  private void resetRecordedItems() {
+    Map<Object, Object> context = engine.getContext();
+    context.remove(TesterImportObject.CONTEXT_KEY_INVOCATIONS);
+    context.remove(TesterImportObject.CONTEXT_KEY_RETURN_VALUES);
+  }
 
   public ScriptVersion deployScript(String scriptText) {
     return new DeployScriptVersionCommand()
@@ -139,6 +151,14 @@ public class AbstractEngineTest {
         .result(result)
         .execute(engine)
         .getScriptExecution();
+  }
+
+  /** each return value will be used in sequence for tester.invoke(...) calls */
+  public void addTesterInvokeReturnValue(Object returnValue) {
+    Map<Object, Object> engineContext = engine.getContext();
+    List<Object> returnValues = (List<Object>) engineContext
+      .computeIfAbsent(CONTEXT_KEY_RETURN_VALUES, k->new ArrayList<>());
+    returnValues.add(returnValue);
   }
 
 }

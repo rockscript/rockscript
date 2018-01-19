@@ -25,7 +25,6 @@ import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.service.ImportObject;
 import io.rockscript.service.ServiceFunctionOutput;
-import io.rockscript.service.StaticImportProvider;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,11 +45,11 @@ public class ObjectLiteralExpressionTest extends AbstractEngineTest {
   protected Engine initializeEngine() {
     return new Configuration()
       .configureTest()
-      .addImportProvider(new StaticImportProvider(new ImportObject("example.com/assert")
+      .addImportProvider(new ImportObject("example.com/assert")
         .put("assertLiteralValue", input -> {
           capturedValues.add(input.getArgs().get(0));
           return ServiceFunctionOutput.endFunction();})
-      ))
+      )
       .build()
       .start();
   }

@@ -29,8 +29,8 @@ import io.rockscript.api.events.Event;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.engine.impl.EventDispatcher;
 import io.rockscript.service.ImportObject;
+import io.rockscript.service.ImportProvider;
 import io.rockscript.service.ServiceFunctionOutput;
-import io.rockscript.service.StaticImportProvider;
 import io.rockscript.test.ScriptExecutionComparator;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -58,18 +58,8 @@ public class CrashTest extends AbstractEngineTest {
 
   public static class CrashConfiguration extends Configuration {
     @Override
-    public Engine build() {
-      return new CrashEngine(this);
-    }
-  }
-
-  public static class CrashEngine extends Engine {
-    public CrashEngine(Configuration configuration) {
-      super(configuration);
-    }
-    @Override
-    protected EventDispatcher createEventDispatcher() {
-      return new CrashEventDispatcher(this, new EventDispatcher(this));
+    protected EventDispatcher createEventDispatcher(Engine engine) {
+      return new CrashEventDispatcher(engine, new EventDispatcher(engine));
     }
   }
 
@@ -121,7 +111,7 @@ public class CrashTest extends AbstractEngineTest {
     }
   }
 
-  private StaticImportProvider createHelloServiceImportProvider() {
+  private ImportProvider createHelloServiceImportProvider() {
     ImportObject importObject = new ImportObject("example.com/hello")
       .put("aSyncFunction", input -> {
         synchronousCapturedData.add("Execution was here");
@@ -130,7 +120,7 @@ public class CrashTest extends AbstractEngineTest {
       .put("anAsyncFunction", input -> {
         waitingAsyncFunctionInvocationIds.add(input.getExecutionId());
         return ServiceFunctionOutput.waitForFunctionEndCallback();});
-    return new StaticImportProvider(importObject);
+    return importObject;
   }
 
   @Test

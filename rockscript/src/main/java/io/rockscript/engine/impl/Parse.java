@@ -15,11 +15,12 @@
  */
 package io.rockscript.engine.impl;
 
-import io.rockscript.api.model.ParseError;
 import io.rockscript.Engine;
+import io.rockscript.api.model.ParseError;
 import io.rockscript.engine.antlr.ECMAScriptLexer;
 import io.rockscript.engine.antlr.ECMAScriptParser;
 import io.rockscript.engine.antlr.ECMAScriptParser.*;
+import jdk.nashorn.internal.ir.Assignment;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
@@ -181,6 +182,18 @@ public class Parse {
     return parseFunctionDeclaration(sourceElementContext.functionDeclaration());
   }
 
+  private List<Statement> parseStatements(StatementListContext statementListContext) {
+    List<Statement> statements = new ArrayList<>();
+    if (statementListContext!=null) {
+      List<StatementContext> statementContexts = statementListContext.statement();
+      for (StatementContext statementContext: statementContexts) {
+        Statement statement = parseStatement(statementContext);
+        statements.add(statement);
+      }
+    }
+    return statements;
+  }
+
   private Statement parseStatement(StatementContext statementContext) {
     VariableStatementContext variableStatementContext = statementContext.variableStatement();
     if (variableStatementContext!=null) {
@@ -201,7 +214,38 @@ public class Parse {
       return expressionStatement;
     }
 
+    IfStatementContext ifStatementContext = statementContext.ifStatement();
+    if (ifStatementContext!=null) {
+      ExpressionSequenceContext conditionContext = ifStatementContext.expressionSequence();
+      SingleExpressionContext firstConditionExpressionContext = conditionContext.singleExpression().get(0);
+      SingleExpression conditionExpression = parseSingleExpression(firstConditionExpressionContext);
+      List<StatementContext> statements = ifStatementContext.statement();
+      Statement thenStatement = parseStatement(statements.get(0));
+      Statement elseStatement = null;
+      if (statements.size()>1) {
+        elseStatement = parseStatement(statements.get(1));
+      }
+      return new IfStatement(createNextScriptElementId(), createLocation(statementContext), conditionExpression, thenStatement, elseStatement);
+    }
+
+    BlockContext blockContext = statementContext.block();
+    if (blockContext!=null) {
+      List<SourceElement> sourceElementList = (List) parseStatements(blockContext.statementList());
+      SourceElements sourceElements = new SourceElements(createNextScriptElementId(), createLocation(statementContext));
+      sourceElements.setSourceElements(sourceElementList);
+      Block block = new Block(createNextScriptElementId(), createLocation(statementContext));
+      block.setSourceElements(sourceElements);
+      return block;
+    }
+
     addErrorUnsupportedElement(statementContext, "statement");
+    return null;
+  }
+
+  private AssignmentExpression parseAssignment(ExpressionStatementContext expressionStatementContext) {
+    if (expressionStatementContext==null) {
+      return null;
+    }
     return null;
   }
 
@@ -262,11 +306,24 @@ public class Parse {
     } else if (singleExpressionContext instanceof ObjectLiteralExpressionContext) {
       return parseObjectLiteralExpression((ObjectLiteralExpressionContext)singleExpressionContext);
 
+    } else if (singleExpressionContext instanceof AssignmentExpressionContext) {
+      return parseAssignmentExpression((AssignmentExpressionContext)singleExpressionContext);
+
     } else if (singleExpressionContext instanceof AdditiveExpressionContext) {
       return parseAdditiveExpression((AdditiveExpressionContext)singleExpressionContext);
     }
     addErrorUnsupportedElement(singleExpressionContext, "singleExpression");
     return null;
+  }
+
+  private AssignmentExpression parseAssignmentExpression(AssignmentExpressionContext singleExpressionContext) {
+    String operator = singleExpressionContext.getChild(1).getText();
+    if (!AssignmentExpressionExecution.supportsOperator(operator)) {
+      addError(singleExpressionContext, "Unsupported assignment operator: "+operator);
+    }
+    SingleExpression left = parseSingleExpression(singleExpressionContext.singleExpression(0));
+    SingleExpression right = parseSingleExpression(singleExpressionContext.singleExpression(1));
+    return new AssignmentExpression(createNextScriptElementId(), createLocation(singleExpressionContext), operator, left, right);
   }
 
   private SingleExpression parseAdditiveExpression(AdditiveExpressionContext additiveExpressionContext) {
@@ -279,13 +336,15 @@ public class Parse {
     ObjectLiteralExpression objectLiteralExpression = new ObjectLiteralExpression(createNextScriptElementId(), createLocation(objectLiteralExpressionContext));
     ObjectLiteralContext objectLiteralContext = objectLiteralExpressionContext.objectLiteral();
     PropertyNameAndValueListContext propertyNameAndValueListContext = objectLiteralContext.propertyNameAndValueList();
-    List<PropertyAssignmentContext> propertyAssignmentContexts = propertyNameAndValueListContext.propertyAssignment();
-    for (PropertyAssignmentContext propertyAssignmentContext: propertyAssignmentContexts) {
-      PropertyNameContext propertyNameContext = (PropertyNameContext) propertyAssignmentContext.getChild(0);
-      String propertyName = parsePropertyName(propertyNameContext);
-      SingleExpressionContext valueContext = (SingleExpressionContext) propertyAssignmentContext.getChild(2);
-      SingleExpression valueExpression = parseSingleExpression(valueContext);
-      objectLiteralExpression.addProperty(propertyName, valueExpression);
+    if (propertyNameAndValueListContext!=null) {
+      List<PropertyAssignmentContext> propertyAssignmentContexts = propertyNameAndValueListContext.propertyAssignment();
+      for (PropertyAssignmentContext propertyAssignmentContext: propertyAssignmentContexts) {
+        PropertyNameContext propertyNameContext = (PropertyNameContext) propertyAssignmentContext.getChild(0);
+        String propertyName = parsePropertyName(propertyNameContext);
+        SingleExpressionContext valueContext = (SingleExpressionContext) propertyAssignmentContext.getChild(2);
+        SingleExpression valueExpression = parseSingleExpression(valueContext);
+        objectLiteralExpression.addProperty(propertyName, valueExpression);
+      }
     }
     return objectLiteralExpression;
   }
