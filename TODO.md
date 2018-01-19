@@ -1,7 +1,6 @@
 # Goal: expand script language support for real use cases
 
-* if-then-else
-* assignment (also of dereferenced properties)
+* comparison boolean expressions for if-then-else
 * for loop
 
 # Goal: add concurrency support

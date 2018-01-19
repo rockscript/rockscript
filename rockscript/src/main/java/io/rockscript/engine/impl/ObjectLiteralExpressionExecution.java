@@ -26,11 +26,6 @@ public class ObjectLiteralExpressionExecution extends BlockExecution<ObjectLiter
 
   @Override
   protected void end() {
-    applyResult();
-    super.end();
-  }
-
-  protected void applyResult() {
     Map<String,Object> properties = new LinkedHashMap<>();
     if (children!=null) {
       List<String> propertyNames = element.getPropertyNames();
@@ -41,5 +36,6 @@ public class ObjectLiteralExpressionExecution extends BlockExecution<ObjectLiter
       }
     }
     setResult(properties);
+    super.end();
   }
 }

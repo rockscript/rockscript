@@ -24,6 +24,8 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 
+import static io.rockscript.engine.impl.MemberIndexExpressionExecution.ensureArrayLength;
+
 public class MemberDotExpressionExecution extends Execution<MemberDotExpression> implements Assignable {
 
   static Logger log = LoggerFactory.getLogger(MemberDotExpressionExecution.class);
@@ -42,14 +44,10 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
 
   @Override
   public void childEnded(Execution child) {
-    setResult(getPropertyValue());
-    end();
-  }
-
-  private Object getPropertyValue() {
     this.target = children.get(0).getResult();
     this.identifier = getElement().getPropertyName();
-    return getFieldValue(target, identifier);
+    setResult(getFieldValue(target, identifier));
+    end();
   }
 
   public static Object getFieldValue(Object target, Object identifier) {
@@ -62,7 +60,9 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
       return map.get(identifier);
     } else if (target instanceof List && identifier instanceof Number) {
       List list = (List) target;
-      return list.get(((Number)identifier).intValue());
+      int indexInt = ((Number) identifier).intValue();
+      ensureArrayLength(list, indexInt);
+      return list.get(indexInt);
     } else if (identifier instanceof String) {
       Field field = Reflection.findFieldInObject(target, (String) identifier);
       if (field!=null) {

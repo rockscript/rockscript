@@ -21,6 +21,7 @@ package io.rockscript.test.engine;
 
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
+import io.rockscript.engine.impl.Literal;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -52,6 +53,21 @@ public class AssignmentTest extends AbstractEngineTest {
     @SuppressWarnings("unchecked")
     Map<String,Object> result = (Map<String,Object>) scriptExecution.getVariable("result");
     assertEquals("hello", result.get("greeting"));
+  }
+
+  @Test
+  public void testLeftHandMemberIndexDereference() {
+    ScriptVersion scriptVersion = deployScript(
+      "var result = []; \n" +
+      "result[2] = 'hello';");
+
+    ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
+    @SuppressWarnings("unchecked")
+    List<Object> result = (List<Object>) scriptExecution.getVariable("result");
+    assertEquals(Literal.UNDEFINED, result.get(0));
+    assertEquals(Literal.UNDEFINED, result.get(1));
+    assertEquals("hello", result.get(2));
+    assertEquals(3, result.size());
   }
 
   @Test

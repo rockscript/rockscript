@@ -16,12 +16,15 @@
 
 package io.rockscript.engine.impl;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static io.rockscript.engine.impl.MemberDotExpressionExecution.getFieldValue;
 
-public class MemberIndexExpressionExecution extends Execution<MemberIndexExpression> {
+public class MemberIndexExpressionExecution extends Execution<MemberIndexExpression> implements Assignable {
+
+  Object target;
+  Object index;
 
   public MemberIndexExpressionExecution(MemberIndexExpression element, Execution parent) {
     super(parent.createInternalExecutionId(), element, parent);
@@ -34,24 +37,47 @@ public class MemberIndexExpressionExecution extends Execution<MemberIndexExpress
 
   @Override
   public void childEnded(Execution child) {
-    startNextParameter();
-  }
-
-  private void startNextParameter() {
-    int indexIndex = children.size()-1; // -1 because the first one is the function expression
+    int indexIndex = children.size()-1; // -1 because the first one is the identifier or function expression
     List<SingleExpression> indexExpressions = element.getExpressionSequence();
     if (indexIndex < indexExpressions.size()) {
       ScriptElement indexExpression = indexExpressions.get(indexIndex);
       startChild(indexExpression);
     } else {
-      Object result = children.get(0).getResult();
+      target = children.get(0).getResult();
+      Object result = target;
       List<Object> indices = collectResultsFromChildren()
         .subList(1, children.size());
-      for (int i=0; i<indices.size() && result!=null; i++) {
-        Object index = indices.get(i);
+      for (int i=0; i<indices.size() && target!=null; i++) {
+        target = result;
+        index = indices.get(i);
         result = getFieldValue(result, index);
       }
       setResult(result);
+      end();
+    }
+  }
+
+  @Override
+  public void assign(Object value) {
+    if (index==null) {
+      throw new RuntimeException("Invalid index: " + index);
+    }
+    if (target instanceof List && index instanceof Number) {
+      int indexInt = ((Number) this.index).intValue();
+      List list = (List) this.target;
+      ensureArrayLength(list, indexInt);
+      list.set(indexInt, value);
+      return;
+    } else if (target instanceof Map && index instanceof String) {
+      ((Map)target).put(index, value);
+      return;
+    }
+    throw new UnsupportedOperationException("Unsupported left hand value: "+target);
+  }
+
+  protected static void ensureArrayLength(List list, int indexInt) {
+    while (list.size()<=indexInt) {
+      list.add(Literal.UNDEFINED);
     }
   }
 }

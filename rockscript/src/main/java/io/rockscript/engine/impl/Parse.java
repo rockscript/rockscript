@@ -306,6 +306,9 @@ public class Parse {
     } else if (singleExpressionContext instanceof ObjectLiteralExpressionContext) {
       return parseObjectLiteralExpression((ObjectLiteralExpressionContext)singleExpressionContext);
 
+    } else if (singleExpressionContext instanceof ArrayLiteralExpressionContext) {
+      return parseArrayLiteralExpression((ArrayLiteralExpressionContext)singleExpressionContext);
+
     } else if (singleExpressionContext instanceof AssignmentExpressionContext) {
       return parseAssignmentExpression((AssignmentExpressionContext)singleExpressionContext);
 
@@ -362,6 +365,19 @@ public class Parse {
     }
     addErrorUnsupportedElement(propertyNameContext, "propertyName");
     return null;
+  }
+
+  private ArrayLiteralExpression parseArrayLiteralExpression(ArrayLiteralExpressionContext arrayLiteralExpressionContext) {
+    ArrayLiteralExpression arrayLiteralExpression = new ArrayLiteralExpression(createNextScriptElementId(), createLocation(arrayLiteralExpressionContext));
+    ArrayLiteralContext arrayLiteralContext = arrayLiteralExpressionContext.arrayLiteral();
+    ElementListContext elementListContext = arrayLiteralContext.elementList();
+    if (elementListContext!=null) {
+      List<SingleExpressionContext> singleExpressionContexts = elementListContext.singleExpression();
+      for (SingleExpressionContext singleExpressionContext: singleExpressionContexts) {
+        arrayLiteralExpression.addElement(parseSingleExpression(singleExpressionContext));
+      }
+    }
+    return arrayLiteralExpression;
   }
 
   private SingleExpression parseLiteralExpression(LiteralExpressionContext literalExpressionContext) {
