@@ -20,6 +20,7 @@ import java.util.List;
 public class Literal extends SingleExpression {
 
   public static final Object UNDEFINED = new Object();
+  public static final Object NAN = new Object();
 
   Object value;
 

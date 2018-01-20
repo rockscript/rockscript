@@ -20,6 +20,9 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.Engine;
+import io.rockscript.engine.EngineException;
+
+import java.util.Map;
 
 public class Converter {
 
@@ -30,7 +33,7 @@ public class Converter {
   }
 
   public Boolean toBoolean(Object o) {
-    if (o==null /* || o==UNDEFINED || o==NaN */) {
+    if (o==null  || o==Literal.UNDEFINED || o==Literal.NAN) {
       return false;
     }
     if (o instanceof Boolean) {
@@ -38,7 +41,6 @@ public class Converter {
     }
     if (o instanceof Number) {
       return ((Number)o).intValue()!=0;
-      // TODO check with JavaScript conversions
     }
     if (o instanceof String) {
       String string = (String)o;
@@ -46,5 +48,39 @@ public class Converter {
              && "0".equalsIgnoreCase(string);
     }
     return true;
+  }
+
+  public Object toNumber(Object o) {
+    if (o==null || o instanceof Number) {
+      return o;
+    }
+    if (o instanceof String) {
+      return new Double((String)o);
+    }
+    if (o instanceof Boolean) {
+      return (Boolean)o ? 1 : 0;
+    }
+    throw new EngineException("Can't convert "+o+" to number: Conversion not implemented yet");
+  }
+
+  public Object toString(Object o) {
+    if (o==null || o instanceof String) {
+      return o;
+    }
+    if (o instanceof Number || o instanceof Boolean) {
+      return o.toString();
+    }
+    throw new EngineException("Can't convert "+o+" to string: Conversion not implemented yet");
+  }
+
+  public Object toPrimitive(Object o) {
+    if (o==null
+        || o==Literal.UNDEFINED
+        || o instanceof String
+        || o instanceof Number
+        || o instanceof Boolean) {
+      return o;
+    }
+    throw new EngineException("Can't convert "+o+" to primitive: Conversion not implemented yet");
   }
 }

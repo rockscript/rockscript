@@ -20,7 +20,6 @@ import io.rockscript.api.model.ParseError;
 import io.rockscript.engine.antlr.ECMAScriptLexer;
 import io.rockscript.engine.antlr.ECMAScriptParser;
 import io.rockscript.engine.antlr.ECMAScriptParser.*;
-import jdk.nashorn.internal.ir.Assignment;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
@@ -314,6 +313,9 @@ public class Parse {
 
     } else if (singleExpressionContext instanceof AdditiveExpressionContext) {
       return parseAdditiveExpression((AdditiveExpressionContext)singleExpressionContext);
+
+    } else if (singleExpressionContext instanceof EqualityExpressionContext) {
+      return parseEqualityExpression((EqualityExpressionContext)singleExpressionContext);
     }
     addErrorUnsupportedElement(singleExpressionContext, "singleExpression");
     return null;
@@ -323,6 +325,7 @@ public class Parse {
     String operator = singleExpressionContext.getChild(1).getText();
     if (!AssignmentExpressionExecution.supportsOperator(operator)) {
       addError(singleExpressionContext, "Unsupported assignment operator: "+operator);
+      return null;
     }
     SingleExpression left = parseSingleExpression(singleExpressionContext.singleExpression(0));
     SingleExpression right = parseSingleExpression(singleExpressionContext.singleExpression(1));
@@ -333,6 +336,17 @@ public class Parse {
     SingleExpression left = parseSingleExpression(additiveExpressionContext.singleExpression(0));
     SingleExpression right = parseSingleExpression(additiveExpressionContext.singleExpression(1));
     return new AdditiveExpression(createNextScriptElementId(), createLocation(additiveExpressionContext), left, right);
+  }
+
+  private SingleExpression parseEqualityExpression(EqualityExpressionContext singleExpressionContext) {
+    String comparator = singleExpressionContext.getChild(1).getText();
+    if (!EqualityExpressionExecution.supportsComparator(comparator)) {
+      addError(singleExpressionContext, "Unsupported assignment operator: "+comparator);
+      return null;
+    }
+    SingleExpression left = parseSingleExpression(singleExpressionContext.singleExpression(0));
+    SingleExpression right = parseSingleExpression(singleExpressionContext.singleExpression(1));
+    return new EqualityExpression(createNextScriptElementId(), createLocation(singleExpressionContext), left, right, comparator);
   }
 
   private SingleExpression parseObjectLiteralExpression(ObjectLiteralExpressionContext objectLiteralExpressionContext) {

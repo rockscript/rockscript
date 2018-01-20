@@ -56,4 +56,22 @@ public class IfThenElseTest extends AbstractEngineTest {
     assertEquals("negative", scriptExecution.getVariable("result"));
   }
 
+  @Test
+  public void testIfLooseEquals() {
+    ScriptVersion scriptVersion = deployScript(
+      "var a = system.input; \n" +
+      "var result; \n" +
+      "if (a == 1) { \n" +
+      "  result = 'affirmative'; \n" +
+      "} else { \n" +
+      "  result = 'negative'; \n" +
+      "}");
+
+    ScriptExecution scriptExecution = startScriptExecution(scriptVersion, 1);
+    assertEquals("affirmative", scriptExecution.getVariable("result"));
+
+    scriptExecution = startScriptExecution(scriptVersion, 2);
+    assertEquals("negative", scriptExecution.getVariable("result"));
+  }
+
 }
