@@ -17,8 +17,18 @@
 package io.rockscript.engine.impl;
 
 import io.rockscript.engine.EngineException;
+import io.rockscript.util.Maps;
+
+import java.util.Map;
+
+import static io.rockscript.util.Maps.entry;
+import static io.rockscript.util.Maps.hashMap;
 
 public class IdentifierExpressionExecution extends Execution<IdentifierExpression> implements Assignable {
+
+  static final Map<String,Object> CONSTANTS = hashMap(
+    entry("encodeURI", EncodeUriFunction.INSTANCE),
+    entry("undefined", Literal.UNDEFINED));
 
   Variable variable = null;
 
@@ -34,15 +44,18 @@ public class IdentifierExpressionExecution extends Execution<IdentifierExpressio
   }
 
   public Object getIdentifierValue() {
-    String variableName = element.getIdentifier();
-    this.variable = parent.getVariable(variableName);
+    String identifier = element.getIdentifier();
+
+    this.variable = parent.getVariable(identifier);
     if (variable!=null) {
       return variable.getValue();
     }
-    if ("encodeURI".equals(variableName)) {
-      return EncodeUriFunction.INSTANCE;
+
+    if (CONSTANTS.containsKey(identifier)) {
+      return CONSTANTS.get(identifier);
     }
-    throw new EngineException("ReferenceError: "+variableName+" is not defined", this);
+
+    throw new EngineException("ReferenceError: "+identifier+" is not defined", this);
   }
 
   @Override

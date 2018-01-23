@@ -28,6 +28,10 @@ import java.util.stream.Collectors;
 
 public class Converter {
 
+  public static final String HINT_DEFAULT = "default";
+  public static final String HINT_NUMBER = "number";
+  public static final String HINT_STRING = "string";
+
   Engine engine;
 
   public Converter(Engine engine) {
@@ -35,16 +39,16 @@ public class Converter {
   }
 
   public Boolean toBoolean(Object o) {
-    if (o==null  || o==Literal.UNDEFINED || o==Literal.NAN) {
+    if (isNull(o)  || isUndefined(o) || isNaN(o)) {
       return false;
     }
-    if (o instanceof Boolean) {
+    if (isBoolean(o)) {
       return (Boolean) o;
     }
-    if (o instanceof Number) {
+    if (isNumber(o)) {
       return ((Number)o).intValue()!=0;
     }
-    if (o instanceof String) {
+    if (isString(o)) {
       String string = (String)o;
       return !"".equalsIgnoreCase(string)
              && "0".equalsIgnoreCase(string);
@@ -52,9 +56,9 @@ public class Converter {
     return true;
   }
 
-  public Object toNumber(Object o) {
+  public Number toNumber(Object o) {
     if (o==null || o instanceof Number) {
-      return o;
+      return (Number) o;
     }
     if (o instanceof String) {
       if (""==o) {
@@ -72,35 +76,64 @@ public class Converter {
     throw new EngineException("Can't convert "+o+" to number: Conversion not implemented yet");
   }
 
-  public Object toString(Object o) {
-    if (o==null) {
+  public String toString(Object o) {
+    if (isNull(o)) {
       return "null";
     }
-    if (o==Literal.UNDEFINED) {
+    if (isUndefined(o)) {
       return Literal.UNDEFINED.toString();
     }
-    if (o instanceof String) {
-      return o;
+    if (isString(o)) {
+      return (String) o;
     }
-    if (o instanceof Number || o instanceof Boolean) {
+    if (isNumber(o)) {
+      return numberToString((Number)o);
+    }
+    if (isBoolean(o)) {
       return o.toString();
     }
-    if (o instanceof Map) {
-      return toPrimitive(o, "string");
+    if (isObject(o)) {
+      return (String) toPrimitive(o, "string");
     }
-    if (o instanceof List) {
-      return toPrimitive(o, "string");
+    if (isArray(o)) {
+      return (String) toPrimitive(o, "string");
     }
     throw new EngineException("Can't convert "+o+" to string: Conversion not implemented yet");
   }
 
+  protected String numberToString(Number number) {
+    if (number instanceof Double && (Double)number%1==0) {
+      return String.format("%.0f", number);
+    }
+    return number.toString();
+  }
+
+  public Object toPrimitiveDefault(Object o) {
+    return toPrimitive(o, HINT_DEFAULT);
+  }
+
+  public Object toPrimitiveNumber(Object o) {
+    return toPrimitive(o, HINT_NUMBER);
+  }
+
+  public Object toPrimitiveString(Object o) {
+    return toPrimitive(o, HINT_STRING);
+  }
+
   /** hint can be "number", "string" or "default" */
   public Object toPrimitive(Object o, String hint) {
-    if (o==null
-        || o==Literal.UNDEFINED
-        || o instanceof String
-        || o instanceof Number
-        || o instanceof Boolean) {
+    if (isNull(o)) {
+      if (HINT_DEFAULT.equals(hint)  || HINT_STRING.equals(hint)) {
+        return "";
+      } else {
+        return 0d;
+      }
+    }
+    if (isNumber(o)
+        || isUndefined(o)
+        || isString(o)
+        || isNumber(o)
+        || isBoolean(o)) {
       return o;
     }
     if (o instanceof Map) {
@@ -109,9 +142,49 @@ public class Converter {
     if (o instanceof List) {
       return ((List) o).stream()
         .map(element->toPrimitive(element,"string"))
-        .map(element->element==null||element==Literal.UNDEFINED ? "" : element.toString())
+        .map(element->isNull(element)||isUndefined(element) ? "" : toString(element))
         .collect(Collectors.joining(","));
     }
     throw new EngineException("Can't convert "+o+" to primitive: Conversion not implemented yet");
+  }
+
+  /** does the value o represent a javascript null */
+  public static boolean isNull(Object o) {
+    return o == null;
+  }
+
+  /** does the value o represent a javascript object */
+  public static boolean isObject(Object o) {
+    return o instanceof Map;
+  }
+
+  /** does the value o represent a javascript string */
+  public static boolean isString(Object o) {
+    return o instanceof String;
+  }
+
+  /** does the value o represent a javascript number */
+  public static boolean isNumber(Object o) {
+    return o instanceof Number;
+  }
+
+  /** does the value o represent a javascript boolean */
+  public static boolean isBoolean(Object o) {
+    return o instanceof Boolean;
+  }
+
+  /** does the value o represent a javascript array */
+  public static boolean isArray(Object o) {
+    return o instanceof List;
+  }
+
+  /** does the value o represent a javascript undefined value */
+  public static boolean isUndefined(Object o) {
+    return o == Literal.UNDEFINED;
+  }
+
+  /** does the value o represent a javascript NaN (not a number) */
+  public static boolean isNaN(Object o) {
+    return o == Literal.NAN;
   }
 }

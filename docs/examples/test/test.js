@@ -18,8 +18,5 @@
  * under the License.
  */
 
-var x = ['a',1];
-console.log(x==x);
-console.log(['a',1]==['a',1]);
-console.log(x===x);
-console.log(['a',1]===['a',1]);
+
+console.log(undefined.toPrimitive("string"));

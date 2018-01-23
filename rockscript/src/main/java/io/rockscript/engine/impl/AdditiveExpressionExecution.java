@@ -2,6 +2,8 @@ package io.rockscript.engine.impl;
 
 import io.rockscript.engine.EngineException;
 
+import static io.rockscript.engine.impl.Converter.*;
+
 public class AdditiveExpressionExecution extends Execution<AdditiveExpression> {
 
   public AdditiveExpressionExecution(AdditiveExpression additiveExpression, Execution parent) {
@@ -21,24 +23,33 @@ public class AdditiveExpressionExecution extends Execution<AdditiveExpression> {
       Object leftValue = getChildren().get(0).getResult();
       Object rightValue = getChildren().get(1).getResult();
 
-      if (leftValue!=null) {
-        if (rightValue!=null) {
-          Object result = addObjects(leftValue, rightValue);
-          setResult(result);
-        } else {
-          setResult(leftValue);
-        }
-      } else if (rightValue!=null) {
-        setResult(rightValue);
-      }
+      Object result = addObjects(leftValue, rightValue);
+      setResult(result);
       end();
     }
   }
 
   private Object addObjects(Object leftValue, Object rightValue) {
-    if (leftValue instanceof String) {
-      return (String)leftValue + rightValue.toString();
+    Converter converter = getEngine().getConverter();
+
+    if (isObject(leftValue) || isArray(leftValue)) {
+      leftValue = converter.toPrimitiveDefault(leftValue);
     }
-    throw new EngineException("Only string addition is supported atm", this);
+
+    if (isObject(rightValue) || isArray(rightValue)) {
+      rightValue = converter.toPrimitiveDefault(rightValue);
+    }
+
+    if (isString(leftValue) || isString(rightValue)) {
+      return converter.toString(leftValue) + converter.toString(rightValue);
+    }
+
+    if (isUndefined(leftValue) || isUndefined(rightValue)) {
+      return Literal.NAN;
+    }
+
+    Number leftNumber = converter.toNumber(leftValue);
+    Number rightNumber = converter.toNumber(rightValue);
+    return  (leftNumber!=null ? leftNumber.doubleValue() : 0) + (rightNumber!=null ? rightNumber.doubleValue() : 0);
   }
 }
