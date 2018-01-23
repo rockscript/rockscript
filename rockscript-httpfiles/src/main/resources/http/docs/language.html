@@ -73,11 +73,14 @@
 
 <div class="content">
   <h1>Language</h1>
-  <p>RockScript is a subset of JavaScript (ECMAScript 5.1)  This page documents 
+  <p>RockScript is a subset of JavaScript (ECMAScript 5.1).  This page documents 
 which subset of JavaScript is supported. At the moment, only a very limited 
-subset is supported.  We are working hard to expand our coverage.</p>
+subset is supported.  We are working hard to expand our coverage.  The reason 
+to use JavaScript is because most developers are familiar with the basic syntax 
+and it’s the perfect language to <a href="why-and-when#juggle-with-json">juggle with JSON</a>, 
+which most API’s use these days.</p>
 
-<p>If you wonder why RockScript doesn’t just use Node.js, <a onclick="scrollOnSamePage('rockscriptvsnodejs')">see 
+<p>If you wonder why RockScript doesn’t just use Node.js, <a href="#rockscript-vs-nodejs">see 
 at the bottom of this page</a>.</p>
 
 <p>The main reason for us to choose JavaScript as the syntax is that it’s familiar 
@@ -97,7 +100,7 @@ with the runtime server environment.</p>
 
 <p><code class="highlighter-rouge">system.import(url)</code> returns a script object that exposes activities as functions.</p>
 
-<p>To learn about how to add activities to the engine, see <a onclick="show('services')">Services</a></p>
+<p>To learn about how to add activities to the engine, see <a href="services">Services</a></p>
 
 <h4 id="systeminput">system.input</h4>
 
@@ -145,7 +148,7 @@ the list of statements are executed sequential.</p>
 <h2 id="if-then-else">If-then-else</h2>
 
 <p>The condition expression will be converted to a boolean.  See also 
-<a href="#boolean_expressions">Boolean expressions</a> for which comparators are supported.</p>
+<a href="#comparison-operator-expressions">Comparison operator expressions</a> for which comparators are supported.</p>
 
 <p>Examples</p>
 <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="nx">msg</span><span class="o">==</span><span class="s1">'call'</span><span class="p">)</span> <span class="nx">http</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span><span class="na">url</span><span class="p">:</span> <span class="s1">'...'</span><span class="p">});</span>
@@ -163,6 +166,18 @@ the list of statements are executed sequential.</p>
 
 <h2 id="expressions">Expressions</h2>
 
+<h4 id="literal-expressions">Literal expressions</h4>
+
+<p>Examples</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s1">'some text'</span>
+<span class="mi">1</span>
+<span class="mf">5.0</span>
+<span class="kc">true</span>
+<span class="kc">false</span>
+<span class="p">{</span> <span class="nl">country</span><span class="p">:</span> <span class="s1">'US'</span> <span class="p">}</span>
+<span class="p">[</span> <span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">]</span>
+</code></pre></div></div>
+
 <h4 id="variable-expressions">Variable expressions</h4>
 <p>Examples</p>
 <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">variableName</span>
@@ -175,28 +190,45 @@ the list of statements are executed sequential.</p>
 </code></pre></div></div>
 <p>Note that for service function invocations, any number of args is allowed.</p>
 
-<h4 id="boolean-expressions">Boolean expressions</h4>
+<h4 id="comparison-operator-expressions">Comparison operator expressions</h4>
+
+<p>All of <a href="https://developer.mozilla.org/nl/docs/Web/JavaScript/Equality_comparisons_and_sameness">Equality comparisons and sameness</a> 
+is implemented</p>
+
+<blockquote>
+  <p>Limitation: object conversion functions like <code class="highlighter-rouge">toString </code> and <code class="highlighter-rouge">valueOf</code> are not invoked yet</p>
+</blockquote>
+
+<p>For now, only == and === are supported</p>
 
 <p>Examples</p>
 <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">text</span><span class="o">==</span><span class="s1">'some text'</span>
 <span class="nx">text</span><span class="o">===</span><span class="s1">'some text'</span>
 </code></pre></div></div>
 
-<p>All of <a href="https://developer.mozilla.org/nl/docs/Web/JavaScript/Equality_comparisons_and_sameness">Equality comparisons and sameness</a> 
-is implemented except Object.is(…) and the use of object conversion functions like <code class="highlighter-rouge">toString </code> and <code class="highlighter-rouge">valueOf</code></p>
+<blockquote>
+  <p>TODO: !=, &lt;, &gt;, &lt;=, &gt;=, !== etc</p>
+</blockquote>
 
-<p>TODO &lt;, &gt;, &lt;=, &gt;= etc</p>
+<h4 id="arithmic-operator-expressions">Arithmic operator expressions</h4>
 
-<h4 id="literal-expressions">Literal expressions</h4>
+<p>All the addition conversions are correctly applied like in Node.js</p>
+
+<blockquote>
+  <p>Limitation: invoking the object <code class="highlighter-rouge">toString</code> and <code class="highlighter-rouge">valueOf</code> methods.</p>
+</blockquote>
+
+<p>For now, only the addition <code class="highlighter-rouge">+</code> is supported:</p>
 
 <p>Examples</p>
-<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s1">'some text'</span>
-<span class="mf">5.0</span>
-<span class="kc">true</span>
-<span class="kc">false</span>
-<span class="p">{</span> <span class="nl">country</span><span class="p">:</span> <span class="s1">'US'</span> <span class="p">}</span>
-<span class="p">[</span> <span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">]</span>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s1">'hello'</span> <span class="o">+</span> <span class="s1">' world'</span> 
+<span class="mi">5</span> <span class="o">+</span> <span class="s1">' EUR'</span>
+<span class="s1">'Formula '</span> <span class="o">+</span> <span class="kc">true</span>
 </code></pre></div></div>
+
+<blockquote>
+  <p>TODO: -, *, /, %. **, ++, –</p>
+</blockquote>
 
 <h2 id="rockscript-vs-nodejs">RockScript vs Node.js</h2>
 

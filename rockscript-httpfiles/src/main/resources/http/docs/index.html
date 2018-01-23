@@ -92,12 +92,11 @@ RockScript server while waiting for a service function to complete.</p>
 <p>Because RockScript language is a subset of JavaScript, it’s really easy to perform data
 transormations between service function invocations.</p>
 
-<p>For more reasons why and when to use RockScript, see <a onclick="show('why-and-when')">Why and 
-when</a></p>
+<p>For more reasons why and when to use RockScript, see <a href="why-and-when">Why and when</a></p>
 
 <h2 id="overview">Overview</h2>
 
-<p>The <a onclick="show('language')">RockScript language</a> is a subset of JavaScript. For example:</p>
+<p>The <a href="language">RockScript language</a> is a subset of JavaScript. For example:</p>
 
 <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">system</span><span class="p">.</span><span class="k">import</span><span class="p">(</span><span class="s1">'rockscript.io/http'</span><span class="p">);</span>
 <span class="kd">var</span> <span class="nx">approvalService</span> <span class="o">=</span> <span class="nx">system</span><span class="p">.</span><span class="k">import</span><span class="p">(</span><span class="s1">'localhost:3000'</span><span class="p">);</span>
@@ -113,7 +112,7 @@ when</a></p>
 
 <p><img src="img/overview.png" alt="RockScript Overview" /></p>
 
-<p>The RockScript server has a HTTP web <a onclick="show('api')">API</a> to</p>
+<p>The RockScript server has a HTTP web <a href="api">API</a> to</p>
 <ul>
   <li>Manage scripts</li>
   <li>Manage script versions</li>
@@ -121,13 +120,13 @@ when</a></p>
   <li>Query events, script executions, scripts and script versions</li>
 </ul>
 
-<p>There is a <a onclick="show('cli')">command line interface</a> which you can use to call the API and SPI 
+<p>There is a <a href="cli">command line interface</a> which you can use to call the API and SPI 
 through the command line.</p>
 
-<p><a onclick="show('services')">Services</a> make functionality available through service functions that can be invoked 
+<p><a href="services">Services</a> make functionality available through service functions that can be invoked 
 from the scripts. The first and most common service is the HTTP service which comes out of the box.</p>
 
-<p>The RockScript server also has a HTTP <a onclick="show('service-spi')">Service SPI</a> to add new service functions 
+<p>The RockScript server also has a HTTP <a href="service-spi">Service SPI</a> to add new service functions 
 really fast and easy.</p>
 
 <h2 id="terminology">Terminology</h2>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 RockScript.io.
+ * Copyright (c) 2018 RockScript.io.
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -103,6 +103,16 @@ th {
 th, td {
   padding: 7px 20px 7px 0px;
   vertical-align: top;
+}
+
+blockquote {
+  background: #f9f9f9;
+  border-left: 7px solid #e2633e;
+  margin: 1.4em 0;
+  padding: 0.7em 15px;
+}
+blockquote p {
+  display: inline;
 }
 
 .titlebar {
