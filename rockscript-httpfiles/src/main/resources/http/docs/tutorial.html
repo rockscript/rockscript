@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright (c) 2017 RockScript.io.
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RockScript Documentation</title>
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <link rel="stylesheet" type="text/css" href="css/highlight-arduino-light-9.12.0.css">
+  <link rel="stylesheet" type="text/css" href="css/rockscript-docs.css">
+
+  <script src="js/highlight-9.12.0.js"></script>
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script type="application/javascript">
+    $(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });
+  </script>
+
+</head>
+<body>
+
+<a href="index/">
+  <div class="titlebar">
+    <div class="brand">RockScript.io<img alt="RockScript.io" src="img/hand-white.png"></div>
+    <div class="title">RockScript Documentation</div>
+  </div>
+</a>
+
+<div class="toc">
+  <a href="index">Introduction</a>
+  <a href="why-and-when">Why and when</a>
+  <a href="project-status">Project status</a>
+  <a href="getting-started">Getting started</a>
+  <a href="cli">Command line interface</a>
+  <a href="tutorial">Tutorial</a>
+  <a href="language">Language</a>
+  <a href="script-versioning">Script versioning</a>
+  <a href="license">License</a>
+  <a href="help">Help</a>
+  <a class="title" href="services">Services</a>
+  <a class="sublink" href="service-http">HTTP service</a>
+  <a class="title" href="api">API</a>
+  <a href="commands">Commands</a>
+  <a class="sublink" href="deploy-script">Deploy script</a>
+  <a class="sublink" href="start-script">Start script</a>
+  <a href="queries">Queries</a>
+  <a class="sublink" href="query-script-execution">Script execution</a>
+  <a class="title" href="service-spi">Service SPI</a>
+  <a class="sublink" href="end-function">End function</a></div>
+</div>
+
+<div class="content">
+  <h1>Tutorial</h1>
+  <h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>A running RockScript server.  See <a onclick="show('getting-started')">Getting started</a></li>
+  <li>NodeJS 7.7.1+</li>
+</ul>
+
+<h2 id="your-first-script">Your first script</h2>
+
+<p>This is the script we’re going to execute.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">system</span><span class="p">.</span><span class="k">import</span><span class="p">(</span><span class="s1">'rockscript.io/http'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">response</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span><span class="na">url</span><span class="p">:</span><span class="s1">'http://api.icndb.com/jokes/random'</span><span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">joke</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">joke</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>The script is available at <code class="highlighter-rouge">docs/examples/chuck/get-joke.rs</code></p>
+
+<h2 id="the-joke-service">The joke service</h2>
+
+<p><code class="highlighter-rouge">http.get(...);</code> in line 4 will perform a HTTP request and makes 
+a HTTP response object available in the script.  For this particular URL,
+the response object looks like this:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{ "status": 200,
+  "headers": { 
+    "Transfer-Encoding": ["chunked"],
+    "other": "irrelevant properties"
+  },
+  "body": {
+    "type": "success",
+    "value": {
+      "joke":"...a Chuck Norris joke...",
+      "other": "irrelevant properties"
+    }
+  }
+}
+</code></pre></div></div>
+
+<h2 id="deploy-the-script">Deploy the script</h2>
+
+<p>When we deploy the script to the server, we</p>
+<ul>
+  <li>Create a script named <code class="highlighter-rouge">get-joke.rs</code>, if no script with that name exists yet</li>
+  <li>Create a new script version with the given text</li>
+  <li>Mark the new script version as the active script version.  The active script version is the version that is started 
+when a new execution is started.</li>
+</ul>
+
+<p>For more about deployment and versioning, see <a onclick="show('script-versioning')">Script versioning</a></p>
+
+<h4 id="deploy-using-the-rock-command">Deploy using the rock command</h4>
+
+<p>To deploy this script to your local running RockScript engine, Type</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rock deploy docs/examples/chuck/
+</code></pre></div></div>
+
+<p>You should get output like</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span> rock deploy docs/examples/chuck/
+  Scanning directory /Code/rockscript/docs/examples/chuck <span class="o">(</span>not recursive<span class="o">)</span> <span class="k">for </span>files matching .<span class="k">*</span><span class="se">\.</span>rs<span class="o">(</span>t<span class="o">)</span>?
+  Deploying docs/examples/chuck/get-joke.rs to http://localhost:3652 ...
+  <span class="o">&gt;</span> POST http://localhost:3652/command
+    Content-Type: application/json
+    <span class="o">{</span>
+      <span class="s2">"deployScript"</span>: <span class="o">{</span>
+        <span class="s2">"scriptName"</span>: <span class="s2">"docs/examples/chuck/get-joke.rs"</span>,
+        <span class="s2">"scriptText"</span>: <span class="s2">"var http </span><span class="se">\u</span><span class="s2">003d system.import(</span><span class="se">\u</span><span class="s2">0027rockscript.io/http</span><span class="se">\u</span><span class="s2">0027);</span><span class="se">\n\n</span><span class="s2">var response </span><span class="se">\u</span><span class="s2">003d http.get({url:</span><span class="se">\.</span><span class="s2">..
+      }
+    }
+  &lt; HTTP/1.1 200 OK
+    Content-Type: application/json
+    {
+      "</span>id<span class="s2">": "</span>sv1<span class="s2">",
+      "</span>scriptId<span class="s2">": "</span>s1<span class="s2">",
+      "</span>name<span class="s2">": "</span>docs/examples/chuck/get-joke.rs<span class="s2">",
+      "</span>version<span class="s2">": 1,
+      "</span>text<span class="s2">": "</span>var http <span class="se">\u</span>003d system.import<span class="o">(</span><span class="se">\u</span>0027rockscript.io/http<span class="se">\u</span>0027<span class="o">)</span><span class="p">;</span><span class="se">\n\n</span>var response <span class="se">\u</span>003d http.get<span class="o">({</span>url:<span class="se">\u</span>0027htt...
+      <span class="s2">"active"</span>: <span class="nb">true</span>
+    <span class="o">}</span>
+  1 scripts successful deployed
+</code></pre></div></div>
+
+<p>If you want to see all the options for the <code class="highlighter-rouge">deploy</code> command, type</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rock <span class="nb">help </span>deploy
+</code></pre></div></div>
+
+<h4 id="deploy-using-only-bash">Deploy using only bash</h4>
+
+<p>Paste this into the command line to save your first script version</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-v</span> <span class="nt">-H</span> <span class="s2">"Content-Type: application/json"</span> <span class="se">\</span>
+  <span class="nt">-d</span> <span class="s2">"{</span><span class="se">\"</span><span class="s2">deployScript</span><span class="se">\"</span><span class="s2">:{ </span><span class="se">\</span><span class="s2">
+    </span><span class="se">\"</span><span class="s2">scriptName</span><span class="se">\"</span><span class="s2">: </span><span class="se">\"</span><span class="s2">get-joke.rs</span><span class="se">\"</span><span class="s2">, </span><span class="se">\</span><span class="s2">
+    </span><span class="se">\"</span><span class="s2">scriptText</span><span class="se">\"</span><span class="s2">: </span><span class="se">\"</span><span class="s2">var http = system.import('rockscript.io</span><span class="se">\/</span><span class="s2">http');</span><span class="se">\r\n\r\n</span><span class="s2">var response = http.get({url:'http:</span><span class="se">\/\/</span><span class="s2">api.icndb.com</span><span class="se">\/</span><span class="s2">jokes</span><span class="se">\/</span><span class="s2">random'});</span><span class="se">\r\n\r\n</span><span class="s2">var joke = response.body.value.joke;</span><span class="se">\"</span><span class="s2"> </span><span class="se">\</span><span class="s2">
+  }}"</span> <span class="se">\</span>
+  http://localhost:3652/command
+</code></pre></div></div>
+
+<p>You should see a response like this:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">{</span>
+  <span class="s2">"id"</span>: <span class="s2">"sv1"</span>,
+  <span class="s2">"scriptId"</span>: <span class="s2">"s1"</span>,
+  <span class="s2">"name"</span>: <span class="s2">"get-joke.rs"</span>,
+  <span class="s2">"version"</span>: 1,
+  <span class="s2">"text"</span>: <span class="s2">"var http </span><span class="se">\u</span><span class="s2">003d system.import(</span><span class="se">\u</span><span class="s2">0027rockscript.io/http</span><span class="se">\u</span><span class="s2">0027);</span><span class="se">\r\n\r\n</span><span class="s2">var response </span><span class="se">\u</span><span class="s2">003d http.get({url:</span><span class="se">\u</span><span class="s2">0027http://api.icndb.com/jokes/random</span><span class="se">\u</span><span class="s2">0027});</span><span class="se">\r\n\r\n</span><span class="s2">var joke </span><span class="se">\u</span><span class="s2">003d response.body.value.joke;"</span>,
+  <span class="s2">"active"</span>: <span class="nb">true</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="starting-the-script">Starting the script</h2>
+
+<p>When starting an execution of the script, we’ll identify the script by name. In 
+this case, that’s <code class="highlighter-rouge">get-joke.rs</code></p>
+
+<h4 id="start-script-using-rock">Start script using rock</h4>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rock start <span class="nt">-n</span> get-joke.rs
+</code></pre></div></div>
+
+<p>If you want to see more options for the <code class="highlighter-rouge">start</code> command, type</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rock <span class="nb">help </span>start
+</code></pre></div></div>
+
+<h4 id="start-script-using-only-bash">Start script using only bash</h4>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-v</span> <span class="nt">-H</span> <span class="s2">"Content-Type:application/json"</span> <span class="se">\</span>
+     <span class="nt">-d</span> <span class="s2">"{</span><span class="se">\"</span><span class="s2">startScript</span><span class="se">\"</span><span class="s2">:{</span><span class="se">\"</span><span class="s2">scriptName</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">get-joke.rs</span><span class="se">\"</span><span class="s2">}}"</span> <span class="se">\</span>
+     localhost:3652/command
+</code></pre></div></div>
+
+<p>Then congrats! You started your first RockScript.</p>
+
+<h2 id="querying-your-script-execution">Querying your script execution</h2>
+
+<p>Of course, now you want to see what the server has done.  Let’s query 
+the script execution details, including all the events that the server 
+has stored.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl http://localhost:3652/query?q<span class="o">=</span>execution<span class="se">\&amp;</span><span class="nv">id</span><span class="o">=</span>se1
+</code></pre></div></div>
+
+<p>Next, check out the <a onclick="language">language details</a> 
+and become a RockScript wizard.</p>
+
+</div>
+
+</body>
+</html>

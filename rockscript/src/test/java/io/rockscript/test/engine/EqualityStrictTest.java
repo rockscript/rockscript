@@ -35,7 +35,7 @@ import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.assertEquals;
 
-public class EqualityLooseTest extends AbstractEngineTest {
+public class EqualityStrictTest extends AbstractEngineTest {
 
   ScriptVersion scriptVersion = null;
 
@@ -43,15 +43,15 @@ public class EqualityLooseTest extends AbstractEngineTest {
   @Override
   public void setUp() {
     super.setUp();
-    scriptVersion = deployScript("var result = system.input.left == system.input.right;");
+    scriptVersion = deployScript("var result = system.input.left === system.input.right;");
   }
 
-  protected void assertLooseEqual(Object left, Object right) {
+  protected void assertStrictEqual(Object left, Object right) {
     assertEquals(true, getResult(left, right));
     assertEquals(true, getResult(right, left));
   }
 
-  protected void assertLooseNotEqual(Object left, Object right) {
+  protected void assertStrictNotEqual(Object left, Object right) {
     assertEquals(false, getResult(left, right));
     assertEquals(false, getResult(right, left));
   }
@@ -68,41 +68,40 @@ public class EqualityLooseTest extends AbstractEngineTest {
 
     // https://developer.mozilla.org/nl/docs/Web/JavaScript/Equality_comparisons_and_sameness#A_model_for_understanding_equality_comparisons
 
-    assertLooseEqual(Literal.UNDEFINED, Literal.UNDEFINED);
-    assertLooseEqual(null, null);
-    assertLooseEqual(true, true);
-    assertLooseEqual(false, false);
-    assertLooseEqual("foo", "foo");
+    assertStrictEqual(Literal.UNDEFINED, Literal.UNDEFINED);
+    assertStrictEqual(null, null);
+    assertStrictEqual(true, true);
+    assertStrictEqual(false, false);
+    assertStrictEqual("foo", "foo");
 
     HashMap<String, String> fooBarObject = hashMap(entry("foo", "bar"));
-    assertLooseEqual(fooBarObject, fooBarObject);
+    assertStrictEqual(fooBarObject, fooBarObject);
 
-    assertLooseEqual(0, 0);
+    assertStrictEqual(0, 0);
     // assertLooseEqual(+0, -0); // This impl doesn't distinct +0 and -0 yet...
-    assertLooseEqual(0, false);
-    assertLooseEqual("", false);
-    assertLooseEqual("", 0);
-    assertLooseEqual("0", 0);
-    assertLooseEqual("17", 17);
-    assertLooseEqual(Arrays.asList(1,2), "1,2");
-    // assertLooseEqual(new String("foo"), "foo"); // This impl doesn't support string constructor yet
-    assertLooseEqual(null, Literal.UNDEFINED);
 
-    assertLooseNotEqual(null, false);
-    assertLooseNotEqual(Literal.UNDEFINED, false);
-    assertLooseNotEqual(hashMap(entry("foo", "bar")), hashMap(entry("foo", "bar")));
-    assertLooseNotEqual(0, null);
-    assertLooseNotEqual(0, Literal.NAN);
-    assertLooseNotEqual("foo", Literal.NAN);
-    assertLooseNotEqual(Literal.NAN, Literal.NAN);
+    assertStrictNotEqual(0, false);
+    assertStrictNotEqual("", false);
+    assertStrictNotEqual("", 0);
+    assertStrictNotEqual("0", 0);
+    assertStrictNotEqual("17", 17);
+    assertStrictNotEqual(Arrays.asList(1,2), "1,2");
+    // assertLooseNotEqual(new String("foo"), "foo"); // This impl doesn't support string constructor yet
+    assertStrictNotEqual(null, Literal.UNDEFINED);
+
+    assertStrictNotEqual(null, false);
+    assertStrictNotEqual(Literal.UNDEFINED, false);
+    assertStrictNotEqual(hashMap(entry("foo", "bar")), hashMap(entry("foo", "bar")));
+    assertStrictNotEqual(0, null);
+    assertStrictNotEqual(0, Literal.NAN);
+    assertStrictNotEqual("foo", Literal.NAN);
+    assertStrictNotEqual(Literal.NAN, Literal.NAN);
 
     // Extra test based on Node.js
 
     List<Object> fooBarArray = Lists.of("foo", "bar");
-    assertLooseEqual(fooBarArray, fooBarArray);
-    assertLooseNotEqual(Lists.of("foo", "bar"), Lists.of("foo", "bar"));
-    assertLooseEqual(Arrays.asList(1,"str",true,null,Literal.UNDEFINED,hashMap(entry("a", 1)),Arrays.asList("one","two")),
-      "1,str,true,,,[object Object],one,two");
+    assertStrictEqual(fooBarArray, fooBarArray);
+    assertStrictNotEqual(Lists.of("foo", "bar"), Lists.of("foo", "bar"));
   }
 
 }

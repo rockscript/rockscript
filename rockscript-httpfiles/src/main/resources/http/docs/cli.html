@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright (c) 2017 RockScript.io.
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RockScript Documentation</title>
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <link rel="stylesheet" type="text/css" href="css/highlight-arduino-light-9.12.0.css">
+  <link rel="stylesheet" type="text/css" href="css/rockscript-docs.css">
+
+  <script src="js/highlight-9.12.0.js"></script>
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script type="application/javascript">
+    $(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });
+  </script>
+
+</head>
+<body>
+
+<a href="index/">
+  <div class="titlebar">
+    <div class="brand">RockScript.io<img alt="RockScript.io" src="img/hand-white.png"></div>
+    <div class="title">RockScript Documentation</div>
+  </div>
+</a>
+
+<div class="toc">
+  <a href="index">Introduction</a>
+  <a href="why-and-when">Why and when</a>
+  <a href="project-status">Project status</a>
+  <a href="getting-started">Getting started</a>
+  <a href="cli">Command line interface</a>
+  <a href="tutorial">Tutorial</a>
+  <a href="language">Language</a>
+  <a href="script-versioning">Script versioning</a>
+  <a href="license">License</a>
+  <a href="help">Help</a>
+  <a class="title" href="services">Services</a>
+  <a class="sublink" href="service-http">HTTP service</a>
+  <a class="title" href="api">API</a>
+  <a href="commands">Commands</a>
+  <a class="sublink" href="deploy-script">Deploy script</a>
+  <a class="sublink" href="start-script">Start script</a>
+  <a href="queries">Queries</a>
+  <a class="sublink" href="query-script-execution">Script execution</a>
+  <a class="title" href="service-spi">Service SPI</a>
+  <a class="sublink" href="end-function">End function</a></div>
+</div>
+
+<div class="content">
+  <h1>CLI</h1>
+  <p>tl;dr :</p>
+
+<blockquote>
+  <p><code class="highlighter-rouge">./install.sh</code> installs <code class="highlighter-rouge">rock</code> in <code class="highlighter-rouge">/usr/local/bin</code>, <br />
+Then type <code class="highlighter-rouge">rock</code>+Enter to as the command line tool.</p>
+</blockquote>
+
+<p>The details:</p>
+
+<p>After you built the project with</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn -Pizza clean install
+</code></pre></div></div>
+
+<p>like explained in <a onclick="show('getting-started')">Getting started</a>, the command 
+line client is available in the executable jar file <code class="highlighter-rouge">rockscript-cli/target/rockscript-cli.jar</code>.</p>
+
+<p>The most basic way to use the command line client is the command</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java -jar rockscript-cli/target/rockscript-cli.jar [command-line-args]
+</code></pre></div></div>
+
+<p>But it’s much cooler to create a short command for this.  Use the 
+<code class="highlighter-rouge">./install.sh</code> to create a <strong><code class="highlighter-rouge">rock</code></strong> executable script in 
+<code class="highlighter-rouge">/usr/local/bin/rock</code>.  That will reduce the command line usage to</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>rock <span class="o">[</span>command-line-args]
+</code></pre></div></div>
+
+<p>On Mac OS X, you can use the script <code class="highlighter-rouge">./install.sh</code> to create 
+the <code class="highlighter-rouge">rock</code> executable bash script in <code class="highlighter-rouge">/usr/local/bin/rock</code>.</p>
+
+<p>On Linux or Unix, <a href="https://github.com/rockscript/rockscript/issues/new">let me know</a> if 
+the above procedure works or if you prefer a different way of installing.</p>
+
+<p>On Windows, create a <code class="highlighter-rouge">rock.bat</code> file in any directory specified in your <code class="highlighter-rouge">%path%</code> environment 
+variable.  And put this content in the <code class="highlighter-rouge">rock.bat</code></p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@echo off
+java -jar rockscript-cli/target/rockscript-cli.jar %*
+</code></pre></div></div>
+
+<p>To get an overview of all the commands, just type <code class="highlighter-rouge">rock &lt;Enter&gt;</code></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rock 
+Usage: rock [command] [command options]
+
+rock help [command]          | Shows help on a particular command
+rock ping [ping options]     | Test the connection with the server
+rock deploy [deploy options] | Deploy script files to the server
+rock start [start options]   | Starts a new script execution
+rock end [end options]       | Ends a waiting service function invocation
+rock test [test options]     | Runs tests
+rock                         | Shows this help message
+</code></pre></div></div>
+
+<p>To get help on a specific command, type <code class="highlighter-rouge">rock help &lt;command&gt;</code>  Eg</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ rock help deploy
+rock deploy : Deploys script files to the server
+
+usage: rock deploy [deploy options] [file or directory]
+ -n &lt;arg&gt;   Script file name pattern used for scanning a directory.
+            Default is *.rs  Ignored if a file is specified. See also
+            https://docs.oracle.com/javase/tutorial/essential/regex/index.
+            html
+ -q         Quiet.  Don't show the HTTP requests to the server.
+ -r         Scan directory recursive. Default is not recursive. Ignored if
+            specified with a file.
+ -s         The server URL.  Default value is http://localhost:3652
+
+Example:
+  rock deploy -r .
+Deploys all files ending with extension .rs or .rst 
+located in the current directory or one of it's nested
+directories
+</code></pre></div></div>
+
+</div>
+
+</body>
+</html>

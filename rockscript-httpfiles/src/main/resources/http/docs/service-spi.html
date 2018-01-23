@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright (c) 2017 RockScript.io.
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RockScript Documentation</title>
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <link rel="stylesheet" type="text/css" href="css/highlight-arduino-light-9.12.0.css">
+  <link rel="stylesheet" type="text/css" href="css/rockscript-docs.css">
+
+  <script src="js/highlight-9.12.0.js"></script>
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script type="application/javascript">
+    $(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });
+  </script>
+
+</head>
+<body>
+
+<a href="index/">
+  <div class="titlebar">
+    <div class="brand">RockScript.io<img alt="RockScript.io" src="img/hand-white.png"></div>
+    <div class="title">RockScript Documentation</div>
+  </div>
+</a>
+
+<div class="toc">
+  <a href="index">Introduction</a>
+  <a href="why-and-when">Why and when</a>
+  <a href="project-status">Project status</a>
+  <a href="getting-started">Getting started</a>
+  <a href="cli">Command line interface</a>
+  <a href="tutorial">Tutorial</a>
+  <a href="language">Language</a>
+  <a href="script-versioning">Script versioning</a>
+  <a href="license">License</a>
+  <a href="help">Help</a>
+  <a class="title" href="services">Services</a>
+  <a class="sublink" href="service-http">HTTP service</a>
+  <a class="title" href="api">API</a>
+  <a href="commands">Commands</a>
+  <a class="sublink" href="deploy-script">Deploy script</a>
+  <a class="sublink" href="start-script">Start script</a>
+  <a href="queries">Queries</a>
+  <a class="sublink" href="query-script-execution">Script execution</a>
+  <a class="title" href="service-spi">Service SPI</a>
+  <a class="sublink" href="end-function">End function</a></div>
+</div>
+
+<div class="content">
+  <h1>Service SPI</h1>
+  <p>The services SPI represents the communication protocol between the RockScript engine 
+and the service bridge.  Service bridges often translate between the RockScript 
+services SPI protocol and a REST API to make the REST API functionality available 
+as a service function in RockScript.</p>
+
+<p>The next sequence diagram represents the most common scenario:</p>
+
+<p><img src="img/service-spi-sequence-words.png" alt="Service SPI sequence diagram in words" /></p>
+
+<p>The <span style="color:#3F80CD">blue sections</span> on the <em>RockScript Server</em> 
+line indicate when it’s executing the script.  In between the 2 blue sections
+the complete execution state is in the event store and no threads nor memory 
+are consumed.</p>
+
+<p>The next diagram shows the same but in more technical words</p>
+
+<p><img src="img/service-spi-sequence-api.png" alt="Service SPI sequence diagram in words" /></p>
+
+<p>For the <code class="highlighter-rouge">startScript</code> command, please refer to the 
+<a onclick="show('start-script')">Start script API docs</a>.</p>
+
+<h2 id="import-url-is-service-bridge-base-url">Import URL is service bridge base URL</h2>
+
+<p>To import a service, all you need to do is import the URL of the 
+service bridge.  The server will prepend <code class="highlighter-rouge">http://</code> if that’s not 
+already present.  For example:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">myService</span> <span class="o">=</span> <span class="nx">system</span><span class="p">.</span><span class="k">import</span><span class="p">(</span><span class="s1">'mycompany.com/hello'</span><span class="p">);</span>
+
+<span class="nx">myService</span><span class="p">.</span><span class="nx">hello</span><span class="p">(</span><span class="s1">'world'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h2 id="1-start-service-function-invocation">1) Start service function invocation</h2>
+
+<p>The request to the service bridge</p>
+
+<h2 id="2-function-invocation-end-callback">2) Function invocation end callback</h2>
+
+<p>This request is documented in <a onclick="show('end-function')">End function command</a></p>
+
+<h2 id="function-execution-error">Function execution error</h2>
+
+<p>Alternatively to the callback that ends the function invocation, the service 
+bridge can also let the server know that there’s an error.  Optionaly 
+the service bridge can ask to retry the service function invocation 
+some specified time in the future.</p>
+
+<p>For details, see <a onclick="show('function-error')">Service function error command</a></p>
+
+
+</div>
+
+</body>
+</html>

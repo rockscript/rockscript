@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright (c) 2017 RockScript.io.
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RockScript Documentation</title>
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <link rel="stylesheet" type="text/css" href="css/highlight-arduino-light-9.12.0.css">
+  <link rel="stylesheet" type="text/css" href="css/rockscript-docs.css">
+
+  <script src="js/highlight-9.12.0.js"></script>
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script type="application/javascript">
+    $(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });
+  </script>
+
+</head>
+<body>
+
+<a href="index/">
+  <div class="titlebar">
+    <div class="brand">RockScript.io<img alt="RockScript.io" src="img/hand-white.png"></div>
+    <div class="title">RockScript Documentation</div>
+  </div>
+</a>
+
+<div class="toc">
+  <a href="index">Introduction</a>
+  <a href="why-and-when">Why and when</a>
+  <a href="project-status">Project status</a>
+  <a href="getting-started">Getting started</a>
+  <a href="cli">Command line interface</a>
+  <a href="tutorial">Tutorial</a>
+  <a href="language">Language</a>
+  <a href="script-versioning">Script versioning</a>
+  <a href="license">License</a>
+  <a href="help">Help</a>
+  <a class="title" href="services">Services</a>
+  <a class="sublink" href="service-http">HTTP service</a>
+  <a class="title" href="api">API</a>
+  <a href="commands">Commands</a>
+  <a class="sublink" href="deploy-script">Deploy script</a>
+  <a class="sublink" href="start-script">Start script</a>
+  <a href="queries">Queries</a>
+  <a class="sublink" href="query-script-execution">Script execution</a>
+  <a class="title" href="service-spi">Service SPI</a>
+  <a class="sublink" href="end-function">End function</a></div>
+</div>
+
+<div class="content">
+  <h1>Services</h1>
+  <p>Services are made available to scripts through <code class="highlighter-rouge">system.import</code> as 
+explained in <a onclick="show('language')">Language</a>.</p>
+
+<p>There are 2 built-in services at the moment (We hope to expand this 
+list. Your contribution can help)</p>
+
+<ul>
+  <li>HTTP service: perform plain HTTP requests</li>
+  <li>Test service: Functions for starting scripts, ending service functions and 
+asserting conditions.</li>
+</ul>
+
+<p>To plug in your own service, you don’t need to configure anything.<br />
+Just host a service bridge that listens to the HTTP POST requests described 
+below.</p>
+
+<p>In the script, import the service by specifying the url like this</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var yourService = system.import('yourhost:yourport/yourpath');
+...
+yourService.yourServiceFunction('your function', args);
+</code></pre></div></div>
+
+<p>Each time <code class="highlighter-rouge">yourServiceFunction</code> is executed, a POST request like this will 
+be performed:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>POST http://yourhost:yourport/yourpath/{functionName}
+Content-Type: application/json
+{ scriptExecutionId: "se98237",
+  executionId: "e9",
+  args: ['your function, [whateverTheContentOfArgsWas]]
+}
+</code></pre></div></div>
+
+<p>Your service bridge can respond to this POST request in 1 of 2 ways:</p>
+
+<p><strong>1) I have received the notification to start the serviceFunction, I’ll call you back when it’s done.</strong></p>
+
+<p>Then the response body can be empty and should return status <code class="highlighter-rouge">200</code>.</p>
+
+<p>Later, when the service bridge has finished the work for the function, the service bridge 
+should call back to the server with a POST request like this:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>POST http://RockScriptServer:port/command
+Content-Type: application/json
+{ endFunction: {
+    scriptExecutionId: "se98237",
+    executionId: "e9",
+    result: {
+      examplePropertyOne: "hello",
+      examplePropertyTwo: "world",
+    }
+}
+</code></pre></div></div>
+
+<p>The result is the return value.  It’s optional and can be any valid json value.<br />
+If the <code class="highlighter-rouge">Content-Type</code> is set to <code class="highlighter-rouge">application/json</code>, then the result is parsed as 
+JSON and the JSON value will be made available as a JSON object.</p>
+
+<p>For any other <code class="highlighter-rouge">Content-Type</code>, a string is returned as the return value of the 
+service function.</p>
+
+<p><strong>2) The service function is already done, please continue the script.</strong></p>
+
+<p>Then the response should look like this:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>200 OK
+Content-Type: application/json
+{ ended: true,
+  result: "any JSON value" 
+}
+</code></pre></div></div>
+
+<p>The service function completes immediately and the result is passed as the 
+return value and the script continues.</p>
+
+<p>This approach 2) should not be done for service functions that take a long time 
+because the engine will perform the initial request blocking.  To implement 
+non-blocking server execution of your service function, use approach 1) above.</p>
+
+</div>
+
+</body>
+</html>

@@ -57,15 +57,14 @@ public class IfThenElseTest extends AbstractEngineTest {
   }
 
   @Test
-  public void testIfLooseEquals() {
+  public void testIfWithoutBlockBrackets() {
     ScriptVersion scriptVersion = deployScript(
       "var a = system.input; \n" +
       "var result; \n" +
-      "if (a == 1) { \n" +
+      "if (a == 1) \n" +
       "  result = 'affirmative'; \n" +
-      "} else { \n" +
-      "  result = 'negative'; \n" +
-      "}");
+      "else \n" +
+      "  result = 'negative'; ");
 
     ScriptExecution scriptExecution = startScriptExecution(scriptVersion, 1);
     assertEquals("affirmative", scriptExecution.getVariable("result"));
@@ -74,4 +73,16 @@ public class IfThenElseTest extends AbstractEngineTest {
     assertEquals("negative", scriptExecution.getVariable("result"));
   }
 
+  @Test
+  public void testIfWithoutElse() {
+    ScriptVersion scriptVersion = deployScript(
+      "var a = system.input; \n" +
+      "var result = 'original'; \n" +
+      "if (false) { \n" +
+      "  result = 'updated'; \n" +
+      "}");
+
+    ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
+    assertEquals("original", scriptExecution.getVariable("result"));
+  }
 }

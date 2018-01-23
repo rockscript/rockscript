@@ -22,7 +22,9 @@ package io.rockscript.engine.impl;
 import io.rockscript.Engine;
 import io.rockscript.engine.EngineException;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Converter {
 
@@ -55,7 +57,14 @@ public class Converter {
       return o;
     }
     if (o instanceof String) {
-      return new Double((String)o);
+      if (""==o) {
+        return 0;
+      }
+      try {
+        return new Double((String)o);
+      } catch (NumberFormatException e) {
+        e.printStackTrace();
+      }
     }
     if (o instanceof Boolean) {
       return (Boolean)o ? 1 : 0;
@@ -64,22 +73,44 @@ public class Converter {
   }
 
   public Object toString(Object o) {
-    if (o==null || o instanceof String) {
+    if (o==null) {
+      return "null";
+    }
+    if (o==Literal.UNDEFINED) {
+      return Literal.UNDEFINED.toString();
+    }
+    if (o instanceof String) {
       return o;
     }
     if (o instanceof Number || o instanceof Boolean) {
       return o.toString();
     }
+    if (o instanceof Map) {
+      return toPrimitive(o, "string");
+    }
+    if (o instanceof List) {
+      return toPrimitive(o, "string");
+    }
     throw new EngineException("Can't convert "+o+" to string: Conversion not implemented yet");
   }
 
-  public Object toPrimitive(Object o) {
+  /** hint can be "number", "string" or "default" */
+  public Object toPrimitive(Object o, String hint) {
     if (o==null
         || o==Literal.UNDEFINED
         || o instanceof String
         || o instanceof Number
         || o instanceof Boolean) {
       return o;
+    }
+    if (o instanceof Map) {
+      return "[object Object]";
+    }
+    if (o instanceof List) {
+      return ((List) o).stream()
+        .map(element->toPrimitive(element,"string"))
+        .map(element->element==null||element==Literal.UNDEFINED ? "" : element.toString())
+        .collect(Collectors.joining(","));
     }
     throw new EngineException("Can't convert "+o+" to primitive: Conversion not implemented yet");
   }

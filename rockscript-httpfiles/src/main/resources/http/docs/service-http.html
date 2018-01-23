@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright (c) 2017 RockScript.io.
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RockScript Documentation</title>
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <link rel="stylesheet" type="text/css" href="css/highlight-arduino-light-9.12.0.css">
+  <link rel="stylesheet" type="text/css" href="css/rockscript-docs.css">
+
+  <script src="js/highlight-9.12.0.js"></script>
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script type="application/javascript">
+    $(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });
+  </script>
+
+</head>
+<body>
+
+<a href="index/">
+  <div class="titlebar">
+    <div class="brand">RockScript.io<img alt="RockScript.io" src="img/hand-white.png"></div>
+    <div class="title">RockScript Documentation</div>
+  </div>
+</a>
+
+<div class="toc">
+  <a href="index">Introduction</a>
+  <a href="why-and-when">Why and when</a>
+  <a href="project-status">Project status</a>
+  <a href="getting-started">Getting started</a>
+  <a href="cli">Command line interface</a>
+  <a href="tutorial">Tutorial</a>
+  <a href="language">Language</a>
+  <a href="script-versioning">Script versioning</a>
+  <a href="license">License</a>
+  <a href="help">Help</a>
+  <a class="title" href="services">Services</a>
+  <a class="sublink" href="service-http">HTTP service</a>
+  <a class="title" href="api">API</a>
+  <a href="commands">Commands</a>
+  <a class="sublink" href="deploy-script">Deploy script</a>
+  <a class="sublink" href="start-script">Start script</a>
+  <a href="queries">Queries</a>
+  <a class="sublink" href="query-script-execution">Script execution</a>
+  <a class="title" href="service-spi">Service SPI</a>
+  <a class="sublink" href="end-function">End function</a></div>
+</div>
+
+<div class="content">
+  <h1>HTTP service</h1>
+  <p>The HTTP service provides functions get, post, put and delete.
+The service is a built-in service and can be imported with 
+url <code class="highlighter-rouge">rockscript.io/http</code></p>
+
+<h2 id="get">get</h2>
+
+<p>Performs a HTTP get request.</p>
+
+<h4 id="example">Example</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var http = system.import('rockscript.io/http');
+
+var servicePort = 9898;
+var response = http.get({
+  url: 'http://localhost:' + servicePort + '/?p1=v1&amp;p2=v2',
+  headers: {
+    Header-One: 'singlevalue'
+    Header-Two: ['array', 'value']
+  }
+});
+</code></pre></div></div>
+
+<h4 id="input-parameters">Input parameters</h4>
+
+<p>As input, this service function expects exactly 1 parameter which 
+must be a JSON object.  The following properties can be specified:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Property name</th>
+      <th>Required?</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="highlighter-rouge">url</code></td>
+      <td>Required</td>
+      <td>The full url including the protocol up to the query parameters</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">headers</code></td>
+      <td>Optional</td>
+      <td>A JSON object where the property names are the header names.  The value can be a string or an array of strings. (Note that array literals are not yet supported)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>A body is not supported in the <code class="highlighter-rouge">get</code> service function.</p>
+
+<h4 id="return-value">Return value</h4>
+
+<p>A response object looks like this</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{ status: 200, 
+  headers: {
+    Date: "Thu, 30 Nov 2017 14:48:30 GMT", 
+    Content-Type: "application/json" 
+  }, 
+  body: {
+    some: "JSON"
+  }
+}
+</code></pre></div></div>
+
+<p>If the Content-Type is <code class="highlighter-rouge">application/json</code>, then the body is parsed as such and 
+made available as an object so that it can be navigated.</p>
+
+<h4 id="failures">Failures</h4>
+
+<p>A request failes when no connection could be established 
+or when the connection gets terminated prematurely.</p>
+
+<p><em>By default, an unexpected response status is not a failure.</em><br />
+If you want to non-expected response status messages to be considered 
+as a failure, specify the property <code class="highlighter-rouge">expectedStatus</code> in the 
+request like this</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var http = system.import('rockscript.io/http');
+
+var response = http.get({
+  url: 'http://...',
+  expectedStatus: 200
+});
+</code></pre></div></div>
+
+<p>This request will now fail if the response status is not 200.</p>
+
+<h4 id="retries">Retries</h4>
+
+<p>In case of a failure, the default is to retry 3 times 
+with incremental backoff.  You can customize the retry policy.
+Please ask for details how to do that 
+<a href="https://github.com/rockscript/rockscript/issues/new?title=How+to+specify+incremental+backoff+in+the+http+service?">in a Github issue</a>.</p>
+
+<h2 id="post">post</h2>
+
+<p>Same as for service function <code class="highlighter-rouge">get</code>, except for the <code class="highlighter-rouge">body</code> property.<br />
+In a post, you can specify a body.</p>
+
+<h4 id="example-1">Example</h4>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var http = system.import('rockscript.io/http');
+
+var response = http.post({
+  url: 'http://localhost/orders',
+  headers: {
+    Content-Type: application/json
+  },
+  body: {
+    item: 'Donut',
+    amount: 6
+  }
+});
+</code></pre></div></div>
+
+<h2 id="put">put</h2>
+
+<p>Same as post (with body property)</p>
+
+<h2 id="delete">delete</h2>
+
+<p>Same as get (without body property)</p>
+
+</div>
+
+</body>
+</html>

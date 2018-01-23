@@ -19,8 +19,23 @@ import java.util.List;
 
 public class Literal extends SingleExpression {
 
-  public static final Object UNDEFINED = new Object();
-  public static final Object NAN = new Object();
+  private static class Undefined {
+    private Undefined(){}
+    @Override
+    public String toString() {
+      return "undefined";
+    }
+  }
+  public static final Object UNDEFINED = new Undefined();
+
+  private static class NaN {
+    private NaN(){}
+    @Override
+    public String toString() {
+      return "NaN";
+    }
+  }
+  public static final Object NAN = new NaN();
 
   Object value;
 

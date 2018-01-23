@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright (c) 2017 RockScript.io.
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RockScript Documentation</title>
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <link rel="stylesheet" type="text/css" href="css/highlight-arduino-light-9.12.0.css">
+  <link rel="stylesheet" type="text/css" href="css/rockscript-docs.css">
+
+  <script src="js/highlight-9.12.0.js"></script>
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script type="application/javascript">
+    $(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });
+  </script>
+
+</head>
+<body>
+
+<a href="index/">
+  <div class="titlebar">
+    <div class="brand">RockScript.io<img alt="RockScript.io" src="img/hand-white.png"></div>
+    <div class="title">RockScript Documentation</div>
+  </div>
+</a>
+
+<div class="toc">
+  <a href="index">Introduction</a>
+  <a href="why-and-when">Why and when</a>
+  <a href="project-status">Project status</a>
+  <a href="getting-started">Getting started</a>
+  <a href="cli">Command line interface</a>
+  <a href="tutorial">Tutorial</a>
+  <a href="language">Language</a>
+  <a href="script-versioning">Script versioning</a>
+  <a href="license">License</a>
+  <a href="help">Help</a>
+  <a class="title" href="services">Services</a>
+  <a class="sublink" href="service-http">HTTP service</a>
+  <a class="title" href="api">API</a>
+  <a href="commands">Commands</a>
+  <a class="sublink" href="deploy-script">Deploy script</a>
+  <a class="sublink" href="start-script">Start script</a>
+  <a href="queries">Queries</a>
+  <a class="sublink" href="query-script-execution">Script execution</a>
+  <a class="title" href="service-spi">Service SPI</a>
+  <a class="sublink" href="end-function">End function</a></div>
+</div>
+
+<div class="content">
+  <h1>Getting started</h1>
+  <h2 id="open-source-server-vs-commercial-app">Open source server vs commercial app</h2>
+
+<p>In order to fund further development of RockScript, we are building a commercial 
+product called the RockScript App.  The RockScript App includes</p>
+
+<ul>
+  <li>RockScript open source server</li>
+  <li>Web UI script editor</li>
+  <li>Web UI execution inspector</li>
+</ul>
+
+<p>For now, early access versions are free, but require registration.</p>
+
+<p><a class="button" href="https://goo.gl/vdgHdG">Download RockScript App<br /><span class="version">(Free, early access version)</span></a></p>
+
+<p>Run the downloaded jar file with</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java -jar rockscript-app.jar examples
+</code></pre></div></div>
+
+<p>The <code class="highlighter-rouge">examples</code> argument will ensure that a couple of example scripts and executions 
+are initialized when the server starts.</p>
+
+<p>Then open <a href="http://localhost:3652/">http://localhost:3652/</a></p>
+
+<p><strong>Limitation</strong>: Bear in mind that for now, the server only has an in-memory event store.
+So each time you reboot the server, it looses all it’s scripts and script executions.</p>
+
+<h2 id="instructions-to-build-the-open-source-server">Instructions to build the open source server</h2>
+
+<p>To run the server and the command line interface (CLI)</p>
+<ul>
+  <li>Java 8 SE JRE+</li>
+</ul>
+
+<p>To build RockScript</p>
+<ul>
+  <li>Java 8 JDK+</li>
+  <li>Maven 3.3.9+</li>
+</ul>
+
+<h2 id="clone-the-rockscript-repo">Clone the rockscript repo</h2>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone git@github.com:rockscript/rockscript.git
+</code></pre></div></div>
+
+<p>Will create a folder called <code class="highlighter-rouge">rockscript</code>.</p>
+
+<h2 id="build-rockscriptjar-and-rockscript-clijar">Build rockscript.jar and rockscript-cli.jar</h2>
+
+<p>Open a terminal in the <code class="highlighter-rouge">rockscript</code> root folder and run</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mvn -Pizza clean install
+</code></pre></div></div>
+
+<p>You eventually should see output like</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[INFO] rockscript-parent .................................. SUCCESS [  0.370 s]
+[INFO] rockscript-gson .................................... SUCCESS [  2.752 s]
+[INFO] rockscript-http .................................... SUCCESS [  0.439 s]
+[INFO] rockscript ......................................... SUCCESS [ 10.176 s]
+[INFO] rockscript-server .................................. SUCCESS [  6.842 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+</code></pre></div></div>
+
+<p>That means you have successfully created</p>
+<ul>
+  <li><code class="highlighter-rouge">rockscript-server/target/rockscript.jar</code></li>
+  <li><code class="highlighter-rouge">rockscript-cli/target/rockscript-cli.jar</code> (see <a onclick="show('cli')">Command line args</a>)</li>
+</ul>
+
+<h2 id="starting-the-rockscript-server">Starting the RockScript server</h2>
+
+<p>Start the RockScript server with</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>java -jar rockscript-server/target/rockscript.jar
+</code></pre></div></div>
+
+<p>You should see output like this</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code> ____            _     ____            _       _    
+|  _ \ ___   ___| | __/ ___|  ___ _ __(_)_ __ | |_  
+| |_) / _ \ / __| |/ /\___ \ / __| '__| | '_ \| __| 
+|  _ &lt; (_) | (__|   &lt;  ___) | (__| |  | | |_) | |_  
+|_| \_\___/ \___|_|\_\|____/ \___|_|  |_| .__/ \__| 
+                                        |_|         
+Server started on port 3652
+</code></pre></div></div>
+
+<p><strong>Limitation</strong>: Bear in mind that for now, the server only has an in-memory event store.
+So each time you reboot the server, it looses all it’s scripts and script executions.</p>
+
+<p>To check that you have the server running, you can just check open 
+the documentation that is included in the server. Point your browser 
+to <a href="http://localhost:3652/">http://localhost:3652/</a></p>
+
+<p>Next, take <a onclick="show('tutorial')">the 5 minute tutorial</a> and get your first 
+script running.</p>
+
+</div>
+
+</body>
+</html>

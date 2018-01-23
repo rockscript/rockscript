@@ -29,39 +29,19 @@
   <link rel="stylesheet" type="text/css" href="css/rockscript-docs.css">
 
   <script src="js/highlight-9.12.0.js"></script>
-  <script src="js/showdown-1.8.2.min.js"></script>
   <script src="js/jquery-3.2.1.min.js"></script>
-  <script src="js/rockscript.js"></script>
-
   <script type="application/javascript">
-    window.addEventListener('load', function() {
-      load('introduction.md',      'Introduction');
-      load('why-and-when.md',      'Why and when');
-      load('project-status.md',    'Project status');
-      load('getting-started.md',   'Getting started');
-      load('cli.md',               'Command line interface');
-      load('tutorial.md',          'Tutorial');
-      load('language.md',          'Language');
-      load('script-versioning.md', 'Script versioning');
-      load('license.md',           'License');
-      load('help.md',              'Help');
-      load('services.md',          'Services',              'title');
-      load('service-http.md',      'HTTP service',          'sublink');
-      load('api.md',               'API',                   'title');
-      load('commands.md',          'Commands');
-      load('deploy-script.md',     'Deploy script',         'sublink');
-      load('start-script.md',      'Start script',          'sublink');
-      load('queries.md',           'Queries');
-      load('query-script-execution.md', 'Script execution', 'sublink');
-      load('service-spi.md',       'Service SPI',           'title');
-      load('end-function.md',      'End function',          'sublink');
+    $(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
     });
   </script>
 
 </head>
 <body>
 
-<a onclick="show('introduction')">
+<a href="index/">
   <div class="titlebar">
     <div class="brand">RockScript.io<img alt="RockScript.io" src="img/hand-white.png"></div>
     <div class="title">RockScript Documentation</div>
@@ -69,9 +49,110 @@
 </a>
 
 <div class="toc">
+  <a href="index">Introduction</a>
+  <a href="why-and-when">Why and when</a>
+  <a href="project-status">Project status</a>
+  <a href="getting-started">Getting started</a>
+  <a href="cli">Command line interface</a>
+  <a href="tutorial">Tutorial</a>
+  <a href="language">Language</a>
+  <a href="script-versioning">Script versioning</a>
+  <a href="license">License</a>
+  <a href="help">Help</a>
+  <a class="title" href="services">Services</a>
+  <a class="sublink" href="service-http">HTTP service</a>
+  <a class="title" href="api">API</a>
+  <a href="commands">Commands</a>
+  <a class="sublink" href="deploy-script">Deploy script</a>
+  <a class="sublink" href="start-script">Start script</a>
+  <a href="queries">Queries</a>
+  <a class="sublink" href="query-script-execution">Script execution</a>
+  <a class="title" href="service-spi">Service SPI</a>
+  <a class="sublink" href="end-function">End function</a></div>
 </div>
 
 <div class="content">
+  <h1>Introduction</h1>
+  <p>RockScript is scripting engine to coordinates service invocations. You write scripts that 
+invoke services.  The RockScript engine executes the scripts resilient and non-blocking.</p>
+
+<p>RockScript is the better alternative for using message queues.  When you want to combine 
+multiple service invocations you can’t use plain code because your server could crash while 
+some invocations have succeeded and some may not have started yet.  The typical way to 
+deal with this is message queues. But using message queues, you have to cut your code into 
+individual message handlers, configure your code to queues and it quickly becomes really 
+hard to understand the overall logic.  With RockScript it’s easy to read your business logic 
+in the scripts.</p>
+
+<p>Because RockScript does persistent, non-blocking execution of service functions, they
+can be <em>long running</em>.  Service function invocations can take seconds to days or
+even months without any problem.  No memory or thread resources are consumed by the
+RockScript server while waiting for a service function to complete.</p>
+
+<p>Because RockScript language is a subset of JavaScript, it’s really easy to perform data
+transormations between service function invocations.</p>
+
+<p>For more reasons why and when to use RockScript, see <a onclick="show('why-and-when')">Why and 
+when</a></p>
+
+<h2 id="overview">Overview</h2>
+
+<p>The <a onclick="show('language')">RockScript language</a> is a subset of JavaScript. For example:</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">system</span><span class="p">.</span><span class="k">import</span><span class="p">(</span><span class="s1">'rockscript.io/http'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">approvalService</span> <span class="o">=</span> <span class="nx">system</span><span class="p">.</span><span class="k">import</span><span class="p">(</span><span class="s1">'localhost:3000'</span><span class="p">);</span>
+
+<span class="cm">/* get is a service function on the built-in http service */</span>
+<span class="kd">var</span> <span class="nx">chuckResponse</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span><span class="na">url</span><span class="p">:</span><span class="s1">'http://api.icndb.com/jokes/random'</span><span class="p">});</span>
+
+<span class="cm">/* approve is a service function on the external approval service */</span>
+<span class="nx">approvalService</span><span class="p">.</span><span class="nx">approve</span><span class="p">(</span><span class="nx">chuckResponse</span><span class="p">.</span><span class="nx">body</span><span class="p">.</span><span class="nx">value</span><span class="p">.</span><span class="nx">joke</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>The <em>RockScript server</em> is the server that manages scripts, script versions and script executions.</p>
+
+<p><img src="img/overview.png" alt="RockScript Overview" /></p>
+
+<p>The RockScript server has a HTTP web <a onclick="show('api')">API</a> to</p>
+<ul>
+  <li>Manage scripts</li>
+  <li>Manage script versions</li>
+  <li>Start script executions</li>
+  <li>Query events, script executions, scripts and script versions</li>
+</ul>
+
+<p>There is a <a onclick="show('cli')">command line interface</a> which you can use to call the API and SPI 
+through the command line.</p>
+
+<p><a onclick="show('services')">Services</a> make functionality available through service functions that can be invoked 
+from the scripts. The first and most common service is the HTTP service which comes out of the box.</p>
+
+<p>The RockScript server also has a HTTP <a onclick="show('service-spi')">Service SPI</a> to add new service functions 
+really fast and easy.</p>
+
+<h2 id="terminology">Terminology</h2>
+
+<p>A <em>script</em> on the server can be identified by its name and has multiple <em>script version</em>s.</p>
+
+<p><em>Deploying</em> a script means saving the script on the server so that script executions 
+can be started for that script.  A <em>script execution</em> is one execution of a script version.</p>
+
+<p>A <em>service</em> makes external API, system, service or functionality available as functions 
+in the RockScript engine. A <em>service function</em> is a single RCP style operation that 
+can be invoked in the script like a normal function.</p>
+
+<p>A <em>service object</em>, like eg <code class="highlighter-rouge">http</code> and <code class="highlighter-rouge">approvalService</code> in the example above, is 
+the script object that exposes the service functions in the script.</p>
+
+<h2 id="thanks">Thanks</h2>
+
+<p>Thanks to <a href="https://github.com">GitHub</a> for hosting the code, community and website.</p>
+
+<p>Thanks to JetBrains for their support to open source and the 
+free <a href="https://www.jetbrains.com/idea/">Intellij IDEA Ultimate</a> license.</p>
+
+<p>Thanks to <a href="https://travis-ci.org/">Travis CI</a> for their continuous integration</p>
+
 </div>
 
 </body>

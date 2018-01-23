@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URLConnection;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static io.rockscript.http.Http.Methods.GET;
 import static io.rockscript.util.Maps.entry;
@@ -52,7 +53,9 @@ public class FileHandler implements RequestHandler {
   @Override
   public boolean matches(ServerRequest request) {
     return GET.equals(request.getMethod())
-           && ("/".equals(request.getPathInfo()) || Io.hasResource(getResource(request)));
+           && ("/".equals(request.getPathInfo())
+               || isDocs(request.getPathInfo())
+               || Io.hasResource(getResource(request)));
   }
 
   @Override
@@ -79,7 +82,7 @@ public class FileHandler implements RequestHandler {
 
   protected boolean redirect(ServerRequest request, ServerResponse response) {
     if (request.getPathInfo().equals("/")) {
-      response.sendRedirect("/docs/");
+      response.sendRedirect("/docs/index");
       return true;
     }
     return false;
@@ -89,8 +92,16 @@ public class FileHandler implements RequestHandler {
     String path = request.getPathInfo();
     if (path.endsWith("/")) {
       path += "index.html";
+    } else if (isDocs(path)) {
+      path += ".html";
     }
     return "http"+path;
+  }
+
+  static Pattern docsPattern = Pattern.compile(".*/docs/[\\w_-]+");
+
+  private boolean isDocs(String path) {
+    return docsPattern.matcher(path).matches();
   }
 
   protected String getContentType(String path) {

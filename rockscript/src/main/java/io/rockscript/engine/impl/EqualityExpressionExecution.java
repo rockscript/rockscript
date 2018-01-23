@@ -21,6 +21,7 @@ package io.rockscript.engine.impl;
 
 import io.rockscript.engine.EngineException;
 
+import java.util.List;
 import java.util.Map;
 
 public class EqualityExpressionExecution extends Execution<EqualityExpression> {
@@ -47,8 +48,8 @@ public class EqualityExpressionExecution extends Execution<EqualityExpression> {
     if (children.size()==1) {
       startChild(element.getRight());
     } else {
-      Object leftValue = checkValidValue(getChildren().get(0).getResult());
-      Object rightValue = checkValidValue(getChildren().get(1).getResult());
+      Object leftValue = checkValidValue("left", getChildren().get(0).getResult());
+      Object rightValue = checkValidValue("right", getChildren().get(1).getResult());
 
       if ("==".equals(comparator)) {
         setResult(looseEquals(leftValue, rightValue));
@@ -66,11 +67,9 @@ public class EqualityExpressionExecution extends Execution<EqualityExpression> {
     // See https://developer.mozilla.org/nl/docs/Web/JavaScript/Equality_comparisons_and_sameness
 
     if (leftValue==null || leftValue==Literal.UNDEFINED) {
-      if (rightValue==null || rightValue==Literal.UNDEFINED) {
-        return true;
-      } else {
-        return false;
-      }
+      return (rightValue==null || rightValue==Literal.UNDEFINED);
+    } else if (leftValue==Literal.NAN || rightValue==Literal.NAN) {
+      return false;
     } else if (leftValue instanceof Number) {
       if (rightValue instanceof Number) {
         return strictEquals(leftValue, rightValue);
@@ -79,7 +78,11 @@ public class EqualityExpressionExecution extends Execution<EqualityExpression> {
       } else if (rightValue instanceof Boolean) {
         return strictEquals(leftValue, converter.toNumber(rightValue));
       } else if (rightValue instanceof Map) {
-        return looseEquals(leftValue, converter.toPrimitive(rightValue));
+        return looseEquals(leftValue, converter.toPrimitive(rightValue, "number"));
+      } else if (rightValue instanceof List) {
+        return false;
+      } else if (rightValue==null || rightValue==Literal.UNDEFINED) {
+        return false;
       }
     } else if (leftValue instanceof String) {
       if (rightValue instanceof Number) {
@@ -89,7 +92,11 @@ public class EqualityExpressionExecution extends Execution<EqualityExpression> {
       } else if (rightValue instanceof Boolean) {
         return strictEquals(converter.toNumber(leftValue), converter.toNumber(rightValue));
       } else if (rightValue instanceof Map) {
-        return looseEquals(leftValue, converter.toPrimitive(rightValue));
+        return looseEquals(leftValue, converter.toPrimitive(rightValue, "string"));
+      } else if (rightValue instanceof List) {
+        return strictEquals(leftValue, converter.toString(rightValue));
+      } else if (rightValue==null || rightValue==Literal.UNDEFINED) {
+        return false;
       }
     } else if (leftValue instanceof Boolean) {
       if (rightValue instanceof Number) {
@@ -99,7 +106,11 @@ public class EqualityExpressionExecution extends Execution<EqualityExpression> {
       } else if (rightValue instanceof Boolean) {
         return strictEquals(leftValue, rightValue);
       } else if (rightValue instanceof Map) {
-        return looseEquals(converter.toNumber(leftValue), converter.toPrimitive(rightValue));
+        return looseEquals(converter.toNumber(leftValue), converter.toPrimitive(rightValue, "number"));
+      } else if (rightValue instanceof List) {
+        return false;
+      } else if (rightValue==null || rightValue==Literal.UNDEFINED) {
+        return false;
       }
     } else if (leftValue instanceof Map) {
       if (rightValue instanceof Number) {
@@ -109,10 +120,26 @@ public class EqualityExpressionExecution extends Execution<EqualityExpression> {
       } else if (rightValue instanceof Boolean) {
         return strictEquals(leftValue, rightValue);
       } else if (rightValue instanceof Map) {
-        return objectEquals((Map<String,Object>)leftValue, (Map<String,Object>) rightValue);
+        return leftValue == rightValue;
+      } else if (rightValue instanceof List) {
+        return false;
+      } else if (rightValue==null || rightValue==Literal.UNDEFINED) {
+        return false;
+      }
+    } else if (leftValue instanceof List) {
+      if (rightValue instanceof List) {
+        return leftValue == rightValue;
+      } else if (rightValue instanceof String) {
+        return strictEquals(converter.toString(leftValue), rightValue);
+      } else if (rightValue instanceof Number
+                  || rightValue instanceof Boolean
+                  || rightValue instanceof Map
+                  || rightValue==null
+                  || rightValue==Literal.UNDEFINED) {
+        return false;
       }
     }
-    throw new EngineException("Bug 298347: please report this bug error code in a github issue");
+    throw new EngineException("Bug 298347: please report this bug error code in a github issue: left("+leftValue+"), right("+rightValue+")");
   }
 
   private boolean strictEquals(Object leftValue, Object rightValue) {
@@ -126,36 +153,24 @@ public class EqualityExpressionExecution extends Execution<EqualityExpression> {
     } else if (leftValue instanceof Boolean && rightValue instanceof Boolean) {
       return leftValue.equals(rightValue);
     } else if (leftValue instanceof Map && rightValue instanceof Map) {
-      return objectEquals((Map<String,Object>)leftValue, (Map<String,Object>) rightValue);
+      return leftValue==rightValue;
+    } else if (leftValue instanceof List && rightValue instanceof List) {
+      return leftValue==rightValue;
     }
     return false;
   }
 
-  private boolean objectEquals(Map<String, Object> leftValue, Map<String, Object> rightValue) {
-    if (leftValue==null || rightValue==null) {
-      return false;
-    }
-    if (!leftValue.keySet().equals(rightValue.keySet())) {
-      return false;
-    }
-    for (String property: leftValue.keySet()) {
-      if (!strictEquals(leftValue.get(property), rightValue.get(property))) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private Object checkValidValue(Object value) {
+  private Object checkValidValue(String side, Object value) {
     if (!( value==null
            || value==Literal.UNDEFINED
            || value==Literal.NAN
            || value instanceof Number
            || value instanceof String
            || value instanceof Boolean
-           || value instanceof Map )
+           || value instanceof Map
+           || value instanceof List)
       ) {
-      throw new EngineException("Invalid right value: "+value+" ("+value.getClass().getName()+")");
+      throw new EngineException("Invalid "+side+" value: "+value+" ("+value.getClass().getName()+")");
     }
     return value;
   }

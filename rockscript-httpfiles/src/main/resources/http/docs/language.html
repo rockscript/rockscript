@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright (c) 2017 RockScript.io.
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RockScript Documentation</title>
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <link rel="stylesheet" type="text/css" href="css/highlight-arduino-light-9.12.0.css">
+  <link rel="stylesheet" type="text/css" href="css/rockscript-docs.css">
+
+  <script src="js/highlight-9.12.0.js"></script>
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script type="application/javascript">
+    $(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });
+  </script>
+
+</head>
+<body>
+
+<a href="index/">
+  <div class="titlebar">
+    <div class="brand">RockScript.io<img alt="RockScript.io" src="img/hand-white.png"></div>
+    <div class="title">RockScript Documentation</div>
+  </div>
+</a>
+
+<div class="toc">
+  <a href="index">Introduction</a>
+  <a href="why-and-when">Why and when</a>
+  <a href="project-status">Project status</a>
+  <a href="getting-started">Getting started</a>
+  <a href="cli">Command line interface</a>
+  <a href="tutorial">Tutorial</a>
+  <a href="language">Language</a>
+  <a href="script-versioning">Script versioning</a>
+  <a href="license">License</a>
+  <a href="help">Help</a>
+  <a class="title" href="services">Services</a>
+  <a class="sublink" href="service-http">HTTP service</a>
+  <a class="title" href="api">API</a>
+  <a href="commands">Commands</a>
+  <a class="sublink" href="deploy-script">Deploy script</a>
+  <a class="sublink" href="start-script">Start script</a>
+  <a href="queries">Queries</a>
+  <a class="sublink" href="query-script-execution">Script execution</a>
+  <a class="title" href="service-spi">Service SPI</a>
+  <a class="sublink" href="end-function">End function</a></div>
+</div>
+
+<div class="content">
+  <h1>Language</h1>
+  <p>RockScript is a subset of JavaScript (ECMAScript 5.1)  This page documents 
+which subset of JavaScript is supported. At the moment, only a very limited 
+subset is supported.  We are working hard to expand our coverage.</p>
+
+<p>If you wonder why RockScript doesn’t just use Node.js, <a onclick="scrollOnSamePage('rockscriptvsnodejs')">see 
+at the bottom of this page</a>.</p>
+
+<p>The main reason for us to choose JavaScript as the syntax is that it’s familiar 
+for most developers and has a low threshold to get started.  It’s also ideal for 
+the data transformations between service functions as most services nowadays are 
+based on JSON.</p>
+
+<h2 id="system-variable">System variable</h2>
+<p>The <code class="highlighter-rouge">system</code> variable is made available to every script.  It provides a mechanism 
+to import activities, access the script input and (over time) other interactions 
+with the runtime server environment.</p>
+
+<h4 id="systemimport">system.import</h4>
+<p>E.g.</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">system</span><span class="p">.</span><span class="k">import</span><span class="p">(</span><span class="s1">'rockscript.io/http'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">system.import(url)</code> returns a script object that exposes activities as functions.</p>
+
+<p>To learn about how to add activities to the engine, see <a onclick="show('services')">Services</a></p>
+
+<h4 id="systeminput">system.input</h4>
+
+<p>When starting a script, you can pass in data.  That input data 
+is made available in the script under the <code class="highlighter-rouge">system.input</code> property.</p>
+
+<p>An example:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>POST http://localhost:3652/command 
+Content-Type: application/json
+{ "startScript" : {
+    "scriptId": "s726",
+    "input": {
+      "orderId": "9sdf8",
+      "countryCode": "01" 
+    }
+}}
+</code></pre></div></div>
+
+<p>You can access the countryCode in the script like this:</p>
+
+<p><code class="highlighter-rouge">var countryCode = system.input.countryCode;</code></p>
+
+<h2 id="script-block">Script block</h2>
+
+<p>Just like in JavaScript environments, the full script text itself is considered a block and 
+the list of statements are executed sequential.</p>
+
+<h2 id="variable-declaration">Variable declaration</h2>
+
+<p>Examples</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">variableName</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">variableName</span> <span class="o">=</span> <span class="s1">'initial value'</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">variableName</span> <span class="o">=</span> <span class="nx">system</span><span class="p">.</span><span class="k">import</span><span class="p">(</span><span class="s1">'rockscript.io/http'</span><span class="p">);</span>
+</code></pre></div></div>
+
+<h2 id="assignment">Assignment</h2>
+
+<p>Examples</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">result</span> <span class="o">=</span> <span class="s1">'initial value'</span><span class="p">;</span>
+<span class="nx">result</span><span class="p">.</span><span class="nx">message</span> <span class="o">=</span> <span class="s1">'hello'</span><span class="p">;</span>
+<span class="nx">result</span><span class="p">.</span><span class="nx">message</span><span class="p">[</span><span class="s1">'firstName'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'John'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="if-then-else">If-then-else</h2>
+
+<p>The condition expression will be converted to a boolean.  See also 
+<a href="#boolean_expressions">Boolean expressions</a> for which comparators are supported.</p>
+
+<p>Examples</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">(</span><span class="nx">msg</span><span class="o">==</span><span class="s1">'call'</span><span class="p">)</span> <span class="nx">http</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span><span class="na">url</span><span class="p">:</span> <span class="s1">'...'</span><span class="p">});</span>
+
+<span class="kd">var</span> <span class="nx">someVar</span> <span class="o">=</span> <span class="p">{</span><span class="na">thisConverts</span><span class="p">:</span><span class="s1">'to boolean true'</span><span class="p">};</span>
+<span class="k">if</span> <span class="p">(</span><span class="nx">someVar</span><span class="p">)</span> <span class="nx">http</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span><span class="na">url</span><span class="p">:</span> <span class="s1">'...'</span><span class="p">});</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nx">flipper</span><span class="o">===</span><span class="s1">'on'</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">http</span><span class="p">.</span><span class="kd">get</span><span class="p">({</span><span class="na">url</span><span class="p">:</span> <span class="s1">'...'</span><span class="p">});</span>
+  <span class="nx">flipper</span> <span class="o">=</span> <span class="s1">'off'</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+  <span class="nx">flipper</span> <span class="o">=</span> <span class="s1">'on'</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="expressions">Expressions</h2>
+
+<h4 id="variable-expressions">Variable expressions</h4>
+<p>Examples</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">variableName</span>
+<span class="nx">variableName</span><span class="p">.</span><span class="nx">propertName</span><span class="p">;</span>
+<span class="nx">variableName</span><span class="p">.</span><span class="nx">propertyName</span><span class="p">(</span><span class="nx">arg0</span><span class="p">,</span> <span class="nx">arg1</span><span class="p">);</span>
+<span class="nx">variableName</span><span class="p">[</span><span class="nx">propertyName</span><span class="p">];</span>
+</code></pre></div></div>
+<p>Or a combination of the above like eg</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>variableName.propertyName(arg0, arg1)['field'].anotherPropertyName;
+</code></pre></div></div>
+<p>Note that for service function invocations, any number of args is allowed.</p>
+
+<h4 id="boolean-expressions">Boolean expressions</h4>
+
+<p>Examples</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">text</span><span class="o">==</span><span class="s1">'some text'</span>
+<span class="nx">text</span><span class="o">===</span><span class="s1">'some text'</span>
+</code></pre></div></div>
+
+<p>All of <a href="https://developer.mozilla.org/nl/docs/Web/JavaScript/Equality_comparisons_and_sameness">Equality comparisons and sameness</a> 
+is implemented except Object.is(…) and the use of object conversion functions like <code class="highlighter-rouge">toString </code> and <code class="highlighter-rouge">valueOf</code></p>
+
+<p>TODO &lt;, &gt;, &lt;=, &gt;= etc</p>
+
+<h4 id="literal-expressions">Literal expressions</h4>
+
+<p>Examples</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s1">'some text'</span>
+<span class="mf">5.0</span>
+<span class="kc">true</span>
+<span class="kc">false</span>
+<span class="p">{</span> <span class="nl">country</span><span class="p">:</span> <span class="s1">'US'</span> <span class="p">}</span>
+<span class="p">[</span> <span class="s1">'a'</span><span class="p">,</span> <span class="s1">'b'</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<h2 id="rockscript-vs-nodejs">RockScript vs Node.js</h2>
+
+<p>The purpose of RockScript is resilient script execution.  In order to do this, we 
+need continuations.  This means that need the ability to serialize the complete 
+runtime state of a script execution when the script is waiting for external 
+callbacks.  And when the server gets a callback, we need to restore the 
+runtime state from the persisted state and then resume execution at that 
+position in the script.  Serializing and deserializing execution state 
+and resuming an execution after deserializing it is something that other 
+script engines can’t do so that’s why we created RockScript.</p>
+
+
+</div>
+
+</body>
+</html>

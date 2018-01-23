@@ -17,4 +17,9 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-console.log(5+true);
+
+var x = ['a',1];
+console.log(x==x);
+console.log(['a',1]==['a',1]);
+console.log(x===x);
+console.log(['a',1]===['a',1]);

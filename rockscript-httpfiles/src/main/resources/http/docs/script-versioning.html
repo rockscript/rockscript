@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright (c) 2017 RockScript.io.
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RockScript Documentation</title>
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <link rel="stylesheet" type="text/css" href="css/highlight-arduino-light-9.12.0.css">
+  <link rel="stylesheet" type="text/css" href="css/rockscript-docs.css">
+
+  <script src="js/highlight-9.12.0.js"></script>
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script type="application/javascript">
+    $(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });
+  </script>
+
+</head>
+<body>
+
+<a href="index/">
+  <div class="titlebar">
+    <div class="brand">RockScript.io<img alt="RockScript.io" src="img/hand-white.png"></div>
+    <div class="title">RockScript Documentation</div>
+  </div>
+</a>
+
+<div class="toc">
+  <a href="index">Introduction</a>
+  <a href="why-and-when">Why and when</a>
+  <a href="project-status">Project status</a>
+  <a href="getting-started">Getting started</a>
+  <a href="cli">Command line interface</a>
+  <a href="tutorial">Tutorial</a>
+  <a href="language">Language</a>
+  <a href="script-versioning">Script versioning</a>
+  <a href="license">License</a>
+  <a href="help">Help</a>
+  <a class="title" href="services">Services</a>
+  <a class="sublink" href="service-http">HTTP service</a>
+  <a class="title" href="api">API</a>
+  <a href="commands">Commands</a>
+  <a class="sublink" href="deploy-script">Deploy script</a>
+  <a class="sublink" href="start-script">Start script</a>
+  <a href="queries">Queries</a>
+  <a class="sublink" href="query-script-execution">Script execution</a>
+  <a class="title" href="service-spi">Service SPI</a>
+  <a class="sublink" href="end-function">End function</a></div>
+</div>
+
+<div class="content">
+  <h1>Script versioning</h1>
+  <p>A RockScript server stores a collection of scripts and each script has a collection
+of script versions.  Each script execution runs against a particular script version.
+Once started, script executions keep running in the same script version.</p>
+
+<h2 id="why">Why</h2>
+
+<p>The RockScript server needs to store the scripts for 2 reasons:</p>
+
+<ol>
+  <li>Service functions can take a long time to complete.  While the script execution 
+ is waiting, the execution state as well as the script version are persisted and 
+ the server may evict those from the cache.  So when the service bridge signals 
+ back to the RockScript server that the service function invocation is done, 
+ the script version is necessary to deserialize the script execution runtime 
+ state before the script execution can be resumed.</li>
+  <li>RockScript is designed with clustering in mind.  Callback that signal completion 
+ of service functions may arrive at a different node of the cluster.  So the 
+ in that case script execution also needs to continue from persistent storage 
+ as well.</li>
+</ol>
+
+<h2 id="deploying-scripts">Deploying scripts</h2>
+
+<p>The most common way to make scripts available for execution on the server is 
+using the deploy command.   When we deploy the script to the server, we</p>
+
+<ul>
+  <li>Ensure a script exists. If no script with that name exists yet, it is created.</li>
+  <li>Create a new script version with the given text and associate it with the script.</li>
+  <li>Mark the new script version as the active script version.</li>
+</ul>
+
+<h2 id="the-active-script-version">The active script version</h2>
+
+<p>The active script version is the version that is started when a script 
+is specified with the <code class="highlighter-rouge">Start script</code> command.  The active script version 
+is typically the latest version of a script.  That’s why the deploy command 
+is the most common.</p>
+
+<p>With the <code class="highlighter-rouge">saveScript</code> command, it’s also possible to save a new script without 
+making it the active script version.</p>
+
+<h2 id="deleting-old-versions">Deleting old versions</h2>
+
+<p>Old versions of the script need to be kept on the server for as long as you 
+want to keep the executions executed in those respective script versions.</p>
+
+</div>
+
+</body>
+</html>

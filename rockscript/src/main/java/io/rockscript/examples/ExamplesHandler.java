@@ -36,11 +36,6 @@ public class ExamplesHandler extends AbstractRequestHandler {
   }
 
   @Override
-  public boolean matches(ServerRequest request) {
-    return super.matches(request);
-  }
-
-  @Override
   public void handle(ServerRequest request, ServerResponse response) {
     if (returnError) {
       response.statusOk();

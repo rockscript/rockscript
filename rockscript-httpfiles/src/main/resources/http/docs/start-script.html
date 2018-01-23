@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright (c) 2017 RockScript.io.
+  ~ Licensed to the Apache Software Foundation (ASF) under one
+  ~ or more contributor license agreements.  See the NOTICE file
+  ~ distributed with this work for additional information
+  ~ regarding copyright ownership.  The ASF licenses this file
+  ~ to you under the Apache License, Version 2.0 (the
+  ~ "License"); you may not use this file except in compliance
+  ~ with the License.  You may obtain a copy of the License at
+  ~
+  ~   http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing,
+  ~ software distributed under the License is distributed on an
+  ~ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  ~ KIND, either express or implied.  See the License for the
+  ~ specific language governing permissions and limitations
+  ~ under the License.
+  -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RockScript Documentation</title>
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+  <link rel="stylesheet" type="text/css" href="css/highlight-arduino-light-9.12.0.css">
+  <link rel="stylesheet" type="text/css" href="css/rockscript-docs.css">
+
+  <script src="js/highlight-9.12.0.js"></script>
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <script type="application/javascript">
+    $(document).ready(function() {
+      $('pre code').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });
+  </script>
+
+</head>
+<body>
+
+<a href="index/">
+  <div class="titlebar">
+    <div class="brand">RockScript.io<img alt="RockScript.io" src="img/hand-white.png"></div>
+    <div class="title">RockScript Documentation</div>
+  </div>
+</a>
+
+<div class="toc">
+  <a href="index">Introduction</a>
+  <a href="why-and-when">Why and when</a>
+  <a href="project-status">Project status</a>
+  <a href="getting-started">Getting started</a>
+  <a href="cli">Command line interface</a>
+  <a href="tutorial">Tutorial</a>
+  <a href="language">Language</a>
+  <a href="script-versioning">Script versioning</a>
+  <a href="license">License</a>
+  <a href="help">Help</a>
+  <a class="title" href="services">Services</a>
+  <a class="sublink" href="service-http">HTTP service</a>
+  <a class="title" href="api">API</a>
+  <a href="commands">Commands</a>
+  <a class="sublink" href="deploy-script">Deploy script</a>
+  <a class="sublink" href="start-script">Start script</a>
+  <a href="queries">Queries</a>
+  <a class="sublink" href="query-script-execution">Script execution</a>
+  <a class="title" href="service-spi">Service SPI</a>
+  <a class="sublink" href="end-function">End function</a></div>
+</div>
+
+<div class="content">
+  <h1>Start script</h1>
+  <p>Starts a new script execution.  If you identify a script with properties 
+<code class="highlighter-rouge">scriptId</code> or <code class="highlighter-rouge">scriptName</code>, then the latest version of that script will 
+be used.  @see also <a onclick="show('script-versioning')">Script versioning</a></p>
+
+<h2 id="example">Example</h2>
+<p>Here’s a <code class="highlighter-rouge">startScript</code> example</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt; POST /command
+  Content-Type: application/json
+  { "startScript" :
+    { "scriptName" : "Submit order",
+      "input" : {
+        item: "Donuts",
+        quantity: 7 
+      }
+    }
+  }
+&lt; HTTP/1.1 200 OK
+  Access-Control-Allow-Origin: *
+  { "scriptExecutionId": "se1" }
+</code></pre></div></div>
+
+<h2 id="request-properties">Request properties</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Property name</th>
+      <th>Required?</th>
+      <th>Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="highlighter-rouge">scriptId</code></td>
+      <td>One of <code class="highlighter-rouge">scriptId</code> or <code class="highlighter-rouge">scriptName</code> or <code class="highlighter-rouge">scriptVersionId</code> is required</td>
+      <td>String</td>
+      <td>ID that identifies the script for which the latest version should be started</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">scriptName</code></td>
+      <td>One of <code class="highlighter-rouge">scriptId</code> or <code class="highlighter-rouge">scriptName</code> or <code class="highlighter-rouge">scriptVersionId</code> is required</td>
+      <td>String</td>
+      <td>Name that identifies the script for which the latest version should be started</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">scriptVersionId</code></td>
+      <td>One of <code class="highlighter-rouge">scriptId</code> or <code class="highlighter-rouge">scriptName</code> or <code class="highlighter-rouge">scriptVersionId</code> is required</td>
+      <td>String</td>
+      <td>The ID of the exact script version that should be started</td>
+    </tr>
+    <tr>
+      <td><code class="highlighter-rouge">input</code></td>
+      <td>Optional</td>
+      <td>Any json type</td>
+      <td>The system.input value.  See also <a onclick="show('language')">Language</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="response-properties">Response properties</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Property name</th>
+      <th>Data type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="highlighter-rouge">scriptExecutionId</code></td>
+      <td>String</td>
+      <td>ID of the script execution</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="failures">Failures</h2>
+
+<p>The request returns a <code class="highlighter-rouge">400 BAD REQUEST</code> in the following situations</p>
+
+<ul>
+  <li>The script for the given <code class="highlighter-rouge">scriptId</code> or <code class="highlighter-rouge">scriptName</code> is not found</li>
+  <li>The script version for the given <code class="highlighter-rouge">scriptVersionId</code> is not found</li>
+  <li>No <code class="highlighter-rouge">scriptId</code>, <code class="highlighter-rouge">scriptName</code> or <code class="highlighter-rouge">scriptVersionId</code> are given</li>
+  <li>The specified script does not have an active script version yet.  Fix this by using the <code class="highlighter-rouge">deployScript</code> instead of the <code class="highlighter-rouge">saveScript</code> command.</li>
+</ul>
+
+<p>In each of these, a json body will be returned with an error message.  For example</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>HTTP/1.1 400 BAD REQUEST
+Content-Type: application/json
+{ "message": "No script found with name UnexistingScript.rs" }
+</code></pre></div></div>
+
+</div>
+
+</body>
+</html>
