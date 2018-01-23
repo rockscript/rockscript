@@ -1,9 +1,6 @@
 # Goal: expand script language support for real use cases
 
-* comparison boolean expressions for if-then-else
-* == & ===
 * <, >, <=, >= etc
-* Update + conversions
 * for loop
 
 # Goal: add concurrency support
