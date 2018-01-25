@@ -56,22 +56,32 @@ public class Converter {
     return true;
   }
 
+  /** returns null if o is
+   *  - a string that cannot be parsed as a Double
+   *  - Literal.UNDEFINED
+   *  - Literal.NAN */
   public Number toNumber(Object o) {
-    if (o==null || o instanceof Number) {
+    if (isNumber(o)) {
       return (Number) o;
     }
-    if (o instanceof String) {
+    if (isString(o)) {
       if (""==o) {
         return 0;
       }
       try {
         return new Double((String)o);
       } catch (NumberFormatException e) {
-        e.printStackTrace();
+        return null;
       }
     }
-    if (o instanceof Boolean) {
+    if (isBoolean(o)) {
       return (Boolean)o ? 1 : 0;
+    }
+    if (isNull(o)) {
+      return 0d;
+    }
+    if (isNaN(o) || isUndefined(o) || isObject(o) || isArray(o)) {
+      return null;
     }
     throw new EngineException("Can't convert "+o+" to number: Conversion not implemented yet");
   }
@@ -93,10 +103,10 @@ public class Converter {
       return o.toString();
     }
     if (isObject(o)) {
-      return (String) toPrimitive(o, "string");
+      return (String) toPrimitiveString(o);
     }
     if (isArray(o)) {
-      return (String) toPrimitive(o, "string");
+      return (String) toPrimitiveString(o);
     }
     throw new EngineException("Can't convert "+o+" to string: Conversion not implemented yet");
   }
@@ -121,29 +131,26 @@ public class Converter {
   }
 
   /** hint can be "number", "string" or "default" */
-  public Object toPrimitive(Object o, String hint) {
-    if (isNull(o)) {
-      if (HINT_DEFAULT.equals(hint)  || HINT_STRING.equals(hint)) {
+  private Object toPrimitive(Object o, String hint) {
+    if (isNumber(o)
+        || isString(o)
+        || isBoolean(o)) {
+      return toString(o);
+    }
+    if (isObject(o)) {
+      return "[object Object]";
+    }
+    if (isArray(o)) {
+      return ((List) o).stream()
+        .map(element->toPrimitiveString(element))
+        .collect(Collectors.joining(","));
+    }
+    if (isNull(o) || isUndefined(o)) {
+      if (HINT_STRING.equals(hint) || HINT_DEFAULT.equals(hint)) {
         return "";
       } else {
         return 0d;
       }
-    }
-    if (isNumber(o)
-        || isUndefined(o)
-        || isString(o)
-        || isNumber(o)
-        || isBoolean(o)) {
-      return o;
-    }
-    if (o instanceof Map) {
-      return "[object Object]";
-    }
-    if (o instanceof List) {
-      return ((List) o).stream()
-        .map(element->toPrimitive(element,"string"))
-        .map(element->isNull(element)||isUndefined(element) ? "" : toString(element))
-        .collect(Collectors.joining(","));
     }
     throw new EngineException("Can't convert "+o+" to primitive: Conversion not implemented yet");
   }
@@ -153,7 +160,11 @@ public class Converter {
     return o == null;
   }
 
-  /** does the value o represent a javascript object */
+  /** does the value o represent a javascript object.
+   * In javascript typeof returns 'object' for objects and arrays:
+   *   typeof {} -> 'object' and
+   *   typeof [] -> 'object'.
+   * To avoid confusion, this method returns true only for objects and returns false for arrays. */
   public static boolean isObject(Object o) {
     return o instanceof Map;
   }
@@ -186,5 +197,37 @@ public class Converter {
   /** does the value o represent a javascript NaN (not a number) */
   public static boolean isNaN(Object o) {
     return o == Literal.NAN;
+  }
+
+  /** is o one of the valid javascript values */
+  public static boolean isValid(Object o) {
+    return isNull(o)
+           || isUndefined(o)
+           || isNaN(o)
+           || isNumber(o)
+           || isString(o)
+           || isBoolean(o)
+           || isObject(o)
+           || isArray(o);
+  }
+
+  public boolean stringEqual(String left, String right) {
+    return left != null && left.equals(right);
+  }
+
+  public boolean stringLessThan(String left, String right) {
+    if (left==null) {
+      return false;
+    }
+    int minCharCount = Math.min(left.length(),right.length());
+    for (int i=0; i<minCharCount; i++) {
+      if (left.charAt(i)<right.charAt(i)) {
+        return true;
+      }
+      if (left.charAt(i)>right.charAt(i)) {
+        return false;
+      }
+    }
+    return left.length()<right.length();
   }
 }

@@ -24,6 +24,9 @@ import io.rockscript.engine.EngineException;
 import java.util.List;
 import java.util.Map;
 
+import static com.sun.jmx.snmp.EnumRowStatus.isValidValue;
+import static io.rockscript.engine.impl.Converter.*;
+
 public class EqualityExpressionExecution extends Execution<EqualityExpression> {
 
   String comparator;
@@ -40,7 +43,9 @@ public class EqualityExpressionExecution extends Execution<EqualityExpression> {
 
   public static boolean supportsComparator(String comparator) {
     return "==".equals(comparator)
-        || "===".equals(comparator);
+           || "===".equals(comparator)
+           || "!=".equals(comparator)
+           || "!==".equals(comparator);
   }
 
   @Override
@@ -55,6 +60,10 @@ public class EqualityExpressionExecution extends Execution<EqualityExpression> {
         setResult(looseEquals(leftValue, rightValue));
       } else if ("===".equals(comparator)) {
         setResult(strictEquals(leftValue, rightValue));
+      } else if ("!=".equals(comparator)) {
+        setResult(!looseEquals(leftValue, rightValue));
+      } else if ("!==".equals(comparator)) {
+        setResult(!strictEquals(leftValue, rightValue));
       }
 
       end();
@@ -66,76 +75,76 @@ public class EqualityExpressionExecution extends Execution<EqualityExpression> {
 
     // See https://developer.mozilla.org/nl/docs/Web/JavaScript/Equality_comparisons_and_sameness
 
-    if (leftValue==null || leftValue==Literal.UNDEFINED) {
-      return (rightValue==null || rightValue==Literal.UNDEFINED);
-    } else if (leftValue==Literal.NAN || rightValue==Literal.NAN) {
+    if (isNull(leftValue) || isUndefined(leftValue)) {
+      return (isNull(rightValue) || isUndefined(rightValue));
+    } else if (isNaN(leftValue) || isNaN(rightValue)) {
       return false;
-    } else if (leftValue instanceof Number) {
-      if (rightValue instanceof Number) {
+    } else if (isNumber(leftValue)) {
+      if (isNumber(rightValue)) {
         return strictEquals(leftValue, rightValue);
-      } else if (rightValue instanceof String) {
+      } else if (isString(rightValue)) {
         return strictEquals(leftValue, converter.toNumber(rightValue));
-      } else if (rightValue instanceof Boolean) {
+      } else if (isBoolean(rightValue)) {
         return strictEquals(leftValue, converter.toNumber(rightValue));
-      } else if (rightValue instanceof Map) {
-        return looseEquals(leftValue, converter.toPrimitive(rightValue, "number"));
-      } else if (rightValue instanceof List) {
+      } else if (isObject(rightValue)) {
+        return looseEquals(leftValue, converter.toPrimitiveNumber(rightValue));
+      } else if (isArray(rightValue)) {
         return false;
-      } else if (rightValue==null || rightValue==Literal.UNDEFINED) {
+      } else if (isNull(rightValue) || isUndefined(rightValue)) {
         return false;
       }
-    } else if (leftValue instanceof String) {
-      if (rightValue instanceof Number) {
+    } else if (isString(leftValue)) {
+      if (isNumber(rightValue)) {
         return strictEquals(converter.toNumber(leftValue), rightValue);
-      } else if (rightValue instanceof String) {
+      } else if (isString(rightValue)) {
         return strictEquals(leftValue, rightValue);
-      } else if (rightValue instanceof Boolean) {
+      } else if (isBoolean(rightValue)) {
         return strictEquals(converter.toNumber(leftValue), converter.toNumber(rightValue));
-      } else if (rightValue instanceof Map) {
-        return looseEquals(leftValue, converter.toPrimitive(rightValue, "string"));
-      } else if (rightValue instanceof List) {
+      } else if (isObject(rightValue)) {
+        return looseEquals(leftValue, converter.toPrimitiveString(rightValue));
+      } else if (isArray(rightValue)) {
         return strictEquals(leftValue, converter.toString(rightValue));
-      } else if (rightValue==null || rightValue==Literal.UNDEFINED) {
+      } else if (isNull(rightValue) || isUndefined(rightValue)) {
         return false;
       }
     } else if (leftValue instanceof Boolean) {
-      if (rightValue instanceof Number) {
+      if (isNumber(rightValue)) {
         return strictEquals(converter.toNumber(leftValue), rightValue);
-      } else if (rightValue instanceof String) {
+      } else if (isString(rightValue)) {
         return strictEquals(converter.toNumber(leftValue), converter.toNumber(rightValue));
-      } else if (rightValue instanceof Boolean) {
+      } else if (isBoolean(rightValue)) {
         return strictEquals(leftValue, rightValue);
-      } else if (rightValue instanceof Map) {
-        return looseEquals(converter.toNumber(leftValue), converter.toPrimitive(rightValue, "number"));
-      } else if (rightValue instanceof List) {
+      } else if (isObject(rightValue)) {
+        return looseEquals(converter.toNumber(leftValue), converter.toPrimitiveNumber(rightValue));
+      } else if (isArray(rightValue)) {
         return false;
-      } else if (rightValue==null || rightValue==Literal.UNDEFINED) {
+      } else if (isNull(rightValue) || isUndefined(rightValue)) {
         return false;
       }
-    } else if (leftValue instanceof Map) {
-      if (rightValue instanceof Number) {
+    } else if (isObject(leftValue)) {
+      if (isNumber(rightValue)) {
         return strictEquals(converter.toNumber(leftValue), rightValue);
-      } else if (rightValue instanceof String) {
-        return strictEquals(converter.toNumber(leftValue), converter.toNumber(rightValue));
-      } else if (rightValue instanceof Boolean) {
+      } else if (isString(rightValue)) {
+        return looseEquals(converter.toPrimitiveString(leftValue), rightValue);
+      } else if (isBoolean(rightValue)) {
         return strictEquals(leftValue, rightValue);
-      } else if (rightValue instanceof Map) {
+      } else if (isObject(rightValue)) {
         return leftValue == rightValue;
-      } else if (rightValue instanceof List) {
+      } else if (isArray(rightValue)) {
         return false;
-      } else if (rightValue==null || rightValue==Literal.UNDEFINED) {
+      } else if (isNull(rightValue) || isUndefined(rightValue)) {
         return false;
       }
-    } else if (leftValue instanceof List) {
-      if (rightValue instanceof List) {
+    } else if (isArray(leftValue)) {
+      if (isArray(rightValue)) {
         return leftValue == rightValue;
-      } else if (rightValue instanceof String) {
-        return strictEquals(converter.toString(leftValue), rightValue);
-      } else if (rightValue instanceof Number
-                  || rightValue instanceof Boolean
-                  || rightValue instanceof Map
-                  || rightValue==null
-                  || rightValue==Literal.UNDEFINED) {
+      } else if (isString(rightValue)) {
+        return looseEquals(converter.toPrimitiveString(leftValue), rightValue);
+      } else if (isNumber(rightValue)
+                  || isBoolean(rightValue)
+                  || isObject(rightValue)
+                  || isNull(rightValue)
+                 || isUndefined(rightValue)) {
         return false;
       }
     }
@@ -143,40 +152,32 @@ public class EqualityExpressionExecution extends Execution<EqualityExpression> {
   }
 
   private boolean strictEquals(Object leftValue, Object rightValue) {
-    if ( (leftValue==null && rightValue==null)
-         || (leftValue==Literal.UNDEFINED && rightValue==Literal.UNDEFINED) ) {
+    if ( (isNull(leftValue) && isNull(rightValue))
+         || (isUndefined(leftValue) && isUndefined(rightValue)) ) {
       return true;
-    } else if (leftValue instanceof Number && rightValue instanceof Number) {
+    } else if (isNumber(leftValue) && isNumber(rightValue)) {
       return ((Number) leftValue).doubleValue()==((Number) rightValue).doubleValue();
-    } else if (leftValue instanceof String && rightValue instanceof String) {
+    } else if (isString(leftValue) && isString(rightValue)) {
       return leftValue.equals(rightValue);
-    } else if (leftValue instanceof Boolean && rightValue instanceof Boolean) {
+    } else if (isBoolean(leftValue) && isBoolean(rightValue)) {
       return leftValue.equals(rightValue);
-    } else if (leftValue instanceof Map && rightValue instanceof Map) {
+    } else if (isObject(leftValue) && isObject(rightValue)) {
       return leftValue==rightValue;
-    } else if (leftValue instanceof List && rightValue instanceof List) {
+    } else if (isArray(leftValue) && isArray(rightValue)) {
       return leftValue==rightValue;
     }
     return false;
   }
 
-  private Object checkValidValue(String side, Object value) {
-    if (!( value==null
-           || value==Literal.UNDEFINED
-           || value==Literal.NAN
-           || value instanceof Number
-           || value instanceof String
-           || value instanceof Boolean
-           || value instanceof Map
-           || value instanceof List)
-      ) {
+  public static Object checkValidValue(String side, Object value) {
+    if (!isValid(value)) {
       throw new EngineException("Invalid "+side+" value: "+value+" ("+value.getClass().getName()+")");
     }
     return value;
   }
 
   private Object addObjects(Object leftValue, Object rightValue) {
-    if (leftValue instanceof String) {
+    if (isString(leftValue)) {
       return (String)leftValue + rightValue.toString();
     }
     throw new EngineException("Only string addition is supported atm", this);

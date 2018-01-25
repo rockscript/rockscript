@@ -316,9 +316,23 @@ public class Parse {
 
     } else if (singleExpressionContext instanceof EqualityExpressionContext) {
       return parseEqualityExpression((EqualityExpressionContext)singleExpressionContext);
+
+    } else if (singleExpressionContext instanceof RelationalExpressionContext) {
+      return parseRelationalExpression((RelationalExpressionContext)singleExpressionContext);
     }
     addErrorUnsupportedElement(singleExpressionContext, "singleExpression");
     return null;
+  }
+
+  private SingleExpression parseRelationalExpression(RelationalExpressionContext singleExpressionContext) {
+    String comparator = singleExpressionContext.getChild(1).getText();
+    if (!ComparatorExpressionExecution.supportsComparator(comparator)) {
+      addError(singleExpressionContext, "Unsupported comparator operator: "+comparator);
+      return null;
+    }
+    SingleExpression left = parseSingleExpression(singleExpressionContext.singleExpression(0));
+    SingleExpression right = parseSingleExpression(singleExpressionContext.singleExpression(1));
+    return new ComparatorExpression(createNextScriptElementId(), createLocation(singleExpressionContext), left, right, comparator);
   }
 
   private AssignmentExpression parseAssignmentExpression(AssignmentExpressionContext singleExpressionContext) {

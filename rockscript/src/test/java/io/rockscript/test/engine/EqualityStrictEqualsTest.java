@@ -35,7 +35,7 @@ import static io.rockscript.util.Maps.entry;
 import static io.rockscript.util.Maps.hashMap;
 import static org.junit.Assert.assertEquals;
 
-public class EqualityStrictTest extends AbstractEngineTest {
+public class EqualityStrictEqualsTest extends AbstractEngineTest {
 
   ScriptVersion scriptVersion = null;
 

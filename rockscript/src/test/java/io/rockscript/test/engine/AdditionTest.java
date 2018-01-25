@@ -102,7 +102,7 @@ public class AdditionTest extends AbstractEngineTest {
   }
 
   function valueToString(o) {
-    return ('string'===typeof o? '\''+o+'\'' : 'object'===typeof o || 'array'===typeof o ? JSON.stringify(o) :o );
+    return ('string'===typeof o? '\''+o+'\'' : 'object'===typeof o || 'array'===typeof o ? JSON.stringify(o).replace('"', "'") :o );
   }
   */
   @Test

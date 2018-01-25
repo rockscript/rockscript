@@ -1,8 +1,7 @@
 package io.rockscript.engine.impl;
 
-import io.rockscript.engine.EngineException;
-
 import static io.rockscript.engine.impl.Converter.*;
+import static io.rockscript.engine.impl.EqualityExpressionExecution.checkValidValue;
 
 public class AdditiveExpressionExecution extends Execution<AdditiveExpression> {
 
@@ -20,16 +19,16 @@ public class AdditiveExpressionExecution extends Execution<AdditiveExpression> {
     if (children.size()==1) {
       startChild(element.getRight());
     } else {
-      Object leftValue = getChildren().get(0).getResult();
-      Object rightValue = getChildren().get(1).getResult();
+      Object leftValue = checkValidValue("left", getChildren().get(0).getResult());
+      Object rightValue = checkValidValue("right", getChildren().get(1).getResult());
 
-      Object result = addObjects(leftValue, rightValue);
+      Object result = performArithmaticOperation("+", leftValue, rightValue);
       setResult(result);
       end();
     }
   }
 
-  private Object addObjects(Object leftValue, Object rightValue) {
+  private Object performArithmaticOperation(String operation, Object leftValue, Object rightValue) {
     Converter converter = getEngine().getConverter();
 
     if (isObject(leftValue) || isArray(leftValue)) {
@@ -48,8 +47,22 @@ public class AdditiveExpressionExecution extends Execution<AdditiveExpression> {
       return Literal.NAN;
     }
 
-    Number leftNumber = converter.toNumber(leftValue);
-    Number rightNumber = converter.toNumber(rightValue);
-    return  (leftNumber!=null ? leftNumber.doubleValue() : 0) + (rightNumber!=null ? rightNumber.doubleValue() : 0);
+    double leftNumber = getDouble(leftValue, converter);
+    double rightNumber = getDouble(rightValue, converter);
+
+    if ("+".equals(operation)) {
+      return leftNumber + rightNumber;
+    }
+
+    throw new UnsupportedOperationException("TODO");
+  }
+
+  private Double getDouble(Object number, Converter converter) {
+    Number leftNumber = converter.toNumber(number);
+    if (leftNumber!=null) {
+      return leftNumber.doubleValue();
+    } else {
+      return 0d;
+    }
   }
 }
