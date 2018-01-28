@@ -39,6 +39,10 @@ public class BlockExecution<T extends ScriptElement> extends Execution<T> {
       ScriptElement nextStatement = childElements.get(index);
       startChild(nextStatement);
     } else {
+      if (children!=null && !children.isEmpty()) {
+        // The result of the last statement or expression is the result of this execution
+        setResult(children.get(children.size()-1).getResult());
+      }
       end();
     }
   }

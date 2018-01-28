@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static io.rockscript.engine.impl.LogicalExpressionExecution.*;
+
 /** Use
  *
  * EngineScript engineScript = Parse.parse(String);
@@ -319,9 +321,54 @@ public class Parse {
 
     } else if (singleExpressionContext instanceof RelationalExpressionContext) {
       return parseRelationalExpression((RelationalExpressionContext)singleExpressionContext);
+
+    } else if (singleExpressionContext instanceof LogicalAndExpressionContext) {
+      return parseLogicalAndExpression((LogicalAndExpressionContext)singleExpressionContext);
+
+    } else if (singleExpressionContext instanceof LogicalOrExpressionContext) {
+      return parseLogicalOrExpression((LogicalOrExpressionContext)singleExpressionContext);
+
+    } else if (singleExpressionContext instanceof NotExpressionContext) {
+      return parseLogicalNotExpression((NotExpressionContext)singleExpressionContext);
+
+    } else if (singleExpressionContext instanceof ParenthesizedExpressionContext) {
+      return parseParenthesizedExpression((ParenthesizedExpressionContext)singleExpressionContext);
     }
+
+
     addErrorUnsupportedElement(singleExpressionContext, "singleExpression");
     return null;
+  }
+
+  private SingleExpression parseParenthesizedExpression(ParenthesizedExpressionContext singleExpressionContext) {
+    List<SingleExpression> expressions = new ArrayList<>();
+    ExpressionSequenceContext expressionSequenceContext = singleExpressionContext.expressionSequence();
+    if (expressionSequenceContext!=null) {
+      for (SingleExpressionContext nestedExpressionContext: expressionSequenceContext.singleExpression()) {
+        SingleExpression nestedExpression = parseSingleExpression(nestedExpressionContext);
+        if (nestedExpression!=null) {
+          expressions.add(nestedExpression);
+        }
+      }
+    }
+    return new ParenthesizedExpression(createNextScriptElementId(), createLocation(singleExpressionContext), expressions);
+  }
+
+  private SingleExpression parseLogicalNotExpression(NotExpressionContext logicalNotExpressionContext) {
+    SingleExpression left = parseSingleExpression(logicalNotExpressionContext.singleExpression());
+    return new LogicalExpression(createNextScriptElementId(), createLocation(logicalNotExpressionContext), left, null, OPERATOR_NOT);
+  }
+
+  private SingleExpression parseLogicalOrExpression(LogicalOrExpressionContext logicalOrExpressionContext) {
+    SingleExpression left = parseSingleExpression(logicalOrExpressionContext.singleExpression(0));
+    SingleExpression right = parseSingleExpression(logicalOrExpressionContext.singleExpression(1));
+    return new LogicalExpression(createNextScriptElementId(), createLocation(logicalOrExpressionContext), left, right, OPERATOR_OR);
+  }
+
+  private SingleExpression parseLogicalAndExpression(LogicalAndExpressionContext logicalAndExpressionContext) {
+    SingleExpression left = parseSingleExpression(logicalAndExpressionContext.singleExpression(0));
+    SingleExpression right = parseSingleExpression(logicalAndExpressionContext.singleExpression(1));
+    return new LogicalExpression(createNextScriptElementId(), createLocation(logicalAndExpressionContext), left, right, OPERATOR_AND);
   }
 
   private SingleExpression parseRelationalExpression(RelationalExpressionContext singleExpressionContext) {
