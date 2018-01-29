@@ -21,6 +21,7 @@ package io.rockscript.test.server;
 
 import com.google.gson.reflect.TypeToken;
 import io.rockscript.api.commands.DeployScriptVersionCommand;
+import io.rockscript.api.commands.SaveScriptVersionCommand;
 import io.rockscript.api.commands.ScriptExecutionResponse;
 import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptVersion;
@@ -41,6 +42,16 @@ public class ServerScenarioTest extends AbstractServerTest {
   @Test
   public void testScenario() {
     ScriptVersion saveScriptVersionResponse = newPost("/command")
+      .bodyJson(new SaveScriptVersionCommand()
+        .scriptText(
+          "var simple = system.import('rockscript.io/simple'); \n" +
+          "simple.wait();" +
+          "var msg = {hello: 'world'};"))
+      .execute()
+      .assertStatusOk()
+      .getBodyAs(ScriptVersion.class);
+
+    ScriptVersion deployedScriptVersionResponse = newPost("/command")
       .bodyJson(new DeployScriptVersionCommand()
         .scriptText(
           "var simple = system.import('rockscript.io/simple'); \n" +
@@ -50,11 +61,11 @@ public class ServerScenarioTest extends AbstractServerTest {
       .assertStatusOk()
       .getBodyAs(ScriptVersion.class);
 
-    String scriptId = saveScriptVersionResponse.getId();
+    String scriptVersionId = deployedScriptVersionResponse.getId();
 
     ScriptExecutionResponse startScriptResponse = newPost("/command")
       .bodyJson(new StartScriptExecutionCommand()
-        .scriptVersionId(scriptId))
+        .scriptVersionId(scriptVersionId))
       .execute()
       .assertStatusOk()
       .getBodyAs(ScriptExecutionResponse.class);
@@ -67,5 +78,9 @@ public class ServerScenarioTest extends AbstractServerTest {
       .getBodyAs(new TypeToken<ScriptExecutionQuery.ScriptExecutionDetails>(){}.getType());
 
     assertTrue(scriptExecutionDetails.getEvents().size()>2);
+
+    newGet("/query/script-executions")
+      .execute()
+      .assertStatusOk();
   }
 }

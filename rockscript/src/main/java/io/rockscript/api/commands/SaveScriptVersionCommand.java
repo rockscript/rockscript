@@ -67,6 +67,7 @@ public class SaveScriptVersionCommand implements Command<ScriptVersion> {
     if (scriptId!=null) {
       Script script = scriptStore.findScriptById(scriptId);
       BadRequestException.throwIfNull(script, "Script %s does not exist", scriptId);
+      scriptName = script.getName();
     } else if (scriptName==null) {
       scriptName = "Unnamed script";
     }
