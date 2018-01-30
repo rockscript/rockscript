@@ -35,18 +35,25 @@ public class ScriptStore {
   Engine engine;
 
   /** all stored scripts */
-  List<Script> scripts = new ArrayList<>();
+  List<Script> scripts;
 
   /** maps script version ids to parsed EngineScript's */
   public Map<String, EngineScript> parsedScriptAsts = new HashMap<>();
 
   public ScriptStore(Engine engine) {
     this.engine = engine;
+    reset();
   }
 
   public ScriptStore(Engine engine, ScriptStore other) {
     this.engine = engine;
     this.scripts = other.scripts;
+    this.parsedScriptAsts = new HashMap<>();
+  }
+
+  public void reset() {
+    this.scripts = new ArrayList<>();
+    this.parsedScriptAsts = new HashMap<>();
   }
 
   /** Finds the first script for which the name ends with the given scriptNameSuffix */

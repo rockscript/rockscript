@@ -38,10 +38,15 @@ public class ScriptExecutionStore implements EventListener {
 
   Engine engine;
   /** maps script execution ids to ordered list of execution events for that script execution */
-  Map<String,List<ExecutionEvent>> events = new HashMap<>();
+  Map<String,List<ExecutionEvent>> events;
 
   public ScriptExecutionStore(Engine engine) {
     this.engine = engine;
+    reset();
+  }
+
+  public void reset() {
+    events = new HashMap<>();
   }
 
   @Override
@@ -65,7 +70,7 @@ public class ScriptExecutionStore implements EventListener {
   }
 
   public List<ExecutionEvent> findEventsByScriptExecutionId(String scriptExecutionId) {
-    return events.get(scriptExecutionId);
+    return new ArrayList(events.get(scriptExecutionId));
   }
 
   private boolean isLastEventUnlocking(List<ExecutionEvent> executionEvents) {

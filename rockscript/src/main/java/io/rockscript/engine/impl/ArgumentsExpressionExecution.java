@@ -113,7 +113,7 @@ public class ArgumentsExpressionExecution extends Execution<ArgumentsExpression>
 
   public void handleServiceFunctionError(String errorMessage, Instant retryTime) {
     EngineScriptExecution scriptExecution = getScriptExecution();
-    dispatch(new ServiceFunctionFailedEvent(this, errorMessage, retryTime));
+    dispatchAndExecute(new ServiceFunctionFailedEvent(this, errorMessage, retryTime));
     if (retryTime!=null) {
       getEngine().getJobService().schedule(
         new RetryServiceFunctionJobHandler(this),

@@ -100,7 +100,7 @@ public class FileHandler implements RequestHandler {
 
   static Pattern docsPattern = Pattern.compile(".*/docs/[\\w_-]+");
 
-  private boolean isDocs(String path) {
+  protected boolean isDocs(String path) {
     return docsPattern.matcher(path).matches();
   }
 

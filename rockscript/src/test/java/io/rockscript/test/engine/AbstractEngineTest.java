@@ -27,7 +27,11 @@ import io.rockscript.api.commands.StartScriptExecutionCommand;
 import io.rockscript.api.model.ScriptExecution;
 import io.rockscript.api.model.ScriptVersion;
 import io.rockscript.engine.impl.ContinuationReference;
+import io.rockscript.engine.impl.ScriptExecutionStore;
+import io.rockscript.engine.impl.ScriptStore;
 import io.rockscript.engine.impl.Time;
+import io.rockscript.engine.job.InMemoryJobStore;
+import io.rockscript.engine.job.JobStore;
 import io.rockscript.http.servlet.ServerRequest;
 import io.rockscript.test.TesterImportObject;
 import org.junit.After;
@@ -57,8 +61,6 @@ public class AbstractEngineTest {
   public void setUp() {
     engine = initializeEngine();
     gson = engine.getGson();
-    resetNow();
-    resetRecordedItems();
   }
 
   public <T> T parseBodyAs(ServerRequest request, Type type) {
@@ -68,11 +70,35 @@ public class AbstractEngineTest {
   @SuppressWarnings("deprecation")
   @After
   public void tearDown() {
+    resetNow();
+    resetRecordedItems();
+    resetStores();
     engine
       .getHttpClient()
       .getApacheHttpClient()
       .getConnectionManager()
       .closeIdleConnections(0, TimeUnit.NANOSECONDS);
+  }
+
+
+  private void resetNow() {
+    TestTime.setNow(null);
+  }
+
+  private void resetRecordedItems() {
+    Map<Object, Object> context = engine.getContext();
+    context.remove(TesterImportObject.CONTEXT_KEY_INVOCATIONS);
+    context.remove(TesterImportObject.CONTEXT_KEY_RETURN_VALUES);
+  }
+
+  private void resetStores() {
+    JobStore jobStore = engine.getJobStore();
+    if (jobStore instanceof InMemoryJobStore) {
+      ((InMemoryJobStore)jobStore).reset();
+    }
+    engine.getScriptExecutionStore().reset();
+    engine.getScriptStore().reset();
+    engine.getEngineLogStore().reset();
   }
 
   /** Override this method if you want your engine to be
@@ -102,16 +128,6 @@ public class AbstractEngineTest {
 
   public void setNow(Instant now) {
     TestTime.setNow(now);
-  }
-
-  private void resetNow() {
-    TestTime.setNow(null);
-  }
-
-  private void resetRecordedItems() {
-    Map<Object, Object> context = engine.getContext();
-    context.remove(TesterImportObject.CONTEXT_KEY_INVOCATIONS);
-    context.remove(TesterImportObject.CONTEXT_KEY_RETURN_VALUES);
   }
 
   public ScriptVersion deployScript(String scriptText) {

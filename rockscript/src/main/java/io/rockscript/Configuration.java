@@ -215,7 +215,9 @@ public class Configuration {
 
     if (isExamples()) {
       addEngineListener(new ExamplesLoader());
-      addRequestHandler(new ExamplesHandler(engine));
+      // The ExamplesHandler must be addd before the FileHandler
+      List<RequestHandler> requestHandlers = getRequestHandlers();
+      requestHandlers.add(requestHandlers.size()-2, new ExamplesHandler(engine));
     }
 
     engine.engineLogStore = new EngineLogStore(engine);

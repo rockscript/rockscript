@@ -46,6 +46,11 @@ public class ServiceFunctionFailedEvent extends ExecutableEvent<ArgumentsExpress
     return true;
   }
 
+  @Override
+  public boolean isReplay() {
+    return true;
+  }
+
   public Instant getRetryTime() {
     return retryTime;
   }

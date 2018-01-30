@@ -40,11 +40,15 @@ public class EngineLogStore {
   public static final String LEVEL_ERROR = "ERROR";
 
   Engine engine;
-
-  List<EngineLog> logs = new ArrayList<>();
+  List<EngineLog> logs;
 
   public EngineLogStore(Engine engine) {
     this.engine = engine;
+    reset();
+  }
+
+  public void reset() {
+    logs = new ArrayList<>();
   }
 
   public void info(String message) {

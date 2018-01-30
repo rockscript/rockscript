@@ -81,9 +81,14 @@ public class HttpRequestRunnable implements Runnable {
       Instant retry = null;
       if (retryPolicy!=null) {
         failedAttemptsCount = failedAttemptsCount!=null ? failedAttemptsCount+1 : 1;
-        if (retryPolicy.size()>failedAttemptsCount) {
+        if (failedAttemptsCount<=retryPolicy.size()) {
           TemporalAmount timeBeforeRetry = retryPolicy.get(failedAttemptsCount-1);
           retry = Time.now().plus(timeBeforeRetry);
+        } else {
+          engine.getEngineLogStore()
+            .error("HTTP function failed ater "+failedAttemptsCount+" attempts: "+e.getMessage()+"\n"+request.toString(), e);
+
+          // TODO add some operator interface to find stuck instances and retry manually later
         }
       }
 

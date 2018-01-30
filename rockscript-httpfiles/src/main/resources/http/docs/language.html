@@ -41,7 +41,7 @@
 </head>
 <body>
 
-<a href="index/">
+<a href="/">
   <div class="titlebar">
     <div class="brand">RockScript.io<img alt="RockScript.io" src="img/hand-white.png"></div>
     <div class="title">RockScript Documentation</div>
@@ -58,6 +58,7 @@
   <a href="language">Language</a>
   <a href="script-versioning">Script versioning</a>
   <a href="license">License</a>
+  <a href="roadmap">Roadmap</a>
   <a href="help">Help</a>
   <a class="title" href="services">Services</a>
   <a class="sublink" href="service-http">HTTP service</a>
@@ -73,20 +74,19 @@
 
 <div class="content">
   <h1>Language</h1>
-  <p>RockScript is a subset of JavaScript (ECMAScript 5.1).  This page documents 
-which subset of JavaScript is supported. At the moment, only a very limited 
-subset is supported.  We are working hard to expand our coverage.  The reason 
-to use JavaScript is because most developers are familiar with the basic syntax 
-and it’s the perfect language to <a href="why-and-when#juggle-with-json">juggle with JSON</a>, 
-which most API’s use these days.</p>
+  <p>RockScript is a subset of JavaScript (ECMAScript 5.1).   The main goal of 
+RockScript is to support resilient, non-blocking script execution. We aim 
+to implement the most used constructs to enable the stitching of service 
+functions.</p>
 
-<p>If you wonder why RockScript doesn’t just use Node.js, <a href="#rockscript-vs-nodejs">see 
-at the bottom of this page</a>.</p>
+<p>This page documents which subset of JavaScript is supported. We leverage 
+JavaScript for developers to  reduce the learning curve and it’s the perfect 
+language to <a href="why-and-when#juggle-with-json">juggle with JSON</a>, which most API’s 
+use these days.  But we do not aim to cover the complete language syntax. If 
+you wonder why RockScript doesn’t just use Node.js, <a href="#rockscript-vs-nodejs">see at the bottom of this 
+page</a>.</p>
 
-<p>The main reason for us to choose JavaScript as the syntax is that it’s familiar 
-for most developers and has a low threshold to get started.  It’s also ideal for 
-the data transformations between service functions as most services nowadays are 
-based on JSON.</p>
+<p>See the <a href="roadmap">Roadmap</a> for what’s next.</p>
 
 <h2 id="system-variable">System variable</h2>
 <p>The <code class="highlighter-rouge">system</code> variable is made available to every script.  It provides a mechanism 
@@ -164,9 +164,20 @@ the list of statements are executed sequential.</p>
 <span class="p">}</span>
 </code></pre></div></div>
 
+<h2 id="loops">Loops</h2>
+
+<p>TODO (not implemented yet)</p>
+
+<h2 id="functions">Functions</h2>
+
+<p>At the moment we don’t support declaration of functions in the script.  We’re believe it’s best to leave 
+out functions so that each script remains the scope of 1 function.  But this is still a hypothesis that 
+we’re seeking validation on.  So <a href="https://github.com/rockscript/rockscript/issues/new?title=Function+declarations">your input</a> 
+is greatly appreciated.</p>
+
 <h2 id="expressions">Expressions</h2>
 
-<h4 id="literal-expressions">Literal expressions</h4>
+<h4 id="literals">Literals</h4>
 
 <p>Examples</p>
 <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s1">'some text'</span>
@@ -190,32 +201,31 @@ the list of statements are executed sequential.</p>
 </code></pre></div></div>
 <p>Note that for service function invocations, any number of args is allowed.</p>
 
-<h4 id="comparison-operator-expressions">Comparison operator expressions</h4>
+<h4 id="comparison-operators">Comparison operators</h4>
 
 <p>All of <a href="https://developer.mozilla.org/nl/docs/Web/JavaScript/Equality_comparisons_and_sameness">Equality comparisons and sameness</a> 
 is implemented</p>
 
 <blockquote>
-  <p>Limitation: object conversion functions like <code class="highlighter-rouge">toString </code> and <code class="highlighter-rouge">valueOf</code> are not invoked yet</p>
+  <p>Limitation: While all automatic type conversions are implemented, object conversion functions like <code class="highlighter-rouge">toString </code> and <code class="highlighter-rouge">valueOf</code> are not invoked yet.</p>
 </blockquote>
-
-<p>For now, only == and === are supported</p>
 
 <p>Examples</p>
 <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">text</span><span class="o">==</span><span class="s1">'some text'</span>
+<span class="s1">'25'</span> <span class="o">!=</span> <span class="nx">service</span><span class="p">.</span><span class="nx">getSomeNumber</span><span class="p">()</span>
 <span class="nx">text</span><span class="o">===</span><span class="s1">'some text'</span>
+<span class="mi">5</span> <span class="o">&lt;</span> <span class="nx">totalAmount</span>
+<span class="kc">true</span> <span class="o">&gt;</span> <span class="mi">0</span>
+<span class="nx">customer</span><span class="p">.</span><span class="nx">getAge</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mi">25</span>
+<span class="s1">'hello'</span> <span class="o">&gt;=</span> <span class="nx">company</span><span class="p">.</span><span class="nx">getName</span><span class="p">()</span>
 </code></pre></div></div>
 
-<blockquote>
-  <p>TODO: !=, &lt;, &gt;, &lt;=, &gt;=, !== etc</p>
-</blockquote>
-
-<h4 id="arithmic-operator-expressions">Arithmic operator expressions</h4>
+<h4 id="arithmic-operators">Arithmic operators</h4>
 
 <p>All the addition conversions are correctly applied like in Node.js</p>
 
 <blockquote>
-  <p>Limitation: invoking the object <code class="highlighter-rouge">toString</code> and <code class="highlighter-rouge">valueOf</code> methods.</p>
+  <p>Limitation: While all automatic type conversions are implemented, object conversion functions like <code class="highlighter-rouge">toString </code> and <code class="highlighter-rouge">valueOf</code> are not invoked yet.</p>
 </blockquote>
 
 <p>For now, only the addition <code class="highlighter-rouge">+</code> is supported:</p>
@@ -229,6 +239,12 @@ is implemented</p>
 <blockquote>
   <p>TODO: -, *, /, %. **, ++, –</p>
 </blockquote>
+
+<h4 id="logical-operators-and-parenthesis">Logical operators and parenthesis</h4>
+
+<p>Examples</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">!</span><span class="p">(</span><span class="kc">true</span> <span class="o">||</span> <span class="kc">false</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="kc">true</span>
+</code></pre></div></div>
 
 <h2 id="rockscript-vs-nodejs">RockScript vs Node.js</h2>
 

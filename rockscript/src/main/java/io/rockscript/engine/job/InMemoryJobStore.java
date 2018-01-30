@@ -31,15 +31,23 @@ public class InMemoryJobStore implements JobStore {
   private static final int MAX_HISTORY = 10;
 
   protected Engine engine;
-  protected Map<String, Job> jobs = new HashMap<>();
-  protected Set<Job> jobsSortedByExecutionTime = new TreeSet<>((o1, o2) -> (int) Duration.between(o2.getExecutionTime(), o1.getExecutionTime()).toMillis());
+  protected Map<String, Job> jobs;
+  protected Set<Job> jobsSortedByExecutionTime;
   /** latest MAX_HISTORY jobs that are executed ok */
-  protected List<Job> history = new ArrayList<>();
+  protected List<Job> history;
   /** jobs that are stuck */
-  protected List<Job> deadJobs = new ArrayList<>();
+  protected List<Job> deadJobs;
 
   public InMemoryJobStore(Engine engine) {
     this.engine = engine;
+    reset();
+  }
+
+  public void reset() {
+    this.jobs = new HashMap<>();
+    this.jobsSortedByExecutionTime = new TreeSet<>((o1, o2) -> (int) Duration.between(o2.getExecutionTime(), o1.getExecutionTime()).toMillis());
+    this.history = new ArrayList<>();
+    this.deadJobs = new ArrayList<>();
   }
 
   @Override
