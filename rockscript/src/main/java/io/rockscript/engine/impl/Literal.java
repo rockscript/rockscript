@@ -19,6 +19,15 @@ import java.util.List;
 
 public class Literal extends SingleExpression {
 
+  private static class Infinity {
+    private Infinity(){}
+    @Override
+    public String toString() {
+      return "infinity";
+    }
+  }
+  public static final Object INFINITY = new Infinity();
+
   private static class Undefined {
     private Undefined(){}
     @Override

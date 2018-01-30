@@ -29,7 +29,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class AdditionTest extends AbstractEngineTest {
+public class ArithmaticAddTest extends AbstractEngineTest {
 
   /*
   Test was generated from (and based on) node.js code:
@@ -102,11 +102,11 @@ public class AdditionTest extends AbstractEngineTest {
   }
 
   function valueToString(o) {
-    return ('string'===typeof o? '\''+o+'\'' : 'object'===typeof o || 'array'===typeof o ? JSON.stringify(o).replace('"', "'") :o );
+    return ('string'===typeof o? '\''+o+'\'' : 'object'===typeof o || 'array'===typeof o ? JSON.stringify(o).replace(new RegExp('"', 'g'), "'") :o );
   }
   */
   @Test
-  public void testLiteralAssignment() {
+  public void testArithmaticAdditions() {
     assertAdd(3d, "1+2");
     assertAdd("1y", "1+'y'");
     assertAdd(2d, "1+true");

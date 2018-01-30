@@ -4,20 +4,22 @@ import io.rockscript.util.Lists;
 
 import java.util.List;
 
-public class AdditiveExpression extends SingleExpression {
+public class ArithmaticExpression extends SingleExpression {
 
+  String operation;
   SingleExpression left;
   SingleExpression right;
 
-  public AdditiveExpression(Integer id, Location location, SingleExpression left, SingleExpression right) {
+  public ArithmaticExpression(Integer id, Location location, String operation, SingleExpression left, SingleExpression right) {
     super(id, location);
+    this.operation = operation;
     this.left = left;
     this.right = right;
   }
 
   @Override
   public Execution createExecution(Execution parent) {
-    return new AdditiveExpressionExecution(this, parent);
+    return new ArithmaticExpressionExecution(this, parent);
   }
 
   @Override
@@ -31,5 +33,9 @@ public class AdditiveExpression extends SingleExpression {
 
   public SingleExpression getRight() {
     return right;
+  }
+
+  public String getOperation() {
+    return operation;
   }
 }

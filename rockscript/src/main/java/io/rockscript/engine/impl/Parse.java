@@ -316,6 +316,9 @@ public class Parse {
     } else if (singleExpressionContext instanceof AdditiveExpressionContext) {
       return parseAdditiveExpression((AdditiveExpressionContext)singleExpressionContext);
 
+    } else if (singleExpressionContext instanceof MultiplicativeExpressionContext) {
+      return parseMultiplicativeExpression((MultiplicativeExpressionContext)singleExpressionContext);
+
     } else if (singleExpressionContext instanceof EqualityExpressionContext) {
       return parseEqualityExpression((EqualityExpressionContext)singleExpressionContext);
 
@@ -394,9 +397,17 @@ public class Parse {
   }
 
   private SingleExpression parseAdditiveExpression(AdditiveExpressionContext additiveExpressionContext) {
+    String operator = additiveExpressionContext.getChild(1).getText();
     SingleExpression left = parseSingleExpression(additiveExpressionContext.singleExpression(0));
     SingleExpression right = parseSingleExpression(additiveExpressionContext.singleExpression(1));
-    return new AdditiveExpression(createNextScriptElementId(), createLocation(additiveExpressionContext), left, right);
+    return new ArithmaticExpression(createNextScriptElementId(), createLocation(additiveExpressionContext), operator, left, right);
+  }
+
+  private SingleExpression parseMultiplicativeExpression(MultiplicativeExpressionContext multiplicativeExpressionContext) {
+    String operator = multiplicativeExpressionContext.getChild(1).getText();
+    SingleExpression left = parseSingleExpression(multiplicativeExpressionContext.singleExpression(0));
+    SingleExpression right = parseSingleExpression(multiplicativeExpressionContext.singleExpression(1));
+    return new ArithmaticExpression(createNextScriptElementId(), createLocation(multiplicativeExpressionContext), operator, left, right);
   }
 
   private SingleExpression parseEqualityExpression(EqualityExpressionContext singleExpressionContext) {
