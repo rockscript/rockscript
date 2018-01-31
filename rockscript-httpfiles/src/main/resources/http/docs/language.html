@@ -51,6 +51,7 @@
 <div class="toc">
   <a href="index">Introduction</a>
   <a href="why-and-when">Why and when</a>
+  <a href="how-does-it-work">How does it work</a>
   <a href="project-status">Project status</a>
   <a href="getting-started">Getting started</a>
   <a href="cli">Command line interface</a>
@@ -166,9 +167,30 @@ the list of statements are executed sequential.</p>
 
 <h2 id="loops">Loops</h2>
 
-<p>TODO (not implemented yet)</p>
+<p>For now, only 1 form of loop is supported.</p>
 
-<h2 id="functions">Functions</h2>
+<p>Example</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">a</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">total</span> <span class="o">=</span> <span class="nx">total</span> <span class="o">+</span> <span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>Limitation: Other forms of loops are not yet supported like <code class="highlighter-rouge">do while</code>, <code class="highlighter-rouge">while do</code>, <code class="highlighter-rouge">for (non-var-declaring-expression;...;...)</code>, <code class="highlighter-rouge">for (a in b)</code> and <code class="highlighter-rouge">for (var a in b)</code></p>
+</blockquote>
+
+<h2 id="default-functions-and-properties">Default functions and properties</h2>
+
+<p>Strings and arrays do not have any predefined functions and properties except for property <code class="highlighter-rouge">length</code>.</p>
+
+<p>Example</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+<span class="k">for</span> <span class="p">(</span><span class="kd">var</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="nx">a</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">total</span> <span class="o">=</span> <span class="nx">total</span> <span class="o">+</span> <span class="nx">a</span><span class="p">[</span><span class="nx">i</span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="declaring-functions">Declaring functions</h2>
 
 <p>At the moment we don’t support declaration of functions in the script.  We’re believe it’s best to leave 
 out functions so that each script remains the scope of 1 function.  But this is still a hypothesis that 
@@ -224,20 +246,21 @@ is implemented</p>
 
 <p>All the addition conversions are correctly applied like in Node.js</p>
 
-<blockquote>
-  <p>Limitation: While all automatic type conversions are implemented, object conversion functions like <code class="highlighter-rouge">toString </code> and <code class="highlighter-rouge">valueOf</code> are not invoked yet.</p>
-</blockquote>
-
-<p>For now, only the addition <code class="highlighter-rouge">+</code> is supported:</p>
+<p>Supported: <code class="highlighter-rouge">+</code>, <code class="highlighter-rouge">-</code>, <code class="highlighter-rouge">*</code>, <code class="highlighter-rouge">/</code>, <code class="highlighter-rouge">++</code>, <code class="highlighter-rouge">--</code></p>
 
 <p>Examples</p>
 <div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s1">'hello'</span> <span class="o">+</span> <span class="s1">' world'</span> 
 <span class="mi">5</span> <span class="o">+</span> <span class="s1">' EUR'</span>
 <span class="s1">'Formula '</span> <span class="o">+</span> <span class="kc">true</span>
+<span class="nx">count</span> <span class="o">*</span> <span class="mi">5</span>
+<span class="nx">i</span><span class="o">++</span>
 </code></pre></div></div>
 
 <blockquote>
-  <p>TODO: -, *, /, %. **, ++, –</p>
+  <p>Limitations: <code class="highlighter-rouge">%</code> and <code class="highlighter-rouge">**</code> are not yet supported.<br />
+And for the conversions, while all automatic type 
+conversions are implemented, object conversion functions like <code class="highlighter-rouge">toString </code> and <code class="highlighter-rouge">valueOf</code> are 
+not invoked yet.</p>
 </blockquote>
 
 <h4 id="logical-operators-and-parenthesis">Logical operators and parenthesis</h4>
