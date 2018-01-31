@@ -42,13 +42,14 @@ public class VariableDeclarationExecution extends Execution<VariableDeclaration>
     Variable variable = createVariable();
     Object value = variable.getValue();
     dispatch(new VariableCreatedEvent(this, value));
+    setResult(value);
     parent.childEnded(this);
   }
 
   private Variable createVariable() {
     VariableDeclaration element = getElement();
     String variableName = element.getVariableName();
-    Variable variable = parent.createVariable(variableName);
+    Variable variable = parent.getScriptExecution().createVariable(variableName);
     Object initialValue = getInitialValue();
     variable.setValue(initialValue);
     return variable;

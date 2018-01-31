@@ -169,7 +169,9 @@ public class Parse {
       List<SourceElementContext> sourceElementContexts = sourceElementsContext.sourceElement();
       for (SourceElementContext sourceElementContext: sourceElementContexts) {
         SourceElement sourceElement = parseSourceElement(sourceElementContext);
-        sourceElements.add(sourceElement);
+        if (sourceElement!=null) {
+          sourceElements.add(sourceElement);
+        }
       }
     }
     return sourceElements;
@@ -189,7 +191,9 @@ public class Parse {
       List<StatementContext> statementContexts = statementListContext.statement();
       for (StatementContext statementContext: statementContexts) {
         Statement statement = parseStatement(statementContext);
-        statements.add(statement);
+        if (statement!=null) {
+          statements.add(statement);
+        }
       }
     }
     return statements;
@@ -204,50 +208,79 @@ public class Parse {
 
     ExpressionStatementContext expressionStatementContext = statementContext.expressionStatement();
     if (expressionStatementContext!=null) {
-      ExpressionSequenceContext expressionSequenceContext = expressionStatementContext.expressionSequence();
-      List<SingleExpressionContext> singleExpressionContexts = expressionSequenceContext.singleExpression();
-
-      ExpressionStatement expressionStatement = new ExpressionStatement(createNextScriptElementId(), createLocation(statementContext));
-
-      List<SingleExpression> singleExpressions = parseSingleExpressionList(singleExpressionContexts);
-
-      expressionStatement.setSingleExpressions(singleExpressions);
-      return expressionStatement;
+      return parseExpressionStatement(expressionStatementContext);
     }
 
     IfStatementContext ifStatementContext = statementContext.ifStatement();
     if (ifStatementContext!=null) {
-      ExpressionSequenceContext conditionContext = ifStatementContext.expressionSequence();
-      SingleExpressionContext firstConditionExpressionContext = conditionContext.singleExpression().get(0);
-      SingleExpression conditionExpression = parseSingleExpression(firstConditionExpressionContext);
-      List<StatementContext> statements = ifStatementContext.statement();
-      Statement thenStatement = parseStatement(statements.get(0));
-      Statement elseStatement = null;
-      if (statements.size()>1) {
-        elseStatement = parseStatement(statements.get(1));
-      }
-      return new IfStatement(createNextScriptElementId(), createLocation(statementContext), conditionExpression, thenStatement, elseStatement);
+      return parseIfStatement(ifStatementContext);
     }
 
     BlockContext blockContext = statementContext.block();
     if (blockContext!=null) {
-      List<SourceElement> sourceElementList = (List) parseStatements(blockContext.statementList());
-      SourceElements sourceElements = new SourceElements(createNextScriptElementId(), createLocation(statementContext));
-      sourceElements.setSourceElements(sourceElementList);
-      Block block = new Block(createNextScriptElementId(), createLocation(statementContext));
-      block.setSourceElements(sourceElements);
-      return block;
+      return parseBlock(blockContext);
+    }
+
+    IterationStatementContext iterationStatementContext = statementContext.iterationStatement();
+    if (iterationStatementContext!=null) {
+      return parseIterationStatement(iterationStatementContext);
     }
 
     addErrorUnsupportedElement(statementContext, "statement");
     return null;
   }
 
-  private AssignmentExpression parseAssignment(ExpressionStatementContext expressionStatementContext) {
-    if (expressionStatementContext==null) {
-      return null;
+  private Statement parseIterationStatement(IterationStatementContext iterationStatementContext) {
+    if (iterationStatementContext instanceof ForVarStatementContext) {
+      return parseForVarStatement((ForVarStatementContext) iterationStatementContext);
     }
+    addErrorUnsupportedElement(iterationStatementContext, "iteration statement");
     return null;
+  }
+
+  private Statement parseForVarStatement(ForVarStatementContext forVarStatementContext) {
+    VariableDeclarationList variableDeclarations = parseVariableDeclarationList(forVarStatementContext.variableDeclarationList());
+    ExpressionSequenceContext whileConditionContexts = forVarStatementContext.expressionSequence(0);
+    ExpressionSequenceContext incrementContexts = forVarStatementContext.expressionSequence(1);
+    SingleExpressionList whileConditions = parseExpressionSequence(whileConditionContexts);
+    SingleExpressionList increments = parseExpressionSequence(incrementContexts);
+    Statement iterativeStatement = parseStatement(forVarStatementContext.statement());
+    return new ForStatement(createNextScriptElementId(), createLocation(forVarStatementContext), variableDeclarations, whileConditions, increments, iterativeStatement);
+  }
+
+  private SingleExpressionList parseExpressionSequence(ExpressionSequenceContext expressionSequenceContext) {
+    return new SingleExpressionList(createNextScriptElementId(), createLocation(expressionSequenceContext), parseSingleExpressionList(expressionSequenceContext.singleExpression()));
+  }
+
+  private Statement parseBlock(BlockContext blockContext) {
+    List<SourceElement> sourceElementList = (List) parseStatements(blockContext.statementList());
+    SourceElements sourceElements = new SourceElements(createNextScriptElementId(), createLocation(blockContext));
+    sourceElements.setSourceElements(sourceElementList);
+    Block block = new Block(createNextScriptElementId(), createLocation(blockContext));
+    block.setSourceElements(sourceElements);
+    return block;
+  }
+
+  private Statement parseIfStatement(IfStatementContext ifStatementContext) {
+    ExpressionSequenceContext conditionContext = ifStatementContext.expressionSequence();
+    SingleExpressionContext firstConditionExpressionContext = conditionContext.singleExpression().get(0);
+    SingleExpression conditionExpression = parseSingleExpression(firstConditionExpressionContext);
+    List<StatementContext> statements = ifStatementContext.statement();
+    Statement thenStatement = parseStatement(statements.get(0));
+    Statement elseStatement = null;
+    if (statements.size()>1) {
+      elseStatement = parseStatement(statements.get(1));
+    }
+    return new IfStatement(createNextScriptElementId(), createLocation(ifStatementContext), conditionExpression, thenStatement, elseStatement);
+  }
+
+  private Statement parseExpressionStatement(ExpressionStatementContext expressionStatementContext) {
+    ExpressionSequenceContext expressionSequenceContext = expressionStatementContext.expressionSequence();
+    List<SingleExpressionContext> singleExpressionContexts = expressionSequenceContext.singleExpression();
+    ExpressionStatement expressionStatement = new ExpressionStatement(createNextScriptElementId(), createLocation(expressionStatementContext));
+    List<SingleExpression> singleExpressions = parseSingleExpressionList(singleExpressionContexts);
+    expressionStatement.setSingleExpressions(singleExpressions);
+    return expressionStatement;
   }
 
   private SourceElement parseFunctionDeclaration(FunctionDeclarationContext functionDeclarationContext) {
@@ -255,14 +288,8 @@ public class Parse {
     return null;
   }
 
-  private Statement parseVariableDeclarationList(VariableDeclarationListContext variableDeclarationListContext) {
+  private VariableDeclarationList parseVariableDeclarationList(VariableDeclarationListContext variableDeclarationListContext) {
     List<VariableDeclarationContext> variableDeclarationContexts = variableDeclarationListContext.variableDeclaration();
-    if (variableDeclarationContexts.size()==1) {
-      // This is an optimisation to skip the list if there is exactly one variable declaration
-      VariableDeclarationContext variableDeclarationContext = variableDeclarationContexts.get(0);
-      VariableDeclaration variableDeclaration = parseVariableDeclaration(variableDeclarationContext);
-      return variableDeclaration;
-    }
     VariableDeclarationList variableDeclarationList = new VariableDeclarationList(createNextScriptElementId(), createLocation(variableDeclarationListContext));
     List<VariableDeclaration> variableDeclarations = new ArrayList<>();
     for (VariableDeclarationContext variableDeclarationContext: variableDeclarationContexts) {
@@ -336,11 +363,42 @@ public class Parse {
 
     } else if (singleExpressionContext instanceof ParenthesizedExpressionContext) {
       return parseParenthesizedExpression((ParenthesizedExpressionContext)singleExpressionContext);
-    }
 
+    } else if (singleExpressionContext instanceof PostIncrementExpressionContext) {
+      return parsePostIncrementExpression((PostIncrementExpressionContext)singleExpressionContext);
+
+    } else if (singleExpressionContext instanceof PostDecreaseExpressionContext) {
+      return parsePostDecreaseExpression((PostDecreaseExpressionContext)singleExpressionContext);
+
+    } else if (singleExpressionContext instanceof PreIncrementExpressionContext) {
+      return parsePreIncrementExpression((PreIncrementExpressionContext)singleExpressionContext);
+
+    } else if (singleExpressionContext instanceof PreDecreaseExpressionContext) {
+      return parsePreDecreaseExpression((PreDecreaseExpressionContext)singleExpressionContext);
+    }
 
     addErrorUnsupportedElement(singleExpressionContext, "singleExpression");
     return null;
+  }
+
+  private SingleExpression parsePostIncrementExpression(PostIncrementExpressionContext postIncrementExpressionContext) {
+    SingleExpression singleExpression = parseSingleExpression(postIncrementExpressionContext.singleExpression());
+    return new UnaryArithmaticExpression(createNextScriptElementId(), createLocation(postIncrementExpressionContext), singleExpression, UnaryArithmaticExpressionExecution.RESULT_CAPTURE_POST, UnaryArithmaticExpressionExecution.OPERATOR_PLUSPLUS);
+  }
+
+  private SingleExpression parsePreIncrementExpression(PreIncrementExpressionContext preIncrementExpressionContext) {
+    SingleExpression singleExpression = parseSingleExpression(preIncrementExpressionContext.singleExpression());
+    return new UnaryArithmaticExpression(createNextScriptElementId(), createLocation(preIncrementExpressionContext), singleExpression, UnaryArithmaticExpressionExecution.RESULT_CAPTURE_PRE, UnaryArithmaticExpressionExecution.OPERATOR_PLUSPLUS);
+  }
+
+  private SingleExpression parsePostDecreaseExpression(PostDecreaseExpressionContext postDecreaseExpressionContext) {
+    SingleExpression singleExpression = parseSingleExpression(postDecreaseExpressionContext.singleExpression());
+    return new UnaryArithmaticExpression(createNextScriptElementId(), createLocation(postDecreaseExpressionContext), singleExpression, UnaryArithmaticExpressionExecution.RESULT_CAPTURE_POST, UnaryArithmaticExpressionExecution.OPERATOR_MINUSMINUS);
+  }
+
+  private SingleExpression parsePreDecreaseExpression(PreDecreaseExpressionContext preDecreaseExpressionContext) {
+    SingleExpression singleExpression = parseSingleExpression(preDecreaseExpressionContext.singleExpression());
+    return new UnaryArithmaticExpression(createNextScriptElementId(), createLocation(preDecreaseExpressionContext), singleExpression, UnaryArithmaticExpressionExecution.RESULT_CAPTURE_PRE, UnaryArithmaticExpressionExecution.OPERATOR_MINUSMINUS);
   }
 
   private SingleExpression parseParenthesizedExpression(ParenthesizedExpressionContext singleExpressionContext) {

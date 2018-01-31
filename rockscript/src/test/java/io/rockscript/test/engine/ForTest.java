@@ -17,36 +17,28 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package io.rockscript.engine.impl;
+package io.rockscript.test.engine;
 
-public class AssignmentExpressionExecution extends Execution<AssignmentExpression> {
+import io.rockscript.api.model.ScriptExecution;
+import io.rockscript.api.model.ScriptVersion;
+import org.junit.Ignore;
+import org.junit.Test;
 
-  public AssignmentExpressionExecution(AssignmentExpression assignment, Execution parent) {
-    super(parent.createInternalExecutionId(), assignment, parent);
-  }
+import static org.junit.Assert.assertEquals;
 
-  @Override
-  public void start() {
-    startChild(element.getLeft());
-  }
+public class ForTest extends AbstractEngineTest {
 
-  public static boolean supportsOperator(String operator) {
-    return "=".equals(operator);
-  }
+ //  @Ignore // TODO
+  @Test
+  public void testForLoop() {
+    ScriptVersion scriptVersion = deployScript(
+      "var a = [1, 2, 3]; \n" +
+      "var total = 0; \n" +
+      "for (var i=0; i<a.length; i++) { \n" +
+      "  total = total + a[i]; \n" +
+      "}");
 
-  @Override
-  public void childEnded(Execution child) {
-    if (children.size()==1) {
-      startChild(element.getRight());
-    } else {
-      Assignable assignable = (Assignable) children.get(0);
-      Object value = children.get(1).getResult();
-
-      String operator = element.getOperator();
-      if ("=".equals(operator)) {
-        assignable.assign(value);
-      }
-      end();
-    }
+    ScriptExecution scriptExecution = startScriptExecution(scriptVersion);
+    assertEquals(6d, scriptExecution.getVariable("total"));
   }
 }

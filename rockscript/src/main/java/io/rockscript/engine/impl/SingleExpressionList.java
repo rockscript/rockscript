@@ -17,36 +17,35 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package io.rockscript.engine.impl;
 
-public class AssignmentExpressionExecution extends Execution<AssignmentExpression> {
+import java.util.List;
 
-  public AssignmentExpressionExecution(AssignmentExpression assignment, Execution parent) {
-    super(parent.createInternalExecutionId(), assignment, parent);
+public class SingleExpressionList extends Statement {
+
+  List<SingleExpression> expressions;
+
+  public SingleExpressionList(Integer index, Location location, List<SingleExpression> expressions) {
+    super(index, location);
+    this.expressions = expressions;
   }
 
   @Override
-  public void start() {
-    startChild(element.getLeft());
-  }
-
-  public static boolean supportsOperator(String operator) {
-    return "=".equals(operator);
+  public Execution createExecution(Execution parent) {
+    return new BlockExecution(this, parent);
   }
 
   @Override
-  public void childEnded(Execution child) {
-    if (children.size()==1) {
-      startChild(element.getRight());
-    } else {
-      Assignable assignable = (Assignable) children.get(0);
-      Object value = children.get(1).getResult();
+  protected List<? extends ScriptElement> getChildren() {
+    return expressions;
+  }
 
-      String operator = element.getOperator();
-      if ("=".equals(operator)) {
-        assignable.assign(value);
-      }
-      end();
-    }
+  public List<SingleExpression> getExpressions() {
+    return expressions;
+  }
+
+  public void setExpressions(List<SingleExpression> expressions) {
+    this.expressions = expressions;
   }
 }

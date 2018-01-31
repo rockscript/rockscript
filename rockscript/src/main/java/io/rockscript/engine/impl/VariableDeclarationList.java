@@ -28,7 +28,7 @@ public class VariableDeclarationList extends Statement {
 
   @Override
   public Execution createExecution(Execution parent) {
-    return new VariableDeclarationListExecution(this, parent);
+    return new BlockExecution(this, parent);
   }
 
   @Override

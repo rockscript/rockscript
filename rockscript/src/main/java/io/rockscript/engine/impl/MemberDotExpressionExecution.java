@@ -63,16 +63,19 @@ public class MemberDotExpressionExecution extends Execution<MemberDotExpression>
       int indexInt = ((Number) identifier).intValue();
       ensureArrayLength(list, indexInt);
       return list.get(indexInt);
+    } else if ("length".equals(identifier)) {
+      if (target instanceof List) {
+        return ((List)target).size();
+      } else if (target instanceof String){
+        return ((String)target).length();
+      }
     } else if (identifier instanceof String) {
       Field field = Reflection.findFieldInObject(target, (String) identifier);
       if (field!=null) {
         return Reflection.getFieldValue(field, target);
-      } else {
-        throw new RuntimeException("Can't dereference '"+identifier+"': target=" + target);
       }
     }
-    log.debug("Can't dereference "+target+"."+identifier+", returning null");
-    return null;
+    throw new RuntimeException("Can't dereference '"+identifier+"': target=" + target);
   }
 
   @Override
